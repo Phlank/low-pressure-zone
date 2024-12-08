@@ -6,6 +6,9 @@ $font-color: #eee;
 $font-color-darker: #ccc;
 $font-color-brighter: #fff;
 
+$control-color: #eee;
+$control-color-hover: darken($control-color, 20%);
+
 $panel-background: $theme-color-darker;
 
 $space-s: 5px;

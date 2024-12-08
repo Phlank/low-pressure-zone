@@ -1,8 +1,8 @@
 <template>
-  <ContentPanel class="header panel">
-    <div class="header_left">The Wayward Inn presents</div>
-    <div class="header_center">Low Pressure Zone</div>
-    <div class="header_right">Link to other sources</div>
+  <ContentPanel class="header">
+    <div class="left">The Wayward Inn presents</div>
+    <div class="center">Low Pressure Zone</div>
+    <div class="right">Online bass radio</div>
   </ContentPanel>
 </template>
 
@@ -17,19 +17,25 @@ import ContentPanel from './ContentPanel.vue'
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
 
-  &_left {
-    margin-right: auto;
-    color: $font-color-darker;
-  }
+.left {
+  margin-right: auto;
+  color: $font-color-darker;
+  width: 33.3vw;
+}
 
-  &_center {
-    color: $font-color-brighter;
-    font-size: larger;
-  }
+.center {
+  color: $font-color-brighter;
+  font-size: larger;
+  width: 33.4vw;
+  text-align: center;
+}
 
-  &_right {
-    margin-left: auto;
-  }
+.right {
+  margin-left: auto;
+  color: $font-color-darker;
+  width: 33.3vw;
+  text-align: right;
 }
 </style>

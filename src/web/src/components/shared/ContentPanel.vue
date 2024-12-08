@@ -9,7 +9,7 @@
 <style lang="scss" scoped>
 @import './../../assets/variables.scss';
 .panel {
-  padding: $space-l;
+  padding: $space-m;
   background-color: rgba($theme-color-darker, 0.6);
 }
 </style>
