@@ -1,0 +1,31 @@
+// Color
+$theme-color: rgb(45, 69, 94);
+$theme-color-darker: color.scale($theme-color, -10%);
+$theme-color-brighter: color.scale($theme-color, 20%);
+
+$font-color-white: #eee;
+$font-color-white-darker: #ccc;
+$font-color-white-brighter: #fff;
+
+$font-color-black: #222;
+$font-color-black-darker: #000;
+$font-color-black-brighter: #333;
+
+$control-color: #eee;
+$control-color-hover: color.scale($control-color, -20%);
+$control-color-pressed: color.scale($control-color, -40%);
+
+// Spacing
+$space-s: 5px;
+$space-m: 10px;
+$space-l: 20px;
+
+$mobile-width: 760px;
+
+// Images
+$bg-1: url('./bg1.jpg');
+$bg-2: url('./bg2.avif');
+
+// Font and styling
+$font-family-body: 'Helvetica Neue', sans-serif;
+$font-family-header: 'Nunito Sans', 'Helvetica Neue', sans-serif;
