@@ -11,8 +11,8 @@ import ContentPanel from '@/components/shared/ContentPanel.vue'
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/main.scss';
-@import '@/assets/variables.scss';
+@use './../../assets/main.scss';
+@use './../../assets/variables.scss';
 
 .site-header {
   display: flex;
@@ -22,12 +22,12 @@ import ContentPanel from '@/components/shared/ContentPanel.vue'
 
 .left {
   margin-right: auto;
-  color: $font-color-white-darker;
+  color: variables.$font-color-white-darker;
   width: 33.3vw;
 }
 
 .center {
-  color: $font-color-white-brighter;
+  color: variables.$font-color-white-brighter;
   font-size: larger;
   width: 33.4vw;
   text-align: center;
@@ -35,7 +35,7 @@ import ContentPanel from '@/components/shared/ContentPanel.vue'
 
 .right {
   margin-left: auto;
-  color: $font-color-white-darker;
+  color: variables.$font-color-white-darker;
   width: 33.3vw;
   text-align: right;
 }

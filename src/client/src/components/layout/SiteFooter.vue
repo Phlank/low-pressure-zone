@@ -40,7 +40,7 @@ const controlIcon = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-@import './../../assets/variables.scss';
+@use './../../assets/variables.scss';
 
 $footer-height: 48px;
 
@@ -57,20 +57,20 @@ $footer-height: 48px;
 
   &__controls {
     display: inline-block;
-    color: $font-color-white-darker;
+    color: variables.$font-color-white-darker;
 
     .material-symbols-outlined {
       font-size: $footer-height;
-      color: $control-color;
+      color: variables.$control-color;
     }
     :hover {
       cursor: pointer;
-      color: $control-color-hover;
+      color: variables.$control-color-hover;
     }
   }
 
   &__stream-metadata {
-    padding-left: $space-m;
+    padding-left: variables.$space-m;
     font-size: larger;
     display: flex;
     margin: auto 0 auto 0;
@@ -83,8 +83,8 @@ $footer-height: 48px;
 
   &__image-metadata {
     font-size: larger;
-    color: $font-color-white-darker;
-    padding-left: $space-m;
+    color: variables.$font-color-white-darker;
+    padding-left: variables.$space-m;
   }
 }
 </style>

@@ -1,7 +1,6 @@
-import pluginVue, { rules } from 'eslint-plugin-vue'
+import pluginVue from 'eslint-plugin-vue'
 import vueTsEslintConfig from '@vue/eslint-config-typescript'
 import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
-import { NONAME } from 'dns/promises'
 
 export default [
   {
@@ -9,7 +8,8 @@ export default [
     files: ['**/*.{ts,mts,tsx,vue}'],
     rules: {
       '@typescript-eslint/array-type': 'error',
-      '@typescript-eslint/no-unused-vars': 'warn'
+      '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/no-explicit-any': 'off'
     }
   },
   {

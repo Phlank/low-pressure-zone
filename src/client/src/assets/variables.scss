@@ -1,7 +1,9 @@
+@use 'sass:color';
+
 // Color
 $theme-color: rgb(45, 69, 94);
-$theme-color-darker: color.scale($theme-color, -10%);
-$theme-color-brighter: color.scale($theme-color, 20%);
+$theme-color-darker: color.scale($theme-color, $lightness: -10%);
+$theme-color-brighter: color.scale($theme-color, $lightness: 20%);
 
 $font-color-white: #eee;
 $font-color-white-darker: #ccc;
@@ -12,8 +14,8 @@ $font-color-black-darker: #000;
 $font-color-black-brighter: #333;
 
 $control-color: #eee;
-$control-color-hover: color.scale($control-color, -20%);
-$control-color-pressed: color.scale($control-color, -40%);
+$control-color-hover: color.scale($control-color, $lightness: -20%);
+$control-color-pressed: color.scale($control-color, $lightness: -40%);
 
 // Spacing
 $space-s: 5px;

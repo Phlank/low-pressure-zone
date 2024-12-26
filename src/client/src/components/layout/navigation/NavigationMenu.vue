@@ -31,7 +31,7 @@ const getActiveClass = (navigationItem: NavigationItem) => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/variables.scss';
+@use './../../../assets/variables.scss';
 
 .navigation {
   display: flex;
@@ -39,13 +39,13 @@ const getActiveClass = (navigationItem: NavigationItem) => {
 }
 
 .navigation-item {
-  padding: $space-l;
+  padding: variables.$space-l;
   font-size: large;
-  color: $font-color-white-darker;
+  color: variables.$font-color-white-darker;
 
   &--active {
     a {
-      color: $font-color-black-darker;
+      color: variables.$font-color-black-darker;
       text-shadow: none;
       text-decoration: underline;
     }
@@ -53,7 +53,7 @@ const getActiveClass = (navigationItem: NavigationItem) => {
 
   &--inactive {
     a {
-      color: $font-color-black-brighter;
+      color: variables.$font-color-black-brighter;
       text-decoration: none;
     }
   }

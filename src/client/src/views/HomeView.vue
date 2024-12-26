@@ -30,8 +30,8 @@ const isMobile = inject('isMobile')
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/variables.scss';
+@use '@/assets/variables.scss';
 td {
-  padding: $space-s $space-m;
+  padding: variables.$space-s variables.$space-m;
 }
 </style>
