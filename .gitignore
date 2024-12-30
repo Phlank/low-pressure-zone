@@ -30,6 +30,7 @@ coverage
 *.tsbuildinfo
 
 # .NET
-
-bin/*
+.vs/
+bin/
+obj/
 appSettings.*.json

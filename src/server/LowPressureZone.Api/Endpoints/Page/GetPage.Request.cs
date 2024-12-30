@@ -4,6 +4,6 @@ public partial class GetPage
 {
     public class Request
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
     }
 }

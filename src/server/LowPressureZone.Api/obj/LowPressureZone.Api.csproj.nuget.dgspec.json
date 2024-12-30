@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Phlank\\source\\repos\\low-pressure-zone\\src\\server\\LowPressureZone\\LowPressureZone.Api\\LowPressureZone.Api.csproj": {}
+    "C:\\Users\\Phlank\\source\\repos\\low-pressure-zone\\src\\server\\LowPressureZone.Api\\LowPressureZone.Api.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Phlank\\source\\repos\\low-pressure-zone\\src\\server\\LowPressureZone\\LowPressureZone.Api\\LowPressureZone.Api.csproj": {
+    "C:\\Users\\Phlank\\source\\repos\\low-pressure-zone\\src\\server\\LowPressureZone.Api\\LowPressureZone.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Phlank\\source\\repos\\low-pressure-zone\\src\\server\\LowPressureZone\\LowPressureZone.Api\\LowPressureZone.Api.csproj",
+        "projectUniqueName": "C:\\Users\\Phlank\\source\\repos\\low-pressure-zone\\src\\server\\LowPressureZone.Api\\LowPressureZone.Api.csproj",
         "projectName": "LowPressureZone.Api",
-        "projectPath": "C:\\Users\\Phlank\\source\\repos\\low-pressure-zone\\src\\server\\LowPressureZone\\LowPressureZone.Api\\LowPressureZone.Api.csproj",
+        "projectPath": "C:\\Users\\Phlank\\source\\repos\\low-pressure-zone\\src\\server\\LowPressureZone.Api\\LowPressureZone.Api.csproj",
         "packagesPath": "C:\\Users\\Phlank\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Phlank\\source\\repos\\low-pressure-zone\\src\\server\\LowPressureZone\\LowPressureZone.Api\\obj\\",
+        "outputPath": "C:\\Users\\Phlank\\source\\repos\\low-pressure-zone\\src\\server\\LowPressureZone.Api\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -53,6 +53,10 @@
             "FastEndpoints": {
               "target": "Package",
               "version": "[5.32.0, )"
+            },
+            "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
+              "target": "Package",
+              "version": "[1.21.0, )"
             }
           },
           "imports": [

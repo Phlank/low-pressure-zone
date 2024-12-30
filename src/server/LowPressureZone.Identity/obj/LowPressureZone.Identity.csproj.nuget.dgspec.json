@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Phlank\\source\\repos\\low-pressure-zone\\src\\server\\LowPressureZone\\LowPressureZone.Identity\\LowPressureZone.Identity.csproj": {}
+    "C:\\Users\\Phlank\\source\\repos\\low-pressure-zone\\src\\server\\LowPressureZone.Identity\\LowPressureZone.Identity.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Phlank\\source\\repos\\low-pressure-zone\\src\\server\\LowPressureZone\\LowPressureZone.Identity\\LowPressureZone.Identity.csproj": {
+    "C:\\Users\\Phlank\\source\\repos\\low-pressure-zone\\src\\server\\LowPressureZone.Identity\\LowPressureZone.Identity.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Phlank\\source\\repos\\low-pressure-zone\\src\\server\\LowPressureZone\\LowPressureZone.Identity\\LowPressureZone.Identity.csproj",
+        "projectUniqueName": "C:\\Users\\Phlank\\source\\repos\\low-pressure-zone\\src\\server\\LowPressureZone.Identity\\LowPressureZone.Identity.csproj",
         "projectName": "LowPressureZone.Identity",
-        "projectPath": "C:\\Users\\Phlank\\source\\repos\\low-pressure-zone\\src\\server\\LowPressureZone\\LowPressureZone.Identity\\LowPressureZone.Identity.csproj",
+        "projectPath": "C:\\Users\\Phlank\\source\\repos\\low-pressure-zone\\src\\server\\LowPressureZone.Identity\\LowPressureZone.Identity.csproj",
         "packagesPath": "C:\\Users\\Phlank\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Phlank\\source\\repos\\low-pressure-zone\\src\\server\\LowPressureZone\\LowPressureZone.Identity\\obj\\",
+        "outputPath": "C:\\Users\\Phlank\\source\\repos\\low-pressure-zone\\src\\server\\LowPressureZone.Identity\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -57,6 +57,10 @@
             "Microsoft.Extensions.DependencyInjection.Abstractions": {
               "target": "Package",
               "version": "[9.0.0, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[9.0.2, )"
             }
           },
           "imports": [

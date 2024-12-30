@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace LowPressureZone.Identity.Extensions
+namespace LowPressureZone.Identity.Extensions;
+
+public static class IdentityServiceCollectionExtensions
 {
-    public static class IdentityServiceCollectionExtensions
+    public static void AddIdentityServices(this IServiceCollection services)
     {
-        public static void AddIdentityServices(this IServiceCollection services)
-        {
-
-        } 
+        
     }
 }

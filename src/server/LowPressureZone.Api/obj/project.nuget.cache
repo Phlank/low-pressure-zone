@@ -1,13 +1,14 @@
 {
   "version": 2,
-  "dgSpecHash": "Tv9tBbAAZB8=",
+  "dgSpecHash": "oPNGLSmvDzU=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Phlank\\source\\repos\\low-pressure-zone\\src\\server\\LowPressureZone\\LowPressureZone.Api\\LowPressureZone.Api.csproj",
+  "projectFilePath": "C:\\Users\\Phlank\\source\\repos\\low-pressure-zone\\src\\server\\LowPressureZone.Api\\LowPressureZone.Api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Phlank\\.nuget\\packages\\fastendpoints\\5.32.0\\fastendpoints.5.32.0.nupkg.sha512",
     "C:\\Users\\Phlank\\.nuget\\packages\\fastendpoints.attributes\\5.32.0\\fastendpoints.attributes.5.32.0.nupkg.sha512",
     "C:\\Users\\Phlank\\.nuget\\packages\\fastendpoints.messaging.core\\5.32.0\\fastendpoints.messaging.core.5.32.0.nupkg.sha512",
-    "C:\\Users\\Phlank\\.nuget\\packages\\fluentvalidation\\11.11.0\\fluentvalidation.11.11.0.nupkg.sha512"
+    "C:\\Users\\Phlank\\.nuget\\packages\\fluentvalidation\\11.11.0\\fluentvalidation.11.11.0.nupkg.sha512",
+    "C:\\Users\\Phlank\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.21.0\\microsoft.visualstudio.azure.containers.tools.targets.1.21.0.nupkg.sha512"
   ],
   "logs": []
 }

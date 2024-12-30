@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LowPressureZone.Identity")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7ea0935bf7821c710ba4760ced268f9d26ca9faa")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9bc14726dd296f5d8f899821e03f06bc67124d44")]
 [assembly: System.Reflection.AssemblyProductAttribute("LowPressureZone.Identity")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LowPressureZone.Identity")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
