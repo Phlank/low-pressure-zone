@@ -1,6 +1,9 @@
-﻿namespace LowPressureZone.Api.Endpoints.User;
+﻿using FastEndpoints;
+using static LowPressureZone.Api.Endpoints.User.CreateUser;
 
-public partial class CreateUser
+namespace LowPressureZone.Api.Endpoints.User;
+
+public partial class CreateUser : Endpoint<Request>
 {
     public class Request
     {

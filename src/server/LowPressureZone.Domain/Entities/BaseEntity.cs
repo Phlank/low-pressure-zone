@@ -2,6 +2,6 @@
 
 public class BaseEntity
 {
-    public int Id { get; set; }
-    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+    public Guid Id { get; init; } = Guid.NewGuid();
+    public DateTime CreatedDate { get; init; } = DateTime.UtcNow;
 }

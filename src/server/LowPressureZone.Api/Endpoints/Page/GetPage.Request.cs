@@ -1,6 +1,9 @@
-﻿namespace LowPressureZone.Api.Endpoints.Page;
+﻿using FastEndpoints;
+using static LowPressureZone.Api.Endpoints.Page.GetPage;
 
-public partial class GetPage
+namespace LowPressureZone.Api.Endpoints.Page;
+
+public partial class GetPage : Endpoint<Request>
 {
     public class Request
     {
