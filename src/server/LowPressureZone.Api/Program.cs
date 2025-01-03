@@ -8,9 +8,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddFastEndpoints()
                 .SwaggerDocument();
 
-var databaseProvider = builder.Configuration.GetSection("Database")
-                                            .GetValue<string>("Provider");
-
 builder.Services.AddDbContext<IdentityContext>(options =>
 {
     options.UseSqlite(sqliteOptions =>

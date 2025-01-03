@@ -7,6 +7,6 @@ public partial class GetPage : Endpoint<Request>
 {
     public class Request
     {
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
     }
 }
