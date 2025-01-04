@@ -1,9 +1,8 @@
 ﻿using FastEndpoints;
-using static LowPressureZone.Api.Endpoints.User.CreateUser;
 
 namespace LowPressureZone.Api.Endpoints.User;
 
-public partial class CreateUser : Endpoint<Request>
+public sealed class CreateUser : Endpoint<CreateUserRequest>
 {
     public override void Configure()
     {
@@ -11,7 +10,7 @@ public partial class CreateUser : Endpoint<Request>
         AllowAnonymous();
     }
 
-    public override Task HandleAsync(Request req, CancellationToken ct)
+    public override Task HandleAsync(CreateUserRequest req, CancellationToken ct)
     {
         return Task.CompletedTask;
     }

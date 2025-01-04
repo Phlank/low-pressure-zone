@@ -3,13 +3,10 @@ using static LowPressureZone.Api.Endpoints.User.CreateUser;
 
 namespace LowPressureZone.Api.Endpoints.User;
 
-public partial class CreateUser : Endpoint<Request>
+public sealed class CreateUserRequest
 {
-    public class Request
-    {
-        public string Name { get; set; } = string.Empty;
-        public string Username { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-    }
+    public string Name { get; set; } = string.Empty;
+    public string Username { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
 }

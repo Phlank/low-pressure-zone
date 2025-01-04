@@ -1,30 +1,16 @@
 using FastEndpoints;
 using FastEndpoints.Swagger;
-using LowPressureZone.Domain;
-using LowPressureZone.Identity;
-using Microsoft.EntityFrameworkCore;
+using LowPressureZone.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddJsonFile("appsettings.json")
+                     .AddJsonFile("appsettings.Development.json", optional: true)
+                     .AddJsonFile("appsettings.Production.json", optional: true);
+
 builder.Services.AddFastEndpoints()
                 .SwaggerDocument();
 
-builder.Services.AddDbContext<IdentityContext>(options =>
-{
-    options.UseSqlite(sqliteOptions =>
-    {
-        sqliteOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-        sqliteOptions.MigrationsAssembly("LowPressureZone.Identity");
-    });
-});
-
-builder.Services.AddDbContext<DatabaseContext>(options =>
-{
-    options.UseSqlite(sqliteOptions =>
-    {
-        sqliteOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-        sqliteOptions.MigrationsAssembly("LowPressureZone.Domain");
-    });
-});
+builder.AddDatabases();
 
 var app = builder.Build();
 

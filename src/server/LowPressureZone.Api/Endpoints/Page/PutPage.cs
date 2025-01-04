@@ -1,10 +1,9 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Identity.Constants;
-using static LowPressureZone.Api.Endpoints.Page.PutPage;
 
 namespace LowPressureZone.Api.Endpoints.Page;
 
-public partial class PutPage : Endpoint<Request>
+public sealed class PutPage : Endpoint<PutPageRequest>
 {
     public override void Configure()
     {
@@ -12,7 +11,7 @@ public partial class PutPage : Endpoint<Request>
         Roles(RoleNames.ADMIN);
     }
 
-    public override Task HandleAsync(Request req, CancellationToken ct)
+    public override Task HandleAsync(PutPageRequest req, CancellationToken ct)
     {
         return Task.CompletedTask;
     }

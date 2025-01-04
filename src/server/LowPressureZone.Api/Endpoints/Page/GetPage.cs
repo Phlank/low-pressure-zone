@@ -1,9 +1,8 @@
 ﻿using FastEndpoints;
-using static LowPressureZone.Api.Endpoints.Page.GetPage;
 
 namespace LowPressureZone.Api.Endpoints.Page;
 
-public partial class GetPage : Endpoint<Request>
+public sealed class GetPage : Endpoint<GetPageRequest>
 {
     public override void Configure()
     {
@@ -11,7 +10,7 @@ public partial class GetPage : Endpoint<Request>
         AllowAnonymous();
     }
 
-    public override Task HandleAsync(Request req, CancellationToken ct)
+    public override Task HandleAsync(GetPageRequest req, CancellationToken ct)
     {
         return base.HandleAsync(req, ct);
     }

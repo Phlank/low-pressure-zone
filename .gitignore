@@ -34,3 +34,7 @@ coverage
 bin/
 obj/
 appSettings.*.json
+
+# SQLite
+
+*.db
