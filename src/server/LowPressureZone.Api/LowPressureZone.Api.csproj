@@ -8,6 +8,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<None Remove="lpz-data.db" />
+		<None Remove="lpz-identity.db" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="FastEndpoints" Version="5.33.0" />
 		<PackageReference Include="FastEndpoints.Swagger" Version="5.33.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />

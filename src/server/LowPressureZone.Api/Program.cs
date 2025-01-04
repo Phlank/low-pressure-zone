@@ -1,6 +1,11 @@
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using LowPressureZone.Api.Extensions;
+using LowPressureZone.Domain;
+using LowPressureZone.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.json")
@@ -11,10 +16,13 @@ builder.Services.AddFastEndpoints()
                 .SwaggerDocument();
 
 builder.AddDatabases();
+builder.Services.AddIdentity<IdentityUser, IdentityRole>();
 
 var app = builder.Build();
 
-app.UseFastEndpoints((config) =>
+app.RunDatabaseMigrations();
+
+app.UseFastEndpoints(config =>
 {
     config.Errors.UseProblemDetails();
 }).UseSwaggerGen();
