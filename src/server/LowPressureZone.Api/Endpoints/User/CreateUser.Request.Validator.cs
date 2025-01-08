@@ -1,7 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using FastEndpoints;
 using FluentValidation;
-using static LowPressureZone.Api.Endpoints.User.CreateUser;
 
 namespace LowPressureZone.Api.Endpoints.User;
 
