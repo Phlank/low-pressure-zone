@@ -1,17 +1,11 @@
 @use 'sass:color';
 
-// Color
-$theme-color: rgb(45, 69, 94);
-$theme-color-darker: color.scale($theme-color, $lightness: -10%);
-$theme-color-brighter: color.scale($theme-color, $lightness: 20%);
+// Art
+$bg-light: url(./bg3-invert.jpg);
+$bg-dark: url(./bg3.jpg);
 
-$font-color-white: #eee;
-$font-color-white-darker: #ccc;
-$font-color-white-brighter: #fff;
-
-$font-color-black: #222;
-$font-color-black-darker: #000;
-$font-color-black-brighter: #333;
+// Font
+$font-size-title: 1.3rem;
 
 $control-color: #eee;
 $control-color-hover: color.scale($control-color, $lightness: -20%);
@@ -23,10 +17,6 @@ $space-m: 10px;
 $space-l: 20px;
 
 $mobile-width: 760px;
-
-// Images
-$bg-1: url('./bg1.jpg');
-$bg-2: url('./bg2.avif');
 
 // Font and styling
 $font-family-body: 'Helvetica Neue', sans-serif;

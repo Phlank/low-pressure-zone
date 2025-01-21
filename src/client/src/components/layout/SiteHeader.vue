@@ -1,42 +1,42 @@
 <template>
-  <ContentPanel class="site-header">
-    <div class="left">The Wayward Inn presents</div>
-    <div class="center header">Low Pressure Zone</div>
-    <div class="right">Online bass radio</div>
-  </ContentPanel>
+  <Toolbar class="header">
+    <template #start>Low Pressure Zone</template>
+    <template #end>
+      <DarkModeToggle></DarkModeToggle>
+      <div v-if="isMobile">
+        <Button icon="pi pi-bars" size="large" outlined></Button>
+      </div>
+      <div v-else>
+        <Button label="Schedules" outlined />
+        <Button label="Chat" outlined />
+      </div>
+    </template>
+  </Toolbar>
 </template>
 
 <script lang="ts" setup>
-import ContentPanel from '@/components/shared/ContentPanel.vue'
+import DarkModeToggle from '../controls/DarkModeToggle.vue'
+import { Button, Toolbar } from 'primevue'
+import { inject } from 'vue'
+
+const isMobile = inject<boolean>('isMobile')
 </script>
 
 <style lang="scss" scoped>
 @use './../../assets/main.scss';
 @use './../../assets/variables.scss';
 
-.site-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.header {
+  font-size: 1.2rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-style: none;
+  background-color: inherit;
+  // background-color: #121212;
 }
 
-.left {
-  margin-right: auto;
-  color: variables.$font-color-white-darker;
-  width: 33.3vw;
-}
-
-.center {
-  color: variables.$font-color-white-brighter;
-  font-size: larger;
-  width: 33.4vw;
-  text-align: center;
-}
-
-.right {
-  margin-left: auto;
-  color: variables.$font-color-white-darker;
-  width: 33.3vw;
-  text-align: right;
+.p-button {
+  margin: 0 variables.$space-s;
 }
 </style>

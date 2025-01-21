@@ -1,17 +1,25 @@
 <template>
-  <div class="content-layout">
-    <NavigationMenu />
-    <div></div>
-    <ContentPanel class="router-panel">
-      <RouterView />
-    </ContentPanel>
+  <div v-if="isMobile" class="content-layout-mobile">
+    <RouterView />
+  </div>
+  <div v-else class="content-layout">
+    <RouterView class="content-layout__view" />
+    <iframe
+      src="https://discord.com/widget?id=722643085137412096&theme=dark"
+      width="350"
+      allowtransparency="true"
+      frameborder="0"
+      sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
+      class="content-layout__chat"
+    ></iframe>
   </div>
 </template>
 
 <script lang="ts" setup>
-import ContentPanel from '../shared/ContentPanel.vue'
-import NavigationMenu from './navigation/NavigationMenu.vue'
+import { inject } from 'vue'
 import { RouterView } from 'vue-router'
+
+const isMobile = inject<boolean>('isMobile')
 </script>
 
 <style lang="scss" scoped>
@@ -19,23 +27,22 @@ import { RouterView } from 'vue-router'
 
 .content-layout {
   display: flex;
-  flex-direction: column;
-}
+  justify-content: space-between;
+  margin: 0 variables.$space-s;
+  max-height: calc(100vh - 64px);
+  overflow-y: scroll;
 
-$panel-max-width: calc(100vw - 2 * variables.$space-l);
-$panel-min-width: 360px;
-$panel-width-mobile: 100%;
-
-.router-panel {
-  max-width: $panel-max-width;
-  min-width: $panel-min-width;
-  margin: 0 auto 0 auto;
-}
-
-@media screen and (max-width: variables.$mobile-width) {
-  .router-panel {
-    min-width: $panel-width-mobile;
-    width: $panel-width-mobile;
+  &__view {
+    min-width: 30%;
+    max-width: 40%;
   }
+
+  &__chat {
+    border-radius: variables.$space-s;
+  }
+}
+
+.content-layout-mobile {
+  margin: 0 variables.$space-m;
 }
 </style>

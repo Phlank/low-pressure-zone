@@ -16,7 +16,6 @@
 		<PackageReference Include="FastEndpoints" Version="5.33.0" />
 		<PackageReference Include="FastEndpoints.Security" Version="5.33.0" />
 		<PackageReference Include="FastEndpoints.Swagger" Version="5.33.0" />
-		<PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.4" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />

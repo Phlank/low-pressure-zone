@@ -1,22 +1,18 @@
 @use 'variables.scss';
 
 @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
+@import 'primeicons/primeicons.css';
 
 body {
   margin: 0;
-  height: 100vh;
-  width: 100vw;
-  font-family: 'Helvetica Neue', sans-serif;
-  font-size: 16px;
-  color: variables.$font-color-white;
   overflow: hidden;
+  background-image: variables.$bg-dark;
+  // margin: variables.$space-m;
+  font-family: 'Helvetica Neue', sans-serif;
+  // overflow: hidden;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-image: variables.$bg-2;
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
 }
 
 .header {

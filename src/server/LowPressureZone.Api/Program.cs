@@ -11,26 +11,25 @@ builder.Configuration.AddJsonFile("appsettings.json")
                      .AddJsonFile("appsettings.Production.json", optional: true);
 
 builder.AddDatabases();
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-                .AddEntityFrameworkStores<IdentityContext>();
-
-var signingKey = builder.Configuration.GetValue<string>("JwtSigningKey");
-builder.Services.AddAuthenticationJwtBearer(options =>
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
-    options.SigningKey = signingKey;
-});
+    options.SignIn.RequireConfirmedEmail = true;
+    options.User.RequireUniqueEmail = true;
+})
+.AddEntityFrameworkStores<IdentityContext>();
+
+builder.Services.AddAuthenticationJwtBearer(s => s.SigningKey = builder.Configuration.GetValue<string>("JwtSigningKey"));
 builder.Services.AddAuthorization();
 builder.Services.AddFastEndpoints();
 builder.Services.SwaggerDocument();
 
+
 var app = builder.Build();
-app.RunDatabaseMigrations();
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.UseFastEndpoints(config =>
 {
-    config.Endpoints.RoutePrefix = "/api";
+    config.Endpoints.RoutePrefix = "api";
     config.Errors.UseProblemDetails();
 }).UseSwaggerGen();
 

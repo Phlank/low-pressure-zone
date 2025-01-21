@@ -1,25 +1,24 @@
 <template>
   <div class="site-layout">
-    <SiteHeader class="header" />
-    <ContentLayout class="content" />
+    <div>
+      <SiteHeader class="header" />
+      <ContentLayout class="content" />
+    </div>
     <SiteFooter class="footer" />
   </div>
 </template>
 
 <script lang="ts" setup>
+import ContentLayout from './ContentLayout.vue'
 import SiteHeader from './SiteHeader.vue'
 import SiteFooter from './SiteFooter.vue'
-import ContentLayout from './ContentLayout.vue'
 </script>
 
 <style lang="scss" scoped>
 .site-layout {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   height: 100vh;
-}
-
-.content {
-  margin: 0 0 auto 0;
 }
 </style>
