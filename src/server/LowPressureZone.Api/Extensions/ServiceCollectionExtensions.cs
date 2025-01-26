@@ -9,23 +9,15 @@ public static class ServiceCollectionExtensions
     public static void AddDatabases(this WebApplicationBuilder builder)
     {
         var identityConnectionString = builder.Configuration.GetConnectionString("Identity");
-        var databaseConnectionString = builder.Configuration.GetConnectionString("Data");
+        var dataConnectionString = builder.Configuration.GetConnectionString("Data");
         
         builder.Services.AddDbContext<IdentityContext>(options =>
         {
-            options.UseSqlite(identityConnectionString, sqliteOptions =>
-            {
-                sqliteOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-                sqliteOptions.MigrationsAssembly("LowPressureZone.Identity");
-            });
+            options.UseNpgsql(identityConnectionString);
         });
-        builder.Services.AddDbContext<DatabaseContext>(options =>
+        builder.Services.AddDbContext<DataContext>(options =>
         {
-            options.UseSqlite(databaseConnectionString, sqliteOptions =>
-            {
-                sqliteOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-                sqliteOptions.MigrationsAssembly("LowPressureZone.Domain");
-            });
+            options.UseNpgsql(dataConnectionString);
         });
     }
 }

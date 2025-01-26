@@ -11,7 +11,7 @@ public static class WebApplicationExtensions
         using (var scope = app.Services.CreateScope())
         {
             var identityContext = app.Services.GetRequiredService<IdentityContext>();
-            var dataContext = app.Services.GetRequiredService<DatabaseContext>();
+            var dataContext = app.Services.GetRequiredService<DataContext>();
             identityContext.Database.Migrate();
             dataContext.Database.Migrate();
         }

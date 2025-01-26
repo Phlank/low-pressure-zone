@@ -1,6 +1,7 @@
 <template>
   <main>
     <Panel :header="currentSchedule.audience" style="border-style: none">
+      <p>{{ currentSchedule.description }}</p>
       <DataTable :value="currentSchedule.timeslots">
         <Column header="Time">
           <template #body="slotProps">
@@ -9,9 +10,6 @@
         </Column>
         <Column field="performance.name" header="Performer" />
       </DataTable>
-      <!-- <Toolbar style="border-style: none">
-        <template #center></template>
-      </Toolbar> -->
     </Panel>
   </main>
 </template>

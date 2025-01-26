@@ -19,6 +19,7 @@ public class GetUsers : EndpointWithoutRequest<IEnumerable<GetUserResponse>>
     public override void Configure()
     {
         Get("/users");
+        Roles(RoleNames.ADMIN);
     }
 
     public override async Task HandleAsync(CancellationToken ct)

@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Domain;
 
-public class DatabaseContext : DbContext
+public class DataContext : DbContext
 {
     public DbSet<Page> Pages { get; set; }
 
-    public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { }
+    public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 }

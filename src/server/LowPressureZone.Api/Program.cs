@@ -1,8 +1,9 @@
 using FastEndpoints;
-using FastEndpoints.Security;
 using FastEndpoints.Swagger;
+using Google.Apis.Auth.AspNetCore3;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Identity;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,11 +19,44 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 })
 .AddEntityFrameworkStores<IdentityContext>();
 
-builder.Services.AddAuthenticationJwtBearer(s => s.SigningKey = builder.Configuration.GetValue<string>("JwtSigningKey"));
+builder.Services.AddOptions<OpenIdConnectOptions>("Authentication:Google");
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.Secure = CookieSecurePolicy.Always;
+    options.MinimumSameSitePolicy = SameSiteMode.None;
+});
+builder.Services.AddAuthentication(authOptions =>
+{
+    authOptions.DefaultChallengeScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
+    authOptions.DefaultForbidScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
+    authOptions.DefaultScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
+}).AddJwtBearer().AddGoogleOpenIdConnect(options =>
+{
+    options.ClientId = builder.Configuration.GetValue<string>("Authentication:Google:ClientId");
+    options.ClientSecret = builder.Configuration.GetValue<string>("Authentication:Google:ClientSecret");
+    options.Events = new OpenIdConnectEvents()
+    {
+        OnTokenValidated = async (context) =>
+        {
+            var name = context.Principal?.Identity?.Name;
+        },
+        OnUserInformationReceived = async (context) =>
+        {
+            var name = context.Principal?.Identity?.Name;
+            if (name == null)
+            {
+                await context.Response.SendForbiddenAsync();
+                return;
+            }
+            // Create user if it doesn't exist in the identity db
+            var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<IdentityUser>>();
+
+        }
+    };
+});
 builder.Services.AddAuthorization();
 builder.Services.AddFastEndpoints();
 builder.Services.SwaggerDocument();
-
 
 var app = builder.Build();
 app.UseAuthentication();
