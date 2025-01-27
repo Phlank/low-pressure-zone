@@ -6,13 +6,17 @@
 body {
   margin: 0;
   overflow: hidden;
-  background-image: variables.$bg-dark;
+  background-image: variables.$bg-light;
   // margin: variables.$space-m;
   font-family: 'Helvetica Neue', sans-serif;
   // overflow: hidden;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body.dark-mode-toggle {
+  background-image: variables.$bg-dark;
 }
 
 .header {

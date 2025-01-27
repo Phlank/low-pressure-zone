@@ -18,22 +18,17 @@ const isDarkMode: Ref<boolean> = ref(true)
 onMounted(() => {
   if (isDarkMode.value && !document.documentElement.classList.contains('dark-mode-toggle')) {
     document.documentElement.classList.toggle('dark-mode-toggle')
+    document.body.classList.toggle('dark-mode-toggle')
   } else if (!isDarkMode.value && document.documentElement.classList.contains('dark-mode-toggle')) {
     document.documentElement.classList.toggle('dark-mode-toggle')
+    document.body.classList.toggle('dark-mode-toggle')
   }
 })
 
 const handleDarkModeToggle = (newValue: boolean) => {
   isDarkMode.value = newValue
   document.documentElement.classList.toggle('dark-mode-toggle')
-  console.log('toggled dark mode')
-  if (newValue) {
-    document.getElementsByTagName('body')[0].style.backgroundImage =
-      'url(http://localhost:5173/src/assets/bg3.jpg)'
-  } else {
-    document.getElementsByTagName('body')[0].style.backgroundImage =
-      'url(http://localhost:5173/src/assets/bg3-invert.jpg)'
-  }
+  document.body.classList.toggle('dark-mode-toggle')
 }
 </script>
 

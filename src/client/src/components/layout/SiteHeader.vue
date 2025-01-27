@@ -2,7 +2,7 @@
   <Toolbar class="header">
     <template #start>Low Pressure Zone</template>
     <template #end>
-      <DarkModeToggle></DarkModeToggle>
+      <DarkModeToggle />
       <div v-if="isMobile">
         <Button icon="pi pi-bars" size="large" outlined></Button>
       </div>
@@ -15,9 +15,9 @@
 </template>
 
 <script lang="ts" setup>
-import DarkModeToggle from '../controls/DarkModeToggle.vue'
 import { Button, Toolbar } from 'primevue'
 import { inject } from 'vue'
+import DarkModeToggle from '../controls/DarkModeToggle.vue'
 
 const isMobile = inject<boolean>('isMobile')
 </script>
