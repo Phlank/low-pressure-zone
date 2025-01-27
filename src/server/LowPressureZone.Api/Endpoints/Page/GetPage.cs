@@ -16,7 +16,7 @@ public sealed class GetPage : Endpoint<GetPageRequest>
     public override void Configure()
     {
         Get("/page/{name}");
-        Roles(RoleNames.ADMIN);
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(GetPageRequest req, CancellationToken ct)

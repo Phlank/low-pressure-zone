@@ -7,9 +7,17 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Configuration.AddJsonFile("appsettings.json")
-                     .AddJsonFile("appsettings.Development.json", optional: true)
-                     .AddJsonFile("appsettings.Production.json", optional: true);
+
+
+builder.Configuration.AddJsonFile("appsettings.json");
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddJsonFile("appsettings.Development.json", optional: true);
+}
+if (builder.Environment.IsProduction())
+{
+    builder.Configuration.AddJsonFile("appsettings.Production.json", optional: true);
+}
 
 builder.AddDatabases();
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
