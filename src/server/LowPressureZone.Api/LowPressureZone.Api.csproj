@@ -26,4 +26,9 @@
 		<ProjectReference Include="..\LowPressureZone.Identity\LowPressureZone.Identity.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Endpoints\Performer\" />
+	  <Folder Include="Endpoints\Schedule\" />
+	</ItemGroup>
+
 </Project>
