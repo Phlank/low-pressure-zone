@@ -42,10 +42,13 @@ public sealed class PutAudience : Endpoint<PutAudienceRequest, EmptyResponse, Au
             return;
         }
 
-        audience.LastModifiedDate = DateTime.UtcNow;
-        audience.Name = req.Name;
-        audience.Url = req.Url;
-        DataContext.SaveChanges();
+        if (audience.Name != req.Name || audience.Url != req.Url)
+        {
+            audience.LastModifiedDate = DateTime.UtcNow;
+            audience.Name = req.Name;
+            audience.Url = req.Url;
+            DataContext.SaveChanges();
+        }
         await SendOkAsync();
     }
 }
