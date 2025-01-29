@@ -1,22 +1,22 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Audience;
 
-public class GetAudience : Endpoint<EmptyRequest, IEnumerable<GetAudienceResponse>, AudienceDtoMapper>
+public sealed class GetAudience : Endpoint<EmptyRequest, IEnumerable<AudienceResponse>, AudienceResponseMapper>
 {
     public required DataContext DataContext { get; set; }
 
     public override void Configure()
     {
         Get("/audience");
-        Description(b => b.Produces<IEnumerable<GetAudienceResponse>>(200));
-        AllowAnonymous();
+        Description(b => b.Produces<IEnumerable<AudienceResponse>>(200));
     }
 
     public override async Task HandleAsync(EmptyRequest req, CancellationToken ct)
     {
-        var audiences = DataContext.Audiences.AsEnumerable();
-        await SendOkAsync(audiences.Select(aud => Map.FromEntity(aud)));
+        var audiences = DataContext.Audiences.AsNoTracking().AsEnumerable();
+        await SendOkAsync(audiences.Select(aud => Map.FromEntity(aud)), ct);
     }
 }

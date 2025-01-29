@@ -16,7 +16,11 @@ import { onMounted, ref, type Ref } from 'vue'
 
 const isDarkMode: Ref<boolean> = ref(true)
 onMounted(() => {
-  if (isDarkMode.value && !document.documentElement.classList.contains('dark-mode-toggle')) {
+  if (
+    isDarkMode.value &&
+    !document.documentElement.classList.contains('dark-mode-toggle') &&
+    !document.body.classList.contains('dark-mode-toggle')
+  ) {
     document.documentElement.classList.toggle('dark-mode-toggle')
     document.body.classList.toggle('dark-mode-toggle')
   } else if (!isDarkMode.value && document.documentElement.classList.contains('dark-mode-toggle')) {

@@ -27,37 +27,37 @@ const currentSchedule: Ref<Schedule> = ref({
   description: "Hot take: Mere Sher isn't that good.",
   timeslots: [
     {
-      startTime: new Date(today.getFullYear(), today.getMonth() - 1, today.getDate(), 16),
-      performance: {
-        name: 'Phlank',
-        type: PerformanceType.Live
-      }
-    },
-    {
-      startTime: new Date(today.getFullYear(), today.getMonth() - 1, today.getDate(), 17),
-      performance: {
-        name: 'strgrll',
-        type: PerformanceType.Live
-      }
-    },
-    {
       startTime: new Date(today.getFullYear(), today.getMonth() - 1, today.getDate(), 18),
       performance: {
-        name: 'Dubski',
+        name: 'Phlank',
         type: PerformanceType.Live
       }
     },
     {
       startTime: new Date(today.getFullYear(), today.getMonth() - 1, today.getDate(), 19),
       performance: {
-        name: 'Phlank',
+        name: 'strgrll',
         type: PerformanceType.Live
       }
     },
     {
       startTime: new Date(today.getFullYear(), today.getMonth() - 1, today.getDate(), 20),
       performance: {
-        name: 'Phlank',
+        name: 'dubski',
+        type: PerformanceType.Live
+      }
+    },
+    {
+      startTime: new Date(today.getFullYear(), today.getMonth() - 1, today.getDate(), 21),
+      performance: {
+        name: 'Sovereign',
+        type: PerformanceType.Live
+      }
+    },
+    {
+      startTime: new Date(today.getFullYear(), today.getMonth() - 1, today.getDate(), 22),
+      performance: {
+        name: 'repulsion',
         type: PerformanceType.Live
       }
     }
