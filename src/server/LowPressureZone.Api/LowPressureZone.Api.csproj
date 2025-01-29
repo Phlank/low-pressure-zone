@@ -27,7 +27,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Endpoints\Performer\" />
 	  <Folder Include="Endpoints\Schedule\" />
 	</ItemGroup>
 
