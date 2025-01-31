@@ -18,7 +18,6 @@
 		<PackageReference Include="FastEndpoints.Swagger" Version="5.33.0" />
 		<PackageReference Include="Google.Apis.Auth.AspNetCore3" Version="1.69.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.1" />
-		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -27,7 +26,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Endpoints\Schedule\" />
+	  <Folder Include="DataStructures\" />
 	</ItemGroup>
 
 </Project>

@@ -11,4 +11,13 @@ public class DataContext : DbContext
     public DbSet<Timeslot> Timeslots { get; set; }
 
     public DataContext(DbContextOptions<DataContext> options) : base(options) { }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Audience>().HasIndex(nameof(Audience.Name)).IsUnique();
+
+        modelBuilder.Entity<Performer>().HasIndex(nameof(Performer.Name)).IsUnique();
+
+        modelBuilder.Entity<Schedule>().HasIndex(nameof(Schedule.Start), nameof(Schedule.End)).IsUnique();
+    }
 }
