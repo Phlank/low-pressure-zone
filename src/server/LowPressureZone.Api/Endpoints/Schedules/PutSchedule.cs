@@ -1,11 +1,12 @@
 ﻿using FastEndpoints;
 using FluentValidation.Results;
 using LowPressureZone.Domain;
+using LowPressureZone.Domain.Entities;
 using LowPressureZone.Domain.Extensions;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
-public class PutSchedule : Endpoint<ScheduleRequest, EmptyResponse, ScheduleRequestMapper>
+public class PutSchedule : EndpointWithMapper<ScheduleRequest, ScheduleRequestMapper>
 {
     public required DataContext DataContext { get; set; }
 
@@ -26,21 +27,15 @@ public class PutSchedule : Endpoint<ScheduleRequest, EmptyResponse, ScheduleRequ
             return;
         }
 
-        var isChanged = false;
         if (req.Start != schedule.Start || req.End != schedule.End)
         {
-            isChanged = true;
-            var doesOverlapAnySchedule = DataContext.Schedules.Where(s => s.Id != id)
-                                                              .WhereOverlaps(req)
-                                                              .Any();
+            var doesOverlapAnySchedule = DataContext.Schedules.Where(s => s.Id != id).WhereOverlaps(req).Any();
             if (doesOverlapAnySchedule)
             {
                 AddError(new ValidationFailure(nameof(req.Start), "Schedule times cannot overlap."));
                 AddError(new ValidationFailure(nameof(req.End), "Schedule times cannot overlap."));
             }
-            var doesExcludeAnyTimeslots = DataContext.Timeslots.Where(t => t.ScheduleId == id)
-                                                               .WhereNotInside(req)
-                                                               .Any();
+            var doesExcludeAnyTimeslots = DataContext.Timeslots.Where(t => t.ScheduleId == id).WhereNotInside(req).Any();
             if (doesExcludeAnyTimeslots)
             {
                 AddError(new ValidationFailure(nameof(req.Start), "Time range cannot exclude linked timeslots."));
@@ -50,23 +45,23 @@ public class PutSchedule : Endpoint<ScheduleRequest, EmptyResponse, ScheduleRequ
 
         if (req.AudienceId != schedule.AudienceId)
         {
-            isChanged = true;
-            if (DataContext.Audiences.Any(a => a.Id == id))
+            if (!DataContext.Has<Audience>(req.AudienceId))
             {
                 AddError(new ValidationFailure(nameof(req.AudienceId), "Invalid audience specified."));
             }
         }
 
         ThrowIfAnyErrors();
-        
-        if (isChanged)
+
+        schedule.Start = req.Start;
+        schedule.End = req.End;
+        schedule.AudienceId = req.AudienceId;
+        if (DataContext.ChangeTracker.HasChanges())
         {
-            schedule.Start = req.Start;
-            schedule.End = req.End;
-            schedule.AudienceId = req.AudienceId;
             schedule.LastModifiedDate = DateTime.UtcNow;
             DataContext.SaveChanges();
         }
+
         await SendNoContentAsync(ct);
     }
 }

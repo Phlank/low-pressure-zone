@@ -2,11 +2,10 @@
 using FluentValidation.Results;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Extensions;
-using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
-public class PostSchedule : Endpoint<ScheduleRequest, EmptyResponse, ScheduleRequestMapper>
+public class PostSchedule : EndpointWithMapper<ScheduleRequest, ScheduleRequestMapper>
 {
     public required DataContext DataContext { get; set; }
 

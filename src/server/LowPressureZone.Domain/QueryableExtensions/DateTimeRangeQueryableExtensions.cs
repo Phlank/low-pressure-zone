@@ -18,4 +18,9 @@ public static class DateTimeRangeQueryableExtensions
     {
         return query.Where(q => q.Start < range.Start || q.End > range.End);
     }
+
+    public static IQueryable<TDateTimeRange> WhereContains<TDateTimeRange>(this IQueryable<TDateTimeRange> query, IDateTimeRange range) where TDateTimeRange : class, IDateTimeRange
+    {
+        return query.Where(q => q.Start <= range.Start && q.End >= range.End);
+    }
 }
