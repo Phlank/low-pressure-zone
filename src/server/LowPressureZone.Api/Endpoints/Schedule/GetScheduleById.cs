@@ -1,5 +1,6 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Domain;
+using LowPressureZone.Domain.QueryableExtensions;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
@@ -16,7 +17,7 @@ public class GetScheduleById : EndpointWithoutRequest<ScheduleResponse, Schedule
     public override async Task HandleAsync(CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        var schedule = DataContext.Schedules.Find(id);
+        var schedule = DataContext.Schedules.IncludeConnectingProperties().FirstOrDefault(s => s.Id == id);
         if (schedule == null)
         {
             await SendNotFoundAsync(ct);

@@ -15,7 +15,7 @@ public class TimeslotResponseMapper : ResponseMapper<TimeslotResponse, Domain.En
             Start = t.Start,
             End = t.End,
             Name = t.Name,
-            Performer = PerformerMapper.FromEntity(t.Performer),
+            Performer = PerformerMapper.FromEntity(t.Performer!),
             PerformanceType = t.Type,
             CreatedDate = t.CreatedDate,
             ModifiedDate = t.LastModifiedDate
