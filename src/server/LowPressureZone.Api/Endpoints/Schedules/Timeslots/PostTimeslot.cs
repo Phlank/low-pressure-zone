@@ -16,7 +16,7 @@ public class PostTimeslot : Endpoint<TimeslotRequest, EmptyResponse, TimeslotReq
 
     public override void Configure()
     {
-        Post("/schedule/{scheduleId}/timeslots");
+        Post("/schedules/{scheduleId}/timeslots");
         Description(b => b.Produces(201)
                           .Produces(404));
     }
