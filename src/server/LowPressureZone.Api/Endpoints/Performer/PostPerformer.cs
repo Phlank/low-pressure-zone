@@ -11,8 +11,7 @@ public sealed class PostPerformer : Endpoint<PerformerRequest, EmptyResponse, Pe
     public override void Configure()
     {
         Post("/performer");
-        Description(b => b.Produces(204)
-                          .ProducesProblem(400));
+        Description(b => b.Produces(201));
     }
 
     public override async Task HandleAsync(PerformerRequest req, CancellationToken ct)

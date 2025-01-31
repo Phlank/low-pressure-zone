@@ -1,8 +1,10 @@
-﻿namespace LowPressureZone.Api.Endpoints.Schedule;
+﻿using LowPressureZone.Domain.Interfaces;
 
-public sealed class ScheduleRequest
+namespace LowPressureZone.Api.Endpoints.Schedule;
+
+public sealed class ScheduleRequest : IDateTimeRange
 {
-    public required DateTime StartTime { get; set; }
-    public required DateTime EndTime { get; set; }
+    public required DateTime Start { get; set; }
+    public required DateTime End { get; set; }
     public required Guid AudienceId { get; set; }
 }

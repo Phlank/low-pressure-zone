@@ -8,6 +8,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="DataStructures\**" />
+	  <Content Remove="DataStructures\**" />
+	  <EmbeddedResource Remove="DataStructures\**" />
+	  <None Remove="DataStructures\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Remove="lpz-data.db" />
 		<None Remove="lpz-identity.db" />
 	</ItemGroup>
@@ -23,10 +30,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\LowPressureZone.Domain\LowPressureZone.Domain.csproj" />
 		<ProjectReference Include="..\LowPressureZone.Identity\LowPressureZone.Identity.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="DataStructures\" />
 	</ItemGroup>
 
 </Project>

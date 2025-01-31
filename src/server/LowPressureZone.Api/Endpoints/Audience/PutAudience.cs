@@ -12,7 +12,6 @@ public sealed class PutAudience : Endpoint<AudienceRequest, EmptyResponse, Audie
     {
         Put("/audience/{id}");
         Description(b => b.Produces(204)
-                          .ProducesProblem(400)
                           .Produces(404));
     }
 

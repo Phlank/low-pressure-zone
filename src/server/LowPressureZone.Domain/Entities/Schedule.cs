@@ -1,6 +1,8 @@
-﻿namespace LowPressureZone.Domain.Entities;
+﻿using LowPressureZone.Domain.Interfaces;
 
-public class Schedule : BaseEntity
+namespace LowPressureZone.Domain.Entities;
+
+public class Schedule : BaseEntity, IDateTimeRange
 {
     public required DateTime Start { get; set; }
     public required DateTime End { get; set; }

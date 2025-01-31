@@ -10,8 +10,8 @@ public class ScheduleRequestMapper : RequestMapper<ScheduleRequest, Domain.Entit
         {
             Id = Guid.NewGuid(),
             AudienceId = r.AudienceId,
-            Start = r.StartTime,
-            End = r.EndTime
+            Start = r.Start,
+            End = r.End
         };
     }
 }

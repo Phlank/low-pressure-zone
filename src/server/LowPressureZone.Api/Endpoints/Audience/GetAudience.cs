@@ -17,6 +17,6 @@ public sealed class GetAudience : Endpoint<EmptyRequest, IEnumerable<AudienceRes
     public override async Task HandleAsync(EmptyRequest req, CancellationToken ct)
     {
         var audiences = DataContext.Audiences.AsNoTracking().ToList();
-        await SendOkAsync(audiences.Select(aud => Map.FromEntity(aud)), ct);
+        await SendOkAsync(audiences.Select(Map.FromEntity), ct);
     }
 }

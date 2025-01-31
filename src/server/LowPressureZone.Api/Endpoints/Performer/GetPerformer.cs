@@ -17,6 +17,6 @@ public sealed class GetPerformer : EndpointWithoutRequest<IEnumerable<PerformerR
     public override async Task HandleAsync(CancellationToken ct)
     {
         var performers = DataContext.Performers.AsNoTracking().ToList();
-        await SendOkAsync(performers.Select(p => Map.FromEntity(p)), ct);
+        await SendOkAsync(performers.Select(Map.FromEntity), ct);
     }
 }

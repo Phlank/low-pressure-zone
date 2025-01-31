@@ -11,8 +11,7 @@ public sealed class PostAudience : Endpoint<AudienceRequest, EmptyResponse, Audi
     public override void Configure()
     {
         Post("/audience");
-        Description(b => b.Produces(204)
-                          .ProducesProblem(400));
+        Description(b => b.Produces(201));
     }
 
     public override async Task HandleAsync(AudienceRequest req, CancellationToken ct)
