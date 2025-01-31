@@ -1,13 +1,14 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Endpoints.Performers;
+using LowPressureZone.Domain.Entities;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
-public class TimeslotResponseMapper : ResponseMapper<TimeslotResponse, Domain.Entities.Timeslot>
+public class TimeslotResponseMapper : ResponseMapper<TimeslotResponse, Timeslot>
 {
     public required PerformerResponseMapper PerformerMapper { get; set; }
 
-    public override TimeslotResponse FromEntity(Domain.Entities.Timeslot t)
+    public override TimeslotResponse FromEntity(Timeslot t)
     {
         return new TimeslotResponse
         {

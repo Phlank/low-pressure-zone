@@ -1,8 +1,9 @@
 ﻿using LowPressureZone.Domain.Enums;
+using LowPressureZone.Domain.Interfaces;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
-public class TimeslotRequest
+public class TimeslotRequest : IDateTimeRange
 {
     public required Guid PerformerId { get; set; }
     public required PerformanceType PerformanceType { get; set; }

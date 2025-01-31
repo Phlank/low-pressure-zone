@@ -1,12 +1,13 @@
 ﻿using FastEndpoints;
+using LowPressureZone.Domain.Entities;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
-public class TimeslotRequestMapper : RequestMapper<TimeslotRequest, Domain.Entities.Timeslot>
+public class TimeslotRequestMapper : RequestMapper<TimeslotRequest, Timeslot>
 {
-    public override Domain.Entities.Timeslot ToEntity(TimeslotRequest r)
+    public override Timeslot ToEntity(TimeslotRequest r)
     {
-        return new Domain.Entities.Timeslot
+        return new Timeslot
         {
             Id = Guid.NewGuid(),
             Name = r.Name,
