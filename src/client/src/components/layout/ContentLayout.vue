@@ -1,18 +1,7 @@
 <template>
-  <div v-if="isMobile" class="content-layout-mobile">
+  <main :class="'content-layout' + `${isMobile ? ' content-layout--mobile' : ''}`">
     <RouterView />
-  </div>
-  <div v-else class="content-layout">
-    <RouterView class="content-layout__view" />
-    <iframe
-      src="https://discord.com/widget?id=722643085137412096&theme=dark"
-      width="350"
-      allowtransparency="true"
-      frameborder="0"
-      sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
-      class="content-layout__chat"
-    ></iframe>
-  </div>
+  </main>
 </template>
 
 <script lang="ts" setup>
@@ -26,23 +15,11 @@ const isMobile = inject<boolean>('isMobile')
 @use './../../assets/variables.scss';
 
 .content-layout {
-  display: flex;
-  justify-content: space-between;
-  margin: 0 variables.$space-s;
-  max-height: calc(100vh - 64px);
-  overflow-y: scroll;
+  position: relative;
+  margin: variables.$space-m;
 
-  &__view {
-    min-width: 30%;
-    max-width: 40%;
+  @include variables.mobile {
+    flex-direction: column;
   }
-
-  &__chat {
-    border-radius: variables.$space-s;
-  }
-}
-
-.content-layout-mobile {
-  margin: 0 variables.$space-m;
 }
 </style>

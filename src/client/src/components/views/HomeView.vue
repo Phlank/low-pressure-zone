@@ -1,6 +1,6 @@
 <template>
-  <main>
-    <Panel :header="currentSchedule.audience" style="border-style: none">
+  <div class="flex-variable-space-between">
+    <Panel :header="currentSchedule.audience" class="current-schedule-panel mobile-fill-width">
       <p>{{ currentSchedule.description }}</p>
       <DataTable :value="currentSchedule.timeslots">
         <Column header="Time">
@@ -11,7 +11,16 @@
         <Column field="performance.name" header="Performer" />
       </DataTable>
     </Panel>
-  </main>
+    <iframe
+      src="https://discord.com/widget?id=722643085137412096&theme=dark"
+      width="350"
+      height="500"
+      allowtransparency="true"
+      frameborder="0"
+      sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
+      class="discord-iframe mobile-fill-width"
+    ></iframe>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -67,4 +76,18 @@ const currentSchedule: Ref<Schedule> = ref({
 
 <style lang="scss" scoped>
 @use '@/assets/variables.scss';
+
+.current-schedule-panel {
+  min-width: 40%;
+  height: fit-content;
+
+  @include variables.mobile {
+    min-width: none;
+    margin-bottom: variables.$space-m;
+  }
+}
+
+.discord-iframe {
+  border-radius: variables.$space-m;
+}
 </style>

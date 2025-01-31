@@ -27,7 +27,7 @@ body.dark-mode-toggle {
   user-select: none;
 }
 
-@media screen and (max-width: variables.$mobile-width) {
+@media screen and (max-width: variables.$mobile-transition-width) {
   .app {
     overflow-x: hidden;
   }
@@ -37,9 +37,32 @@ p {
   font-size: 0.9rem;
 }
 
-// a {
-//   text-shadow: 0 0 0.1em $font-color-white-brighter;
-//   color: $font-color-white-brighter;
-//   text-decoration: none;
-//   font-style: normal;
-// }
+.space-below {
+  margin-bottom: variables.$space-m;
+}
+
+.flex-variable-space-between {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  @include variables.mobile {
+    flex-direction: column;
+    justify-content: start;
+    height: fit-content;
+  }
+}
+
+.mobile-fill-width {
+  @include variables.mobile {
+    width: variables.$mobile-element-width;
+    margin-left: variables.$space-m;
+    margin-right: variables.$space-m;
+  }
+}
+
+// PrimeVue overrides
+
+div.p-panel {
+  border-style: none;
+}

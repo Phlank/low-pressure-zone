@@ -1,25 +1,59 @@
 <template>
   <Toolbar class="header">
-    <template #start>Low Pressure Zone</template>
+    <template #start><RouterLink :to="'/'">Low Pressure Zone</RouterLink></template>
     <template #end>
       <DarkModeToggle />
-      <div v-if="isMobile">
-        <Button icon="pi pi-bars" size="large" outlined></Button>
+      <div v-if="isMobile" style="display: flex">
+        <Button
+          icon="pi pi-bars"
+          size="large"
+          @click="toggleMenu"
+          outlined
+          aria-controls="navigation-menu"
+        />
+        <Menu id="navigation-menu" ref="navMenuRef" :model="navMenuItems" :popup="true">
+          <template #item="{ item, props }">
+            <router-link v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom>
+              <a v-ripple :href="href" v-bind="props.action" @click="navigate">
+                <span :class="item.icon" />
+                <span class="ml-2">{{ item.label }}</span>
+              </a>
+            </router-link>
+            <a v-else v-ripple :href="item.url" :target="item.target" v-bind="props.action">
+              <span :class="item.icon" />
+              <span class="ml-2">{{ item.label }}</span>
+            </a>
+          </template>
+        </Menu>
       </div>
       <div v-else>
-        <Button label="Schedules" outlined />
-        <Button label="Chat" outlined />
+        <!-- <Button label="Home" outlined></Button> -->
+        <Button label="Dashboard" outlined></Button>
       </div>
     </template>
   </Toolbar>
 </template>
 
 <script lang="ts" setup>
-import { Button, Toolbar } from 'primevue'
-import { inject } from 'vue'
+import { Button, Toolbar, Menu } from 'primevue'
+import { inject, useTemplateRef, type Ref } from 'vue'
 import DarkModeToggle from '../controls/DarkModeToggle.vue'
+import type { MenuItem } from 'primevue/menuitem'
 
-const isMobile = inject<boolean>('isMobile')
+const isMobile: Ref<boolean> | undefined = inject('isMobile')
+
+const navMenuRef = useTemplateRef('navMenuRef')
+const navMenuItems: MenuItem[] = [
+  {
+    label: 'Dashboard',
+    icon: 'pi pi-cog',
+    route: '/dashboard'
+  }
+]
+
+const toggleMenu = (event: MouseEvent) => {
+  navMenuRef.value?.toggle(event)
+}
 </script>
 
 <style lang="scss" scoped>
@@ -31,12 +65,20 @@ const isMobile = inject<boolean>('isMobile')
   position: sticky;
   top: 0;
   z-index: 10;
-  border-style: none;
-  background-color: inherit;
-  // background-color: #121212;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  border-radius: 0;
 }
 
 .p-button {
   margin: 0 variables.$space-s;
+}
+
+:deep(.p-toolbar-start) {
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
 }
 </style>
