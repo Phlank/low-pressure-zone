@@ -1,6 +1,6 @@
-﻿namespace LowPressureZone.Api.Endpoints.Performer;
+﻿namespace LowPressureZone.Api.Endpoints.Audiences;
 
-public sealed class PerformerRequest
+public sealed class AudienceRequest
 {
     public required string Name { get; set; }
     public required string Url { get; set; }

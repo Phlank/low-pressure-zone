@@ -1,7 +1,7 @@
-﻿using LowPressureZone.Api.Endpoints.Audience;
-using LowPressureZone.Api.Endpoints.Schedule.Timeslot;
+﻿using LowPressureZone.Api.Endpoints.Audiences;
+using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
-namespace LowPressureZone.Api.Endpoints.Schedule;
+namespace LowPressureZone.Api.Endpoints.Schedules;
 
 public sealed class ScheduleResponse
 {

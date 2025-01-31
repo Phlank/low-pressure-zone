@@ -1,6 +1,6 @@
 ﻿using FastEndpoints;
 
-namespace LowPressureZone.Api.Endpoints.Audience;
+namespace LowPressureZone.Api.Endpoints.Audiences;
 
 public sealed class AudienceRequestMapper : RequestMapper<AudienceRequest, Domain.Entities.Audience>
 {

@@ -3,7 +3,7 @@ using FluentValidation.Results;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Extensions;
 
-namespace LowPressureZone.Api.Endpoints.Schedule;
+namespace LowPressureZone.Api.Endpoints.Schedules;
 
 public class PutSchedule : Endpoint<ScheduleRequest, EmptyResponse, ScheduleRequestMapper>
 {
@@ -11,9 +11,8 @@ public class PutSchedule : Endpoint<ScheduleRequest, EmptyResponse, ScheduleRequ
 
     public override void Configure()
     {
-        Put("/schedule/{id}");
+        Put("/schedules/{id}");
         Description(b => b.Produces(204)
-                          .ProducesValidationProblem(400)
                           .Produces(404));
     }
 
@@ -31,13 +30,17 @@ public class PutSchedule : Endpoint<ScheduleRequest, EmptyResponse, ScheduleRequ
         if (req.Start != schedule.Start || req.End != schedule.End)
         {
             isChanged = true;
-            var doesOverlapAnySchedule = DataContext.Schedules.Where(s => s.Id != id).WhereOverlaps(req).Any();
+            var doesOverlapAnySchedule = DataContext.Schedules.Where(s => s.Id != id)
+                                                              .WhereOverlaps(req)
+                                                              .Any();
             if (doesOverlapAnySchedule)
             {
                 AddError(new ValidationFailure(nameof(req.Start), "Schedule times cannot overlap."));
                 AddError(new ValidationFailure(nameof(req.End), "Schedule times cannot overlap."));
             }
-            var doesExcludeAnyTimeslots = DataContext.Timeslots.Where(t => t.ScheduleId == id).WhereNotInside(req).Any();
+            var doesExcludeAnyTimeslots = DataContext.Timeslots.Where(t => t.ScheduleId == id)
+                                                               .WhereNotInside(req)
+                                                               .Any();
             if (doesExcludeAnyTimeslots)
             {
                 AddError(new ValidationFailure(nameof(req.Start), "Time range cannot exclude linked timeslots."));

@@ -4,7 +4,7 @@ using LowPressureZone.Domain;
 using LowPressureZone.Domain.Extensions;
 using Microsoft.EntityFrameworkCore;
 
-namespace LowPressureZone.Api.Endpoints.Schedule;
+namespace LowPressureZone.Api.Endpoints.Schedules;
 
 public class PostSchedule : Endpoint<ScheduleRequest, EmptyResponse, ScheduleRequestMapper>
 {
@@ -12,7 +12,7 @@ public class PostSchedule : Endpoint<ScheduleRequest, EmptyResponse, ScheduleReq
 
     public override void Configure()
     {
-        Post("/schedule");
+        Post("/schedules");
         Description(b => b.Produces(201));
     }
 

@@ -1,6 +1,6 @@
 ﻿using LowPressureZone.Domain.Interfaces;
 
-namespace LowPressureZone.Api.Endpoints.Schedule;
+namespace LowPressureZone.Api.Endpoints.Schedules;
 
 public sealed class ScheduleRequest : IDateTimeRange
 {

@@ -1,7 +1,7 @@
 ﻿using FastEndpoints;
 using FluentValidation;
 
-namespace LowPressureZone.Api.Endpoints.Schedule;
+namespace LowPressureZone.Api.Endpoints.Schedules;
 
 public class ScheduleRequestValidator : Validator<ScheduleRequest>
 {

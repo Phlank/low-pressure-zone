@@ -2,15 +2,15 @@
 using LowPressureZone.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace LowPressureZone.Api.Endpoints.Audience;
+namespace LowPressureZone.Api.Endpoints.Audiences;
 
-public sealed class GetAudience : Endpoint<EmptyRequest, IEnumerable<AudienceResponse>, AudienceResponseMapper>
+public sealed class GetAudiences : Endpoint<EmptyRequest, IEnumerable<AudienceResponse>, AudienceResponseMapper>
 {
     public required DataContext DataContext { get; set; }
 
     public override void Configure()
     {
-        Get("/audience");
+        Get("/audiences");
         Description(b => b.Produces<IEnumerable<AudienceResponse>>(200));
     }
 

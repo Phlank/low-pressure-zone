@@ -1,6 +1,6 @@
 ﻿using FastEndpoints;
 
-namespace LowPressureZone.Api.Endpoints.Schedule;
+namespace LowPressureZone.Api.Endpoints.Schedules;
 
 public class ScheduleRequestMapper : RequestMapper<ScheduleRequest, Domain.Entities.Schedule>
 {

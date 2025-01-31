@@ -2,7 +2,7 @@
 using FluentValidation.Results;
 using LowPressureZone.Domain;
 
-namespace LowPressureZone.Api.Endpoints.Audience;
+namespace LowPressureZone.Api.Endpoints.Audiences;
 
 public sealed class PutAudience : Endpoint<AudienceRequest, EmptyResponse, AudienceRequestMapper>
 {
@@ -10,7 +10,7 @@ public sealed class PutAudience : Endpoint<AudienceRequest, EmptyResponse, Audie
 
     public override void Configure()
     {
-        Put("/audience/{id}");
+        Put("/audiences/{id}");
         Description(b => b.Produces(204)
                           .Produces(404));
     }

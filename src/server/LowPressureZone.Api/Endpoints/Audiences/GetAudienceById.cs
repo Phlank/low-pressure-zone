@@ -2,28 +2,29 @@
 using LowPressureZone.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace LowPressureZone.Api.Endpoints.Performer;
+namespace LowPressureZone.Api.Endpoints.Audiences;
 
-public sealed class GetPerformerById : Endpoint<EmptyRequest, PerformerResponse, PerformerResponseMapper>
+public sealed class GetAudienceById : Endpoint<EmptyRequest, AudienceResponse, AudienceResponseMapper>
 {
     public required DataContext DataContext { get; set; }
 
     public override void Configure()
     {
-        Get("/performer/{id}");
-        Description(b => b.Produces<PerformerResponse>(200)
+        Get("/audiences/{id}");
+        Description(b => b.Produces<AudienceResponse>(200)
                           .Produces(404));
     }
 
     public override async Task HandleAsync(EmptyRequest req, CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        var performer = DataContext.Performers.AsNoTracking().FirstOrDefault(p => p.Id == id);
-        if (performer == null)
+        var audience = DataContext.Audiences.AsNoTracking().FirstOrDefault(aud => aud.Id == id);
+        if (audience == null)
         {
             await SendNotFoundAsync(ct);
             return;
         }
-        await SendOkAsync(Map.FromEntity(performer), ct);
+
+        await SendOkAsync(Map.FromEntity(audience), ct);
     }
 }

@@ -2,7 +2,7 @@
 using FluentValidation.Results;
 using LowPressureZone.Domain;
 
-namespace LowPressureZone.Api.Endpoints.Performer;
+namespace LowPressureZone.Api.Endpoints.Performers;
 
 public sealed class PutPerformer : Endpoint<PerformerRequest, EmptyResponse, PerformerRequestMapper>
 {
@@ -10,7 +10,7 @@ public sealed class PutPerformer : Endpoint<PerformerRequest, EmptyResponse, Per
 
     public override void Configure()
     {
-        Put("/performer/{id}");
+        Put("/performers/{id}");
         Description(b => b.Produces(204)
                           .Produces(404));
     }

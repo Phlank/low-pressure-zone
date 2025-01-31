@@ -2,7 +2,7 @@
 using FluentValidation.Results;
 using LowPressureZone.Domain;
 
-namespace LowPressureZone.Api.Endpoints.Audience;
+namespace LowPressureZone.Api.Endpoints.Audiences;
 
 public sealed class PostAudience : Endpoint<AudienceRequest, EmptyResponse, AudienceRequestMapper>
 {
@@ -10,7 +10,7 @@ public sealed class PostAudience : Endpoint<AudienceRequest, EmptyResponse, Audi
 
     public override void Configure()
     {
-        Post("/audience");
+        Post("/audiences");
         Description(b => b.Produces(201));
     }
 
@@ -25,6 +25,6 @@ public sealed class PostAudience : Endpoint<AudienceRequest, EmptyResponse, Audi
         var entity = Map.ToEntity(req);
         DataContext.Audiences.Add(entity);
         DataContext.SaveChanges();
-        await SendCreatedAtAsync<GetAudience>(new { entity.Id }, Response);
+        await SendCreatedAtAsync<GetAudiences>(new { entity.Id }, Response);
     }
 }

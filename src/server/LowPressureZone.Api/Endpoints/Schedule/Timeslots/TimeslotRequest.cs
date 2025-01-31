@@ -1,6 +1,6 @@
 ﻿using LowPressureZone.Domain.Enums;
 
-namespace LowPressureZone.Api.Endpoints.Schedule.Timeslot;
+namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
 public class TimeslotRequest
 {

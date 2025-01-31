@@ -1,6 +1,6 @@
 ﻿using FastEndpoints;
 
-namespace LowPressureZone.Api.Endpoints.Performer;
+namespace LowPressureZone.Api.Endpoints.Performers;
 
 public sealed class PerformerRequestMapper : RequestMapper<PerformerRequest, Domain.Entities.Performer>
 {

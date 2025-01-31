@@ -1,6 +1,6 @@
 ﻿using FastEndpoints;
 
-namespace LowPressureZone.Api.Endpoints.Schedule.Timeslot;
+namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
 public class TimeslotRequestMapper : RequestMapper<TimeslotRequest, Domain.Entities.Timeslot>
 {
