@@ -1,18 +1,17 @@
 ﻿using FastEndpoints;
 using FluentValidation.Results;
 using LowPressureZone.Domain;
-using Microsoft.EntityFrameworkCore;
 
-namespace LowPressureZone.Api.Endpoints.Performer;
+namespace LowPressureZone.Api.Endpoints.Performers;
 
 public sealed class PostPerformer : Endpoint<PerformerRequest, EmptyResponse, PerformerRequestMapper>
 {
     public required DataContext DataContext { get; set; }
+
     public override void Configure()
     {
-        Post("/performer");
-        Description(b => b.Produces(204)
-                          .ProducesProblem(400));
+        Post("/performers");
+        Description(b => b.Produces(201));
     }
 
     public override async Task HandleAsync(PerformerRequest req, CancellationToken ct)

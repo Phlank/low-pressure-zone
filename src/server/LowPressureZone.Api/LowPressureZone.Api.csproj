@@ -8,6 +8,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="DataStructures\**" />
+	  <Content Remove="DataStructures\**" />
+	  <EmbeddedResource Remove="DataStructures\**" />
+	  <None Remove="DataStructures\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Remove="lpz-data.db" />
 		<None Remove="lpz-identity.db" />
 	</ItemGroup>
@@ -18,16 +25,11 @@
 		<PackageReference Include="FastEndpoints.Swagger" Version="5.33.0" />
 		<PackageReference Include="Google.Apis.Auth.AspNetCore3" Version="1.69.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.1" />
-		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\LowPressureZone.Domain\LowPressureZone.Domain.csproj" />
 		<ProjectReference Include="..\LowPressureZone.Identity\LowPressureZone.Identity.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Endpoints\Schedule\" />
 	</ItemGroup>
 
 </Project>

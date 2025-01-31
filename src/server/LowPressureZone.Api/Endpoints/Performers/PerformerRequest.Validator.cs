@@ -2,7 +2,7 @@
 using FluentValidation;
 using LowPressureZone.Api.Extensions;
 
-namespace LowPressureZone.Api.Endpoints.Performer;
+namespace LowPressureZone.Api.Endpoints.Performers;
 
 public sealed class PerformerRequestValidator : Validator<PerformerRequest>
 {

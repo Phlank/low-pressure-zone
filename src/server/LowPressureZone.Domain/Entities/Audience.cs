@@ -2,6 +2,6 @@
 
 public class Audience : BaseEntity
 {
-    public string Name { get; set; } = string.Empty;
-    public string Url { get; set; } = string.Empty;
+    public required string Name { get; set; }
+    public required string Url { get; set; }
 }
