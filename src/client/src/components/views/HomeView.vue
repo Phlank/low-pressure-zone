@@ -27,8 +27,6 @@
 </template>
 
 <script setup lang="ts">
-import { PerformanceType } from '@/models/performance/performanceType'
-import type { Schedule } from '@/models/schedule/schedule'
 import { Panel, DataTable, Column } from 'primevue'
 import { ref, type Ref } from 'vue'
 

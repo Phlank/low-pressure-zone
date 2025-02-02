@@ -1,4 +1,4 @@
-import type { PerformanceType } from '@/models/performance/performanceType'
+import type { PerformanceType } from '@/models/performanceType'
 import type { PerformerResponse } from '@/api/performers/performerResponse'
 
 export interface TimeslotResponse {

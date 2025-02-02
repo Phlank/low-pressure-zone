@@ -1,23 +1,30 @@
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { ApiResponse, type ValidationProblemDetails } from '@/api/apiResponse'
 
 const axiosInstance = axios.create({
-  timeout: 1000
+  timeout: 1000,
+  baseURL: import.meta.env.DEV ? 'https://localhost:5002/api' : 'https://lowpressurezone.com/api',
+  headers: { 'Access-Control-Allow-Origin': '*' }
 })
 
 export const sendGet = async <TResponse>(route: string) => {
-  const response = await axiosInstance.get(route)
-  if (response.status === 200) {
-    return new ApiResponse<TResponse>(response.status, response.data as TResponse)
+  try {
+    const response = await axiosInstance.get(route)
+    if (response.status === 200) {
+      return new ApiResponse<TResponse>(response.status, response.data as TResponse)
+    }
+    if (response.status === 400) {
+      return new ApiResponse<TResponse>(
+        response.status,
+        undefined,
+        response.data as ValidationProblemDetails
+      )
+    }
+    return new ApiResponse<TResponse>(response.status)
+  } catch (error) {
+    const axiosError = error as AxiosError
+    debugger
   }
-  if (response.status === 400) {
-    return new ApiResponse<TResponse>(
-      response.status,
-      undefined,
-      response.data as ValidationProblemDetails
-    )
-  }
-  return new ApiResponse<TResponse>(response.status)
 }
 
 export const sendPut = async <TRequest>(route: string, request: TRequest) => {
