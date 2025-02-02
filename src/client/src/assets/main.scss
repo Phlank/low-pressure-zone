@@ -37,32 +37,57 @@ p {
   font-size: 0.9rem;
 }
 
-.space-below {
-  margin-bottom: variables.$space-m;
-}
-
 .flex-variable-space-between {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  margin: 0 variables.$space-m;
+
+  &__left,
+  &__right {
+    &--variable-height {
+      height: fit-content;
+    }
+    &--full-width {
+      width: 100%;
+    }
+  }
+
+  &__right {
+    margin-left: variables.$space-m;
+  }
 
   @include variables.mobile {
     flex-direction: column;
     justify-content: start;
     height: fit-content;
+
+    &__left {
+      width: variables.$mobile-element-width;
+      margin-bottom: variables.$space-m;
+    }
+
+    &__right {
+      margin-left: 0;
+      width: variables.$mobile-element-width;
+    }
   }
 }
 
-.mobile-fill-width {
-  @include variables.mobile {
-    width: variables.$mobile-element-width;
-    margin-left: variables.$space-m;
-    margin-right: variables.$space-m;
-  }
-}
+// .mobile-fill-width {
+//   @include variables.mobile {
+//     width: variables.$mobile-element-width;
+//     margin-left: variables.$space-m;
+//     margin-right: variables.$space-m;
+//   }
+// }
 
 // PrimeVue overrides
 
 div.p-panel {
+  border-style: none;
+}
+
+div.p-menu {
   border-style: none;
 }

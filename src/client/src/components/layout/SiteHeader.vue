@@ -12,6 +12,7 @@
           aria-controls="navigation-menu"
         />
         <Menu id="navigation-menu" ref="navMenuRef" :model="navMenuItems" :popup="true">
+          <!-- https://primevue.org/menu/#router -->
           <template #item="{ item, props }">
             <router-link v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom>
               <a v-ripple :href="href" v-bind="props.action" @click="navigate">
@@ -27,8 +28,9 @@
         </Menu>
       </div>
       <div v-else>
-        <!-- <Button label="Home" outlined></Button> -->
-        <Button label="Dashboard" outlined></Button>
+        <RouterLink to="/dashboard">
+          <Button label="Dashboard" outlined />
+        </RouterLink>
       </div>
     </template>
   </Toolbar>
