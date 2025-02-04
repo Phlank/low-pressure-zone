@@ -32,4 +32,8 @@
 		<ProjectReference Include="..\LowPressureZone.Identity\LowPressureZone.Identity.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Middleware\" />
+	</ItemGroup>
+
 </Project>

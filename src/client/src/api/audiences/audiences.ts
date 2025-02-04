@@ -1,8 +1,8 @@
-import { sendGet, sendPost, sendPut } from '../axiosInstance'
+import { sendGet, sendPost, sendPut } from '../sendRequest'
 import type { AudienceRequest } from './audienceRequest'
 import type { AudienceResponse } from './audienceResponse'
 
-const route = (id?: string) => `/audiences${id ? '/' + id : ''}`
+const route = (id?: string) => `/api/audiences${id ? '/' + id : ''}`
 
 export default {
   get: () => sendGet<AudienceResponse[]>(route()),

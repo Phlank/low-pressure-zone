@@ -21,12 +21,7 @@ if (builder.Environment.IsProduction())
 }
 
 builder.AddDatabases();
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
-{
-    options.SignIn.RequireConfirmedEmail = true;
-    options.User.RequireUniqueEmail = true;
-})
-.AddEntityFrameworkStores<IdentityContext>();
+builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<IdentityContext>();
 
 builder.Services.AddOptions<OpenIdConnectOptions>("Authentication:Google");
 builder.Services.Configure<CookiePolicyOptions>(options =>
@@ -43,31 +38,49 @@ builder.Services.AddAuthentication(authOptions =>
 {
     options.ClientId = builder.Configuration.GetValue<string>("Authentication:Google:ClientId");
     options.ClientSecret = builder.Configuration.GetValue<string>("Authentication:Google:ClientSecret");
+    options.Scope.Add("openid");
+    options.Scope.Add("https://www.googleapis.com/auth/userinfo.email");
     options.Events = new OpenIdConnectEvents()
     {
         OnTokenValidated = async (context) =>
         {
-            var name = context.Principal?.Identity?.Name;
+            string? email;
         },
-        OnUserInformationReceived = async (context) =>
+        OnTicketReceived = (context) =>
         {
-            var name = context.Principal?.Identity?.Name;
-            if (name == null)
-            {
-                await context.Response.SendForbiddenAsync();
-                return;
-            }
-            // Create user if it doesn't exist in the identity db
-            var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<IdentityUser>>();
-
-        }
+            context.ReturnUri = builder.Configuration.GetValue<string>("Client:BaseUrl") + builder.Configuration.GetValue<string>("Client:ChallengeRedirect");
+            return Task.CompletedTask;
+        },
     };
 });
 builder.Services.AddAuthorization();
 builder.Services.AddFastEndpoints();
 builder.Services.SwaggerDocument();
+builder.Services.AddCors(options =>
+{
+    if (builder.Environment.IsDevelopment())
+    {
+        options.AddPolicy("Development", builder =>
+        {
+            builder.WithOrigins("http://localhost:4001")
+                   .AllowAnyHeader()
+                   .AllowAnyMethod();
+        });
+    } 
+    else
+    {
+        options.AddPolicy("Production", builder =>
+        {
+            builder.WithOrigins("https://lowpressurezone.com")
+                   .AllowAnyHeader()
+                   .AllowAnyMethod();
+        });
+    }
+});
 
 var app = builder.Build();
+app.UseCors(app.Environment.IsDevelopment() ? "Development" : "Production");
+app.UseRedirectUnauthorizedToChallengeEndpoint();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseFastEndpoints(config =>

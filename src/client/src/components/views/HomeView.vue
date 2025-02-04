@@ -27,11 +27,12 @@
 </template>
 
 <script setup lang="ts">
+import { PerformanceType } from '@/models/performanceType'
 import { Panel, DataTable, Column } from 'primevue'
 import { ref, type Ref } from 'vue'
 
 const today = new Date()
-const currentSchedule: Ref<Schedule> = ref({
+const currentSchedule: Ref = ref({
   audience: '/r/realdubstep',
   startDate: new Date(),
   description: "Hot take: Mere Sher isn't that good.",

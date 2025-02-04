@@ -1,8 +1,8 @@
-import { sendDelete, sendPost, sendPut } from '@/api/axiosInstance'
+import { sendDelete, sendPost, sendPut } from '../../sendRequest'
 import type { TimeslotRequest } from './timeslotRequest'
 
 const route = (scheduleId: string, timeslotId?: string) =>
-  `/schedules/${scheduleId}/timeslots${timeslotId ? '/' + timeslotId : ''}`
+  `/api/schedules/${scheduleId}/timeslots${timeslotId ? '/' + timeslotId : ''}`
 
 export default {
   put: (scheduleId: string, timeslotId: string, request: TimeslotRequest) => () =>

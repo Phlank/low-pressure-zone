@@ -1,4 +1,5 @@
-﻿using LowPressureZone.Domain;
+﻿using FastEndpoints;
+using LowPressureZone.Domain;
 using LowPressureZone.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,5 +16,22 @@ public static class WebApplicationExtensions
             identityContext.Database.Migrate();
             dataContext.Database.Migrate();
         }
+    }
+
+    public static IApplicationBuilder UseRedirectUnauthorizedToChallengeEndpoint(this WebApplication webApplication)
+    {
+        webApplication.Use(async (context, next) =>
+        {
+            await next.Invoke();
+
+            var isRedirect = context.Response.StatusCode == 302;
+            var isOauth2 = context.Response.Headers.Location.Any(l => l.Contains("oauth2"));
+            var isChallenge = context.Request.Path == "/challenge";
+            if (isRedirect && isOauth2 && !isChallenge)
+            {
+                await context.Response.SendUnauthorizedAsync();
+            }
+        });
+        return webApplication;
     }
 }
