@@ -1,8 +1,8 @@
-import { sendDelete, sendPost, sendPut } from '../../sendRequest'
+import { sendDelete, sendPost, sendPut } from '../../fetchFunctions'
 import type { TimeslotRequest } from './timeslotRequest'
 
 const route = (scheduleId: string, timeslotId?: string) =>
-  `/api/schedules/${scheduleId}/timeslots${timeslotId ? '/' + timeslotId : ''}`
+  `/schedules/${scheduleId}/timeslots${timeslotId ? '/' + timeslotId : ''}`
 
 export default {
   put: (scheduleId: string, timeslotId: string, request: TimeslotRequest) => () =>

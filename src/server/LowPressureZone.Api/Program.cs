@@ -44,11 +44,22 @@ builder.Services.AddAuthentication(authOptions =>
     {
         OnTokenValidated = async (context) =>
         {
-            string? email;
+            var emailClaim = context.Principal?.Claims.FirstOrDefault(c => c.Type.Contains("email"));
+            if (emailClaim == null)
+            {
+                return;
+            }
+            Console.WriteLine($"{emailClaim.Type}: {emailClaim.Value}");
+            var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<IdentityUser>>();
+            var user = await userManager.FindByEmailAsync(emailClaim.Value);
+            if (user == null)
+            {
+                throw new Exception("Individual has no corresponding user in the database.");
+            }
         },
         OnTicketReceived = (context) =>
         {
-            context.ReturnUri = builder.Configuration.GetValue<string>("Client:BaseUrl") + builder.Configuration.GetValue<string>("Client:ChallengeRedirect");
+            context.ReturnUri = builder.Configuration.GetValue<string>("Client:BaseUrl") + builder.Configuration.GetValue<string>("Client:LoginRedirect");
             return Task.CompletedTask;
         },
     };
@@ -103,6 +114,5 @@ app.UseFastEndpoints(config =>
     };
     config.Errors.ProducesMetadataType = typeof(ValidationProblemDetails);
 }).UseSwaggerGen();
-
 app.UseHsts();
 app.Run();

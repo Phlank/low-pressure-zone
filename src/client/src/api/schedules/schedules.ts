@@ -1,8 +1,8 @@
-import { sendGet, sendPost, sendPut } from '../sendRequest'
+import { sendGet, sendPost, sendPut } from '../fetchFunctions'
 import { type ScheduleResponse } from './scheduleResponse'
 import type { ScheduleRequest } from './scheduleRequest'
 
-const route = (scheduleId?: string) => `/api/schedules${scheduleId ? '/' + scheduleId : ''}`
+const route = (scheduleId?: string) => `/schedules${scheduleId ? '/' + scheduleId : ''}`
 
 export default {
   get: () => sendGet<ScheduleResponse[]>(route()),

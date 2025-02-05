@@ -29,6 +29,8 @@ public static class WebApplicationExtensions
             var isChallenge = context.Request.Path == "/challenge";
             if (isRedirect && isOauth2 && !isChallenge)
             {
+                context.Response.Headers.Append("Require-Login", "Yes");
+                context.Response.Headers.AccessControlExposeHeaders = "Require-Login";
                 await context.Response.SendUnauthorizedAsync();
             }
         });

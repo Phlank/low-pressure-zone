@@ -8,18 +8,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="DataStructures\**" />
-	  <Content Remove="DataStructures\**" />
-	  <EmbeddedResource Remove="DataStructures\**" />
-	  <None Remove="DataStructures\**" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Remove="lpz-data.db" />
-		<None Remove="lpz-identity.db" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="FastEndpoints" Version="5.33.0" />
 		<PackageReference Include="FastEndpoints.Security" Version="5.33.0" />
 		<PackageReference Include="FastEndpoints.Swagger" Version="5.33.0" />
@@ -30,10 +18,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\LowPressureZone.Domain\LowPressureZone.Domain.csproj" />
 		<ProjectReference Include="..\LowPressureZone.Identity\LowPressureZone.Identity.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Middleware\" />
 	</ItemGroup>
 
 </Project>
