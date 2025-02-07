@@ -15,6 +15,7 @@ public class PutSchedule : EndpointWithMapper<ScheduleRequest, ScheduleRequestMa
         Put("/schedules/{id}");
         Description(b => b.Produces(204)
                           .Produces(404));
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(ScheduleRequest req, CancellationToken ct)

@@ -13,6 +13,7 @@ public sealed class PutAudience : Endpoint<AudienceRequest, EmptyResponse, Audie
         Put("/audiences/{id}");
         Description(b => b.Produces(204)
                           .Produces(404));
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(AudienceRequest req, CancellationToken ct)

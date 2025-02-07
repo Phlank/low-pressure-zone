@@ -12,6 +12,7 @@ public sealed class GetPerformers : EndpointWithoutRequest<IEnumerable<Performer
     {
         Get("/performers");
         Description(b => b.Produces<IEnumerable<PerformerResponse>>(200));
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

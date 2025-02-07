@@ -13,6 +13,7 @@ public class PostSchedule : EndpointWithMapper<ScheduleRequest, ScheduleRequestM
     {
         Post("/schedules");
         Description(b => b.Produces(201));
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(ScheduleRequest req, CancellationToken ct)

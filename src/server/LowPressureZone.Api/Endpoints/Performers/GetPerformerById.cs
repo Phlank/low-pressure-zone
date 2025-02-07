@@ -13,6 +13,7 @@ public sealed class GetPerformerById : Endpoint<EmptyRequest, PerformerResponse,
         Get("/performers/{id}");
         Description(b => b.Produces<PerformerResponse>(200)
                           .Produces(404));
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(EmptyRequest req, CancellationToken ct)

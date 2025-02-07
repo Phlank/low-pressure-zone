@@ -5,10 +5,8 @@ const route = (scheduleId: string, timeslotId?: string) =>
   `/schedules/${scheduleId}/timeslots${timeslotId ? '/' + timeslotId : ''}`
 
 export default {
-  put: (scheduleId: string, timeslotId: string, request: TimeslotRequest) => () =>
+  put: (scheduleId: string, timeslotId: string, request: TimeslotRequest) =>
     sendPut(route(scheduleId, timeslotId), request),
-  post: (scheduleId: string, request: TimeslotRequest) => () =>
-    sendPost(route(scheduleId), request),
-  delete: (scheduleId: string, timeslotId: string) => () =>
-    sendDelete(route(scheduleId, timeslotId))
+  post: (scheduleId: string, request: TimeslotRequest) => sendPost(route(scheduleId), request),
+  delete: (scheduleId: string, timeslotId: string) => sendDelete(route(scheduleId, timeslotId))
 }

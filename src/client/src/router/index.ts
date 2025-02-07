@@ -14,11 +14,11 @@ const router = createRouter({
     },
     {
       path: '/dashboard',
-      name: 'Dashboard',
+      // name: 'Dashboard',
       component: DashboardView,
       children: [
         {
-          path: 'schedules',
+          path: '',
           name: 'Schedules',
           component: SchedulesView
         },

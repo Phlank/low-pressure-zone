@@ -1,7 +1,6 @@
 import { ApiResponse, type ValidationProblemDetails } from '@/api/apiResponse'
 
 const API_URL = 'https://localhost:5002/api'
-const LOGIN_URL = 'https://localhost:5002/challenge'
 
 const sendRequest = async <TRequest = never, TResponse = never>(
   method: string,
@@ -10,18 +9,11 @@ const sendRequest = async <TRequest = never, TResponse = never>(
 ) => {
   const response = await fetch(`${API_URL}${route}`, {
     body: request ? JSON.stringify(request) : null,
-    method: method,
-    redirect: 'manual'
+    method: method
   })
 
   if (response.status === 200) {
     return new ApiResponse<never, TResponse>(response.status, (await response.json()) as TResponse)
-  }
-  if (response.status === 201) {
-    return new ApiResponse<never, never>(response.status)
-  }
-  if (response.status === 204) {
-    return new ApiResponse<never, never>(response.status)
   }
   if (response.status === 400) {
     return new ApiResponse<TRequest, never>(
@@ -30,9 +22,7 @@ const sendRequest = async <TRequest = never, TResponse = never>(
       (await response.json()) as ValidationProblemDetails<TRequest>
     )
   }
-  if (response.status === 401 && response.headers.get('Require-Login') === 'Yes') {
-    window.location.href = LOGIN_URL
-  }
+  return new ApiResponse<never, never>(response.status)
 }
 
 export const sendGet = async <TResponse>(route: string) => {

@@ -1,9 +1,7 @@
 using FastEndpoints;
 using FastEndpoints.Swagger;
-using Google.Apis.Auth.AspNetCore3;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Identity;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,48 +20,7 @@ if (builder.Environment.IsProduction())
 
 builder.AddDatabases();
 builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<IdentityContext>();
-
-builder.Services.AddOptions<OpenIdConnectOptions>("Authentication:Google");
-builder.Services.Configure<CookiePolicyOptions>(options =>
-{
-    options.Secure = CookieSecurePolicy.Always;
-    options.MinimumSameSitePolicy = SameSiteMode.None;
-});
-builder.Services.AddAuthentication(authOptions =>
-{
-    authOptions.DefaultChallengeScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
-    authOptions.DefaultForbidScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
-    authOptions.DefaultScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
-}).AddJwtBearer().AddGoogleOpenIdConnect(options =>
-{
-    options.ClientId = builder.Configuration.GetValue<string>("Authentication:Google:ClientId");
-    options.ClientSecret = builder.Configuration.GetValue<string>("Authentication:Google:ClientSecret");
-    options.Scope.Add("openid");
-    options.Scope.Add("https://www.googleapis.com/auth/userinfo.email");
-    options.Events = new OpenIdConnectEvents()
-    {
-        OnTokenValidated = async (context) =>
-        {
-            var emailClaim = context.Principal?.Claims.FirstOrDefault(c => c.Type.Contains("email"));
-            if (emailClaim == null)
-            {
-                return;
-            }
-            Console.WriteLine($"{emailClaim.Type}: {emailClaim.Value}");
-            var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<IdentityUser>>();
-            var user = await userManager.FindByEmailAsync(emailClaim.Value);
-            if (user == null)
-            {
-                throw new Exception("Individual has no corresponding user in the database.");
-            }
-        },
-        OnTicketReceived = (context) =>
-        {
-            context.ReturnUri = builder.Configuration.GetValue<string>("Client:BaseUrl") + builder.Configuration.GetValue<string>("Client:LoginRedirect");
-            return Task.CompletedTask;
-        },
-    };
-});
+builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 builder.Services.AddFastEndpoints();
 builder.Services.SwaggerDocument();
@@ -77,7 +34,7 @@ builder.Services.AddCors(options =>
                    .AllowAnyHeader()
                    .AllowAnyMethod();
         });
-    } 
+    }
     else
     {
         options.AddPolicy("Production", builder =>
@@ -91,7 +48,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 app.UseCors(app.Environment.IsDevelopment() ? "Development" : "Production");
-app.UseRedirectUnauthorizedToChallengeEndpoint();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseFastEndpoints(config =>

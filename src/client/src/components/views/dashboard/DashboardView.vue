@@ -35,7 +35,7 @@ const menuItems: MenuItem[] = [
   {
     label: 'Schedules',
     icon: 'pi pi-calendar',
-    route: '/dashboard/schedules'
+    route: '/dashboard'
   },
   {
     label: 'Audiences',

@@ -12,6 +12,7 @@ public sealed class GetAudiences : Endpoint<EmptyRequest, IEnumerable<AudienceRe
     {
         Get("/audiences");
         Description(b => b.Produces<IEnumerable<AudienceResponse>>(200));
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(EmptyRequest req, CancellationToken ct)
