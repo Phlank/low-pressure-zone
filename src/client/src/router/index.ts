@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import DashboardView from '@/components/views/dashboard/DashboardView.vue'
-import SchedulesView from '@/components/views/dashboard/SchedulesView.vue'
-import AudiencesView from '@/components/views/dashboard/AudiencesView.vue'
-import PerformersView from '@/components/views/dashboard/PerformersView.vue'
+import DashboardSchedulesView from '@/components/views/dashboard/DashboardSchedulesView.vue'
+import DashboardAudiencesView from '@/components/views/dashboard/DashboardAudiencesView.vue'
+import DashboardPerformersView from '@/components/views/dashboard/DashboardPerformersView.vue'
 import HomeView from '@/components/views/HomeView.vue'
 
 const router = createRouter({
@@ -14,23 +14,22 @@ const router = createRouter({
     },
     {
       path: '/dashboard',
-      // name: 'Dashboard',
       component: DashboardView,
       children: [
         {
           path: '',
           name: 'Schedules',
-          component: SchedulesView
+          component: DashboardSchedulesView
         },
         {
           path: 'audiences',
           name: 'Audiences',
-          component: AudiencesView
+          component: DashboardAudiencesView
         },
         {
           path: 'performers',
           name: 'Performers',
-          component: PerformersView
+          component: DashboardPerformersView
         }
       ]
     }

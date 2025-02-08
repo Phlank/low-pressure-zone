@@ -1,6 +1,6 @@
 import { ApiResponse, type ValidationProblemDetails } from '@/api/apiResponse'
 
-const API_URL = 'https://localhost:5002/api'
+const API_URL = import.meta.env.API_URL
 
 const sendRequest = async <TRequest = never, TResponse = never>(
   method: string,
