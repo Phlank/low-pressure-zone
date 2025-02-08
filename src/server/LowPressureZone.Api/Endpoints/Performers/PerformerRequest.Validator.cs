@@ -9,6 +9,6 @@ public sealed class PerformerRequestValidator : Validator<PerformerRequest>
     public PerformerRequestValidator()
     {
         RuleFor(p => p.Name).NotEmpty();
-        RuleFor(p => p.Url).NotEmpty().AbsoluteHttpsUri();
+        RuleFor(p => p.Url).NotEmpty().AbsoluteHttpUri();
     }
 }

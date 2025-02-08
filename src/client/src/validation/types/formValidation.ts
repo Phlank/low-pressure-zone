@@ -1,7 +1,7 @@
 import { alwaysValid } from './../rules/single/untypedRules'
 import type { FormValidationState } from './../types/formValidationState'
 import type { PropertyRules } from './../types/propertyRules'
-import { valid, type ValidationResult } from './../types/validationResult'
+import { invalid, valid, type ValidationResult } from './../types/validationResult'
 import type { ValidationRule } from './../types/validationRule'
 
 export class FormValidation<TForm extends object> {
@@ -82,5 +82,14 @@ export class FormValidation<TForm extends object> {
     keys.forEach((key) => {
       this.setValidity(key, valid)
     })
+  }
+
+  mapApiValidationErrors(errors: { [key in keyof TForm]: string[] }) {
+    const keys = this.getKeys()
+    for (let i = 0; i < keys.length; i++) {
+      if (!errors[keys[i]]) continue
+      const message = errors[keys[i]][0]
+      this.setValidity(keys[i], invalid(message))
+    }
   }
 }
