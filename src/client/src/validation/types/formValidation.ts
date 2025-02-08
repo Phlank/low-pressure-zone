@@ -43,7 +43,7 @@ export class FormValidation<TForm extends object> {
     return this.propertyState[key].message
   }
 
-  public setPropertyRule = (key: keyof TForm, rule: ValidationRule) => {
+  public setPropertyRule = <T>(key: keyof TForm, rule: ValidationRule<T>) => {
     this.propertyState[key].rule = rule
   }
 

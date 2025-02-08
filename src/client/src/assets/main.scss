@@ -74,20 +74,31 @@ p {
   }
 }
 
-// .mobile-fill-width {
-//   @include variables.mobile {
-//     width: variables.$mobile-element-width;
-//     margin-left: variables.$space-m;
-//     margin-right: variables.$space-m;
-//   }
-// }
-
-// PrimeVue overrides
-
 div.p-panel {
   border-style: none;
 }
 
 div.p-menu {
   border-style: none;
+}
+
+.desktop-inline-form {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  @include variables.mobile {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .input {
+    margin: variables.$space-m;
+    height: fit-content;
+  }
+
+  .validation {
+    color: red;
+    font-size: 0.8rem;
+  }
 }

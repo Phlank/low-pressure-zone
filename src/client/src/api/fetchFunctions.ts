@@ -1,15 +1,17 @@
 import { ApiResponse, type ValidationProblemDetails } from '@/api/apiResponse'
 
-const API_URL = import.meta.env.API_URL
+const API_URL = import.meta.env.VITE_API_URL
 
 const sendRequest = async <TRequest = never, TResponse = never>(
   method: string,
   route: string,
   request?: TRequest
 ) => {
+  console.log(API_URL)
   const response = await fetch(`${API_URL}${route}`, {
     body: request ? JSON.stringify(request) : null,
-    method: method
+    method: method,
+    headers: request ? { 'Content-Type': 'application/json' } : undefined
   })
 
   if (response.status === 200) {

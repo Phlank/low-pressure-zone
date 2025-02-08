@@ -29,7 +29,7 @@ public sealed class PutPerformer : Endpoint<PerformerRequest, EmptyResponse, Per
         var isNameInUse = DataContext.Performers.Any(p => p.Name == req.Name && p.Id != id);
         if (isNameInUse)
         {
-            ThrowError(new ValidationFailure(nameof(req.Name), "Performer name already in use.", req.Name));
+            ThrowError(new ValidationFailure(nameof(req.Name), "Name in use", req.Name));
         }
 
         if (req.Name != existingPerformer.Name || req.Url != existingPerformer.Url)

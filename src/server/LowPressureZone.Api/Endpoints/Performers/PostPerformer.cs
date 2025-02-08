@@ -20,7 +20,7 @@ public sealed class PostPerformer : Endpoint<PerformerRequest, EmptyResponse, Pe
         var isNameInUse = DataContext.Performers.Any(p => p.Name == req.Name);
         if (isNameInUse)
         {
-            ThrowError(new ValidationFailure(nameof(req.Name), "Performer name already in use.", req.Name));
+            ThrowError(new ValidationFailure(nameof(req.Name), "Name in use", req.Name));
         }
 
         var performer = Map.ToEntity(req);
