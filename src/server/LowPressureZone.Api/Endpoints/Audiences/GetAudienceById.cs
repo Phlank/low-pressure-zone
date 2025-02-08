@@ -13,6 +13,7 @@ public sealed class GetAudienceById : Endpoint<EmptyRequest, AudienceResponse, A
         Get("/audiences/{id}");
         Description(b => b.Produces<AudienceResponse>(200)
                           .Produces(404));
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(EmptyRequest req, CancellationToken ct)

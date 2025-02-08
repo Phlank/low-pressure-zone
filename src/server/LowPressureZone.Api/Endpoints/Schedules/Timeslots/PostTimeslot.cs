@@ -19,6 +19,7 @@ public class PostTimeslot : Endpoint<TimeslotRequest, EmptyResponse, TimeslotReq
         Post("/schedules/{scheduleId}/timeslots");
         Description(b => b.Produces(201)
                           .Produces(404));
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(TimeslotRequest req, CancellationToken ct)

@@ -12,6 +12,7 @@ public sealed class PostPerformer : Endpoint<PerformerRequest, EmptyResponse, Pe
     {
         Post("/performers");
         Description(b => b.Produces(201));
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(PerformerRequest req, CancellationToken ct)

@@ -8,7 +8,7 @@ export default [
     files: ['**/*.{ts,mts,tsx,vue}'],
     rules: {
       '@typescript-eslint/array-type': 'error',
-      '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-explicit-any': 'off'
     }
   },

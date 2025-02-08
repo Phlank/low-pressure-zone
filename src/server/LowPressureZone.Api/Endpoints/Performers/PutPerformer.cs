@@ -13,6 +13,7 @@ public sealed class PutPerformer : Endpoint<PerformerRequest, EmptyResponse, Per
         Put("/performers/{id}");
         Description(b => b.Produces(204)
                           .Produces(404));
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(PerformerRequest req, CancellationToken ct)

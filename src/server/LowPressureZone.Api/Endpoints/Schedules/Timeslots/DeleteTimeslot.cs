@@ -13,6 +13,7 @@ public class DeleteTimeslot : Endpoint<EmptyRequest>
         Delete("/schedules/{scheduleId}/timeslots/{timeslotId}");
         Description(b => b.Produces(204)
                           .Produces(404));
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(EmptyRequest req, CancellationToken ct)

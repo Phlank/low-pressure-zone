@@ -12,6 +12,7 @@ public class GetScheduleById : EndpointWithoutRequest<ScheduleResponse, Schedule
     {
         Get("/schedules/{id}");
         Description(b => b.Produces<ScheduleResponse>(200));
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

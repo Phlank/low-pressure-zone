@@ -12,6 +12,7 @@ public sealed class PostAudience : Endpoint<AudienceRequest, EmptyResponse, Audi
     {
         Post("/audiences");
         Description(b => b.Produces(201));
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(AudienceRequest req, CancellationToken ct)

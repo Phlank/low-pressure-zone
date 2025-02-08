@@ -2,13 +2,12 @@
 
 namespace LowPressureZone.Identity.Constants;
 
-public static class RoleNames
+public record RoleNames
 {
-    public const string ADMIN = "Admin";
-    public const string PERFORMER = "Performer";
-    public const string LISTENER = "Listener";
+    public const string Admin = "Admin";
+    public const string Publicist = "Publicist";
+    public const string Performer = "Performer";
+    public const string Listener = "Listener";
 
-    public static ImmutableArray<string> AllRoles = [
-        ADMIN, PERFORMER, LISTENER
-    ];
+    public static string[] AllRoles => [Admin, Publicist, Performer, Listener];
 }
