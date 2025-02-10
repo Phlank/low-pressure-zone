@@ -1,7 +1,7 @@
-export class ApiResponse<TRequest, TResponse> {
+export class ApiResponse<TRequest extends object, TResponse> {
   readonly data?: TResponse
   readonly status: number
-  private readonly validationProblem?: ValidationProblemDetails<TRequest>
+  readonly validationProblem?: ValidationProblemDetails<TRequest>
 
   constructor(
     status: number,
@@ -15,14 +15,21 @@ export class ApiResponse<TRequest, TResponse> {
 
   readonly isSuccess = () => this.status >= 200 && this.status < 300
 
-  readonly getValidationErrors = () => this.validationProblem?.errors
+  readonly isInvalid = () => this.validationProblem != undefined
+
+  readonly getValidationErrors = (): { [key in keyof TRequest | 'none']?: string[] } =>
+    this.validationProblem?.errors ?? {}
 }
 
-export interface ValidationProblemDetails<T> {
+export interface ValidationProblemDetails<TRequest extends object> {
   type: string
   title: string
   status: number
   instance: string
   traceId: string
-  errors: { [key in keyof T]: string[] }
+  errors: ErrorMessageDictionary<TRequest>
+}
+
+export type ErrorMessageDictionary<TRequest extends object> = {
+  [key in keyof TRequest | 'none']?: string[]
 }

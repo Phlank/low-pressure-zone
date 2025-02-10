@@ -4,6 +4,7 @@ import type { FormValidationState } from './../types/formValidationState'
 import type { PropertyRules } from './../types/propertyRules'
 import { invalid, valid, type ValidationResult } from './../types/validationResult'
 import type { ValidationRule } from './../types/validationRule'
+import type { ErrorMessageDictionary } from '@/api/apiResponse'
 
 class FormValidationImplementation<TForm extends object> implements FormValidation<TForm> {
   private formState: TForm
@@ -87,13 +88,13 @@ class FormValidationImplementation<TForm extends object> implements FormValidati
     })
   }
 
-  public mapApiValidationErrors = (errors: { [key in keyof TForm]: string[] }) => {
+  public mapApiValidationErrors = (errors: ErrorMessageDictionary<TForm>) => {
     const keys = this.getKeys()
-    for (let i = 0; i < keys.length; i++) {
-      if (!errors[keys[i]]) continue
-      const message = errors[keys[i]][0]
-      this.setValidity(keys[i], invalid(message))
-    }
+    keys.forEach((key) => {
+      if (errors[key] == undefined) return
+      const message = errors[key].join(' | ')
+      this.setValidity(key, invalid(message))
+    })
   }
 }
 
@@ -107,7 +108,7 @@ export interface FormValidation<TForm extends object> {
   validateIfDirty: (...keys: (keyof TForm)[]) => boolean
   isValid: (...keys: (keyof TForm)[]) => boolean
   reset: (...keys: (keyof TForm)[]) => void
-  mapApiValidationErrors: (errors: { [key in keyof TForm]: string[] }) => void
+  mapApiValidationErrors: (errors: { [key in keyof TForm | 'none']?: string[] }) => void
 }
 
 export const createFormValidation = <TForm extends object>(

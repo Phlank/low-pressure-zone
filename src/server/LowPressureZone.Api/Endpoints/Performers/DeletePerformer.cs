@@ -21,7 +21,12 @@ public class DeletePerformer : EndpointWithoutRequest<EmptyResponse>
     public override async Task HandleAsync(CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        var deleted = DataContext.Performers.Where(p => p.Id == id).ExecuteDelete();
+        var isLinked = DataContext.Timeslots.Any(t => t.PerformerId == id);
+        if (isLinked)
+        {
+            ThrowError(new FluentValidation.Results.ValidationFailure(null, "Cannot delete performer with linked timeslots."));
+        }
+        var deleted = await DataContext.Performers.Where(p => p.Id == id).ExecuteDeleteAsync(ct);
         if (deleted > 0)
         {
             await SendNoContentAsync(ct);

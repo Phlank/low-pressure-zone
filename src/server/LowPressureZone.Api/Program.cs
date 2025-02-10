@@ -63,7 +63,7 @@ app.UseFastEndpoints(config =>
     config.Errors.ResponseBuilder = (failures, ctx, statusCode) =>
     {
         return new ValidationProblemDetails(
-            failures.GroupBy(f => f.PropertyName.ToCamelCase())
+            failures.GroupBy(f => (f.PropertyName ?? "none").ToCamelCase())
                     .ToDictionary(
                         keySelector: e => e.Key,
                         elementSelector: e => e.Select(m => m.ErrorMessage).ToArray()))
