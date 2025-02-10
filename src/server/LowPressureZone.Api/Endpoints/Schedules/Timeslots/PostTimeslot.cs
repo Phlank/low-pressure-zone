@@ -1,12 +1,9 @@
 ﻿using FastEndpoints;
 using FluentValidation.Results;
-using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Entities;
 using LowPressureZone.Domain.Extensions;
-using LowPressureZone.Domain.QueryableExtensions;
-using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 

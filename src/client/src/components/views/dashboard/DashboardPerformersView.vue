@@ -70,13 +70,13 @@
 
 <script lang="ts" setup>
 import api from '@/api/api'
+import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
 import type { PerformerRequest } from '@/api/performers/performerRequest'
 import type { PerformerResponse } from '@/api/performers/performerResponse'
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
 import FormDialog from '@/components/dialogs/FormDialog.vue'
 import PerformerForm from '@/components/form/requestForms/PerformerForm.vue'
 import {
-  showApiStatusToast,
   showCreateSuccessToast,
   showDeleteSuccessToast,
   showEditSuccessToast
@@ -111,22 +111,15 @@ const createFormInitialState: PerformerRequest = { name: '', url: '' }
 const createForm = useTemplateRef('createForm')
 
 const handleCreatePerformer = async () => {
-  createForm.value?.validation.validate()
-  if (!createForm.value?.validation.isValid()) return
+  if (createForm.value == undefined) return
+  const isValid = createForm.value.validation.validate()
+  if (!isValid) return
 
   isSubmitting.value = true
   const response = await api.performers.post(createForm.value.formState)
   isSubmitting.value = false
 
-  if (!response.isSuccess()) {
-    const errors = response.getValidationErrors()
-    if (errors) {
-      createForm.value!.validation.mapApiValidationErrors(errors)
-    } else {
-      showApiStatusToast(toast, response.status)
-    }
-    return
-  }
+  if (tryHandleUnsuccessfulResponse(response, toast, createForm.value.validation)) return
 
   showCreateSuccessToast(toast, 'performer', createForm.value.formState.name)
   await loadPerformers()
@@ -148,10 +141,9 @@ const handleEditActionClick = (performer: PerformerResponse) => {
 }
 
 const handleSave = async () => {
-  editForm.value?.validation.validate()
-  if (!editForm.value?.validation.isValid()) {
-    return
-  }
+  if (editForm.value == undefined) return
+  const isValid = editForm.value.validation.validate()
+  if (!isValid) return
 
   if (
     editForm.value.formState.name === editFormInitialState.value.name &&
@@ -165,15 +157,7 @@ const handleSave = async () => {
   const response = await api.performers.put(editingId, editForm.value.formState)
   isSubmitting.value = false
 
-  if (!response.isSuccess()) {
-    const errors = response.getValidationErrors()
-    if (errors) {
-      editForm.value.validation.mapApiValidationErrors(errors)
-    } else {
-      showApiStatusToast(toast, response.status)
-    }
-    return
-  }
+  if (tryHandleUnsuccessfulResponse(response, toast, editForm.value.validation)) return
 
   showEditSuccessToast(toast, 'performer', editFormInitialState.value.name)
   const performerInGrid = performers.value.find((performer) => performer.id == editingId)
@@ -202,10 +186,7 @@ const handleDelete = async () => {
   const response = await api.performers.delete(deletingId)
   isSubmitting.value = false
 
-  if (!response.isSuccess()) {
-    showApiStatusToast(toast, response.status)
-    return
-  }
+  if (tryHandleUnsuccessfulResponse(response, toast)) return
 
   const performerInGrid = performers.value.find((performer) => performer.id == deletingId)
   performers.value.splice(performers.value.indexOf(performerInGrid!), 1)
