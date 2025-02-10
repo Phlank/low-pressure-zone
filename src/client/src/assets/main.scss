@@ -92,13 +92,25 @@ div.p-menu {
     align-items: start;
   }
 
-  .input {
-    margin: variables.$space-m;
-    height: fit-content;
-  }
-
   .validation {
     color: red;
     font-size: 0.8rem;
+  }
+}
+
+.input {
+  margin: variables.$space-m variables.$space-s;
+  height: fit-content;
+
+  &__field {
+    &--small {
+      width: variables.$input-width-s;
+    }
+    &--medium {
+      width: variables.$input-width-m;
+    }
+    &--large {
+      width: variables.$input-width-l;
+    }
   }
 }

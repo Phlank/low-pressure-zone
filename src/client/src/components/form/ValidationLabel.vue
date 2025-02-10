@@ -1,5 +1,5 @@
 <template>
-  <label for="for">
+  <label :for="props.for">
     <slot></slot>
     <span v-if="optional"> (Optional)</span>
     <span v-if="message"> - {{ message }}</span>
@@ -7,10 +7,10 @@
 </template>
 
 <script lang="ts" setup>
-withDefaults(
+const props = withDefaults(
   defineProps<{
     for: string
-    message: string | null | undefined
+    message: string
     optional?: boolean
   }>(),
   {

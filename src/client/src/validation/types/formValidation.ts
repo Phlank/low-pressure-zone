@@ -4,7 +4,7 @@ import type { PropertyRules } from './../types/propertyRules'
 import { invalid, valid, type ValidationResult } from './../types/validationResult'
 import type { ValidationRule } from './../types/validationRule'
 
-export class FormValidation<TForm extends object> {
+class FormValidationImplementation<TForm extends object> implements FormValidation<TForm> {
   private formState: TForm
   private propertyState: FormValidationState<TForm>
 
@@ -17,10 +17,10 @@ export class FormValidation<TForm extends object> {
       if (!rule) {
         rule = alwaysValid
       }
-      this.propertyState[key as keyof TForm] = {
+      this.propertyState[key] = {
         rule: rule,
         isValid: true,
-        message: null,
+        message: '',
         isDirty: false
       }
     })
@@ -43,7 +43,10 @@ export class FormValidation<TForm extends object> {
     return this.propertyState[key].message
   }
 
-  public setPropertyRule = <T>(key: keyof TForm, rule: ValidationRule<T>) => {
+  public setPropertyRule = <TProperty extends keyof TForm>(
+    key: TProperty,
+    rule: ValidationRule<TForm[TProperty]>
+  ) => {
     this.propertyState[key].rule = rule
   }
 
@@ -59,7 +62,7 @@ export class FormValidation<TForm extends object> {
     return this.isValid(...keys)
   }
 
-  validateIfDirty(...keys: (keyof TForm)[]): boolean {
+  public validateIfDirty = (...keys: (keyof TForm)[]) => {
     if (keys.length == 0) keys = this.getKeys()
     const dirtyKeys = keys.filter((key) => this.propertyState[key].isDirty)
     if (dirtyKeys.length == 0) {
@@ -68,7 +71,7 @@ export class FormValidation<TForm extends object> {
     return this.validate(...dirtyKeys)
   }
 
-  isValid(...keys: (keyof TForm)[]): boolean {
+  public isValid = (...keys: (keyof TForm)[]) => {
     if (keys.length == 0) keys = this.getKeys()
     for (let i = 0; i < keys.length; i++) {
       const isKeyValid = this.propertyState[keys[i]].isValid
@@ -77,14 +80,15 @@ export class FormValidation<TForm extends object> {
     return true
   }
 
-  reset(...keys: (keyof TForm)[]) {
+  public reset = (...keys: (keyof TForm)[]) => {
     if (keys.length == 0) keys = this.getKeys()
     keys.forEach((key) => {
       this.setValidity(key, valid)
+      this.propertyState[key].isDirty = false
     })
   }
 
-  mapApiValidationErrors(errors: { [key in keyof TForm]: string[] }) {
+  public mapApiValidationErrors = (errors: { [key in keyof TForm]: string[] }) => {
     const keys = this.getKeys()
     for (let i = 0; i < keys.length; i++) {
       if (!errors[keys[i]]) continue
@@ -93,3 +97,21 @@ export class FormValidation<TForm extends object> {
     }
   }
 }
+
+export interface FormValidation<TForm extends object> {
+  message: (key: keyof TForm) => string
+  setPropertyRule: <TProperty extends keyof TForm>(
+    key: TProperty,
+    rule: ValidationRule<TForm[TProperty]>
+  ) => void
+  validate: (...keys: (keyof TForm)[]) => boolean
+  validateIfDirty: (...keys: (keyof TForm)[]) => boolean
+  isValid: (...keys: (keyof TForm)[]) => boolean
+  reset: (...keys: (keyof TForm)[]) => void
+  mapApiValidationErrors: (errors: { [key in keyof TForm]: string[] }) => void
+}
+
+export const createFormValidation = <TForm extends object>(
+  formState: TForm,
+  rules: PropertyRules<TForm>
+): FormValidation<TForm> => new FormValidationImplementation<TForm>(formState, rules)
