@@ -1,3 +1,4 @@
+import { ref } from 'vue'
 import { alwaysValid } from './../rules/single/untypedRules'
 import type { FormValidationState } from './../types/formValidationState'
 import type { PropertyRules } from './../types/propertyRules'
@@ -19,8 +20,8 @@ class FormValidationImplementation<TForm extends object> implements FormValidati
       }
       this.propertyState[key] = {
         rule: rule,
-        isValid: true,
-        message: '',
+        isValid: ref(true),
+        message: ref(''),
         isDirty: false
       }
     })
@@ -28,8 +29,8 @@ class FormValidationImplementation<TForm extends object> implements FormValidati
 
   private setValidity(key: keyof TForm, value: ValidationResult): void {
     const state = this.propertyState[key]
-    state.isValid = value.isValid
-    state.message = value.message
+    state.isValid.value = value.isValid
+    state.message.value = value.message
     if (!state.isDirty && !value.isValid) {
       state.isDirty = true
     }
@@ -40,7 +41,7 @@ class FormValidationImplementation<TForm extends object> implements FormValidati
   }
 
   public message = (key: keyof TForm) => {
-    return this.propertyState[key].message
+    return this.propertyState[key].message.value
   }
 
   public setPropertyRule = <TProperty extends keyof TForm>(
@@ -55,9 +56,7 @@ class FormValidationImplementation<TForm extends object> implements FormValidati
       keys = this.getKeys()
     }
     keys.forEach((key) => {
-      const rule = this.propertyState[key].rule
-      const result = rule ? rule(this.formState[key]) : valid
-      this.setValidity(key, result)
+      this.setValidity(key, this.propertyState[key].rule(this.formState[key]))
     })
     return this.isValid(...keys)
   }
@@ -74,7 +73,7 @@ class FormValidationImplementation<TForm extends object> implements FormValidati
   public isValid = (...keys: (keyof TForm)[]) => {
     if (keys.length == 0) keys = this.getKeys()
     for (let i = 0; i < keys.length; i++) {
-      const isKeyValid = this.propertyState[keys[i]].isValid
+      const isKeyValid = this.propertyState[keys[i]].isValid.value
       if (!isKeyValid) return false
     }
     return true

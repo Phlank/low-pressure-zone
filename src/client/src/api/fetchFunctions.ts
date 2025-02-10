@@ -7,7 +7,6 @@ const sendRequest = async <TRequest = never, TResponse = never>(
   route: string,
   request?: TRequest
 ) => {
-  console.log(API_URL)
   const response = await fetch(`${API_URL}${route}`, {
     body: request ? JSON.stringify(request) : null,
     method: method,

@@ -2,7 +2,7 @@
   <label :for="props.for">
     <slot></slot>
     <span v-if="optional"> (Optional)</span>
-    <span v-if="message"> - {{ message }}</span>
+    <span v-show="message"> - {{ message }}</span>
   </label>
 </template>
 

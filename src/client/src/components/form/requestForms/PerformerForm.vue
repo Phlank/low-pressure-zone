@@ -28,26 +28,29 @@
 import { nameValidator, urlValidator } from '@/validation/rules/composed/performerValidators'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { IftaLabel, InputText } from 'primevue'
-import { reactive } from 'vue'
-import { handleUpdate } from '../formInputHandling'
+import { onMounted, reactive } from 'vue'
+import { createUpdateHandler } from '../formInputHandling'
 import ValidationLabel from '../ValidationLabel.vue'
 import type { PerformerRequest } from '@/api/performers/performerRequest'
 
 const formState: PerformerRequest = reactive({ name: '', url: '' })
-const validation = reactive(
-  createFormValidation(formState, {
-    name: nameValidator,
-    url: urlValidator
-  })
-)
+const validation = createFormValidation(formState, {
+  name: nameValidator,
+  url: urlValidator
+})
 
 const props = defineProps<{
   initialState: PerformerRequest
   isSubmitting: boolean
 }>()
 
-const handleNameUpdate = handleUpdate(formState, validation, 'name', '')
-const handleUrlUpdate = handleUpdate(formState, validation, 'url', '')
+onMounted(() => {
+  formState.name = props.initialState.name
+  formState.url = props.initialState.url
+})
+
+const handleNameUpdate = createUpdateHandler(formState, validation, 'name', '')
+const handleUrlUpdate = createUpdateHandler(formState, validation, 'url', '')
 
 const reset = () => {
   formState.name = props.initialState.name

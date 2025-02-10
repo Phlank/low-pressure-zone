@@ -8,6 +8,14 @@ export const showCreateSuccessToast = (entityType: string, entityName?: string) 
   })
 }
 
+export const showEditSuccessToast = (entityType: string, entityName?: string) => {
+  useToast().add({
+    severity: 'success',
+    summary: 'Success',
+    detail: `Updated ${entityType}${entityName ? ': ' + entityName : ''}`
+  })
+}
+
 export const showApiStatusToast = (status: number) => {
   if (status >= 200 && status < 400) {
     useToast().add({

@@ -1,6 +1,5 @@
 <template>
   <div class="desktop-inline-form">
-    <Toast />
     <PerformerForm ref="form" :initial-state="initialState" :is-submitting="isSubmitting" />
     <Button class="input" label="Create" @click="handleCreatePerformer" :disabled="isSubmitting" />
   </div>
@@ -19,7 +18,8 @@ const initialState: PerformerRequest = { name: '', url: '' }
 const form = useTemplateRef('form')
 
 const handleCreatePerformer = async () => {
-  if (!form.value?.validation.validate()) return
+  form.value?.validation.validate()
+  if (!form.value?.validation.isValid()) return
 
   isSubmitting.value = true
   const response = await api.performers.post(form.value!.formState)
