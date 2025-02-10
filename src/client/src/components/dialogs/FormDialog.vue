@@ -2,8 +2,9 @@
   <Dialog
     class="form-dialog"
     :visible="visible"
-    :header="title"
+    :header="header"
     @update:visible="isSubmitting ? undefined : emit('close')"
+    :draggable="false"
   >
     <template #default><slot></slot></template>
     <template #footer>
@@ -25,7 +26,7 @@
 import { Dialog, Button } from 'primevue'
 
 defineProps<{
-  title: string
+  header: string
   visible: boolean
   isSubmitting: boolean
 }>()

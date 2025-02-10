@@ -5,7 +5,7 @@
         id="name"
         :value="formState.name"
         @update:model-value="handleNameUpdate"
-        :disabled="isSubmitting"
+        :disabled="disabled"
         :invalid="!validation.isValid('name')"
       />
       <ValidationLabel for="name" :message="validation.message('name')">Name</ValidationLabel>
@@ -16,7 +16,7 @@
         id="url"
         :value="formState.url"
         @update:model-value="handleUrlUpdate"
-        :disabled="isSubmitting"
+        :disabled="disabled"
         :invalid="!validation.isValid('url')"
       />
       <ValidationLabel for="url" :message="validation.message('url')">URL</ValidationLabel>
@@ -41,7 +41,7 @@ const validation = createFormValidation(formState, {
 
 const props = defineProps<{
   initialState: PerformerRequest
-  isSubmitting: boolean
+  disabled: boolean
 }>()
 
 onMounted(() => {
