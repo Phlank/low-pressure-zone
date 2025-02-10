@@ -33,6 +33,7 @@ public class PostSchedule : EndpointWithMapper<ScheduleRequest, ScheduleRequestM
         ThrowIfAnyErrors();
 
         DataContext.Schedules.Add(schedule);
+        DataContext.SaveChanges();
         await SendCreatedAtAsync<GetScheduleById>(new { schedule.Id }, Response, cancellation: ct);
     }
 }

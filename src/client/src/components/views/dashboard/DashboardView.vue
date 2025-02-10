@@ -1,6 +1,10 @@
 <template>
   <div class="flex-variable-space-between">
-    <Menu v-if="!isMobile" class="flex-variable-space-between__left" :model="menuItems">
+    <Menu
+      v-if="!isMobile"
+      class="flex-variable-space-between__left flex-variable-space-between__left--variable-height"
+      :model="menuItems"
+    >
       <template #item="{ item, props }">
         <RouterLink v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom>
           <a v-ripple v-if="item.route" :href="href" v-bind="props.action" @click="navigate">

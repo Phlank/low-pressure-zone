@@ -4,6 +4,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import { PrimeVue } from '@primevue/core'
+import { Ripple, ToastService } from 'primevue'
 import Aura from '@primevue/themes/aura'
 
 const app = createApp(App)
@@ -17,7 +18,10 @@ app.use(PrimeVue, {
       darkModeSelector: '.dark-mode-toggle',
       cssLayer: false
     }
-  }
+  },
+  ripple: true
 })
+app.use(ToastService)
+app.directive('ripple', Ripple)
 
 app.mount('#app')

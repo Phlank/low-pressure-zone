@@ -14,6 +14,7 @@ export default defineConfig(() => {
   return {
     server: config,
     preview: config,
+    mode: 'development',
     plugins: [vue(), vueDevTools()],
     resolve: {
       alias: {

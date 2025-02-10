@@ -1,5 +1,5 @@
 import type { ValidationRule } from './validationRule'
 
 export type PropertyRules<TForm extends object> = {
-  [Key in keyof TForm]: ValidationRule
+  [Key in keyof TForm]: ValidationRule<TForm[Key]>
 }

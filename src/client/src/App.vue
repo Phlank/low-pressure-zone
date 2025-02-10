@@ -1,5 +1,6 @@
 <template>
   <div class="app">
+    <Toast />
     <SiteLayout />
   </div>
 </template>
@@ -7,6 +8,7 @@
 <script setup lang="ts">
 import { onMounted, computed, provide, type ComputedRef, ref, type Ref, onUnmounted } from 'vue'
 import SiteLayout from './components/layout/SiteLayout.vue'
+import { Toast } from 'primevue'
 
 const screenWidth: Ref<number> = ref(1000)
 

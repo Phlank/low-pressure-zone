@@ -1,9 +1,12 @@
+using System.Text.Json;
 using FastEndpoints;
 using FastEndpoints.Swagger;
+using Humanizer;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Minerals.StringCases;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +22,10 @@ if (builder.Environment.IsProduction())
 }
 
 builder.AddDatabases();
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+});
 builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<IdentityContext>();
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
@@ -56,7 +63,7 @@ app.UseFastEndpoints(config =>
     config.Errors.ResponseBuilder = (failures, ctx, statusCode) =>
     {
         return new ValidationProblemDetails(
-            failures.GroupBy(f => f.PropertyName)
+            failures.GroupBy(f => (f.PropertyName ?? "none").ToCamelCase())
                     .ToDictionary(
                         keySelector: e => e.Key,
                         elementSelector: e => e.Select(m => m.ErrorMessage).ToArray()))

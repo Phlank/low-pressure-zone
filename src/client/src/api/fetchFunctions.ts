@@ -1,15 +1,16 @@
 import { ApiResponse, type ValidationProblemDetails } from '@/api/apiResponse'
 
-const API_URL = import.meta.env.API_URL
+const API_URL = import.meta.env.VITE_API_URL
 
-const sendRequest = async <TRequest = never, TResponse = never>(
+const sendRequest = async <TRequest extends object = never, TResponse = never>(
   method: string,
   route: string,
   request?: TRequest
 ) => {
   const response = await fetch(`${API_URL}${route}`, {
     body: request ? JSON.stringify(request) : null,
-    method: method
+    method: method,
+    headers: request ? { 'Content-Type': 'application/json' } : undefined
   })
 
   if (response.status === 200) {
@@ -29,11 +30,11 @@ export const sendGet = async <TResponse>(route: string) => {
   return await sendRequest<never, TResponse>('GET', route)
 }
 
-export const sendPut = async <TRequest>(route: string, request: TRequest) => {
+export const sendPut = async <TRequest extends object>(route: string, request: TRequest) => {
   return await sendRequest<TRequest, never>('PUT', route, request)
 }
 
-export const sendPost = async <TRequest>(route: string, request: TRequest) => {
+export const sendPost = async <TRequest extends object>(route: string, request: TRequest) => {
   return await sendRequest<TRequest, never>('POST', route, request)
 }
 

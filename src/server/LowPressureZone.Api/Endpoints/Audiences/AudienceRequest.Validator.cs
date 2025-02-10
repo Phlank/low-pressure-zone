@@ -9,6 +9,6 @@ public sealed class AudienceRequestValidator : Validator<AudienceRequest>
     public AudienceRequestValidator()
     {
         RuleFor(r => r.Name).NotEmpty();
-        RuleFor(r => r.Url).NotEmpty().AbsoluteHttpsUri();
+        RuleFor(r => r.Url).NotEmpty().AbsoluteHttpUri();
     }
 }

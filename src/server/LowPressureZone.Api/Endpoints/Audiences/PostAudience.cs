@@ -1,5 +1,6 @@
 ﻿using FastEndpoints;
 using FluentValidation.Results;
+using LowPressureZone.Api.Constants;
 using LowPressureZone.Domain;
 
 namespace LowPressureZone.Api.Endpoints.Audiences;
@@ -20,7 +21,7 @@ public sealed class PostAudience : Endpoint<AudienceRequest, EmptyResponse, Audi
         var isNameInUse = DataContext.Audiences.Any(a => a.Name == req.Name);
         if (isNameInUse)
         {
-            ThrowError(new ValidationFailure(nameof(req.Name), "Audience name already in use.", req.Name));
+            ThrowError(new ValidationFailure(nameof(req.Name), ValidationMessages.Unique, req.Name));
         }
 
         var entity = Map.ToEntity(req);

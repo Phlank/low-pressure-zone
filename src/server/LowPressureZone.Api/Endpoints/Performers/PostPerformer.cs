@@ -1,5 +1,6 @@
 ﻿using FastEndpoints;
 using FluentValidation.Results;
+using LowPressureZone.Api.Constants;
 using LowPressureZone.Domain;
 
 namespace LowPressureZone.Api.Endpoints.Performers;
@@ -20,7 +21,7 @@ public sealed class PostPerformer : Endpoint<PerformerRequest, EmptyResponse, Pe
         var isNameInUse = DataContext.Performers.Any(p => p.Name == req.Name);
         if (isNameInUse)
         {
-            ThrowError(new ValidationFailure(nameof(req.Name), "Performer name already in use.", req.Name));
+            ThrowError(new ValidationFailure(nameof(req.Name), ValidationMessages.Unique, req.Name));
         }
 
         var performer = Map.ToEntity(req);

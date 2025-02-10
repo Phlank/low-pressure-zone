@@ -1,10 +1,12 @@
+import { ref } from 'vue'
 import { alwaysValid } from './../rules/single/untypedRules'
 import type { FormValidationState } from './../types/formValidationState'
 import type { PropertyRules } from './../types/propertyRules'
-import { valid, type ValidationResult } from './../types/validationResult'
+import { invalid, valid, type ValidationResult } from './../types/validationResult'
 import type { ValidationRule } from './../types/validationRule'
+import type { ErrorMessageDictionary } from '@/api/apiResponse'
 
-export class FormValidation<TForm extends object> {
+class FormValidationImplementation<TForm extends object> implements FormValidation<TForm> {
   private formState: TForm
   private propertyState: FormValidationState<TForm>
 
@@ -17,10 +19,10 @@ export class FormValidation<TForm extends object> {
       if (!rule) {
         rule = alwaysValid
       }
-      this.propertyState[key as keyof TForm] = {
+      this.propertyState[key] = {
         rule: rule,
-        isValid: true,
-        message: null,
+        isValid: ref(true),
+        message: ref(''),
         isDirty: false
       }
     })
@@ -28,8 +30,8 @@ export class FormValidation<TForm extends object> {
 
   private setValidity(key: keyof TForm, value: ValidationResult): void {
     const state = this.propertyState[key]
-    state.isValid = value.isValid
-    state.message = value.message
+    state.isValid.value = value.isValid
+    state.message.value = value.message
     if (!state.isDirty && !value.isValid) {
       state.isDirty = true
     }
@@ -40,10 +42,13 @@ export class FormValidation<TForm extends object> {
   }
 
   public message = (key: keyof TForm) => {
-    return this.propertyState[key].message
+    return this.propertyState[key].message.value
   }
 
-  public setPropertyRule = (key: keyof TForm, rule: ValidationRule) => {
+  public setPropertyRule = <TProperty extends keyof TForm>(
+    key: TProperty,
+    rule: ValidationRule<TForm[TProperty]>
+  ) => {
     this.propertyState[key].rule = rule
   }
 
@@ -52,14 +57,12 @@ export class FormValidation<TForm extends object> {
       keys = this.getKeys()
     }
     keys.forEach((key) => {
-      const rule = this.propertyState[key].rule
-      const result = rule ? rule(this.formState[key]) : valid
-      this.setValidity(key, result)
+      this.setValidity(key, this.propertyState[key].rule(this.formState[key]))
     })
     return this.isValid(...keys)
   }
 
-  validateIfDirty(...keys: (keyof TForm)[]): boolean {
+  public validateIfDirty = (...keys: (keyof TForm)[]) => {
     if (keys.length == 0) keys = this.getKeys()
     const dirtyKeys = keys.filter((key) => this.propertyState[key].isDirty)
     if (dirtyKeys.length == 0) {
@@ -68,19 +71,47 @@ export class FormValidation<TForm extends object> {
     return this.validate(...dirtyKeys)
   }
 
-  isValid(...keys: (keyof TForm)[]): boolean {
+  public isValid = (...keys: (keyof TForm)[]) => {
     if (keys.length == 0) keys = this.getKeys()
     for (let i = 0; i < keys.length; i++) {
-      const isKeyValid = this.propertyState[keys[i]].isValid
+      const isKeyValid = this.propertyState[keys[i]].isValid.value
       if (!isKeyValid) return false
     }
     return true
   }
 
-  reset(...keys: (keyof TForm)[]) {
+  public reset = (...keys: (keyof TForm)[]) => {
     if (keys.length == 0) keys = this.getKeys()
     keys.forEach((key) => {
       this.setValidity(key, valid)
+      this.propertyState[key].isDirty = false
+    })
+  }
+
+  public mapApiValidationErrors = (errors: ErrorMessageDictionary<TForm>) => {
+    const keys = this.getKeys()
+    keys.forEach((key) => {
+      if (errors[key] == undefined) return
+      const message = errors[key].join(' | ')
+      this.setValidity(key, invalid(message))
     })
   }
 }
+
+export interface FormValidation<TForm extends object> {
+  message: (key: keyof TForm) => string
+  setPropertyRule: <TProperty extends keyof TForm>(
+    key: TProperty,
+    rule: ValidationRule<TForm[TProperty]>
+  ) => void
+  validate: (...keys: (keyof TForm)[]) => boolean
+  validateIfDirty: (...keys: (keyof TForm)[]) => boolean
+  isValid: (...keys: (keyof TForm)[]) => boolean
+  reset: (...keys: (keyof TForm)[]) => void
+  mapApiValidationErrors: (errors: { [key in keyof TForm | 'none']?: string[] }) => void
+}
+
+export const createFormValidation = <TForm extends object>(
+  formState: TForm,
+  rules: PropertyRules<TForm>
+): FormValidation<TForm> => new FormValidationImplementation<TForm>(formState, rules)

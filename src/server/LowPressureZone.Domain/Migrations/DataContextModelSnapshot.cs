@@ -47,7 +47,7 @@ namespace LowPressureZone.Domain.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Audiences");
+                    b.ToTable("Audiences", (string)null);
                 });
 
             modelBuilder.Entity("LowPressureZone.Domain.Entities.Performer", b =>
@@ -75,7 +75,7 @@ namespace LowPressureZone.Domain.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Performers");
+                    b.ToTable("Performers", (string)null);
                 });
 
             modelBuilder.Entity("LowPressureZone.Domain.Entities.Schedule", b =>
@@ -106,7 +106,7 @@ namespace LowPressureZone.Domain.Migrations
                     b.HasIndex("Start", "End")
                         .IsUnique();
 
-                    b.ToTable("Schedules");
+                    b.ToTable("Schedules", (string)null);
                 });
 
             modelBuilder.Entity("LowPressureZone.Domain.Entities.Timeslot", b =>
@@ -145,7 +145,7 @@ namespace LowPressureZone.Domain.Migrations
 
                     b.HasIndex("ScheduleId");
 
-                    b.ToTable("Timeslots");
+                    b.ToTable("Timeslots", (string)null);
                 });
 
             modelBuilder.Entity("LowPressureZone.Domain.Entities.Schedule", b =>

@@ -1,18 +1,31 @@
 @use 'variables.scss';
 
-@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
 @import 'primeicons/primeicons.css';
+
+@font-face {
+  font-family: 'Nunito Sans';
+  font-stretch: 100%; /* Note that font-stretch is a % of normal width */
+  font-style: normal; /* See note below */
+  font-weight: 300;
+  src: url('Nunito_Sans.woff2') format('woff2');
+}
 
 body {
   margin: 0;
   overflow: hidden;
   background-image: variables.$bg-light;
   // margin: variables.$space-m;
-  font-family: 'Helvetica Neue', sans-serif;
+  font-family: 'Nunito Sans', 'Helvetica Neue', sans-serif;
   // overflow: hidden;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Helvetica Neue', sans-serif;
 }
 
 body.dark-mode-toggle {
@@ -74,20 +87,47 @@ p {
   }
 }
 
-// .mobile-fill-width {
-//   @include variables.mobile {
-//     width: variables.$mobile-element-width;
-//     margin-left: variables.$space-m;
-//     margin-right: variables.$space-m;
-//   }
-// }
-
-// PrimeVue overrides
-
 div.p-panel {
   border-style: none;
 }
 
 div.p-menu {
   border-style: none;
+}
+
+.desktop-inline-form {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  @include variables.mobile {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .validation {
+    color: red;
+    font-size: 0.8rem;
+  }
+}
+
+.input {
+  margin: variables.$space-m variables.$space-s;
+  height: fit-content;
+
+  &__field {
+    &--small {
+      width: variables.$input-width-s;
+    }
+    &--medium {
+      width: variables.$input-width-m;
+    }
+    &--large {
+      width: variables.$input-width-l;
+    }
+  }
+}
+
+.action {
+  margin: variables.$space-s;
 }

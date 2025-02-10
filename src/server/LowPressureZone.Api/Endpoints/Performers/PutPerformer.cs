@@ -1,5 +1,6 @@
 ﻿using FastEndpoints;
 using FluentValidation.Results;
+using LowPressureZone.Api.Constants;
 using LowPressureZone.Domain;
 
 namespace LowPressureZone.Api.Endpoints.Performers;
@@ -29,7 +30,7 @@ public sealed class PutPerformer : Endpoint<PerformerRequest, EmptyResponse, Per
         var isNameInUse = DataContext.Performers.Any(p => p.Name == req.Name && p.Id != id);
         if (isNameInUse)
         {
-            ThrowError(new ValidationFailure(nameof(req.Name), "Performer name already in use.", req.Name));
+            ThrowError(new ValidationFailure(nameof(req.Name), ValidationMessages.Unique, req.Name));
         }
 
         if (req.Name != existingPerformer.Name || req.Url != existingPerformer.Url)
