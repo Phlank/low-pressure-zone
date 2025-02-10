@@ -153,6 +153,14 @@ const handleSave = async () => {
     return
   }
 
+  if (
+    editForm.value.formState.name === editFormInitialState.value.name &&
+    editForm.value.formState.url === editFormInitialState.value.url
+  ) {
+    showEditDialog.value = false
+    return
+  }
+
   isSubmitting.value = true
   const response = await api.performers.put(editingId, editForm.value.formState)
   isSubmitting.value = false
@@ -172,6 +180,7 @@ const handleSave = async () => {
   if (performerInGrid) {
     performerInGrid.name = editForm.value.formState.name
     performerInGrid.url = editForm.value.formState.url
+    performerInGrid.modifiedDate = new Date().toLocaleString()
   }
   showEditDialog.value = false
 }
@@ -188,10 +197,19 @@ const handleDeleteActionClick = (performer: PerformerResponse) => {
   showDeleteDialog.value = true
 }
 
-const handleDelete = () => {
-  showDeleteDialog.value = false
-  showDeleteSuccessToast(toast, 'performer', deletingName.value)
+const handleDelete = async () => {
+  isSubmitting.value = true
+  const response = await api.performers.delete(deletingId)
+  isSubmitting.value = false
+
+  if (!response.isSuccess()) {
+    showApiStatusToast(toast, response.status)
+    return
+  }
+
   const performerInGrid = performers.value.find((performer) => performer.id == deletingId)
   performers.value.splice(performers.value.indexOf(performerInGrid!), 1)
+  showDeleteSuccessToast(toast, 'performer', deletingName.value)
+  showDeleteDialog.value = false
 }
 </script>
