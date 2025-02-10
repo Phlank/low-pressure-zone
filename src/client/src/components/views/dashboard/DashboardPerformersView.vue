@@ -53,7 +53,7 @@
       <PerformerForm
         ref="editForm"
         :initial-state="editFormInitialState"
-        :is-submitting="isSubmitting"
+        :disabled="isSubmitting"
       />
     </FormDialog>
     <DeleteDialog
@@ -105,14 +105,19 @@ const loadPerformers = async () => {
   performers.value = response.data!
 }
 
+// CREATING PERFORMERS
+
 const createFormInitialState: PerformerRequest = { name: '', url: '' }
 const createForm = useTemplateRef('createForm')
+
 const handleCreatePerformer = async () => {
   createForm.value?.validation.validate()
   if (!createForm.value?.validation.isValid()) return
+
   isSubmitting.value = true
   const response = await api.performers.post(createForm.value.formState)
   isSubmitting.value = false
+
   if (!response.isSuccess()) {
     const errors = response.getValidationErrors()
     if (errors) {
@@ -122,29 +127,36 @@ const handleCreatePerformer = async () => {
     }
     return
   }
+
   showCreateSuccessToast(toast, 'performer', createForm.value.formState.name)
   await loadPerformers()
   createForm.value.reset()
 }
 
+// EDITING PERFORMERS
+
 const showEditDialog = ref(false)
 let editingId = ''
 const editFormInitialState: Ref<PerformerRequest> = ref({ name: '', url: '' })
 const editForm = useTemplateRef('editForm')
+
 const handleEditActionClick = (performer: PerformerResponse) => {
   editingId = performer.id
   editFormInitialState.value.name = performer.name
   editFormInitialState.value.url = performer.url
   showEditDialog.value = true
 }
+
 const handleSave = async () => {
   editForm.value?.validation.validate()
   if (!editForm.value?.validation.isValid()) {
     return
   }
+
   isSubmitting.value = true
   const response = await api.performers.put(editingId, editForm.value.formState)
   isSubmitting.value = false
+
   if (!response.isSuccess()) {
     const errors = response.getValidationErrors()
     if (errors) {
@@ -154,6 +166,7 @@ const handleSave = async () => {
     }
     return
   }
+
   showEditSuccessToast(toast, 'performer', editFormInitialState.value.name)
   const performerInGrid = performers.value.find((performer) => performer.id == editingId)
   if (performerInGrid) {
@@ -163,14 +176,18 @@ const handleSave = async () => {
   showEditDialog.value = false
 }
 
+// DELETING PERFORMERS
+
 const showDeleteDialog = ref(false)
 let deletingId = ''
 const deletingName = ref('')
+
 const handleDeleteActionClick = (performer: PerformerResponse) => {
   deletingId = performer.id
   deletingName.value = performer.name
   showDeleteDialog.value = true
 }
+
 const handleDelete = () => {
   showDeleteDialog.value = false
   showDeleteSuccessToast(toast, 'performer', deletingName.value)
