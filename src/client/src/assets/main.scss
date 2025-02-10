@@ -1,18 +1,31 @@
 @use 'variables.scss';
 
-@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
 @import 'primeicons/primeicons.css';
+
+@font-face {
+  font-family: 'Nunito Sans';
+  font-stretch: 100%; /* Note that font-stretch is a % of normal width */
+  font-style: normal; /* See note below */
+  font-weight: 300;
+  src: url('Nunito_Sans.woff2') format('woff2');
+}
 
 body {
   margin: 0;
   overflow: hidden;
   background-image: variables.$bg-light;
   // margin: variables.$space-m;
-  font-family: 'Helvetica Neue', sans-serif;
+  font-family: 'Nunito Sans', 'Helvetica Neue', sans-serif;
   // overflow: hidden;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Helvetica Neue', sans-serif;
 }
 
 body.dark-mode-toggle {
