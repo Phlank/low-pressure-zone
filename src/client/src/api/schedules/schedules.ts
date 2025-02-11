@@ -1,4 +1,4 @@
-import { sendGet, sendPost, sendPut } from '../fetchFunctions'
+import { sendDelete, sendGet, sendPost, sendPut } from '../fetchFunctions'
 import { type ScheduleResponse } from './scheduleResponse'
 import type { ScheduleRequest } from './scheduleRequest'
 
@@ -10,7 +10,8 @@ export default {
   post: <TSchedule extends ScheduleRequest>(request: TSchedule) =>
     sendPost<ScheduleRequest>(route(), mapRequest(request)),
   put: <TSchedule extends ScheduleRequest>(id: string, request: TSchedule) =>
-    sendPut<ScheduleRequest>(route(id), mapRequest(request))
+    sendPut<ScheduleRequest>(route(id), mapRequest(request)),
+  delete: (id: string) => sendDelete(route(id))
 }
 
 // Forms will deal with dates, but we don't want to send the actual dates into the API

@@ -5,7 +5,9 @@
     @update:visible="isSubmitting ? undefined : emit('close')"
     :draggable="false"
   >
-    <template #default> Delete {{ entityType }} {{ entityName }}? </template>
+    <template #default>
+      {{ `Delete ${entityType}${entityName == undefined ? '?' : ' ' + entityName + '?'}` }}
+    </template>
     <template #footer>
       <div class="form-dialog__footer">
         <Button
@@ -35,7 +37,7 @@ defineProps<{
   visible: boolean
   isSubmitting: boolean
   entityType: string
-  entityName: string
+  entityName?: string
 }>()
 
 const emit = defineEmits<{
