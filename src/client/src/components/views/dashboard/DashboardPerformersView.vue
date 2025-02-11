@@ -1,6 +1,6 @@
 <template>
   <div class="performers-dashboard">
-    <div class="desktop-inline-form">
+    <div class="desktop-inline">
       <PerformerForm
         ref="createForm"
         :initial-state="createFormInitialState"
@@ -32,6 +32,7 @@
             outlined
           />
           <Button
+            v-if="slotProps.data.canDelete"
             class="action"
             icon="pi pi-trash"
             severity="danger"

@@ -26,6 +26,9 @@ public sealed class GetAudienceById : Endpoint<EmptyRequest, AudienceResponse, A
             return;
         }
 
+        var response = Map.FromEntity(audience);
+        response.CanDelete = !DataContext.Schedules.Any(s => s.AudienceId == audience.Id);
+
         await SendOkAsync(Map.FromEntity(audience), ct);
     }
 }

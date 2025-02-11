@@ -1,5 +1,5 @@
 <template>
-  <div class="desktop-inline">
+  <div class="performer-form desktop-inline">
     <IftaLabel class="input input--small">
       <InputText
         id="name"
@@ -13,8 +13,8 @@
     </IftaLabel>
     <IftaLabel class="input input--large">
       <InputText
-        id="url"
         class="input__field"
+        id="url"
         :value="formState.url"
         @update:model-value="handleUrlUpdate"
         :disabled="disabled"
@@ -26,22 +26,22 @@
 </template>
 
 <script lang="ts" setup>
-import { nameValidator, urlValidator } from '@/validation/rules/composed/performerValidators'
+import { nameValidator, urlValidator } from '@/validation/rules/composed/audienceValidators'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { IftaLabel, InputText } from 'primevue'
 import { onMounted, reactive } from 'vue'
 import { createUpdateHandler } from '../formInputHandling'
 import ValidationLabel from '../ValidationLabel.vue'
-import type { PerformerRequest } from '@/api/performers/performerRequest'
+import type { AudienceRequest } from '@/api/audiences/audienceRequest'
 
-const formState: PerformerRequest = reactive({ name: '', url: '' })
+const formState: AudienceRequest = reactive({ name: '', url: '' })
 const validation = createFormValidation(formState, {
   name: nameValidator,
   url: urlValidator
 })
 
 const props = defineProps<{
-  initialState: PerformerRequest
+  initialState: AudienceRequest
   disabled: boolean
 }>()
 

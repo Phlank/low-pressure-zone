@@ -19,12 +19,15 @@ public sealed class GetPerformerById : Endpoint<EmptyRequest, PerformerResponse,
     public override async Task HandleAsync(EmptyRequest req, CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        var performer = DataContext.Performers.AsNoTracking().FirstOrDefault(p => p.Id == id);
+        var performer = await DataContext.Performers.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id, ct);
         if (performer == null)
         {
             await SendNotFoundAsync(ct);
             return;
         }
+
+        var response = Map.FromEntity(performer);
+        response.CanDelete = !await DataContext.Timeslots.AnyAsync(t => t.PerformerId == id, ct);
         await SendOkAsync(Map.FromEntity(performer), ct);
     }
 }
