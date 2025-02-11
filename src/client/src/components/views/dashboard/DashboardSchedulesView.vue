@@ -3,6 +3,24 @@
     <ScheduleForm ref="createForm" :audiences="audiences" :disabled="false" />
     <Button class="input" label="Create" @click="handleCreateClick" />
   </div>
+  <DataTable v-if="isLoaded" :value="schedules">
+    <Column field="audience.name" header="Audience" />
+    <Column header="Date">
+      <template #body="{ data }">
+        {{ new Date(Date.parse(data.start)).toLocaleDateString() }}
+      </template>
+    </Column>
+    <Column header="Start">
+      <template #body="{ data }">
+        {{ new Date(Date.parse(data.start)).toLocaleTimeString() }}
+      </template>
+    </Column>
+    <Column header="End">
+      <template #body="{ data }">
+        {{ new Date(Date.parse(data.end)).toLocaleTimeString() }}
+      </template>
+    </Column>
+  </DataTable>
 </template>
 
 <script lang="ts" setup>
@@ -12,17 +30,16 @@ import type { AudienceResponse } from '@/api/audiences/audienceResponse'
 import type { ScheduleResponse } from '@/api/schedules/scheduleResponse'
 import ScheduleForm from '@/components/form/requestForms/ScheduleForm.vue'
 import { showCreateSuccessToast } from '@/utils/toastUtils'
-import { Button, useToast } from 'primevue'
+import { Button, DataTable, useToast, Column } from 'primevue'
 import { onMounted, ref, useTemplateRef, type Ref } from 'vue'
 
 const toast = useToast()
 const isSubmitting = ref(false)
-const isLoading = ref(false)
+const isLoaded = ref(false)
 
 onMounted(async () => {
-  isLoading.value = true
   await Promise.all([loadSchedules(), loadAudiences()])
-  isLoading.value = false
+  isLoaded.value = true
 })
 
 const schedules: Ref<ScheduleResponse[]> = ref([])

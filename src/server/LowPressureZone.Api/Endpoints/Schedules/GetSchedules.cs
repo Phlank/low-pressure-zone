@@ -1,7 +1,6 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.QueryableExtensions;
-using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;

@@ -33,14 +33,14 @@ public class PutSchedule : EndpointWithMapper<ScheduleRequest, ScheduleRequestMa
             var doesOverlapAnySchedule = DataContext.Schedules.Where(s => s.Id != id).WhereOverlaps(req).Any();
             if (doesOverlapAnySchedule)
             {
-                AddError(new ValidationFailure(nameof(req.Start), "Schedule times cannot overlap."));
-                AddError(new ValidationFailure(nameof(req.End), "Schedule times cannot overlap."));
+                AddError(new ValidationFailure(nameof(req.Start), "Overlaps other schedule"));
+                AddError(new ValidationFailure(nameof(req.End), "Overlaps other schedule"));
             }
             var doesExcludeAnyTimeslots = DataContext.Timeslots.Where(t => t.ScheduleId == id).WhereNotInside(req).Any();
             if (doesExcludeAnyTimeslots)
             {
-                AddError(new ValidationFailure(nameof(req.Start), "Time range cannot exclude linked timeslots."));
-                AddError(new ValidationFailure(nameof(req.End), "Time range cannot exclude linked timeslots."));
+                AddError(new ValidationFailure(nameof(req.Start), "Excludes timeslots"));
+                AddError(new ValidationFailure(nameof(req.End), "Excludes timeslots"));
             }
         }
 
@@ -48,7 +48,7 @@ public class PutSchedule : EndpointWithMapper<ScheduleRequest, ScheduleRequestMa
         {
             if (!DataContext.Has<Audience>(req.AudienceId))
             {
-                AddError(new ValidationFailure(nameof(req.AudienceId), "Invalid audience specified."));
+                AddError(new ValidationFailure(nameof(req.AudienceId), "Invalid audience"));
             }
         }
 

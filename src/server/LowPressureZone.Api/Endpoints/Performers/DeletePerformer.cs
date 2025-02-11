@@ -1,7 +1,5 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Domain;
-using LowPressureZone.Domain.Entities;
-using LowPressureZone.Domain.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Performers;

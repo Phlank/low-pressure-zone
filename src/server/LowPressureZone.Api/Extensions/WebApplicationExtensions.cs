@@ -1,5 +1,4 @@
-﻿using FastEndpoints;
-using LowPressureZone.Domain;
+﻿using LowPressureZone.Domain;
 using LowPressureZone.Identity;
 using Microsoft.EntityFrameworkCore;
 
