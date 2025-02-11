@@ -23,6 +23,7 @@
     <Column style="text-align: right">
       <template #body="{ data }">
         <Button
+          v-if="data.timeslots.length === 0"
           class="action"
           icon="pi pi-trash"
           severity="danger"
