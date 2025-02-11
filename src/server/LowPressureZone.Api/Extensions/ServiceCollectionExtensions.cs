@@ -1,4 +1,8 @@
-﻿using LowPressureZone.Domain;
+﻿using LowPressureZone.Api.Endpoints.Audiences;
+using LowPressureZone.Api.Endpoints.Performers;
+using LowPressureZone.Api.Endpoints.Schedules;
+using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
+using LowPressureZone.Domain;
 using LowPressureZone.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,5 +23,17 @@ public static class ServiceCollectionExtensions
         {
             options.UseNpgsql(dataConnectionString);
         });
+    }
+
+    public static void AddMappers(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddSingleton<AudienceRequestMapper>();
+        builder.Services.AddSingleton<AudienceResponseMapper>();
+        builder.Services.AddSingleton<ScheduleRequestMapper>();
+        builder.Services.AddSingleton<ScheduleResponseMapper>();
+        builder.Services.AddSingleton<PerformerRequestMapper>();
+        builder.Services.AddSingleton<PerformerResponseMapper>();
+        builder.Services.AddSingleton<TimeslotRequestMapper>();
+        builder.Services.AddSingleton<TimeslotResponseMapper>();
     }
 }

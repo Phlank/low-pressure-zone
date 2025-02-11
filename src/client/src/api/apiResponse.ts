@@ -17,7 +17,7 @@ export class ApiResponse<TRequest extends object, TResponse> {
 
   readonly isInvalid = () => this.validationProblem != undefined
 
-  readonly getValidationErrors = (): { [key in keyof TRequest | 'none']?: string[] } =>
+  readonly getValidationErrors = (): ErrorMessageDictionary<TRequest> =>
     this.validationProblem?.errors ?? {}
 }
 

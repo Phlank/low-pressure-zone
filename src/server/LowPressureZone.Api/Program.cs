@@ -26,6 +26,7 @@ builder.Services.Configure<JsonOptions>(options =>
 {
     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
+builder.AddMappers();
 builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<IdentityContext>();
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();

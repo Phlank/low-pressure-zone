@@ -11,20 +11,20 @@
         placeholder="Select an audience"
         :invalid="!validation.isValid('audienceId')"
         :model-value="formState.audienceId"
-        @update:model-value="(value) => (formState.audienceId = value)"
+        @update:model-value="handleUpdateAudience"
       />
       <ValidationLabel for="audienceSelect" :message="validation.message('audienceId')">
         Audience
       </ValidationLabel>
     </IftaLabel>
-    <IftaLabel class="input input--small">
+    <IftaLabel class="input input--medium">
       <DatePicker
         class="input__field"
         id="startTime"
         hourFormat="12"
         :min-date="new Date()"
         :model-value="formState.startTime"
-        @update:model-value="handleStartUpdate"
+        @update:model-value="handleUpdateStart"
         :invalid="!validation.isValid('start')"
         show-time
         fluid
@@ -33,15 +33,15 @@
         Start Time
       </ValidationLabel>
     </IftaLabel>
-    <IftaLabel class="input input--small">
+    <IftaLabel class="input input--medium">
       <DatePicker
         class="input__field"
         id="startTime"
         hourFormat="12"
         :min-date="formState.startTime"
-        :max-date="new Date(formState.startTime.getTime() + MAX_DURATION_MINUTES * 60000)"
+        :max-date="new Date(formState.startTime.getTime() + MAX_DURATION_MINUTES * MS_PER_MINUTE)"
         :model-value="formState.endTime"
-        @update:model-value="handleEndUpdate"
+        @update:model-value="handleUpdateEnd"
         :invalid="!validation.isValid('end')"
         show-time
         fluid
@@ -57,26 +57,50 @@
 import type { AudienceResponse } from '@/api/audiences/audienceResponse'
 import { DatePicker, IftaLabel, Select } from 'primevue'
 import ValidationLabel from '../ValidationLabel.vue'
-import { reactive } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import { createFormValidation } from '@/validation/types/formValidation'
-import type { ScheduleRequest } from '@/api/schedules/scheduleRequest'
-import { audienceValidator } from '@/validation/rules/composed/scheduleValidators'
+import {
+  audienceValidator,
+  endValidator,
+  startValidator
+} from '@/validation/rules/composed/scheduleValidators'
 import { alwaysValid } from '@/validation/rules/single/untypedRules'
+import { MS_PER_MINUTE } from '@/constants/times'
+import type { ScheduleRequest } from '@/api/schedules/scheduleRequest'
 
 const MAX_DURATION_MINUTES = 1440
-let now = new Date()
+const DEFAULT_MINUTES = 60
 
-const formState = reactive({
+let now = new Date()
+const resetTime = new Date(
+  now.getFullYear(),
+  now.getMonth(),
+  now.getDate(),
+  now.getHours() + 1,
+  0,
+  0,
+  0
+)
+
+export interface ScheduleFormState extends ScheduleRequest {
+  startTime: Date
+  endTime: Date
+}
+
+const formState: ScheduleFormState = reactive({
   audienceId: '',
-  startTime: now,
-  start: now.toISOString(),
-  endTime: new Date(now.getTime() + 60 * 60000),
-  end: now.toISOString()
+  startTime: resetTime,
+  start: resetTime.toISOString(),
+  endTime: new Date(resetTime.getTime() + DEFAULT_MINUTES * MS_PER_MINUTE),
+  end: new Date(resetTime.getTime() + DEFAULT_MINUTES * MS_PER_MINUTE).toISOString()
 })
-const validation = createFormValidation(formState as ScheduleRequest, {
+const startRef = ref(formState.start)
+const validation = createFormValidation(formState, {
   audienceId: audienceValidator,
-  start: alwaysValid,
-  end: alwaysValid
+  start: startValidator,
+  startTime: alwaysValid,
+  end: endValidator(startRef),
+  endTime: alwaysValid
 })
 
 defineProps<{
@@ -84,27 +108,42 @@ defineProps<{
   disabled: boolean
 }>()
 
-const handleStartUpdate = (value: Date | Date[] | (Date | null)[] | null | undefined) => {
+const handleUpdateAudience = (value: string) => {
+  formState.audienceId = value
+  validation.validateIfDirty('audienceId')
+}
+
+const handleUpdateStart = (value: Date | Date[] | (Date | null)[] | null | undefined) => {
   const duration = formState.endTime.getTime() - formState.startTime.getTime()
   formState.startTime = value as Date
   formState.start = formState.startTime.toISOString()
   formState.endTime = new Date(formState.startTime.getTime() + duration)
   formState.end = formState.endTime.toISOString()
+  validation.validateIfDirty('start')
+  validation.validateIfDirty('end')
 }
 
-const handleEndUpdate = (value: Date | Date[] | (Date | null)[] | null | undefined) => {
+const handleUpdateEnd = (value: Date | Date[] | (Date | null)[] | null | undefined) => {
   formState.endTime = value as Date
   formState.end = formState.endTime.toISOString()
+  validation.validateIfDirty('end')
 }
 
 const reset = () => {
   now = new Date()
   formState.audienceId = ''
-  formState.startTime = now
-  formState.start = now.toISOString()
-  formState.endTime = new Date(now.getTime() + 60 * 60000)
+  formState.startTime = resetTime
+  formState.start = formState.startTime.toISOString()
+  formState.endTime = new Date(resetTime.getTime() + DEFAULT_MINUTES * MS_PER_MINUTE)
   formState.end = formState.endTime.toISOString()
 }
 
 defineExpose({ formState, validation, reset })
+
+watch(
+  () => formState.start,
+  (newValue: string) => {
+    startRef.value = newValue
+  }
+)
 </script>
