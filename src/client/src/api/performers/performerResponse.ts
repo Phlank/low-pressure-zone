@@ -4,4 +4,5 @@ export interface PerformerResponse {
   url: string
   createdDate: string
   modifiedDate: string
+  canDelete: boolean
 }

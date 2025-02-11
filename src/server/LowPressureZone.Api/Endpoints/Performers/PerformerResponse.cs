@@ -7,4 +7,5 @@ public sealed class PerformerResponse
     public required string Url { get; set; }
     public required DateTime CreatedDate { get; set; }
     public required DateTime ModifiedDate { get; set; }
+    public bool CanDelete { get; set; }
 }

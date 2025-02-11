@@ -32,6 +32,7 @@
             outlined
           />
           <Button
+            v-if="slotProps.data.canDelete"
             class="action"
             icon="pi pi-trash"
             severity="danger"

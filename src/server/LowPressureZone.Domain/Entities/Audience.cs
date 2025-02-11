@@ -4,4 +4,5 @@ public class Audience : BaseEntity
 {
     public required string Name { get; set; }
     public required string Url { get; set; }
+    public virtual List<Schedule> Schedules { get; set; } = new();
 }

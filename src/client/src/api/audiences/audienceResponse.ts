@@ -4,4 +4,5 @@ export interface AudienceResponse {
   url: string
   createdDate: string
   modifiedDate: string
+  canDelete: boolean
 }

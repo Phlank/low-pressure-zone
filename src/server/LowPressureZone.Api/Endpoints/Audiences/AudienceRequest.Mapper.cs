@@ -11,8 +11,8 @@ public sealed class AudienceRequestMapper : RequestMapper<AudienceRequest, Domai
             Id = Guid.NewGuid(),
             Name = r.Name,
             Url = r.Url,
-            CreatedDate = DateTime.Now,
-            LastModifiedDate = DateTime.Now
+            CreatedDate = DateTime.UtcNow,
+            LastModifiedDate = DateTime.UtcNow
         };
     }
 }
