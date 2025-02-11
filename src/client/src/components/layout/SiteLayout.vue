@@ -26,10 +26,26 @@ import SiteFooter from './SiteFooter.vue'
 
   &__header {
     margin-bottom: variables.$space-m;
+    font-size: 1.2rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+  }
+
+  main {
+    // margin-bottom: variables.$header-height;
   }
 
   &__footer {
-    margin-top: variables.$space-m;
+    position: sticky;
+    margin-top: auto;
+    bottom: variables.$space-m;
+    text-align: center;
+    width: 100%;
   }
 }
 </style>

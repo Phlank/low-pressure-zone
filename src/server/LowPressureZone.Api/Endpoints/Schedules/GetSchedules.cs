@@ -14,12 +14,12 @@ public class GetSchedules : EndpointWithoutRequest<IEnumerable<ScheduleResponse>
     {
         Get("/schedules");
         Description(b => b.Produces<IEnumerable<ScheduleResponse>>(200));
-        Roles(RoleNames.AllRoles);
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var schedules = DataContext.Schedules.IncludeConnectingProperties().AsNoTracking().ToList();
+        var schedules = await DataContext.Schedules.IncludeConnectingProperties().AsNoTracking().ToListAsync(ct);
         await SendOkAsync(schedules.Select(Map.FromEntity), ct);
     }
 }

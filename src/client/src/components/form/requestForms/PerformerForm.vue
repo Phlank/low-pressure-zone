@@ -1,8 +1,9 @@
 <template>
-  <div class="performer-form desktop-inline-form">
-    <IftaLabel class="input">
+  <div class="desktop-inline">
+    <IftaLabel class="input input--small">
       <InputText
         id="name"
+        class="input__field"
         :value="formState.name"
         @update:model-value="handleNameUpdate"
         :disabled="disabled"
@@ -10,10 +11,10 @@
       />
       <ValidationLabel for="name" :message="validation.message('name')">Name</ValidationLabel>
     </IftaLabel>
-    <IftaLabel class="input">
+    <IftaLabel class="input input--large">
       <InputText
-        class="input__field--large"
         id="url"
+        class="input__field"
         :value="formState.url"
         @update:model-value="handleUrlUpdate"
         :disabled="disabled"

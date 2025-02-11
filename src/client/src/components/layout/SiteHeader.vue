@@ -59,19 +59,7 @@ const toggleMenu = (event: MouseEvent) => {
 </script>
 
 <style lang="scss" scoped>
-@use './../../assets/main.scss';
 @use './../../assets/variables.scss';
-
-.header {
-  font-size: 1.2rem;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  border-top: 0;
-  border-left: 0;
-  border-right: 0;
-  border-radius: 0;
-}
 
 .p-button {
   margin: 0 variables.$space-s;
