@@ -42,14 +42,7 @@
       </template>
     </Column>
     <template #expansion="rowProps">
-      <DataTable data-key="id" :value="rowProps.data.timeslots">
-        <Column field="start" header="Start">
-          <template #body="timeslotProps">
-            {{ timeslotProps.data.start.toLocaleDateString() }}
-          </template>
-        </Column>
-        <Column field="performer.name" header="Performer" />
-      </DataTable>
+      <DashboardSchedulesTimeslotsTable :schedule="rowProps.data" />
     </template>
   </DataTable>
   <FormDialog
@@ -88,6 +81,7 @@ import { setToNextHour } from '@/utils/dateUtils'
 import { showCreateSuccessToast, showEditSuccessToast } from '@/utils/toastUtils'
 import { Button, DataTable, useToast, Column } from 'primevue'
 import { onMounted, reactive, ref, useTemplateRef, type Ref } from 'vue'
+import DashboardSchedulesTimeslotsTable from './DashboardSchedulesTimeslotsTable.vue'
 
 const toast = useToast()
 const isSubmitting = ref(false)
