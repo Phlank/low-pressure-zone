@@ -4,11 +4,11 @@
       <Select
         class="input__field"
         id="audienceSelect"
-        :options="audiences"
+        placeholder="Select an audience"
         option-label="name"
         option-value="id"
+        :options="audiences"
         :disabled="disabled"
-        placeholder="Select an audience"
         :invalid="!validation.isValid('audienceId')"
         :model-value="formState.audienceId"
         @update:model-value="handleUpdateAudience"
@@ -22,12 +22,11 @@
         class="input__field"
         id="startTime"
         hourFormat="12"
-        :min-date="minStartTime"
-        :step-minute="60"
-        :step-second="3600"
+        :min-date="minimumDate(formState.startTime, minStartTime)"
         :model-value="formState.startTime"
-        @update:model-value="handleUpdateStart"
+        :disabled="disabled || formState.startTime.getTime() < minStartTime.getTime()"
         :invalid="!validation.isValid('start')"
+        @update:model-value="handleUpdateStart"
         show-time
         fluid
       />
@@ -43,8 +42,9 @@
         :min-date="formState.startTime"
         :max-date="new Date(formState.startTime.getTime() + MAX_DURATION_MINUTES * MS_PER_MINUTE)"
         :model-value="formState.endTime"
-        @update:model-value="handleUpdateEnd"
         :invalid="!validation.isValid('end')"
+        :disabled="disabled || formState.endTime.getTime() < minStartTime.getTime()"
+        @update:model-value="handleUpdateEnd"
         show-time
         fluid
       />
@@ -59,7 +59,7 @@
 import type { AudienceResponse } from '@/api/audiences/audienceResponse'
 import { DatePicker, IftaLabel, Select } from 'primevue'
 import ValidationLabel from '../ValidationLabel.vue'
-import { reactive, ref, watch } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
 import { createFormValidation } from '@/validation/types/formValidation'
 import {
   audienceValidator,
@@ -69,7 +69,7 @@ import {
 import { alwaysValid } from '@/validation/rules/single/untypedRules'
 import { MS_PER_MINUTE } from '@/constants/times'
 import type { ScheduleRequest } from '@/api/schedules/scheduleRequest'
-import { setToHour } from '@/utils/dateUtils'
+import { setToHour, minimumDate } from '@/utils/dateUtils'
 
 const MAX_DURATION_MINUTES = 1440
 const DEFAULT_MINUTES = 60
@@ -115,10 +115,21 @@ const validation = createFormValidation(formState, {
   endTime: alwaysValid
 })
 
-defineProps<{
+const props = defineProps<{
+  initialState?: ScheduleFormState
   audiences: AudienceResponse[]
   disabled: boolean
 }>()
+
+onMounted(() => {
+  if (props.initialState != undefined) {
+    formState.audienceId = props.initialState.audienceId
+    formState.start = props.initialState.start
+    formState.end = props.initialState.end
+    formState.startTime = props.initialState.startTime
+    formState.endTime = props.initialState.endTime
+  }
+})
 
 const handleUpdateAudience = (value: string) => {
   formState.audienceId = value

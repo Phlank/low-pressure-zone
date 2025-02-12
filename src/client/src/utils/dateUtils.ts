@@ -23,3 +23,14 @@ export const hoursBetween = (start: Date, end: Date) => {
   }
   return out
 }
+
+export const minimumDate = (...dates: Date[]) => {
+  let minimum = dates[0].getTime()
+  for (let i = 1; i < dates.length; i++) {
+    const currentTime = dates[i].getTime()
+    if (currentTime < minimum) {
+      minimum = currentTime
+    }
+  }
+  return new Date(minimum)
+}
