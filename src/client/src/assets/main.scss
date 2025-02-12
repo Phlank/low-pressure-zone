@@ -19,6 +19,7 @@ body {
   background-image: url(./bg-invert.jpg);
   font-family: 'Nunito Sans', 'Helvetica Neue', sans-serif;
   text-rendering: optimizeLegibility;
+  overflow-y: scroll;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

@@ -1,8 +1,9 @@
 <template>
   <DataTable data-key="id" :value="rows">
+    <Column style="width: 8rem" />
     <Column field="start" header="Start">
-      <template #body="timeslotProps">
-        {{ timeslotProps.data.start.toLocaleTimeString() }}
+      <template #body="{ data }">
+        {{ data.start }}
       </template>
     </Column>
     <Column field="timeslot.performer.name" header="Performer" />
@@ -12,7 +13,7 @@
 <script lang="ts" setup>
 import { DataTable, Column } from 'primevue'
 import type { ScheduleResponse } from '@/api/schedules/scheduleResponse'
-import { hoursBetween } from '@/utils/dateUtils'
+import { formatHourOnly, hoursBetween } from '@/utils/dateUtils'
 import { onMounted, ref, type Ref } from 'vue'
 import type { TimeslotResponse } from '@/api/schedules/timeslots/timeslotResponse'
 
@@ -38,7 +39,7 @@ const setupRows = () => {
   const hours = hoursBetween(startDate.value, endDate.value)
   hours.forEach((hour) => {
     newRows.push({
-      start: hour.toLocaleTimeString(),
+      start: formatHourOnly(hour),
       timeslot: props.schedule.timeslots.find((timeslot) => timeslot.start === hour.toISOString())
     })
   })

@@ -8,7 +8,7 @@
       <DataTable :value="currentSchedule.timeslots">
         <Column header="Time">
           <template #body="slotProps">
-            {{ slotProps.data.startTime.toLocaleTimeString() }}
+            {{ formatHourOnly(slotProps.data.startTime) }}
           </template>
         </Column>
         <Column field="performance.name" header="Performer" />
@@ -28,7 +28,8 @@
 
 <script setup lang="ts">
 import { PerformanceType } from '@/models/performanceType'
-import { Panel, DataTable, Column } from 'primevue'
+import { formatHourOnly } from '@/utils/dateUtils'
+import { Column, DataTable, Panel } from 'primevue'
 import { ref, type Ref } from 'vue'
 
 const today = new Date()
