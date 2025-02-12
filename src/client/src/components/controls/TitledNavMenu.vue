@@ -29,7 +29,8 @@ const props = defineProps<{
 </script>
 
 <style lang="scss" scoped>
-@use '@/assets/variables.scss';
+@use '@/assets/styles/variables.scss';
+
 .titled-nav-menu {
   :deep(a.p-menubar-button) {
     margin-left: auto;

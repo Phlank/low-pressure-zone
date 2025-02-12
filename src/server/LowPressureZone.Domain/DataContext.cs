@@ -18,6 +18,10 @@ public class DataContext : DbContext
 
         modelBuilder.Entity<Performer>().HasIndex(nameof(Performer.Name)).IsUnique();
 
-        modelBuilder.Entity<Schedule>().HasIndex(nameof(Schedule.Start), nameof(Schedule.End)).IsUnique();
+        modelBuilder.Entity<Schedule>().HasIndex(nameof(Schedule.Start)).IsUnique();
+        modelBuilder.Entity<Schedule>().HasIndex(nameof(Schedule.End)).IsUnique();
+
+        modelBuilder.Entity<Timeslot>().HasIndex(nameof(Timeslot.Start)).IsUnique();
+        modelBuilder.Entity<Timeslot>().HasIndex(nameof(Timeslot.End)).IsUnique();
     }
 }

@@ -4,28 +4,29 @@
       <Select
         class="input__field"
         id="audienceSelect"
-        :options="audiences"
+        placeholder="Select an audience"
         option-label="name"
         option-value="id"
+        :options="audiences"
         :disabled="disabled"
-        placeholder="Select an audience"
         :invalid="!validation.isValid('audienceId')"
         :model-value="formState.audienceId"
-        @update:model-value="(value) => (formState.audienceId = value)"
+        @update:model-value="handleUpdateAudience"
       />
       <ValidationLabel for="audienceSelect" :message="validation.message('audienceId')">
         Audience
       </ValidationLabel>
     </IftaLabel>
-    <IftaLabel class="input input--small">
+    <IftaLabel class="input input--medium">
       <DatePicker
         class="input__field"
         id="startTime"
         hourFormat="12"
-        :min-date="new Date()"
+        :min-date="minimumDate(formState.startTime, minStartTime)"
         :model-value="formState.startTime"
-        @update:model-value="handleStartUpdate"
+        :disabled="disabled || formState.startTime.getTime() < minStartTime.getTime()"
         :invalid="!validation.isValid('start')"
+        @update:model-value="handleUpdateStart"
         show-time
         fluid
       />
@@ -33,16 +34,17 @@
         Start Time
       </ValidationLabel>
     </IftaLabel>
-    <IftaLabel class="input input--small">
+    <IftaLabel class="input input--medium">
       <DatePicker
         class="input__field"
         id="startTime"
         hourFormat="12"
         :min-date="formState.startTime"
-        :max-date="new Date(formState.startTime.getTime() + MAX_DURATION_MINUTES * 60000)"
+        :max-date="new Date(formState.startTime.getTime() + MAX_DURATION_MINUTES * MS_PER_MINUTE)"
         :model-value="formState.endTime"
-        @update:model-value="handleEndUpdate"
         :invalid="!validation.isValid('end')"
+        :disabled="disabled || formState.endTime.getTime() < minStartTime.getTime()"
+        @update:model-value="handleUpdateEnd"
         show-time
         fluid
       />
@@ -57,54 +59,118 @@
 import type { AudienceResponse } from '@/api/audiences/audienceResponse'
 import { DatePicker, IftaLabel, Select } from 'primevue'
 import ValidationLabel from '../ValidationLabel.vue'
-import { reactive } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
 import { createFormValidation } from '@/validation/types/formValidation'
-import type { ScheduleRequest } from '@/api/schedules/scheduleRequest'
-import { audienceValidator } from '@/validation/rules/composed/scheduleValidators'
+import {
+  audienceValidator,
+  endValidator,
+  startValidator
+} from '@/validation/rules/composed/scheduleValidators'
 import { alwaysValid } from '@/validation/rules/single/untypedRules'
+import { MS_PER_MINUTE } from '@/constants/times'
+import type { ScheduleRequest } from '@/api/schedules/scheduleRequest'
+import { setToHour, minimumDate } from '@/utils/dateUtils'
 
 const MAX_DURATION_MINUTES = 1440
+const DEFAULT_MINUTES = 60
+
 let now = new Date()
+const resetStartTime = new Date(
+  now.getFullYear(),
+  now.getMonth(),
+  now.getDate(),
+  now.getHours() + 1,
+  0,
+  0,
+  0
+)
+const minStartTime = new Date(
+  resetStartTime.getFullYear(),
+  resetStartTime.getMonth(),
+  resetStartTime.getDate() - 1,
+  resetStartTime.getHours() + 1,
+  0,
+  0,
+  0
+)
 
-const formState = reactive({
+export interface ScheduleFormState extends ScheduleRequest {
+  startTime: Date
+  endTime: Date
+}
+
+const formState: ScheduleFormState = reactive({
   audienceId: '',
-  startTime: now,
-  start: now.toISOString(),
-  endTime: new Date(now.getTime() + 60 * 60000),
-  end: now.toISOString()
+  startTime: resetStartTime,
+  start: resetStartTime.toISOString(),
+  endTime: new Date(resetStartTime.getTime() + DEFAULT_MINUTES * MS_PER_MINUTE),
+  end: new Date(resetStartTime.getTime() + DEFAULT_MINUTES * MS_PER_MINUTE).toISOString()
 })
-const validation = createFormValidation(formState as ScheduleRequest, {
+const startRef = ref(formState.start)
+const validation = createFormValidation(formState, {
   audienceId: audienceValidator,
-  start: alwaysValid,
-  end: alwaysValid
+  start: startValidator,
+  startTime: alwaysValid,
+  end: endValidator(startRef),
+  endTime: alwaysValid
 })
 
-defineProps<{
+const props = defineProps<{
+  initialState?: ScheduleFormState
   audiences: AudienceResponse[]
   disabled: boolean
 }>()
 
-const handleStartUpdate = (value: Date | Date[] | (Date | null)[] | null | undefined) => {
+onMounted(() => {
+  if (props.initialState != undefined) {
+    formState.audienceId = props.initialState.audienceId
+    formState.start = props.initialState.start
+    formState.end = props.initialState.end
+    formState.startTime = props.initialState.startTime
+    formState.endTime = props.initialState.endTime
+  }
+})
+
+const handleUpdateAudience = (value: string) => {
+  formState.audienceId = value
+  validation.validateIfDirty('audienceId')
+}
+
+const handleUpdateStart = (value: Date | Date[] | (Date | null)[] | null | undefined) => {
   const duration = formState.endTime.getTime() - formState.startTime.getTime()
-  formState.startTime = value as Date
+  const newStart = value as Date
+  setToHour(newStart)
+  formState.startTime = newStart
   formState.start = formState.startTime.toISOString()
   formState.endTime = new Date(formState.startTime.getTime() + duration)
   formState.end = formState.endTime.toISOString()
+  validation.validateIfDirty('start')
+  validation.validateIfDirty('end')
 }
 
-const handleEndUpdate = (value: Date | Date[] | (Date | null)[] | null | undefined) => {
-  formState.endTime = value as Date
+const handleUpdateEnd = (value: Date | Date[] | (Date | null)[] | null | undefined) => {
+  const newEnd = value as Date
+  setToHour(newEnd)
+  formState.endTime = newEnd
   formState.end = formState.endTime.toISOString()
+  validation.validateIfDirty('end')
 }
 
 const reset = () => {
   now = new Date()
   formState.audienceId = ''
-  formState.startTime = now
-  formState.start = now.toISOString()
-  formState.endTime = new Date(now.getTime() + 60 * 60000)
+  formState.startTime = resetStartTime
+  formState.start = formState.startTime.toISOString()
+  formState.endTime = new Date(resetStartTime.getTime() + DEFAULT_MINUTES * MS_PER_MINUTE)
   formState.end = formState.endTime.toISOString()
 }
 
 defineExpose({ formState, validation, reset })
+
+watch(
+  () => formState.start,
+  (newValue: string) => {
+    startRef.value = newValue
+  }
+)
 </script>

@@ -88,11 +88,13 @@ class FormValidationImplementation<TForm extends object> implements FormValidati
     })
   }
 
-  public mapApiValidationErrors = (errors: ErrorMessageDictionary<TForm>) => {
+  public mapApiValidationErrors = <TRequest extends object>(
+    errors: ErrorMessageDictionary<TRequest>
+  ) => {
     const keys = this.getKeys()
     keys.forEach((key) => {
-      if (errors[key] == undefined) return
-      const message = errors[key].join(' | ')
+      if (errors[key as unknown as keyof TRequest] == undefined) return
+      const message = errors[key as unknown as keyof TRequest]!.join(' | ')
       this.setValidity(key, invalid(message))
     })
   }
@@ -108,7 +110,9 @@ export interface FormValidation<TForm extends object> {
   validateIfDirty: (...keys: (keyof TForm)[]) => boolean
   isValid: (...keys: (keyof TForm)[]) => boolean
   reset: (...keys: (keyof TForm)[]) => void
-  mapApiValidationErrors: (errors: { [key in keyof TForm | 'none']?: string[] }) => void
+  mapApiValidationErrors: <TRequest extends object>(
+    errors: ErrorMessageDictionary<TRequest>
+  ) => void
 }
 
 export const createFormValidation = <TForm extends object>(

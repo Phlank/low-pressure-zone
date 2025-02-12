@@ -16,7 +16,7 @@ import SiteFooter from './SiteFooter.vue'
 </script>
 
 <style lang="scss" scoped>
-@use '@/assets/variables.scss';
+@use '@/assets/styles/variables.scss';
 
 .site-layout {
   display: flex;
@@ -34,10 +34,6 @@ import SiteFooter from './SiteFooter.vue'
     border-left: 0;
     border-right: 0;
     border-radius: 0;
-  }
-
-  main {
-    // margin-bottom: variables.$header-height;
   }
 
   &__footer {

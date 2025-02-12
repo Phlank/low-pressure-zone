@@ -2,7 +2,7 @@ import { ApiResponse, type ValidationProblemDetails } from '@/api/apiResponse'
 
 const API_URL = import.meta.env.VITE_API_URL
 
-const sendRequest = async <TRequest extends object = never, TResponse = never>(
+const sendRequest = async <TRequest extends object, TResponse = never>(
   method: string,
   route: string,
   request?: TRequest
@@ -14,16 +14,22 @@ const sendRequest = async <TRequest extends object = never, TResponse = never>(
   })
 
   if (response.status === 200) {
-    return new ApiResponse<never, TResponse>(response.status, (await response.json()) as TResponse)
+    return new ApiResponse<TRequest, TResponse>(
+      response.status,
+      (await response.json()) as TResponse
+    )
   }
   if (response.status === 400) {
-    return new ApiResponse<TRequest, never>(
+    return new ApiResponse<TRequest, TResponse>(
       response.status,
       undefined,
       (await response.json()) as ValidationProblemDetails<TRequest>
     )
   }
-  return new ApiResponse<never, never>(response.status)
+  if (request) {
+    return new ApiResponse<TRequest, TResponse>(response.status)
+  }
+  return new ApiResponse<TRequest, TResponse>(response.status)
 }
 
 export const sendGet = async <TResponse>(route: string) => {

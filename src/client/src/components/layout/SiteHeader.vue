@@ -28,8 +28,8 @@
         </Menu>
       </div>
       <div v-else>
-        <RouterLink to="/dashboard">
-          <Button label="Dashboard" outlined />
+        <RouterLink v-for="item in navMenuItems" :key="item.labelString" :to="item.route">
+          <Button :label="item.labelString" outlined />
         </RouterLink>
       </div>
     </template>
@@ -48,6 +48,7 @@ const navMenuRef = useTemplateRef('navMenuRef')
 const navMenuItems: MenuItem[] = [
   {
     label: 'Dashboard',
+    labelString: 'Dashboard',
     icon: 'pi pi-cog',
     route: '/dashboard'
   }
@@ -59,7 +60,7 @@ const toggleMenu = (event: MouseEvent) => {
 </script>
 
 <style lang="scss" scoped>
-@use './../../assets/variables.scss';
+@use '@/assets/styles/variables.scss';
 
 .p-button {
   margin: 0 variables.$space-s;

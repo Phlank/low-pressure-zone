@@ -22,13 +22,13 @@ public class PostSchedule : EndpointWithMapper<ScheduleRequest, ScheduleRequestM
         var doesOverlapOtherSchedule = DataContext.Schedules.WhereOverlaps(schedule).Any();
         if (doesOverlapOtherSchedule)
         {
-            AddError(new ValidationFailure(nameof(req.Start), "Schedule times cannot overlap."));
-            AddError(new ValidationFailure(nameof(req.End), "Schedule times cannot overlap."));
+            AddError(new ValidationFailure(nameof(req.Start), "Overlaps other schedule"));
+            AddError(new ValidationFailure(nameof(req.End), "Overlaps other schedule"));
         }
         var doesAudienceExist = DataContext.Audiences.Any(a => a.Id == req.AudienceId);
         if (!doesAudienceExist)
         {
-            AddError(new ValidationFailure(nameof(req.AudienceId), "Invalid audience specified."));
+            AddError(new ValidationFailure(nameof(req.AudienceId), "Invalid audience"));
         }
         ThrowIfAnyErrors();
 

@@ -1,0 +1,37 @@
+@use 'variables.scss';
+
+.input {
+  margin: variables.$space-m variables.$space-s;
+  height: fit-content;
+
+  &--small.p-iftalabel {
+    width: variables.$input-width-s;
+    @include variables.mobile {
+      width: 100%;
+    }
+  }
+  &--medium.p-iftalabel {
+    width: variables.$input-width-m;
+    @include variables.mobile {
+      width: 100%;
+    }
+  }
+  &--large.p-iftalabel {
+    width: variables.$input-width-l;
+    @include variables.mobile {
+      width: 100%;
+    }
+  }
+
+  @include variables.mobile {
+    width: 100%;
+  }
+
+  &__field {
+    width: 100%;
+  }
+}
+
+.action {
+  margin: variables.$space-s;
+}

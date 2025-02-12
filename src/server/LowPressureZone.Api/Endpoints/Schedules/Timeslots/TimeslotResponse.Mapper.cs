@@ -6,7 +6,12 @@ namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
 public class TimeslotResponseMapper : ResponseMapper<TimeslotResponse, Timeslot>
 {
-    public required PerformerResponseMapper PerformerMapper { get; set; }
+    private readonly PerformerResponseMapper _performerMapper;
+
+    public TimeslotResponseMapper(PerformerResponseMapper performerMapper)
+    {
+        _performerMapper = performerMapper;
+    }
 
     public override TimeslotResponse FromEntity(Timeslot t)
     {
@@ -16,7 +21,7 @@ public class TimeslotResponseMapper : ResponseMapper<TimeslotResponse, Timeslot>
             Start = t.Start,
             End = t.End,
             Name = t.Name,
-            Performer = PerformerMapper.FromEntity(t.Performer!),
+            Performer = _performerMapper.FromEntity(t.Performer!),
             PerformanceType = t.Type,
             CreatedDate = t.CreatedDate,
             ModifiedDate = t.LastModifiedDate

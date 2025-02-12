@@ -37,7 +37,7 @@ const handleDarkModeToggle = (newValue: boolean) => {
 </script>
 
 <style lang="scss" scoped>
-@use './../../assets/variables.scss';
+@use '@/assets/styles/variables.scss';
 
 .dark-mode-toggle {
   display: flex;
