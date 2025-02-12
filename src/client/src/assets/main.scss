@@ -1,23 +1,24 @@
-@use 'variables.scss';
+@use 'styles/variables.scss';
+
+@import 'styles/forms.scss';
+@import 'styles/layouts.scss';
+@import 'styles/primevueOverrides.scss';
 
 @import 'primeicons/primeicons.css';
-@import 'primevue-overrides.scss';
 
 @font-face {
   font-family: 'Nunito Sans';
   font-stretch: 100%; /* Note that font-stretch is a % of normal width */
   font-style: normal; /* See note below */
   font-weight: 400;
-  src: url('Nunito_Sans.woff2') format('woff2');
+  src: url('fonts/Nunito_Sans.woff2') format('woff2');
 }
 
 body {
   margin: 0;
   overflow: hidden;
   background-image: variables.$bg-light;
-  // margin: variables.$space-m;
   font-family: 'Nunito Sans', 'Helvetica Neue', sans-serif;
-  // overflow: hidden;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -37,10 +38,6 @@ body.dark-mode-toggle {
   font-family: variables.$font-family-header;
 }
 
-.material-symbols-outlined {
-  user-select: none;
-}
-
 @media screen and (max-width: variables.$mobile-transition-width) {
   .app {
     overflow-x: hidden;
@@ -49,89 +46,4 @@ body.dark-mode-toggle {
 
 p {
   font-size: 0.9rem;
-}
-
-.flex-variable-space-between {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  margin: 0 variables.$space-m;
-
-  &__left,
-  &__right {
-    &--variable-height {
-      height: fit-content;
-    }
-    &--full-width {
-      width: 100%;
-    }
-  }
-
-  &__right {
-    margin-left: variables.$space-m;
-  }
-
-  @include variables.mobile {
-    flex-direction: column;
-    justify-content: start;
-    height: fit-content;
-
-    &__left {
-      width: variables.$mobile-element-width;
-      margin-bottom: variables.$space-m;
-    }
-
-    &__right {
-      margin-left: 0;
-      width: variables.$mobile-element-width;
-    }
-  }
-}
-
-.desktop-inline {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-
-  @include variables.mobile {
-    flex-direction: column;
-    align-items: start;
-    width: 100%;
-  }
-}
-
-.input {
-  margin: variables.$space-m variables.$space-s;
-  height: fit-content;
-
-  &--small.p-iftalabel {
-    width: variables.$input-width-s;
-    @include variables.mobile {
-      width: 100%;
-    }
-  }
-  &--medium.p-iftalabel {
-    width: variables.$input-width-m;
-    @include variables.mobile {
-      width: 100%;
-    }
-  }
-  &--large.p-iftalabel {
-    width: variables.$input-width-l;
-    @include variables.mobile {
-      width: 100%;
-    }
-  }
-
-  @include variables.mobile {
-    width: 100%;
-  }
-
-  &__field {
-    width: 100%;
-  }
-}
-
-.action {
-  margin: variables.$space-s;
 }

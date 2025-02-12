@@ -55,7 +55,7 @@ const menuItems: MenuItem[] = [
 </script>
 
 <style lang="scss" scoped>
-@use '@/assets/variables.scss';
+@use '@/assets/styles/variables.scss';
 
 .flex-variable-space-between__right {
   :deep(div.p-panel-header) {

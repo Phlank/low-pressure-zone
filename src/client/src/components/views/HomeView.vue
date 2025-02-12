@@ -77,7 +77,7 @@ const currentSchedule: Ref = ref({
 </script>
 
 <style lang="scss" scoped>
-@use '@/assets/variables.scss';
+@use '@/assets/styles/variables.scss';
 
 .discord-iframe {
   border-radius: variables.$space-m;

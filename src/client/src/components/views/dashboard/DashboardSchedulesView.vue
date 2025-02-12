@@ -3,7 +3,8 @@
     <ScheduleForm ref="createForm" :audiences="audiences" :disabled="false" />
     <Button class="input" label="Create" @click="handleCreateClick" />
   </div>
-  <DataTable v-if="isLoaded" :value="schedules">
+  <DataTable v-if="isLoaded" data-key="id" :value="schedules" :expanded-rows="expandedRows">
+    <Column expander style="width: 5rem" />
     <Column field="audience.name" header="Audience" />
     <Column header="Date">
       <template #body="{ data }">
@@ -22,17 +23,28 @@
     </Column>
     <Column style="text-align: right">
       <template #body="{ data }">
+        <Button v-if="canEdit(data)" icon="pi pi-pencil" rounded outlined />
         <Button
           v-if="data.timeslots.length === 0"
           class="action"
           icon="pi pi-trash"
           severity="danger"
-          @click="handleDeleteActionClick(data as ScheduleResponse)"
+          @click="handleDeleteActionClick(data)"
           rounded
           outlined
         />
       </template>
     </Column>
+    <template #expansion="rowProps">
+      <DataTable data-key="id" :value="rowProps.data.timeslots">
+        <Column field="start" header="Start">
+          <template #body="timeslotProps">
+            {{ timeslotProps.data.start.toLocaleDateString() }}
+          </template>
+        </Column>
+        <Column field="performer.name" header="Performer" />
+      </DataTable>
+    </template>
   </DataTable>
   <DeleteDialog
     entity-type="schedule"
@@ -51,6 +63,7 @@ import type { AudienceResponse } from '@/api/audiences/audienceResponse'
 import type { ScheduleResponse } from '@/api/schedules/scheduleResponse'
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
 import ScheduleForm from '@/components/form/requestForms/ScheduleForm.vue'
+import { setToNextHour } from '@/utils/dateUtils'
 import { showCreateSuccessToast } from '@/utils/toastUtils'
 import { Button, DataTable, useToast, Column } from 'primevue'
 import { onMounted, ref, useTemplateRef, type Ref } from 'vue'
@@ -58,6 +71,7 @@ import { onMounted, ref, useTemplateRef, type Ref } from 'vue'
 const toast = useToast()
 const isSubmitting = ref(false)
 const isLoaded = ref(false)
+const expandedRows = ref({})
 
 onMounted(async () => {
   await Promise.all([loadSchedules(), loadAudiences()])
@@ -83,6 +97,13 @@ const handleCreateClick = async () => {
   showCreateSuccessToast(toast, 'schedule')
   await loadSchedules()
   createForm.value.reset()
+}
+
+const editLimit = new Date() // Schedule times prior to this can't be altered
+setToNextHour(editLimit)
+editLimit.setDate(editLimit.getDate() - 1)
+const canEdit = (schedule: ScheduleResponse) => {
+  return Date.parse(schedule.end) > editLimit.getTime()
 }
 
 let deletingId = ''

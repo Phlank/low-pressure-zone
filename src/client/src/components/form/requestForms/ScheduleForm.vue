@@ -22,7 +22,9 @@
         class="input__field"
         id="startTime"
         hourFormat="12"
-        :min-date="new Date()"
+        :min-date="minStartTime"
+        :step-minute="60"
+        :step-second="3600"
         :model-value="formState.startTime"
         @update:model-value="handleUpdateStart"
         :invalid="!validation.isValid('start')"
@@ -67,16 +69,26 @@ import {
 import { alwaysValid } from '@/validation/rules/single/untypedRules'
 import { MS_PER_MINUTE } from '@/constants/times'
 import type { ScheduleRequest } from '@/api/schedules/scheduleRequest'
+import { setToHour } from '@/utils/dateUtils'
 
 const MAX_DURATION_MINUTES = 1440
 const DEFAULT_MINUTES = 60
 
 let now = new Date()
-const resetTime = new Date(
+const resetStartTime = new Date(
   now.getFullYear(),
   now.getMonth(),
   now.getDate(),
   now.getHours() + 1,
+  0,
+  0,
+  0
+)
+const minStartTime = new Date(
+  resetStartTime.getFullYear(),
+  resetStartTime.getMonth(),
+  resetStartTime.getDate() - 1,
+  resetStartTime.getHours() + 1,
   0,
   0,
   0
@@ -89,10 +101,10 @@ export interface ScheduleFormState extends ScheduleRequest {
 
 const formState: ScheduleFormState = reactive({
   audienceId: '',
-  startTime: resetTime,
-  start: resetTime.toISOString(),
-  endTime: new Date(resetTime.getTime() + DEFAULT_MINUTES * MS_PER_MINUTE),
-  end: new Date(resetTime.getTime() + DEFAULT_MINUTES * MS_PER_MINUTE).toISOString()
+  startTime: resetStartTime,
+  start: resetStartTime.toISOString(),
+  endTime: new Date(resetStartTime.getTime() + DEFAULT_MINUTES * MS_PER_MINUTE),
+  end: new Date(resetStartTime.getTime() + DEFAULT_MINUTES * MS_PER_MINUTE).toISOString()
 })
 const startRef = ref(formState.start)
 const validation = createFormValidation(formState, {
@@ -115,7 +127,9 @@ const handleUpdateAudience = (value: string) => {
 
 const handleUpdateStart = (value: Date | Date[] | (Date | null)[] | null | undefined) => {
   const duration = formState.endTime.getTime() - formState.startTime.getTime()
-  formState.startTime = value as Date
+  const newStart = value as Date
+  setToHour(newStart)
+  formState.startTime = newStart
   formState.start = formState.startTime.toISOString()
   formState.endTime = new Date(formState.startTime.getTime() + duration)
   formState.end = formState.endTime.toISOString()
@@ -124,7 +138,9 @@ const handleUpdateStart = (value: Date | Date[] | (Date | null)[] | null | undef
 }
 
 const handleUpdateEnd = (value: Date | Date[] | (Date | null)[] | null | undefined) => {
-  formState.endTime = value as Date
+  const newEnd = value as Date
+  setToHour(newEnd)
+  formState.endTime = newEnd
   formState.end = formState.endTime.toISOString()
   validation.validateIfDirty('end')
 }
@@ -132,9 +148,9 @@ const handleUpdateEnd = (value: Date | Date[] | (Date | null)[] | null | undefin
 const reset = () => {
   now = new Date()
   formState.audienceId = ''
-  formState.startTime = resetTime
+  formState.startTime = resetStartTime
   formState.start = formState.startTime.toISOString()
-  formState.endTime = new Date(resetTime.getTime() + DEFAULT_MINUTES * MS_PER_MINUTE)
+  formState.endTime = new Date(resetStartTime.getTime() + DEFAULT_MINUTES * MS_PER_MINUTE)
   formState.end = formState.endTime.toISOString()
 }
 

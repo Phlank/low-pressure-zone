@@ -4,10 +4,9 @@ import type { Ref } from 'vue'
 
 export const withinRangeOf =
   (other: Ref<string>, minMinutes: number, maxMinutes: number, msg?: string) => (arg: string) => {
-    console.log(`Validating ${arg} is in range of ${other.value}`)
     const otherTime = Date.parse(other.value)
     const thisTime = Date.parse(arg)
-    if (!otherTime || !thisTime) return invalid('Out of range')
+    if (!otherTime || !thisTime) return valid // Don't unintentionally enforce required validation
     if (
       otherTime + MS_PER_MINUTE * minMinutes <= thisTime &&
       otherTime + MS_PER_MINUTE * maxMinutes >= thisTime
@@ -16,3 +15,12 @@ export const withinRangeOf =
     }
     return invalid(msg ?? 'Out of range')
   }
+
+export const hourOnly = (msg?: string) => (arg: string) => {
+  const time = new Date(Date.parse(arg))
+  if (!time) return valid // Don't unintentionally enforce required() validation
+  if (time.getMinutes() != 0 || time.getSeconds() != 0 || time.getMilliseconds() != 0) {
+    return invalid(msg ?? 'Hour intervals only')
+  }
+  return valid
+}
