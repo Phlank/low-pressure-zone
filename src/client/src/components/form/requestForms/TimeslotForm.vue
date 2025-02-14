@@ -2,10 +2,10 @@
   <div class="timeslot-form">
     <div class="desktop-inline">
       <IftaLabel class="input input--small">
-        <DatePicker
+        <InputText
           class="input__field"
           id="startInput"
-          :model-value="parseDate(formState.start)"
+          :model-value="formatHourOnly(parseDate(formState.start))"
           disabled
         />
         <label for="startInput">Start</label>
@@ -69,13 +69,13 @@
 <script setup lang="ts">
 import type { PerformerResponse } from '@/api/performers/performerResponse'
 import type { TimeslotRequest } from '@/api/schedules/timeslots/timeslotRequest'
-import { parseDate } from '@/utils/dateUtils'
+import { parseDate, formatHourOnly } from '@/utils/dateUtils'
 import { timeslotRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
-import { IftaLabel, Select } from 'primevue'
-import { reactive, ref } from 'vue'
+import { IftaLabel, Select, InputText } from 'primevue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import ValidationLabel from '../ValidationLabel.vue'
-import { performanceTypes } from '@/api/schedules/timeslots/performanceType'
+import { PerformanceType, performanceTypes } from '@/api/schedules/timeslots/performanceType'
 
 const props = defineProps<{
   initialState: TimeslotRequest
@@ -83,23 +83,32 @@ const props = defineProps<{
   performers: PerformerResponse[]
 }>()
 
+const defaultStartPerformerId = computed(() => {
+  if (props.performers.length == 1) return props.performers[0].id
+  return undefined
+})
+
 const formState: TimeslotRequest = reactive({
-  start: props.initialState.start,
-  end: props.initialState.end,
-  performerId: props.initialState.performerId,
-  performanceType: props.initialState.performanceType,
-  name: props.initialState.name
+  start: '',
+  end: '',
+  performerId: '',
+  performanceType: PerformanceType.Live,
+  name: null
 })
 const validation = createFormValidation(formState, timeslotRequestRules(formState))
 
 const isSubmitting = ref(false)
 
+onMounted(() => {
+  reset()
+})
+
 const reset = () => {
   formState.start = props.initialState.start
   formState.end = props.initialState.end
-  formState.performerId = props.initialState.performerId
+  formState.performerId = defaultStartPerformerId.value ?? props.initialState.performerId
   formState.performanceType = props.initialState.performanceType
-  formState.name = props.initialState.end
+  formState.name = props.initialState.name
 }
 
 defineExpose({ formState, validation, reset })

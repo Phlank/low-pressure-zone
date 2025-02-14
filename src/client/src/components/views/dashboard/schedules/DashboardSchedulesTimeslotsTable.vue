@@ -14,7 +14,7 @@
           class="grid-action-col__item"
           :icon="`pi ${data.timeslot ? 'pi-pencil' : 'pi-plus'}`"
           :severity="data.timeslot ? 'secondary' : 'primary'"
-          :disabled="isEditingRow || isParentSubmitting || isParentEditing"
+          :disabled="isDialogOpen || props.disabled"
           @click="handleEditClicked(data)"
           outlined
           rounded
@@ -24,7 +24,7 @@
           v-if="data.timeslot"
           icon="pi pi-trash"
           severity="danger"
-          :disabled="isEditingRow || isParentSubmitting || isParentEditing"
+          :disabled="isDialogOpen || props.disabled"
           @click="handleDeleteClicked(data)"
           outlined
           rounded
@@ -76,22 +76,19 @@ import {
   showEditSuccessToast
 } from '@/utils/toastUtils'
 import { Button, Column, DataTable, useToast } from 'primevue'
-import { computed, onMounted, ref, useTemplateRef, type Ref } from 'vue'
+import { computed, onMounted, ref, useTemplateRef, watch, type Ref } from 'vue'
 
 const toast = useToast()
 const props = defineProps<{
   schedule: ScheduleResponse
   performers: PerformerResponse[]
-  isParentSubmitting: boolean
-  isParentEditing: boolean
+  disabled: boolean
 }>()
 
 const timeslots: Ref<TimeslotResponse[]> = ref(props.schedule.timeslots)
 const startDate = ref(parseDate(props.schedule.start))
 const endDate = ref(parseDate(props.schedule.end))
 const isSubmitting = ref(false)
-
-const isEditingRow = computed(() => rows.value.some((r) => r.isEditing))
 
 interface TimeslotRow {
   start: Date
@@ -116,6 +113,10 @@ const setupRows = () => {
   })
   rows.value = newRows
 }
+const updateRows = async () => {
+  timeslots.value = (await api.timeslots.get(props.schedule.id)).data ?? props.schedule.timeslots
+  setupRows()
+}
 
 const showFormDialog = ref(false)
 let editingId = ''
@@ -139,8 +140,7 @@ const handleEditClicked = (row: TimeslotRow) => {
   }
 }
 const handleSave = async () => {
-  const requestPerformer = props.performers.find((p) => p.id === request.performerId)
-  if (!timeslotForm.value || !requestPerformer) return
+  if (!timeslotForm.value) return
   const isValid = timeslotForm.value.validation.validate()
   if (!isValid) return
 
@@ -153,22 +153,23 @@ const handleSave = async () => {
     response = await api.timeslots.post(props.schedule.id, request)
   }
   isSubmitting.value = false
-
   if (tryHandleUnsuccessfulResponse(response, toast, timeslotForm.value.validation)) return
 
+  const requestPerformer = props.performers.find((p) => p.id === request.performerId)
   if (editingId) {
     showEditSuccessToast(
       toast,
       'timeslot',
-      `${formatHourOnly(parseDate(request.start))} | ${request.name ?? requestPerformer.name}`
+      `${formatHourOnly(parseDate(request.start))} | ${requestPerformer!.name}`
     )
   } else {
     showCreateSuccessToast(
       toast,
       'timeslot',
-      `${formatHourOnly(parseDate(request.start))} | ${request.name ?? requestPerformer.name}`
+      `${formatHourOnly(parseDate(request.start))} | ${requestPerformer!.name}`
     )
   }
+  updateRows()
   editingId = ''
   showFormDialog.value = false
 }
@@ -177,9 +178,10 @@ const showDeleteDialog = ref(false)
 let deletingId = ''
 const deletingName = ref('')
 const handleDeleteClicked = async (row: TimeslotRow) => {
-  showDeleteDialog.value = true
+  if (!row.timeslot) return
   deletingId = row.timeslot!.id
-  deletingName.value = `${formatHourOnly(parseDate(row.timeslot!.start))} | ${row.timeslot!.name ?? row.timeslot!.performer.name}`
+  deletingName.value = `${formatHourOnly(parseDate(row.timeslot.start))} - ${row.timeslot.performer.name}`
+  showDeleteDialog.value = true
 }
 const handleDelete = async () => {
   isSubmitting.value = true
@@ -192,7 +194,15 @@ const handleDelete = async () => {
   showDeleteDialog.value = false
   deletingId = ''
   deletingName.value = ''
-  timeslots.value = (await api.timeslots.get(props.schedule.id)).data ?? props.schedule.timeslots
-  setupRows()
+  updateRows()
 }
+
+const emit = defineEmits<{ dialogStateChange: [value: boolean] }>()
+const isDialogOpen = computed(() => showDeleteDialog.value || showFormDialog.value)
+watch(
+  () => isDialogOpen.value,
+  (newValue) => {
+    emit('dialogStateChange', newValue)
+  }
+)
 </script>
