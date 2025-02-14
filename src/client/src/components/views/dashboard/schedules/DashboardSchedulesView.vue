@@ -4,7 +4,7 @@
     <Button class="input" label="Create" @click="handleCreateClick" :disabled="controlsDisabled" />
   </div>
   <DataTable
-    v-if="isLoaded"
+    :loading="!isLoaded"
     data-key="id"
     :value="schedules"
     :expanded-rows="expandedRows"
@@ -52,7 +52,12 @@
       </Column>
     </template>
     <template #expansion="rowProps">
-      <DashboardSchedulesTimeslotsTable :schedule="rowProps.data" :performers="performers" />
+      <DashboardSchedulesTimeslotsTable
+        :schedule="rowProps.data"
+        :performers="performers"
+        :disabled="isSubmitting || showEditScheduleDialog || showDeleteScheduleDialog"
+        @dialog-state-change="(value) => (isEditingTimeslot = value)"
+      />
     </template>
   </DataTable>
   <FormDialog
@@ -97,12 +102,14 @@ import type { PerformerResponse } from '@/api/performers/performerResponse'
 const toast = useToast()
 const isSubmitting = ref(false)
 const isLoaded = ref(false)
+const isEditingTimeslot = ref(false)
 const controlsDisabled = computed(
   () =>
     !isLoaded.value ||
     isSubmitting.value ||
     showDeleteScheduleDialog.value ||
-    showEditScheduleDialog.value
+    showEditScheduleDialog.value ||
+    isEditingTimeslot.value
 )
 
 onMounted(async () => {
@@ -161,17 +168,14 @@ const handleEditScheduleActionClick = (schedule: ScheduleResponse) => {
   showEditScheduleDialog.value = true
 }
 const handleEditScheduleSave = async () => {
-  console.log('saving schedule edit')
   if (scheduleEditForm.value == undefined) return
-  console.log('edit form is not undefined')
   const isValid = scheduleEditForm.value.validation.validate()
-  console.log(isValid)
   if (!isValid) return
-  console.log('is valid')
+
   isSubmitting.value = true
   const response = await api.schedules.put(editingId, scheduleEditForm.value.formState)
   isSubmitting.value = false
-  console.log('submitted')
+
   if (tryHandleUnsuccessfulResponse(response, toast, scheduleEditForm.value.validation)) return
   showEditSuccessToast(toast, 'schedule')
   showEditScheduleDialog.value = false

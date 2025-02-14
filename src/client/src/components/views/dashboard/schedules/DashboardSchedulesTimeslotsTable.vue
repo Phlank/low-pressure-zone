@@ -5,112 +5,47 @@
         {{ formatHourOnly(data.start) }}
       </template>
     </Column>
-    <Column field="timeslot.performer.name" header="Performer">
-      <template #body="{ data }">
-        <span v-if="!data.isEditing">{{ data.timeslot?.performer.name }}</span>
-        <IftaLabel v-else class="input input--small">
-          <Select
-            class="input__field"
-            id="timeslotPerformerSelect"
-            option-label="name"
-            option-value="id"
-            :disabled="isSubmitting"
-            :options="performers"
-            v-model:model-value="data.formState.performerId"
-            :invalid="!data.validation?.isValid('performerId')"
-          />
-          <ValidationLabel
-            for="timeslotPerformerSelect"
-            :message="data.validation?.message('performerId')"
-          >
-            Performer
-          </ValidationLabel>
-        </IftaLabel>
-      </template>
-    </Column>
-    <Column field="timeslot.performanceType" header="Type">
-      <template #body="{ data }">
-        <span v-if="!data.isEditing">
-          {{ data.timeslot?.performanceType }}
-        </span>
-        <IftaLabel v-else class="input input--small">
-          <Select
-            class="input__field"
-            id="timeslotTypeSelect"
-            :disabled="isSubmitting"
-            :options="performanceTypes"
-            v-model:model-value="data.formState.performanceType"
-            :invalid="!data.validation?.isValid('performanceType')"
-          />
-          <ValidationLabel
-            for="timeslotTypeSelect"
-            :message="data.validation?.message('performanceType')"
-          >
-            Performance Type
-          </ValidationLabel>
-        </IftaLabel>
-      </template>
-    </Column>
-    <Column field="timeslot.name" header="Name">
-      <template #body="{ data }">
-        <span v-if="!data.isEditing">
-          {{ data.timeslot?.name }}
-        </span>
-        <IftaLabel v-else class="input input--medium">
-          <InputText
-            class="input__field"
-            id="timeslotNameInput"
-            :disabled="isSubmitting"
-            v-model:model-value="data.formState.name"
-            :invalid="!data.validation?.isValid('name')"
-          />
-          <ValidationLabel
-            for="timeslotNameInput"
-            :message="data.validation?.message('name')"
-            optional
-          >
-            Name
-          </ValidationLabel>
-        </IftaLabel>
-      </template>
-    </Column>
+    <Column field="timeslot.performer.name" header="Performer" />
+    <Column field="timeslot.performanceType" header="Type" />
+    <Column field="timeslot.name" header="Name" />
     <Column class="grid-action-col">
       <template #body="{ data }">
-        <span v-if="!data.isEditing">
-          <Button
-            class="grid-action-col__item"
-            :icon="`pi ${data.timeslot ? 'pi-pencil' : 'pi-plus'}`"
-            :severity="data.timeslot ? 'secondary' : 'primary'"
-            :disabled="isEditingRow"
-            @click="handleEditClicked(data)"
-            outlined
-            rounded
-          />
-          <Button
-            class="grid-action-col__item"
-            v-if="data.timeslot"
-            icon="pi pi-trash"
-            severity="danger"
-            :disabled="isEditingRow"
-            @click="handleDeleteClicked(data)"
-            outlined
-            rounded
-          />
-        </span>
-        <span v-else>
-          <Button
-            class="grid-action-col__item"
-            icon="pi pi-times"
-            severity="danger"
-            @click="handleCancelClicked(data)"
-            outlined
-            rounded
-          />
-          <Button icon="pi pi-check" @click="handleSaveClicked(data)" outlined rounded />
-        </span>
+        <Button
+          class="grid-action-col__item"
+          :icon="`pi ${data.timeslot ? 'pi-pencil' : 'pi-plus'}`"
+          :severity="data.timeslot ? 'secondary' : 'primary'"
+          :disabled="isDialogOpen || props.disabled"
+          @click="handleEditClicked(data)"
+          outlined
+          rounded
+        />
+        <Button
+          class="grid-action-col__item"
+          v-if="data.timeslot"
+          icon="pi pi-trash"
+          severity="danger"
+          :disabled="isDialogOpen || props.disabled"
+          @click="handleDeleteClicked(data)"
+          outlined
+          rounded
+        />
       </template>
     </Column>
   </DataTable>
+  <FormDialog
+    :header="editingId ? 'Edit Timeslot' : 'Create Timeslot'"
+    :is-submitting="isSubmitting"
+    :visible="showFormDialog"
+    @close="showFormDialog = false"
+    @save="handleSave"
+  >
+    <TimeslotForm
+      ref="timeslotForm"
+      :initial-state="formInitialValue"
+      :performers="performers"
+      :disabled="isSubmitting"
+    />
+  </FormDialog>
   <DeleteDialog
     entity-type="timeslot"
     header="Delete Timeslot"
@@ -123,43 +58,41 @@
 </template>
 
 <script lang="ts" setup>
-import { DataTable, Column, Select, IftaLabel, useToast, InputText, Button } from 'primevue'
-import type { ScheduleResponse } from '@/api/schedules/scheduleResponse'
-import { formatHourOnly, getNextHour, hoursBetween, parseDate } from '@/utils/dateUtils'
-import { computed, onMounted, ref, type Ref } from 'vue'
-import type { TimeslotResponse } from '@/api/schedules/timeslots/timeslotResponse'
-import type { TimeslotRequest } from '@/api/schedules/timeslots/timeslotRequest'
-import { createFormValidation, type FormValidation } from '@/validation/types/formValidation'
-import type { PerformerResponse } from '@/api/performers/performerResponse'
-import ValidationLabel from '@/components/form/ValidationLabel.vue'
-import { PerformanceType, performanceTypes } from '@/api/schedules/timeslots/performanceType'
-import { timeslotRequestRules } from '@/validation/requestRules'
-import type { ApiResponse } from '@/api/apiResponse'
 import api from '@/api/api'
+import type { ApiResponse } from '@/api/apiResponse'
+import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
+import type { PerformerResponse } from '@/api/performers/performerResponse'
+import type { ScheduleResponse } from '@/api/schedules/scheduleResponse'
+import { PerformanceType } from '@/api/schedules/timeslots/performanceType'
+import type { TimeslotRequest } from '@/api/schedules/timeslots/timeslotRequest'
+import type { TimeslotResponse } from '@/api/schedules/timeslots/timeslotResponse'
+import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
+import FormDialog from '@/components/dialogs/FormDialog.vue'
+import TimeslotForm from '@/components/form/requestForms/TimeslotForm.vue'
+import { formatHourOnly, getNextHour, hoursBetween, parseDate } from '@/utils/dateUtils'
 import {
   showCreateSuccessToast,
   showDeleteSuccessToast,
   showEditSuccessToast
 } from '@/utils/toastUtils'
-import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
-import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
+import { Button, Column, DataTable, useToast } from 'primevue'
+import { computed, onMounted, ref, useTemplateRef, watch, type Ref } from 'vue'
 
 const toast = useToast()
-const props = defineProps<{ schedule: ScheduleResponse; performers: PerformerResponse[] }>()
+const props = defineProps<{
+  schedule: ScheduleResponse
+  performers: PerformerResponse[]
+  disabled: boolean
+}>()
 
 const timeslots: Ref<TimeslotResponse[]> = ref(props.schedule.timeslots)
 const startDate = ref(parseDate(props.schedule.start))
 const endDate = ref(parseDate(props.schedule.end))
 const isSubmitting = ref(false)
-const editingRows: Ref<unknown[]> = ref([])
-
-const isEditingRow = computed(() => rows.value.some((r) => r.isEditing))
 
 interface TimeslotRow {
   start: Date
   isEditing: boolean
-  formState?: TimeslotRequest
-  validation?: FormValidation<TimeslotRequest>
   timeslot?: TimeslotResponse
 }
 
@@ -180,65 +113,75 @@ const setupRows = () => {
   })
   rows.value = newRows
 }
-
-const handleEditClicked = (row: TimeslotRow) => {
-  row.isEditing = true
-  row.formState = {
-    start: row.start.toISOString(),
-    end: getNextHour(row.start).toISOString(),
-    performerId: row.timeslot?.performer.id ?? getInitialCreatePerformerId(),
-    performanceType: row.timeslot?.performanceType ?? PerformanceType.Live,
-    name: row.timeslot?.name ?? null
-  }
-  row.validation = createFormValidation(row.formState, timeslotRequestRules(row.formState))
-}
-
-const getInitialCreatePerformerId = () => {
-  if (props.performers.length == 1) {
-    return props.performers[0].id
-  }
-  return ''
-}
-
-const handleCancelClicked = (row: TimeslotRow) => {
-  row.isEditing = false
-  row.validation = undefined
-  row.formState = undefined
-}
-
-const handleSaveClicked = async (row: TimeslotRow) => {
-  const isEdit = row.timeslot != undefined
-  if (!row.formState || !row.validation) return
-  const isValid = row.validation.validate()
-  if (!isValid) return
-  let response: ApiResponse<TimeslotRequest, never> | undefined = undefined
-  console.log(JSON.stringify(row.formState))
-  if (isEdit) {
-    response = await api.timeslots.put(props.schedule.id, row.timeslot!.id, row.formState)
-  } else {
-    response = await api.timeslots.post(props.schedule.id, row.formState)
-  }
-
-  if (tryHandleUnsuccessfulResponse(response, toast, row.validation)) {
-    editingRows.value.push(row)
-  }
-
-  if (isEdit) {
-    showEditSuccessToast(toast, 'timeslot', formatHourOnly(row.start))
-  } else {
-    showCreateSuccessToast(toast, 'timeslot', formatHourOnly(row.start))
-  }
+const updateRows = async () => {
   timeslots.value = (await api.timeslots.get(props.schedule.id)).data ?? props.schedule.timeslots
   setupRows()
+}
+
+const showFormDialog = ref(false)
+let editingId = ''
+const formInitialValue: Ref<TimeslotRequest> = ref({
+  start: '',
+  end: '',
+  performerId: '',
+  performanceType: PerformanceType.Live,
+  name: ''
+})
+const timeslotForm = useTemplateRef('timeslotForm')
+const handleEditClicked = (row: TimeslotRow) => {
+  showFormDialog.value = true
+  editingId = row.timeslot?.id ?? ''
+  formInitialValue.value = {
+    start: row.start.toISOString(),
+    end: getNextHour(row.start).toISOString(),
+    performerId: row.timeslot?.performer.id ?? '',
+    performanceType: row.timeslot?.performanceType ?? PerformanceType.Live,
+    name: row.timeslot?.performanceType ?? ''
+  }
+}
+const handleSave = async () => {
+  if (!timeslotForm.value) return
+  const isValid = timeslotForm.value.validation.validate()
+  if (!isValid) return
+
+  isSubmitting.value = true
+  const request = timeslotForm.value.formState
+  let response: ApiResponse<TimeslotRequest, never> | undefined = undefined
+  if (editingId) {
+    response = await api.timeslots.put(props.schedule.id, editingId, request)
+  } else {
+    response = await api.timeslots.post(props.schedule.id, request)
+  }
+  isSubmitting.value = false
+  if (tryHandleUnsuccessfulResponse(response, toast, timeslotForm.value.validation)) return
+
+  const requestPerformer = props.performers.find((p) => p.id === request.performerId)
+  if (editingId) {
+    showEditSuccessToast(
+      toast,
+      'timeslot',
+      `${formatHourOnly(parseDate(request.start))} | ${requestPerformer!.name}`
+    )
+  } else {
+    showCreateSuccessToast(
+      toast,
+      'timeslot',
+      `${formatHourOnly(parseDate(request.start))} | ${requestPerformer!.name}`
+    )
+  }
+  updateRows()
+  editingId = ''
+  showFormDialog.value = false
 }
 
 const showDeleteDialog = ref(false)
 let deletingId = ''
 const deletingName = ref('')
 const handleDeleteClicked = async (row: TimeslotRow) => {
-  showDeleteDialog.value = true
+  if (!row.timeslot) return
   deletingId = row.timeslot!.id
-  deletingName.value = `${formatHourOnly(parseDate(row.timeslot!.start))} | ${row.timeslot!.name ?? row.timeslot!.performer.name}`
+  deletingName.value = `${formatHourOnly(parseDate(row.timeslot.start))} - ${row.timeslot.performer.name}`
+  showDeleteDialog.value = true
 }
 const handleDelete = async () => {
   isSubmitting.value = true
@@ -251,7 +194,15 @@ const handleDelete = async () => {
   showDeleteDialog.value = false
   deletingId = ''
   deletingName.value = ''
-  timeslots.value = (await api.timeslots.get(props.schedule.id)).data ?? props.schedule.timeslots
-  setupRows()
+  updateRows()
 }
+
+const emit = defineEmits<{ dialogStateChange: [value: boolean] }>()
+const isDialogOpen = computed(() => showDeleteDialog.value || showFormDialog.value)
+watch(
+  () => isDialogOpen.value,
+  (newValue) => {
+    emit('dialogStateChange', newValue)
+  }
+)
 </script>

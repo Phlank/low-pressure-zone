@@ -13,7 +13,7 @@
         :disabled="controlsDisabled"
       />
     </div>
-    <DataTable v-if="isLoaded" :value="audiences" data-key="id">
+    <DataTable :loading="!isLoaded" :value="audiences" data-key="id">
       <Column field="name" header="Name" />
       <Column field="url" header="URL" />
       <Column field="modifiedDate" header="Last Modified">

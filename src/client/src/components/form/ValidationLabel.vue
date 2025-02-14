@@ -1,6 +1,6 @@
 <template>
   <label :for="props.for">
-    <slot></slot>
+    <slot>{{ text }}</slot>
     <span v-if="optional"> (Optional)</span>
     <span v-show="message"> - {{ message }}</span>
   </label>
@@ -10,6 +10,7 @@
 const props = withDefaults(
   defineProps<{
     for: string
+    text?: string
     message: string
     optional?: boolean
   }>(),
