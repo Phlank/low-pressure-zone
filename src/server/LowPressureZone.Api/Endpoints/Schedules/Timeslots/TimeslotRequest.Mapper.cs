@@ -10,10 +10,10 @@ public class TimeslotRequestMapper : RequestMapper<TimeslotRequest, Timeslot>
         return new Timeslot
         {
             Id = Guid.NewGuid(),
-            Name = r.Name,
+            Name = r.Name?.Trim(),
             Start = r.Start.ToUniversalTime(),
             End = r.End.ToUniversalTime(),
-            Type = r.PerformanceType,
+            Type = r.PerformanceType.Trim(),
             PerformerId = r.PerformerId,
             ScheduleId = Guid.Empty,
             CreatedDate = DateTime.UtcNow,

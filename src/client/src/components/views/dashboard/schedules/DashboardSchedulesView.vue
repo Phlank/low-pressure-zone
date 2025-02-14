@@ -27,11 +27,12 @@
           {{ formatHourOnly(parseDate(data.start)) }} - {{ formatHourOnly(parseDate(data.end)) }}
         </template>
       </Column>
-      <Column style="text-align: right">
+      <Column class="grid-action-col">
         <template #body="{ data }">
           <Button
             v-if="canEdit(data)"
             icon="pi pi-pencil"
+            severity="secondary"
             :disabled="controlsDisabled"
             @click="handleEditScheduleActionClick(data)"
             rounded
@@ -39,7 +40,7 @@
           />
           <Button
             v-if="data.timeslots.length === 0"
-            class="action"
+            class="grid-action-col__item"
             icon="pi pi-trash"
             severity="danger"
             :disabled="controlsDisabled"

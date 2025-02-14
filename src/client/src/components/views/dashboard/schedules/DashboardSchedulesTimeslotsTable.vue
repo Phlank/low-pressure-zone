@@ -16,7 +16,7 @@
             option-value="id"
             :disabled="isSubmitting"
             :options="performers"
-            :model-value="data.formState?.performerId"
+            v-model:model-value="data.formState.performerId"
             :invalid="!data.validation?.isValid('performerId')"
           />
           <ValidationLabel
@@ -39,8 +39,7 @@
             id="timeslotTypeSelect"
             :disabled="isSubmitting"
             :options="performanceTypes"
-            :model-value="data.formState?.performanceType"
-            @update:model-value="(value) => (data.formState.performanceType = value)"
+            v-model:model-value="data.formState.performanceType"
             :invalid="!data.validation?.isValid('performanceType')"
           />
           <ValidationLabel
@@ -62,7 +61,7 @@
             class="input__field"
             id="timeslotNameInput"
             :disabled="isSubmitting"
-            :model-value="data.formState?.name ?? ''"
+            v-model:model-value="data.formState.name"
             :invalid="!data.validation?.isValid('name')"
           />
           <ValidationLabel
@@ -75,11 +74,11 @@
         </IftaLabel>
       </template>
     </Column>
-    <Column style="width: 8.75rem; text-align: center">
+    <Column class="grid-action-col">
       <template #body="{ data }">
         <span v-if="!data.isEditing">
           <Button
-            class="action"
+            class="grid-action-col__item"
             :icon="`pi ${data.timeslot ? 'pi-pencil' : 'pi-plus'}`"
             :severity="data.timeslot ? 'secondary' : 'primary'"
             :disabled="isEditingRow"
@@ -88,7 +87,7 @@
             rounded
           />
           <Button
-            class="action"
+            class="grid-action-col__item"
             v-if="data.timeslot"
             icon="pi pi-trash"
             severity="danger"
@@ -100,7 +99,7 @@
         </span>
         <span v-else>
           <Button
-            class="action"
+            class="grid-action-col__item"
             icon="pi pi-times"
             severity="danger"
             @click="handleCancelClicked(data)"
@@ -213,6 +212,7 @@ const handleSaveClicked = async (row: TimeslotRow) => {
   const isValid = row.validation.validate()
   if (!isValid) return
   let response: ApiResponse<TimeslotRequest, never> | undefined = undefined
+  console.log(JSON.stringify(row.formState))
   if (isEdit) {
     response = await api.timeslots.put(props.schedule.id, row.timeslot!.id, row.formState)
   } else {
@@ -238,7 +238,7 @@ const deletingName = ref('')
 const handleDeleteClicked = async (row: TimeslotRow) => {
   showDeleteDialog.value = true
   deletingId = row.timeslot!.id
-  deletingName.value = formatHourOnly(parseDate(row.timeslot!.start))
+  deletingName.value = `${formatHourOnly(parseDate(row.timeslot!.start))} | ${row.timeslot!.name ?? row.timeslot!.performer.name}`
 }
 const handleDelete = async () => {
   isSubmitting.value = true

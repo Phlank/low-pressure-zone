@@ -59,6 +59,7 @@ public class PutTimeslot : EndpointWithMapper<TimeslotRequest, TimeslotRequestMa
         timeslot.End = req.End;
         timeslot.PerformerId = req.PerformerId;
         timeslot.Type = req.PerformanceType;
+        timeslot.Name = req.Name;
         if (DataContext.ChangeTracker.HasChanges())
         {
             timeslot.LastModifiedDate = DateTime.UtcNow;

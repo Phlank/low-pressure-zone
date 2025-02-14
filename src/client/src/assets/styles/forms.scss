@@ -32,6 +32,11 @@
   }
 }
 
-.action {
-  margin: variables.$space-s;
+tbody.p-datatable-tbody tr > td.grid-action-col {
+  width: 8.75rem;
+  text-align: center;
+
+  .grid-action-col__item {
+    margin: 0 variables.$space-s;
+  }
 }

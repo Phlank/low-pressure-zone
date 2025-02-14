@@ -9,8 +9,8 @@ public sealed class PerformerRequestMapper : RequestMapper<PerformerRequest, Dom
         return new Domain.Entities.Performer
         {
             Id = Guid.NewGuid(),
-            Name = r.Name,
-            Url = r.Url,
+            Name = r.Name.Trim(),
+            Url = r.Url.Trim(),
             CreatedDate = DateTime.UtcNow,
             LastModifiedDate = DateTime.UtcNow,
         };
