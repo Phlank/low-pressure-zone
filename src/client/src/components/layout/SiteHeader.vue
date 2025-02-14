@@ -1,8 +1,10 @@
 <template>
   <Toolbar class="header">
-    <template #start><RouterLink :to="'/'">Low Pressure Zone</RouterLink></template>
+    <template #start>
+      <RouterLink :to="'/'" class="header__title"> Low Pressure Zone </RouterLink>
+    </template>
     <template #end>
-      <DarkModeToggle />
+      <DarkModeToggle class="header__dark-mode-toggle" />
       <div v-if="isMobile" style="display: flex">
         <Button
           icon="pi pi-bars"
@@ -61,6 +63,14 @@ const toggleMenu = (event: MouseEvent) => {
 
 <style lang="scss" scoped>
 @use '@/assets/styles/variables.scss';
+
+.header {
+  &__dark-mode-toggle {
+    @include variables.tiny {
+      display: none;
+    }
+  }
+}
 
 .p-button {
   margin: 0 variables.$space-s;

@@ -24,7 +24,7 @@
       </Column>
       <Column field="end" header="Time">
         <template #body="{ data }">
-          {{ formatHourOnly(parseDate(data.start)) }} - {{ formatHourOnly(parseDate(data.end)) }}
+          {{ formatTimeslot(parseDate(data.start)) }} - {{ formatTimeslot(parseDate(data.end)) }}
         </template>
       </Column>
       <Column class="grid-action-col">
@@ -92,7 +92,7 @@ import type { ScheduleResponse } from '@/api/schedules/scheduleResponse'
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
 import FormDialog from '@/components/dialogs/FormDialog.vue'
 import ScheduleForm from '@/components/form/requestForms/ScheduleForm.vue'
-import { formatHourOnly, setToNextHour, parseDate } from '@/utils/dateUtils'
+import { formatTimeslot, setToNextHour, parseDate } from '@/utils/dateUtils'
 import { showCreateSuccessToast, showEditSuccessToast } from '@/utils/toastUtils'
 import { Button, Column, DataTable, useToast } from 'primevue'
 import { computed, onMounted, reactive, ref, useTemplateRef, type Ref } from 'vue'
