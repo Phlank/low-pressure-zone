@@ -4,7 +4,7 @@
     <Button class="input" label="Create" @click="handleCreateClick" :disabled="controlsDisabled" />
   </div>
   <DataTable
-    v-if="isLoaded"
+    :loading="!isLoaded"
     data-key="id"
     :value="schedules"
     :expanded-rows="expandedRows"
@@ -52,7 +52,12 @@
       </Column>
     </template>
     <template #expansion="rowProps">
-      <DashboardSchedulesTimeslotsTable :schedule="rowProps.data" :performers="performers" />
+      <DashboardSchedulesTimeslotsTable
+        :schedule="rowProps.data"
+        :performers="performers"
+        :is-parent-submitting="isSubmitting"
+        :is-parent-editing="showEditScheduleDialog"
+      />
     </template>
   </DataTable>
   <FormDialog
