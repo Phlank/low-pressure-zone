@@ -26,19 +26,16 @@
 </template>
 
 <script lang="ts" setup>
-import { nameValidator, urlValidator } from '@/validation/rules/composed/performerValidators'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { IftaLabel, InputText } from 'primevue'
 import { onMounted, reactive } from 'vue'
 import { createUpdateHandler } from '../formInputHandling'
 import ValidationLabel from '../ValidationLabel.vue'
 import type { PerformerRequest } from '@/api/performers/performerRequest'
+import { performerRequestRules } from '@/validation/requestRules'
 
 const formState: PerformerRequest = reactive({ name: '', url: '' })
-const validation = createFormValidation(formState, {
-  name: nameValidator,
-  url: urlValidator
-})
+const validation = createFormValidation(formState, performerRequestRules)
 
 const props = defineProps<{
   initialState: PerformerRequest

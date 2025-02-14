@@ -1,10 +1,10 @@
 import { ref } from 'vue'
-import { alwaysValid } from './../rules/single/untypedRules'
 import type { FormValidationState } from './../types/formValidationState'
 import type { PropertyRules } from './../types/propertyRules'
 import { invalid, valid, type ValidationResult } from './../types/validationResult'
 import type { ValidationRule } from './../types/validationRule'
 import type { ErrorMessageDictionary } from '@/api/apiResponse'
+import { alwaysValid } from '../rules/untypedRules'
 
 class FormValidationImplementation<TForm extends object> implements FormValidation<TForm> {
   private formState: TForm
@@ -15,12 +15,8 @@ class FormValidationImplementation<TForm extends object> implements FormValidati
     this.propertyState = {} as FormValidationState<TForm>
     const formKeys = this.getKeys()
     formKeys.forEach((key) => {
-      let rule = rules[key]
-      if (!rule) {
-        rule = alwaysValid
-      }
       this.propertyState[key] = {
-        rule: rule,
+        rule: rules[key] ?? alwaysValid,
         isValid: ref(true),
         message: ref(''),
         isDirty: false
@@ -75,7 +71,7 @@ class FormValidationImplementation<TForm extends object> implements FormValidati
     if (keys.length == 0) keys = this.getKeys()
     for (let i = 0; i < keys.length; i++) {
       const isKeyValid = this.propertyState[keys[i]].isValid.value
-      if (!isKeyValid) return false
+      if (isKeyValid === false) return false
     }
     return true
   }

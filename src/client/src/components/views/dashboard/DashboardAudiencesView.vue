@@ -1,6 +1,6 @@
 <template>
   <div class="performers-dashboard">
-    <div class="desktop-inline">
+    <div class="create-form desktop-inline">
       <AudienceForm
         ref="createForm"
         :initial-state="createFormInitialState"

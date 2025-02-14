@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { PerformanceType } from '@/models/performanceType'
+import { PerformanceType } from '@/api/schedules/timeslots/performanceType'
 import { formatHourOnly } from '@/utils/dateUtils'
 import { Column, DataTable, Panel } from 'primevue'
 import { ref, type Ref } from 'vue'

@@ -11,13 +11,13 @@ public class TimeslotRequestMapper : RequestMapper<TimeslotRequest, Timeslot>
         {
             Id = Guid.NewGuid(),
             Name = r.Name,
-            Start = r.Start,
-            End = r.End,
+            Start = r.Start.ToUniversalTime(),
+            End = r.End.ToUniversalTime(),
             Type = r.PerformanceType,
             PerformerId = r.PerformerId,
             ScheduleId = Guid.Empty,
-            CreatedDate = DateTime.Now,
-            LastModifiedDate = DateTime.Now,
+            CreatedDate = DateTime.UtcNow,
+            LastModifiedDate = DateTime.UtcNow,
         };
     }
 }

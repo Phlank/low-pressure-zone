@@ -47,3 +47,9 @@ body.dark-mode-toggle {
 p {
   font-size: 0.9rem;
 }
+
+.desktop-only {
+  @include variables.mobile {
+    display: none;
+  }
+}

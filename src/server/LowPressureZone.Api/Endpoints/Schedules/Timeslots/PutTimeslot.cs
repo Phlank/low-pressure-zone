@@ -3,6 +3,7 @@ using FluentValidation.Results;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Entities;
 using LowPressureZone.Domain.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
@@ -23,8 +24,8 @@ public class PutTimeslot : EndpointWithMapper<TimeslotRequest, TimeslotRequestMa
         var scheduleId = Route<Guid>("scheduleId");
         var timeslotId = Route<Guid>("timeslotId");
 
-        var timeslot = DataContext.Timeslots.FirstOrDefault(t => t.Id == timeslotId && t.ScheduleId == scheduleId);
-        if (timeslot == null)
+        var timeslot = DataContext.Timeslots.Include("Schedule").FirstOrDefault(t => t.Id == timeslotId && t.ScheduleId == scheduleId);
+        if (timeslot == null || timeslot.Schedule == null)
         {
             await SendNotFoundAsync();
             return;
@@ -32,18 +33,20 @@ public class PutTimeslot : EndpointWithMapper<TimeslotRequest, TimeslotRequestMa
 
         if (req.Start != timeslot.Start || req.End != timeslot.End)
         {
-            var isRequestWithinSchedule = DataContext.Schedules.Where(s => s.Id == scheduleId).WhereContains(req).Any();
-            if (!isRequestWithinSchedule)
+            if (req.Start < timeslot.Schedule.Start || req.Start > timeslot.Schedule.End)
             {
-                AddError(new ValidationFailure(nameof(req.Start), "Timeslot range must not exceed schedule."));
-                AddError(new ValidationFailure(nameof(req.End), "Timeslot range must not exceed schedule."));
+                AddError(new ValidationFailure(nameof(req.Start), "Exceeds schedule"));
+            }
+            if (req.End < timeslot.Schedule.Start || req.End > timeslot.Schedule.End)
+            {
+                AddError(new ValidationFailure(nameof(req.End), "Exceeds schedule"));
             }
 
             var doesOverlapOtherTimeslot = DataContext.Timeslots.Where(t => t.ScheduleId == scheduleId).WhereOverlaps(req).Any();
             if (doesOverlapOtherTimeslot)
             {
-                AddError(new ValidationFailure(nameof(req.Start), "Timeslot times cannot overlap."));
-                AddError(new ValidationFailure(nameof(req.End), "Timeslot times cannot overlap."));
+                AddError(new ValidationFailure(nameof(req.Start), "Overlaps other timeslot"));
+                AddError(new ValidationFailure(nameof(req.End), "Overlaps other timeslot"));
             }
         }
 

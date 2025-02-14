@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
-public class GetSchedules : EndpointWithoutRequest<IEnumerable<ScheduleResponse>, ScheduleResponseMapper>
+public class GetSchedules : Endpoint<GetSchedulesRequest, IEnumerable<ScheduleResponse>, ScheduleResponseMapper>
 {
     public required DataContext DataContext { get; set; }
 
@@ -16,9 +16,20 @@ public class GetSchedules : EndpointWithoutRequest<IEnumerable<ScheduleResponse>
         AllowAnonymous();
     }
 
-    public override async Task HandleAsync(CancellationToken ct)
+    public override async Task HandleAsync(GetSchedulesRequest req, CancellationToken ct)
     {
-        var schedules = await DataContext.Schedules.IncludeConnectingProperties().OrderByDescending(s => s.Start).AsNoTracking().ToListAsync(ct);
+        var scheduleQuery = DataContext.Schedules.IncludeConnectingProperties().AsNoTracking();
+        
+        if (req.Before.HasValue)
+        {
+            scheduleQuery = scheduleQuery.Where(s => s.End < req.Before.Value.ToUniversalTime());
+        }
+        if (req.After.HasValue)
+        {
+            scheduleQuery = scheduleQuery.Where(s => s.End > req.After.Value.ToUniversalTime());
+        }
+        
+        var schedules = await scheduleQuery.ToListAsync(ct);
         foreach (var schedule in schedules)
         {
             schedule.Timeslots = schedule.Timeslots.OrderBy(t => t.Start).ToList();
