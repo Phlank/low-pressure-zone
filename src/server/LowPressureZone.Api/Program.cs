@@ -40,7 +40,7 @@ builder.Services.AddCors(options =>
         {
             builder.WithOrigins("http://localhost:4001")
                    .AllowAnyHeader()
-                   .AllowAnyMethod();
+                   .WithMethods("GET", "PUT", "POST", "DELETE");
         });
     }
     else
@@ -49,7 +49,7 @@ builder.Services.AddCors(options =>
         {
             builder.WithOrigins("https://lowpressurezone.com")
                    .AllowAnyHeader()
-                   .AllowAnyMethod();
+                   .WithMethods("GET", "PUT", "POST", "DELETE");
         });
     }
 });
