@@ -1,19 +1,8 @@
 <template>
   <div class="flex-variable-space-between">
-    <Panel
-      :header="currentSchedule.audience"
+    <UpcomingSchedules
       class="flex-variable-space-between__left flex-variable-space-between__left--variable-height"
-    >
-      <p>{{ currentSchedule.description }}</p>
-      <DataTable :value="currentSchedule.timeslots">
-        <Column header="Time">
-          <template #body="slotProps">
-            {{ formatHourOnly(slotProps.data.startTime) }}
-          </template>
-        </Column>
-        <Column field="performance.name" header="Performer" />
-      </DataTable>
-    </Panel>
+    />
     <iframe
       src="https://discord.com/widget?id=722643085137412096&theme=dark"
       width="350"
@@ -27,54 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { PerformanceType } from '@/api/schedules/timeslots/performanceType'
-import { formatHourOnly } from '@/utils/dateUtils'
-import { Column, DataTable, Panel } from 'primevue'
-import { ref, type Ref } from 'vue'
-
-const today = new Date()
-const currentSchedule: Ref = ref({
-  audience: '/r/realdubstep',
-  startDate: new Date(),
-  description: "Hot take: Mere Sher isn't that good.",
-  timeslots: [
-    {
-      startTime: new Date(today.getFullYear(), today.getMonth() - 1, today.getDate(), 18),
-      performance: {
-        name: 'Phlank',
-        type: PerformanceType.Live
-      }
-    },
-    {
-      startTime: new Date(today.getFullYear(), today.getMonth() - 1, today.getDate(), 19),
-      performance: {
-        name: 'strgrll',
-        type: PerformanceType.Live
-      }
-    },
-    {
-      startTime: new Date(today.getFullYear(), today.getMonth() - 1, today.getDate(), 20),
-      performance: {
-        name: 'dubski',
-        type: PerformanceType.Live
-      }
-    },
-    {
-      startTime: new Date(today.getFullYear(), today.getMonth() - 1, today.getDate(), 21),
-      performance: {
-        name: 'Sovereign',
-        type: PerformanceType.Live
-      }
-    },
-    {
-      startTime: new Date(today.getFullYear(), today.getMonth() - 1, today.getDate(), 22),
-      performance: {
-        name: 'repulsion',
-        type: PerformanceType.Live
-      }
-    }
-  ]
-})
+import UpcomingSchedules from '../data/UpcomingSchedules.vue'
 </script>
 
 <style lang="scss" scoped>

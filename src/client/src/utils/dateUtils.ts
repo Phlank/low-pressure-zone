@@ -2,10 +2,22 @@ import { formatDate } from '@vueuse/core'
 
 export const parseDate = (dateString: string) => new Date(Date.parse(dateString))
 
+export const getHour = (date: Date) => {
+  const newDate = new Date(date.getTime())
+  setToHour(newDate)
+  return newDate
+}
+
 export const setToHour = (date: Date) => {
   date.setMinutes(0)
   date.setSeconds(0)
   date.setMilliseconds(0)
+}
+
+export const getNextHour = (date: Date) => {
+  const newDate = new Date(date)
+  setToNextHour(newDate)
+  return newDate
 }
 
 export const setToNextHour = (date: Date) => {
@@ -13,10 +25,15 @@ export const setToNextHour = (date: Date) => {
   setToHour(date)
 }
 
-export const getNextHour = (date: Date) => {
-  const newDate = new Date(date.getTime())
-  setToNextHour(newDate)
+export const getPreviousHour = (date: Date) => {
+  const newDate = new Date(date)
+  setToPreviousHour(newDate)
   return newDate
+}
+
+export const setToPreviousHour = (date: Date) => {
+  setToHour(date)
+  date.setHours(date.getHours() - 1)
 }
 
 export const isHour = (date: Date) =>
@@ -45,4 +62,4 @@ export const minimumDate = (...dates: Date[]) => {
   return new Date(minimum)
 }
 
-export const formatHourOnly = (date: Date) => formatDate(date, 'h A')
+export const formatTimeslot = (date: Date) => formatDate(date, 'h:mm A')

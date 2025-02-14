@@ -16,6 +16,12 @@
     }
   }
 
+  &__left {
+    @include variables.desktop {
+      min-width: 30%;
+    }
+  }
+
   &__right {
     margin-left: variables.$space-m;
   }

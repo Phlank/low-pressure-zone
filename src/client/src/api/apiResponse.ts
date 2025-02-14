@@ -13,7 +13,11 @@ export class ApiResponse<TRequest extends object, TResponse> {
     this.validationProblem = validationProblem
   }
 
-  readonly isSuccess = () => this.status >= 200 && this.status < 300
+  readonly isSuccess = () => {
+    const hasSuccessStatus = this.status >= 200 && this.status < 300
+    const hasDataIf200 = this.status !== 200 || this.data !== undefined
+    return hasSuccessStatus && hasDataIf200
+  }
 
   readonly isInvalid = () => this.validationProblem != undefined
 

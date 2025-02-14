@@ -1,0 +1,96 @@
+<template>
+  <Panel class="upcoming-schedules" :header="title">
+    <div v-if="isLoaded && schedules.length === 0" class="upcoming-schedules__content--none">
+      No upcoming schedule to display.
+    </div>
+    <div v-else-if="scheduleData" class="upcoming-schedules__content">
+      <DataTable :loading="!isLoaded" :value="scheduleData!.timeslots">
+        <Column field="start" header="Time">
+          <template #body="{ data }">
+            {{ formatTimeslot(data.start) }}
+          </template>
+        </Column>
+        <Column field="performer" header="Performer" />
+        <Column v-if="!isMobile" field="type" header="Type" />
+      </DataTable>
+    </div>
+  </Panel>
+</template>
+
+<script lang="ts" setup>
+import type { ScheduleResponse } from '@/api/schedules/scheduleResponse'
+import { computed, inject, onMounted, ref, type ComputedRef, type Ref } from 'vue'
+import { DataTable, Panel, Column } from 'primevue'
+import api from '@/api/api'
+import { formatTimeslot, getPreviousHour, hoursBetween, parseDate } from '@/utils/dateUtils'
+
+const isMobile: Ref<boolean> | undefined = inject('isMobile')
+const schedules: Ref<ScheduleResponse[]> = ref([])
+const scheduleIndex: Ref<number> = ref(0)
+const isLoaded = ref(false)
+
+interface ScheduleData {
+  id: string
+  start: Date
+  audience: string
+  timeslots: TimeslotData[]
+}
+
+interface TimeslotData {
+  start: Date
+  performer: string
+  type: string
+}
+
+const scheduleData: ComputedRef<ScheduleData | undefined> = computed(() => {
+  if (schedules.value.length === 0) return undefined
+  const schedule = schedules.value[scheduleIndex.value]
+  return {
+    id: schedule.id,
+    start: parseDate(schedule.start),
+    audience: schedule.audience.name,
+    timeslots: mapTimeslotDisplayData(schedule)
+  }
+})
+
+const title: ComputedRef<string> = computed(() => {
+  if (scheduleData.value) {
+    return `${scheduleData.value.audience} - ${scheduleData.value.start.toLocaleDateString()}`
+  }
+  return 'Upcoming Schedules'
+})
+
+const mapTimeslotDisplayData = (schedule: ScheduleResponse) => {
+  const timeslots = schedule.timeslots
+  const timeslotData: TimeslotData[] = []
+  if (timeslots.length === 0) return timeslotData
+
+  const startFirst = parseDate(timeslots[0].start)
+  const endLast = parseDate(timeslots[timeslots.length - 1].end)
+  const hours = hoursBetween(startFirst, endLast)
+  if (startFirst > parseDate(schedule.start)) {
+    hours.unshift(getPreviousHour(startFirst))
+  }
+  if (endLast < parseDate(schedule.end)) {
+    hours.push(endLast)
+  }
+
+  hours.forEach((hour) => {
+    const slot = timeslots.find((t) => Date.parse(t.start) === hour.getTime())
+    timeslotData.push({
+      start: hour,
+      performer: slot?.performer.name ?? '',
+      type: slot?.performanceType ?? ''
+    })
+  })
+  return timeslotData
+}
+
+onMounted(async () => {
+  const response = await api.schedules.get({ after: new Date().toISOString() })
+  if (response.isSuccess() && response.data) {
+    schedules.value = response.data.sort((a, b) => Date.parse(a.end) - Date.parse(b.end))
+  }
+  isLoaded.value = true
+})
+</script>

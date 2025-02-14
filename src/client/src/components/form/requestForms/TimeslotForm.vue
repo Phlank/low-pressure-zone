@@ -5,7 +5,7 @@
         <InputText
           class="input__field"
           id="startInput"
-          :model-value="formatHourOnly(parseDate(formState.start))"
+          :model-value="formatTimeslot(parseDate(formState.start))"
           disabled
         />
         <label for="startInput">Start</label>
@@ -69,7 +69,7 @@
 <script setup lang="ts">
 import type { PerformerResponse } from '@/api/performers/performerResponse'
 import type { TimeslotRequest } from '@/api/schedules/timeslots/timeslotRequest'
-import { parseDate, formatHourOnly } from '@/utils/dateUtils'
+import { parseDate, formatTimeslot } from '@/utils/dateUtils'
 import { timeslotRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { IftaLabel, Select, InputText } from 'primevue'

@@ -2,7 +2,7 @@
   <DataTable data-key="start" :value="rows" size="large">
     <Column field="start" header="Start">
       <template #body="{ data }">
-        {{ formatHourOnly(data.start) }}
+        {{ formatTimeslot(data.start) }}
       </template>
     </Column>
     <Column field="timeslot.performer.name" header="Performer" />
@@ -69,7 +69,7 @@ import type { TimeslotResponse } from '@/api/schedules/timeslots/timeslotRespons
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
 import FormDialog from '@/components/dialogs/FormDialog.vue'
 import TimeslotForm from '@/components/form/requestForms/TimeslotForm.vue'
-import { formatHourOnly, getNextHour, hoursBetween, parseDate } from '@/utils/dateUtils'
+import { formatTimeslot, getNextHour, hoursBetween, parseDate } from '@/utils/dateUtils'
 import {
   showCreateSuccessToast,
   showDeleteSuccessToast,
@@ -160,13 +160,13 @@ const handleSave = async () => {
     showEditSuccessToast(
       toast,
       'timeslot',
-      `${formatHourOnly(parseDate(request.start))} | ${requestPerformer!.name}`
+      `${formatTimeslot(parseDate(request.start))} | ${requestPerformer!.name}`
     )
   } else {
     showCreateSuccessToast(
       toast,
       'timeslot',
-      `${formatHourOnly(parseDate(request.start))} | ${requestPerformer!.name}`
+      `${formatTimeslot(parseDate(request.start))} | ${requestPerformer!.name}`
     )
   }
   updateRows()
@@ -180,7 +180,7 @@ const deletingName = ref('')
 const handleDeleteClicked = async (row: TimeslotRow) => {
   if (!row.timeslot) return
   deletingId = row.timeslot!.id
-  deletingName.value = `${formatHourOnly(parseDate(row.timeslot.start))} - ${row.timeslot.performer.name}`
+  deletingName.value = `${formatTimeslot(parseDate(row.timeslot.start))} - ${row.timeslot.performer.name}`
   showDeleteDialog.value = true
 }
 const handleDelete = async () => {
