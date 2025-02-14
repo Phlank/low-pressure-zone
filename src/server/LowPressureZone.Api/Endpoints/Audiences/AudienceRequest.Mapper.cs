@@ -9,8 +9,8 @@ public sealed class AudienceRequestMapper : RequestMapper<AudienceRequest, Domai
         return new Domain.Entities.Audience
         {
             Id = Guid.NewGuid(),
-            Name = r.Name,
-            Url = r.Url,
+            Name = r.Name.Trim(),
+            Url = r.Url.Trim(),
             CreatedDate = DateTime.UtcNow,
             LastModifiedDate = DateTime.UtcNow
         };

@@ -26,24 +26,18 @@
 </template>
 
 <script lang="ts" setup>
-import { nameValidator, urlValidator } from '@/validation/rules/composed/audienceValidators'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { IftaLabel, InputText } from 'primevue'
 import { onMounted, reactive } from 'vue'
 import { createUpdateHandler } from '../formInputHandling'
 import ValidationLabel from '../ValidationLabel.vue'
 import type { AudienceRequest } from '@/api/audiences/audienceRequest'
+import { audienceRequestRules } from '@/validation/requestRules'
 
 const formState: AudienceRequest = reactive({ name: '', url: '' })
-const validation = createFormValidation(formState, {
-  name: nameValidator,
-  url: urlValidator
-})
+const validation = createFormValidation(formState, audienceRequestRules)
 
-const props = defineProps<{
-  initialState: AudienceRequest
-  disabled: boolean
-}>()
+const props = defineProps<{ initialState: AudienceRequest; disabled: boolean }>()
 
 onMounted(() => {
   formState.name = props.initialState.name
@@ -59,9 +53,5 @@ const reset = () => {
   validation.reset()
 }
 
-defineExpose({
-  formState,
-  validation,
-  reset
-})
+defineExpose({ formState, validation, reset })
 </script>

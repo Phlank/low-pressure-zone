@@ -1,6 +1,6 @@
 <template>
   <div class="performers-dashboard">
-    <div class="desktop-inline">
+    <div class="create-form desktop-inline">
       <AudienceForm
         ref="createForm"
         :initial-state="createFormInitialState"
@@ -21,11 +21,12 @@
           {{ new Date(slotProps.data.modifiedDate).toLocaleString() }}
         </template>
       </Column>
-      <Column style="text-align: right">
+      <Column class="grid-action-col__item">
         <template #body="slotProps">
           <Button
-            class="action"
+            class="grid-action-col__item"
             icon="pi pi-pencil"
+            severity="secondary"
             @click="handleEditActionClick(slotProps.data as AudienceResponse)"
             :disabled="controlsDisabled"
             rounded
@@ -33,7 +34,7 @@
           />
           <Button
             v-if="slotProps.data.canDelete"
-            class="action"
+            class="grid-action-col__item"
             icon="pi pi-trash"
             severity="danger"
             @click="handleDeleteActionClick(slotProps.data as AudienceResponse)"

@@ -48,3 +48,10 @@
     width: 100%;
   }
 }
+
+.flex-split {
+  display: flex;
+  direction: row;
+  justify-content: space-between;
+  align-items: center;
+}

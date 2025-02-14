@@ -1,9 +1,9 @@
-import type { PerformanceType } from '@/models/performance/performanceType'
+import type { PerformanceType } from './performanceType'
 
 export interface TimeslotRequest {
   performerId: string
   performanceType: PerformanceType
-  name?: string
+  name: string | null
   start: string
   end: string
 }

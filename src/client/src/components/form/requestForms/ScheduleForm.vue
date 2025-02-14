@@ -61,15 +61,10 @@ import { DatePicker, IftaLabel, Select } from 'primevue'
 import ValidationLabel from '../ValidationLabel.vue'
 import { onMounted, reactive, ref, watch } from 'vue'
 import { createFormValidation } from '@/validation/types/formValidation'
-import {
-  audienceValidator,
-  endValidator,
-  startValidator
-} from '@/validation/rules/composed/scheduleValidators'
-import { alwaysValid } from '@/validation/rules/single/untypedRules'
 import { MS_PER_MINUTE } from '@/constants/times'
 import type { ScheduleRequest } from '@/api/schedules/scheduleRequest'
 import { setToHour, minimumDate } from '@/utils/dateUtils'
+import { scheduleRequestRules } from '@/validation/requestRules'
 
 const MAX_DURATION_MINUTES = 1440
 const DEFAULT_MINUTES = 60
@@ -107,13 +102,7 @@ const formState: ScheduleFormState = reactive({
   end: new Date(resetStartTime.getTime() + DEFAULT_MINUTES * MS_PER_MINUTE).toISOString()
 })
 const startRef = ref(formState.start)
-const validation = createFormValidation(formState, {
-  audienceId: audienceValidator,
-  start: startValidator,
-  startTime: alwaysValid,
-  end: endValidator(startRef),
-  endTime: alwaysValid
-})
+const validation = createFormValidation(formState, scheduleRequestRules(formState))
 
 const props = defineProps<{
   initialState?: ScheduleFormState

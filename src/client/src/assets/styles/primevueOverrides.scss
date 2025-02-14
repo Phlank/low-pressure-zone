@@ -11,3 +11,7 @@ div.p-datepicker-minute-picker {
     display: none;
   }
 }
+
+th.p-datatable-column-sorted {
+  background: var(--p-datatable-header-cell-background);
+}

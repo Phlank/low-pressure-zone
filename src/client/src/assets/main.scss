@@ -1,8 +1,7 @@
 @use 'styles/variables.scss';
-
-@import 'styles/forms.scss';
-@import 'styles/layouts.scss';
-@import 'styles/primevueOverrides.scss';
+@use 'styles/forms.scss';
+@use 'styles/layouts.scss';
+@use 'styles/primevueOverrides.scss';
 
 @import 'primeicons/primeicons.css';
 
@@ -17,9 +16,10 @@
 body {
   margin: 0;
   overflow: hidden;
-  background-image: variables.$bg-light;
+  background-image: url(./bg-invert.jpg);
   font-family: 'Nunito Sans', 'Helvetica Neue', sans-serif;
   text-rendering: optimizeLegibility;
+  overflow-y: scroll;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -31,7 +31,7 @@ h3 {
 }
 
 body.dark-mode-toggle {
-  background-image: variables.$bg-dark;
+  background-image: url(./bg.jpg);
 }
 
 .header {
@@ -46,4 +46,10 @@ body.dark-mode-toggle {
 
 p {
   font-size: 0.9rem;
+}
+
+.desktop-only {
+  @include variables.mobile {
+    display: none;
+  }
 }

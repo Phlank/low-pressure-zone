@@ -1,10 +1,10 @@
 import { MS_PER_MINUTE } from '@/constants/times'
+import { parseDate } from '@/utils/dateUtils'
 import { invalid, valid } from '@/validation/types/validationResult'
-import type { Ref } from 'vue'
 
 export const withinRangeOf =
-  (other: Ref<string>, minMinutes: number, maxMinutes: number, msg?: string) => (arg: string) => {
-    const otherTime = Date.parse(other.value)
+  (other: () => string, minMinutes: number, maxMinutes: number, msg?: string) => (arg: string) => {
+    const otherTime = Date.parse(other())
     const thisTime = Date.parse(arg)
     if (!otherTime || !thisTime) return valid // Don't unintentionally enforce required validation
     if (
@@ -17,7 +17,7 @@ export const withinRangeOf =
   }
 
 export const hourOnly = (msg?: string) => (arg: string) => {
-  const time = new Date(Date.parse(arg))
+  const time = parseDate(arg)
   if (!time) return valid // Don't unintentionally enforce required() validation
   if (time.getMinutes() != 0 || time.getSeconds() != 0 || time.getMilliseconds() != 0) {
     return invalid(msg ?? 'Hour intervals only')

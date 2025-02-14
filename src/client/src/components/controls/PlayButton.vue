@@ -1,5 +1,6 @@
 <template>
   <Button
+    class="play-button"
     :icon="controlIcon"
     @click="handleControlClick"
     :label="controlLabel"
@@ -10,19 +11,31 @@
 
 <script lang="ts" setup>
 import { Button } from 'primevue'
-import { PlayState, toggle } from '@/constants/playState'
 import { computed, ref, type Ref } from 'vue'
+
+enum PlayState {
+  Playing = 'playing',
+  Paused = 'paused'
+}
 
 const djName: Ref<string> = ref('strgrll')
 const streamType: Ref<string> = ref('Live DJ Set')
-const controlState: Ref<PlayState> = ref(PlayState.Paused)
+const playState: Ref<PlayState> = ref(PlayState.Paused)
 
 const handleControlClick = () => {
-  toggle(controlState)
+  toggle(playState)
+}
+
+const toggle = (ref: Ref<PlayState>) => {
+  if (ref.value === PlayState.Paused) {
+    ref.value = PlayState.Playing
+  } else {
+    ref.value = PlayState.Paused
+  }
 }
 
 const controlIcon = computed(() => {
-  if (controlState.value == PlayState.Paused) {
+  if (playState.value == PlayState.Paused) {
     return 'pi pi-play'
   }
   return 'pi pi-pause'
@@ -32,7 +45,7 @@ const controlLabel = computed(() => `${djName.value} | ${streamType.value}`)
 </script>
 
 <style lang="scss" scoped>
-.control-icon {
-  font-size: 1rem;
+.play-button {
+  width: fit-content;
 }
 </style>

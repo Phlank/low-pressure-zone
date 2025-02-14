@@ -1,3 +1,7 @@
+import { formatDate } from '@vueuse/core'
+
+export const parseDate = (dateString: string) => new Date(Date.parse(dateString))
+
 export const setToHour = (date: Date) => {
   date.setMinutes(0)
   date.setSeconds(0)
@@ -7,6 +11,12 @@ export const setToHour = (date: Date) => {
 export const setToNextHour = (date: Date) => {
   date.setHours(date.getHours() + 1)
   setToHour(date)
+}
+
+export const getNextHour = (date: Date) => {
+  const newDate = new Date(date.getTime())
+  setToNextHour(newDate)
+  return newDate
 }
 
 export const isHour = (date: Date) =>
@@ -34,3 +44,5 @@ export const minimumDate = (...dates: Date[]) => {
   }
   return new Date(minimum)
 }
+
+export const formatHourOnly = (date: Date) => formatDate(date, 'h A')

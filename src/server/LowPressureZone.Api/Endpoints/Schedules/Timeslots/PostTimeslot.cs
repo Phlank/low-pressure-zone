@@ -50,8 +50,9 @@ public class PostTimeslot : Endpoint<TimeslotRequest, EmptyResponse, TimeslotReq
 
         ThrowIfAnyErrors();
 
-
-        DataContext.Timeslots.Add(Map.ToEntity(req));
+        var entity = Map.ToEntity(req);
+        entity.ScheduleId = scheduleId;
+        DataContext.Timeslots.Add(entity);
         DataContext.SaveChanges();
         await SendCreatedAtAsync<GetScheduleById>(new { id = scheduleId }, Response);
     }

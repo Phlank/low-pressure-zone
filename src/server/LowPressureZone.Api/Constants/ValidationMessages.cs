@@ -1,6 +1,6 @@
 ﻿namespace LowPressureZone.Api.Constants;
 
-public record ValidationMessages
+public static class ValidationMessages
 {
     public const string Unique = "Already in use";
 }
