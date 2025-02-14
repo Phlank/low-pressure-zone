@@ -29,6 +29,11 @@
 
   &__field {
     width: 100%;
+
+    // This is needed to adjust the password input width
+    input {
+      width: 100%;
+    }
   }
 }
 
