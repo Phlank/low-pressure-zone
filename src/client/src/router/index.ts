@@ -47,7 +47,7 @@ router.beforeEach(async (to, from, next) => {
     if (await getCurrentUser()) {
       next()
     } else {
-      next('/')
+      next('/user/login')
     }
   } else {
     next()

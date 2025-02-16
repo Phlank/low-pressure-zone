@@ -49,3 +49,8 @@ export const timeslotRequestRules = (
     )
   }
 }
+
+export const loginRequestRules = {
+  email: required(),
+  password: required()
+}

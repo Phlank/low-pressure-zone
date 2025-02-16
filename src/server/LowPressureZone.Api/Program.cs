@@ -27,9 +27,23 @@ builder.Services.Configure<JsonOptions>(options =>
     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
 builder.AddMappers();
-builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<IdentityContext>();
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+{
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequiredUniqueChars = 1;
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequiredLength = 8;
+}).AddEntityFrameworkStores<IdentityContext>().AddDefaultTokenProviders();
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.Name = "LowPressureZoneCookie";
+    options.Cookie.Expiration = TimeSpan.FromDays(1);
+    options.Cookie.HttpOnly = true;
+});
 builder.Services.AddFastEndpoints();
 builder.Services.SwaggerDocument();
 builder.Services.AddCors(options =>
