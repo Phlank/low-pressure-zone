@@ -11,6 +11,7 @@
 		<PackageReference Include="FastEndpoints" Version="5.33.0" />
 		<PackageReference Include="FastEndpoints.Security" Version="5.33.0" />
 		<PackageReference Include="FastEndpoints.Swagger" Version="5.33.0" />
+		<PackageReference Include="FluentEmail.Mailgun" Version="3.0.2" />
 		<PackageReference Include="Google.Apis.Auth.AspNetCore3" Version="1.69.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.1" />
 		<PackageReference Include="Minerals.StringCases" Version="0.2.1" />

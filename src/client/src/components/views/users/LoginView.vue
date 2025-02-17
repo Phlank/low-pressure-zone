@@ -4,22 +4,24 @@
       <IftaLabel class="input input--medium">
         <InputText
           :autofocus="true"
-          id="emailInput"
+          id="usernameInput"
           class="input__field"
-          v-model:model-value="formState.email" />
+          :disabled="isSubmitting"
+          v-model:model-value="formState.username" />
         <ValidationLabel
-          for="emailInput"
+          for="usernameInput"
           message=""
-          text="Email" />
+          text="Username" />
       </IftaLabel>
       <IftaLabel class="input input--medium">
         <Password
           id="passwordInput"
           class="input__field"
           :feedback="false"
+          :disabled="isSubmitting"
           v-model:model-value="formState.password" />
         <ValidationLabel
-          for="emailInput"
+          for="passwordInput"
           message=""
           text="Password" />
       </IftaLabel>
@@ -33,45 +35,52 @@
       <Button
         class="input"
         label="Login"
+        :disabled="isSubmitting"
         @click="handleLogin" />
     </div>
   </Panel>
 </template>
 
 <script lang="ts" setup>
-import { Panel, IftaLabel, InputText, Button, Message, Password, KeyFilter } from 'primevue'
-import { reactive, ref } from 'vue'
-import ValidationLabel from '../form/ValidationLabel.vue'
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
-import router from '@/router'
-import { onKeyDown } from '@vueuse/core'
+import api from '@/api/api'
+import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { KeyName } from '@/constants/keys'
-import { createFormValidation } from '@/validation/types/formValidation'
+import router, { LOGIN_REDIRECT } from '@/router'
 import { loginRequestRules } from '@/validation/requestRules'
+import { createFormValidation } from '@/validation/types/formValidation'
+import { onKeyDown } from '@vueuse/core'
+import { Button, IftaLabel, InputText, Message, Panel, Password } from 'primevue'
+import { reactive, ref } from 'vue'
 
 const formState = reactive({
-  email: '',
+  username: '',
   password: ''
 })
 const validationState = createFormValidation(formState, loginRequestRules)
 
 onKeyDown(KeyName.Enter, () => handleLogin())
 
-const errorCode = ref('')
+const isSubmitting = ref(false)
 const errorMessage = ref('')
 
-const handleLogin = () => {
+const handleLogin = async () => {
   const isValid = validationState.validate()
   if (!isValid) return
 
-  signInWithEmailAndPassword(getAuth(), formState.email, formState.password)
-    .then(() => {
-      router.push('/dashboard')
-    })
-    .catch((reason: any) => {
-      errorCode.value = reason.code
-      errorMessage.value = reason.message
-    })
+  isSubmitting.value = true
+  const response = await api.users.login.post(formState)
+  isSubmitting.value = true
+  if (!response.isSuccess()) {
+    errorMessage.value = 'Invalid credentials entered'
+    return
+  }
+
+  if (response.data?.requiresTwoFactor) {
+    router.push('/user/twofactor')
+    return
+  }
+
+  router.push(LOGIN_REDIRECT)
 }
 </script>
 

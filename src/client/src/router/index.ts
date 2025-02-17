@@ -4,9 +4,10 @@ import DashboardSchedulesView from '@/components/views/dashboard/schedules/Dashb
 import DashboardAudiencesView from '@/components/views/dashboard/DashboardAudiencesView.vue'
 import DashboardPerformersView from '@/components/views/dashboard/DashboardPerformersView.vue'
 import HomeView from '@/components/views/HomeView.vue'
-import LoginView from '@/components/views/LoginView.vue'
-import RegisterView from '@/components/views/RegisterView.vue'
+import LoginView from '@/components/views/users/LoginView.vue'
+import RegisterView from '@/components/views/users/RegisterView.vue'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import TwoFactorView from '@/components/views/users/TwoFactorView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,6 +15,7 @@ const router = createRouter({
     { path: '/', component: HomeView },
     { path: '/user/login', component: LoginView },
     { path: '/user/register', component: RegisterView },
+    { path: '/user/twofactor', component: TwoFactorView },
     {
       path: '/dashboard',
       component: DashboardView,
@@ -44,14 +46,15 @@ const getCurrentUser = () => {
 
 router.beforeEach(async (to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuthentication)) {
-    if (await getCurrentUser()) {
-      next()
-    } else {
-      next('/user/login')
-    }
+    // if (await getCurrentUser()) {
+    next()
+    // } else {
+    //   next('/user/login')
+    // }
   } else {
     next()
   }
 })
 
 export default router
+export const LOGIN_REDIRECT = '/dashboard'

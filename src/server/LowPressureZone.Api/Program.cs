@@ -27,6 +27,7 @@ builder.Services.Configure<JsonOptions>(options =>
     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
 builder.AddMappers();
+builder.AddServices();
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
     options.Password.RequireNonAlphanumeric = true;
@@ -41,8 +42,8 @@ builder.Services.AddAuthorization();
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.Name = "LowPressureZoneCookie";
-    options.Cookie.Expiration = TimeSpan.FromDays(1);
     options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.FromDays(1);
 });
 builder.Services.AddFastEndpoints();
 builder.Services.SwaggerDocument();

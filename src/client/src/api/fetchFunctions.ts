@@ -11,7 +11,8 @@ const sendRequest = async <TRequest extends object, TResponse = never>(
     const response = await fetch(`${API_URL}${route}`, {
       body: request ? JSON.stringify(request) : null,
       method: method,
-      headers: request ? { 'Content-Type': 'application/json' } : undefined
+      headers: request ? { 'Content-Type': 'application/json' } : undefined,
+      credentials: 'same-origin'
     })
 
     if (response.status === 200) {
@@ -45,8 +46,11 @@ export const sendPut = async <TRequest extends object>(route: string, request: T
   return await sendRequest<TRequest, never>('PUT', route, request)
 }
 
-export const sendPost = async <TRequest extends object>(route: string, request: TRequest) => {
-  return await sendRequest<TRequest, never>('POST', route, request)
+export const sendPost = async <TRequest extends object, TResponse = never>(
+  route: string,
+  request: TRequest
+) => {
+  return await sendRequest<TRequest, TResponse>('POST', route, request)
 }
 
 export const sendDelete = async (route: string) => {

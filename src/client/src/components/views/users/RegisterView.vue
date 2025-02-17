@@ -45,7 +45,7 @@
 import { Panel, IftaLabel, InputText, Button, Password } from 'primevue'
 import { reactive, ref } from 'vue'
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'
-import ValidationLabel from '../form/ValidationLabel.vue'
+import ValidationLabel from '@/components/form/ValidationLabel.vue'
 
 const formState = reactive({
   email: '',
