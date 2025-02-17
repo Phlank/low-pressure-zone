@@ -1,6 +1,5 @@
-﻿namespace LowPressureZone.Api.Constants
+﻿namespace LowPressureZone.Api.Constants;
+
+public class TokenNames
 {
-    public class TokenName
-    {
-    }
 }

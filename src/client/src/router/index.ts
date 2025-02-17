@@ -8,6 +8,7 @@ import LoginView from '@/components/views/users/LoginView.vue'
 import RegisterView from '@/components/views/users/RegisterView.vue'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import TwoFactorView from '@/components/views/users/TwoFactorView.vue'
+import api from '@/api/api'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,26 +32,22 @@ const router = createRouter({
   ]
 })
 
-const getCurrentUser = () => {
-  return new Promise((resolve, reject) => {
-    const removeListener = onAuthStateChanged(
-      getAuth(),
-      (user) => {
-        removeListener()
-        resolve(user)
-      },
-      reject
-    )
-  })
+const getCurrentUser = async () => {
+  const response = await api.users.info.get()
+  console.log(JSON.stringify(response))
+  if (!response.isSuccess()) return undefined
+
+  return response.data
 }
 
 router.beforeEach(async (to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuthentication)) {
-    // if (await getCurrentUser()) {
+    const user = await getCurrentUser()
+    if (!user) {
+      next('/')
+      return
+    }
     next()
-    // } else {
-    //   next('/user/login')
-    // }
   } else {
     next()
   }

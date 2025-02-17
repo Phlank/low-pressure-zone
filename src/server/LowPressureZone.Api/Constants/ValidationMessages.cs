@@ -5,4 +5,5 @@ public static class ValidationMessages
 {
     public const string Unique = "Already in use";
     public const string InvalidUrl = "Invalid URL";
+
 }
