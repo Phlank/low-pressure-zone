@@ -12,7 +12,7 @@ const sendRequest = async <TRequest extends object, TResponse = never>(
       body: request ? JSON.stringify(request) : null,
       method: method,
       headers: request ? { 'Content-Type': 'application/json' } : undefined,
-      credentials: 'same-origin'
+      credentials: 'include'
     })
 
     if (response.status === 200) {

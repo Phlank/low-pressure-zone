@@ -44,6 +44,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.Name = "LowPressureZoneCookie";
     options.Cookie.HttpOnly = true;
     options.ExpireTimeSpan = TimeSpan.FromDays(1);
+    options.Cookie.SameSite = SameSiteMode.Lax;
 });
 builder.Services.AddFastEndpoints();
 builder.Services.SwaggerDocument();
@@ -55,7 +56,8 @@ builder.Services.AddCors(options =>
         {
             builder.WithOrigins("http://localhost:4001")
                    .AllowAnyHeader()
-                   .WithMethods("GET", "PUT", "POST", "DELETE");
+                   .WithMethods("GET", "PUT", "POST", "DELETE")
+                   .AllowCredentials();
         });
     }
     else
@@ -64,7 +66,8 @@ builder.Services.AddCors(options =>
         {
             builder.WithOrigins("https://lowpressurezone.com")
                    .AllowAnyHeader()
-                   .WithMethods("GET", "PUT", "POST", "DELETE");
+                   .WithMethods("GET", "PUT", "POST", "DELETE")
+                   .AllowCredentials();
         });
     }
 });

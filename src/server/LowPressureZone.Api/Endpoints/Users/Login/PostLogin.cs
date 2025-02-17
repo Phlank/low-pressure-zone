@@ -21,7 +21,7 @@ public class PostLogin : Endpoint<LoginRequest, LoginResponse>
 
     public override async Task HandleAsync(LoginRequest req, CancellationToken ct)
     {
-        if (User == null || User.Identities.Any())
+        if (User.Identities.Any(e => e.IsAuthenticated))
         {
             await SignInManager.SignOutAsync();
         }
@@ -43,7 +43,7 @@ public class PostLogin : Endpoint<LoginRequest, LoginResponse>
 
         if (signInResult.RequiresTwoFactor)
         {
-            var token = await UserManager.GenerateTwoFactorTokenAsync(user, "Email");
+            var token = await UserManager.GenerateTwoFactorTokenAsync(user, "TwoFactor");
             await SendOkAsync(new LoginResponse
             {
                 RequiresTwoFactor = true,

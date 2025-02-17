@@ -51,7 +51,7 @@ const handleVerify = async () => {
   const response = await api.users.twoFactor.post(formState)
   isSubmitting.value = false
   if (!response.isSuccess()) {
-    errorMessage.value = "Something isn't right about that code"
+    errorMessage.value = 'Invalid code'
     return
   }
 
