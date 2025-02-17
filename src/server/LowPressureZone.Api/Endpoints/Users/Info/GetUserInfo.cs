@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using System.Text.Json;
 using FastEndpoints;
 
 namespace LowPressureZone.Api.Endpoints.Users.Info;

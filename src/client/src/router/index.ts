@@ -1,21 +1,21 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import DashboardView from '@/components/views/dashboard/DashboardView.vue'
-import DashboardSchedulesView from '@/components/views/dashboard/schedules/DashboardSchedulesView.vue'
 import DashboardAudiencesView from '@/components/views/dashboard/DashboardAudiencesView.vue'
 import DashboardPerformersView from '@/components/views/dashboard/DashboardPerformersView.vue'
+import DashboardView from '@/components/views/dashboard/DashboardView.vue'
+import DashboardSchedulesView from '@/components/views/dashboard/schedules/DashboardSchedulesView.vue'
 import HomeView from '@/components/views/HomeView.vue'
-import LoginView from '@/components/views/users/LoginView.vue'
-import RegisterView from '@/components/views/users/RegisterView.vue'
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import TwoFactorView from '@/components/views/users/TwoFactorView.vue'
-import api from '@/api/api'
+import LoginView from '@/components/views/user/LoginView.vue'
+import TwoFactorView from '@/components/views/user/TwoFactorView.vue'
+import { useUserStore } from '@/stores/userStore'
+import { createRouter, createWebHistory } from 'vue-router'
+import { Routes } from './routes'
+import LogoutView from '@/components/views/user/LogoutView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     { path: '/', component: HomeView },
     { path: '/user/login', component: LoginView },
-    { path: '/user/register', component: RegisterView },
+    { path: '/user/logout', component: LogoutView },
     { path: '/user/twofactor', component: TwoFactorView },
     {
       path: '/dashboard',
@@ -32,22 +32,22 @@ const router = createRouter({
   ]
 })
 
-const getCurrentUser = async () => {
-  const response = await api.users.info.get()
-  console.log(JSON.stringify(response))
-  if (!response.isSuccess()) return undefined
-
-  return response.data
-}
-
 router.beforeEach(async (to, from, next) => {
-  if (to.matched.some((record) => record.meta.requiresAuthentication)) {
-    const user = await getCurrentUser()
-    if (!user) {
-      next('/')
+  if (to.meta.requiresAuthentication) {
+    const userStore = useUserStore()
+    if (!(await userStore.isLoggedIn())) {
+      console.log('User not logged in')
+      next(Routes.Login)
       return
     }
-    next()
+
+    const allowedRoles = (to.meta.roles ?? []) as string[]
+    if (await userStore.isInAnySpecifiedRole(...allowedRoles)) {
+      next()
+      return
+    }
+
+    next(Routes.Login)
   } else {
     next()
   }

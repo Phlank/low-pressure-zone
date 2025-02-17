@@ -1,6 +1,6 @@
 <template>
-  <Panel class="login">
-    <div class="login__form">
+  <Panel class="login single-panel-center">
+    <div class="single-panel-center__form">
       <IftaLabel class="input input--medium">
         <InputText
           :autofocus="true"
@@ -46,6 +46,7 @@ import api from '@/api/api'
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { KeyName } from '@/constants/keys'
 import router, { LOGIN_REDIRECT } from '@/router'
+import { useUserStore } from '@/stores/userStore'
 import { loginRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { onKeyDown } from '@vueuse/core'
@@ -69,9 +70,9 @@ const handleLogin = async () => {
 
   isSubmitting.value = true
   const response = await api.users.login.post(formState)
-  isSubmitting.value = true
   if (!response.isSuccess()) {
-    errorMessage.value = 'Invalid credentials entered'
+    errorMessage.value = 'Invalid credentials'
+    isSubmitting.value = false
     return
   }
 
@@ -80,20 +81,8 @@ const handleLogin = async () => {
     return
   }
 
+  await useUserStore().load()
+  isSubmitting.value = false
   router.push(LOGIN_REDIRECT)
 }
 </script>
-
-<style lang="scss" scoped>
-.login {
-  margin: auto;
-  margin-top: calc(min(20vh));
-  width: fit-content;
-
-  &__form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-}
-</style>

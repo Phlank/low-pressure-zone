@@ -6,25 +6,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, provide, type ComputedRef, ref, type Ref, onUnmounted } from 'vue'
-import SiteLayout from './components/layout/SiteLayout.vue'
 import { Toast } from 'primevue'
-import { getAuth, onAuthStateChanged, type Auth, type User } from 'firebase/auth'
+import { computed, onMounted, onUnmounted, provide, ref, type ComputedRef, type Ref } from 'vue'
+import SiteLayout from './components/layout/SiteLayout.vue'
 
 const screenWidth: Ref<number> = ref(1000)
-const isLoggedIn = ref(false)
-provide('isLoggedIn', isLoggedIn)
 
-let auth: Auth | undefined
 onMounted(() => {
-  auth = getAuth()
-  onAuthStateChanged(auth, (user: User | null) => {
-    if (user) {
-      isLoggedIn.value = true
-    } else {
-      isLoggedIn.value = false
-    }
-  })
   updateScreenWidth()
   window.addEventListener('resize', updateScreenWidth)
 })
