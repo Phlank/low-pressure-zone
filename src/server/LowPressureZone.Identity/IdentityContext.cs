@@ -12,12 +12,10 @@ public class IdentityContext : IdentityDbContext<IdentityUser>
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        var adminEmail = GetSeedAdminEmail();
-
         optionsBuilder.UseSeeding((context, _) =>
         {
             var roles = context.Set<IdentityRole>().ToList();
-            foreach (var role in Constants.RoleNames.AllRoles)
+            foreach (var role in RoleNames.All)
             {
                 if (!roles.Any(r => r.Name == role))
                 {
@@ -25,13 +23,30 @@ public class IdentityContext : IdentityDbContext<IdentityUser>
                 }
             }
 
-            var adminRole = context.Set<IdentityRole>().First(r => r.Name == Constants.RoleNames.Admin);
+            var adminRole = context.Set<IdentityRole>().First(r => r.Name == RoleNames.Admin);
             if (!context.Set<IdentityUser>().Any())
             {
-                var user = new IdentityUser("AdminUser")
+                var seedData = GetSeedData();
+                var hasher = new PasswordHasher<IdentityUser>();
+                var user = new IdentityUser()
                 {
-                    Email = adminEmail,
+                    Id = Guid.NewGuid().ToString(),
+                    AccessFailedCount = 0,
+                    ConcurrencyStamp = Guid.NewGuid().ToString(),
+                    Email = seedData.AdminEmail,
+                    NormalizedEmail = seedData.AdminEmail.ToUpper(),
+                    EmailConfirmed = true,
+                    LockoutEnabled = false,
+                    LockoutEnd = null,
+                    PhoneNumber = null,
+                    PhoneNumberConfirmed = false,
+                    SecurityStamp = Guid.NewGuid().ToString(),
+                    TwoFactorEnabled = true,
+                    UserName = seedData.AdminUsername,
+                    NormalizedUserName = seedData.AdminUsername.ToUpper(),
                 };
+                var passwordHash = hasher.HashPassword(user, seedData.AdminPassword);
+                user.PasswordHash = passwordHash;
                 context.Set<IdentityUser>().Add(user);
                 context.Set<IdentityUserRole<string>>().Add(new IdentityUserRole<string>
                 {
@@ -43,12 +58,13 @@ public class IdentityContext : IdentityDbContext<IdentityUser>
         });
     }
 
-    private string GetSeedAdminEmail()
+    private IdentitySeedData GetSeedData()
     {
         IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json")
-                                                                        .AddJsonFile("appsettings.Development.json", optional: true)
-                                                                        .AddJsonFile("appsettings.Production.json", optional: true)
-                                                                        .Build();
-        return config.GetValue<string>("SeedData:AdminEmail") ?? throw new Exception("No admin email specified in configuration.");
+                                                              .AddJsonFile("appsettings.Development.json", optional: true)
+                                                              .AddJsonFile("appsettings.Production.json", optional: true)
+                                                              .Build();
+        var section = config.GetRequiredSection("SeedData:Identity") ?? throw new Exception("No admin email specified in configuration.");
+        return section.Get<IdentitySeedData>() ?? throw new NullReferenceException("Seed data missing from configuration.");
     }
 }

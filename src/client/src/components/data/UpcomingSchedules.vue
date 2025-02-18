@@ -1,17 +1,32 @@
 <template>
-  <Panel class="upcoming-schedules" :header="title">
-    <div v-if="isLoaded && schedules.length === 0" class="upcoming-schedules__content--none">
+  <Panel
+    class="upcoming-schedules"
+    :header="title">
+    <div
+      v-if="isLoaded && schedules.length === 0"
+      class="upcoming-schedules__content--none">
       No upcoming schedule to display.
     </div>
-    <div v-else-if="scheduleData" class="upcoming-schedules__content">
-      <DataTable :loading="!isLoaded" :value="scheduleData!.timeslots">
-        <Column field="start" header="Time">
+    <div
+      v-else-if="scheduleData"
+      class="upcoming-schedules__content">
+      <DataTable
+        :loading="!isLoaded"
+        :value="scheduleData!.timeslots">
+        <Column
+          field="start"
+          header="Time">
           <template #body="{ data }">
             {{ formatTimeslot(data.start) }}
           </template>
         </Column>
-        <Column field="performer" header="Performer" />
-        <Column v-if="!isMobile" field="type" header="Type" />
+        <Column
+          field="performer"
+          header="Performer" />
+        <Column
+          v-if="!isMobile"
+          field="type"
+          header="Type" />
       </DataTable>
     </div>
   </Panel>
@@ -20,14 +35,16 @@
 <script lang="ts" setup>
 import type { ScheduleResponse } from '@/api/schedules/scheduleResponse'
 import { computed, inject, onMounted, ref, type ComputedRef, type Ref } from 'vue'
-import { DataTable, Panel, Column } from 'primevue'
+import { DataTable, Panel, Column, useToast } from 'primevue'
 import api from '@/api/api'
 import { formatTimeslot, getPreviousHour, hoursBetween, parseDate } from '@/utils/dateUtils'
+import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const schedules: Ref<ScheduleResponse[]> = ref([])
 const scheduleIndex: Ref<number> = ref(0)
 const isLoaded = ref(false)
+const toast = useToast()
 
 interface ScheduleData {
   id: string
@@ -88,6 +105,7 @@ const mapTimeslotDisplayData = (schedule: ScheduleResponse) => {
 
 onMounted(async () => {
   const response = await api.schedules.get({ after: new Date().toISOString() })
+  if (tryHandleUnsuccessfulResponse(response, toast)) return
   if (response.isSuccess() && response.data) {
     schedules.value = response.data.sort((a, b) => Date.parse(a.end) - Date.parse(b.end))
   }

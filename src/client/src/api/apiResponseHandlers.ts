@@ -16,6 +16,7 @@ export const tryHandleUnsuccessfulResponse = <TRequest extends object, TResponse
   validation?: FormValidation<TRequest>
 ) => {
   if (response.isSuccess()) return false
+  if (tryHandleFailure(response, toast)) return true
   if (tryHandleInvalidResponse(response, toast, validation)) return true
   showApiStatusToast(toast, response.status)
   return true
@@ -39,4 +40,16 @@ const tryHandleInvalidResponse = <TRequest extends object, TResponse>(
     })
   }
   return true
+}
+
+const tryHandleFailure = (response: ApiResponse<object, unknown>, toast: ToastServiceMethods) => {
+  if (response.isFailure()) {
+    toast.add({
+      severity: 'error',
+      summary: 'HTTP Failure',
+      detail: 'There was an issue when sending a request to the API. Is the API operational?'
+    })
+    return true
+  }
+  return false
 }

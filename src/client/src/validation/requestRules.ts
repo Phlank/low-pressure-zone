@@ -9,6 +9,7 @@ import type { TimeslotRequest } from '@/api/schedules/timeslots/timeslotRequest'
 import { hourOnly, withinRangeOf } from './rules/dateStringRules'
 import type { RequestValidator } from './types/requestValidator'
 import { alwaysValid } from './rules/untypedRules'
+import type { LoginRequest } from '@/api/users/login/loginRequest'
 
 export const audienceRequestRules: PropertyRules<AudienceRequest> = {
   name: required(),
@@ -48,4 +49,9 @@ export const timeslotRequestRules = (
       withinRangeOf(() => formState.start, 60, 180, '1 - 3h allowed')
     )
   }
+}
+
+export const loginRequestRules: PropertyRules<LoginRequest> = {
+  username: required(),
+  password: required()
 }

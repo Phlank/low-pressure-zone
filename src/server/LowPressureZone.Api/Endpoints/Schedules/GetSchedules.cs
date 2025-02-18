@@ -1,6 +1,8 @@
 ﻿using FastEndpoints;
+using LowPressureZone.Api.Extensions;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.QueryableExtensions;
+using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
@@ -28,7 +30,12 @@ public class GetSchedules : Endpoint<GetSchedulesRequest, IEnumerable<ScheduleRe
         {
             scheduleQuery = scheduleQuery.Where(s => s.End > req.After.Value.ToUniversalTime());
         }
-        
+
+        if (!User.HasAnySpecifiedRole(RoleNames.Admin, RoleNames.Organizer))
+        {
+            scheduleQuery = scheduleQuery.Where(s  => s.End > DateTime.UtcNow);
+        }
+
         var schedules = await scheduleQuery.ToListAsync(ct);
         foreach (var schedule in schedules)
         {

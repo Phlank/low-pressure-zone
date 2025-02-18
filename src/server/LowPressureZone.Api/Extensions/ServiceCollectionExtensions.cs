@@ -1,7 +1,9 @@
-﻿using LowPressureZone.Api.Endpoints.Audiences;
+﻿using FluentEmail.Mailgun;
+using LowPressureZone.Api.Endpoints.Audiences;
 using LowPressureZone.Api.Endpoints.Performers;
 using LowPressureZone.Api.Endpoints.Schedules;
 using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
+using LowPressureZone.Api.Services;
 using LowPressureZone.Domain;
 using LowPressureZone.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -35,5 +37,13 @@ public static class ServiceCollectionExtensions
         builder.Services.AddSingleton<PerformerResponseMapper>();
         builder.Services.AddSingleton<TimeslotRequestMapper>();
         builder.Services.AddSingleton<TimeslotResponseMapper>();
+    }
+
+    public static void AddServices(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddSingleton(builder.Configuration.GetRequiredSection("Email").Get<EmailServiceConfiguration>() ?? throw new ArgumentNullException());
+        builder.Services.AddSingleton(new MailgunSender(builder.Configuration.GetValue<string>("Email:MailgunDomain"),
+                                                        builder.Configuration.GetValue<string>("Email:MailgunApiKey")));
+        builder.Services.AddSingleton<EmailService>();
     }
 }

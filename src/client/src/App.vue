@@ -6,9 +6,9 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, provide, type ComputedRef, ref, type Ref, onUnmounted } from 'vue'
-import SiteLayout from './components/layout/SiteLayout.vue'
 import { Toast } from 'primevue'
+import { computed, onMounted, onUnmounted, provide, ref, type ComputedRef, type Ref } from 'vue'
+import SiteLayout from './components/layout/SiteLayout.vue'
 
 const screenWidth: Ref<number> = ref(1000)
 
