@@ -13,9 +13,6 @@
           :disabled="isSubmitting"
           text="Code" />
       </IftaLabel>
-      <Checkbox
-        v-model:model-value="formState.rememberMe"
-        name="Remember Me" />
       <div v-if="errorMessage">
         <Message
           class="input--medium"

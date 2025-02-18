@@ -36,7 +36,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
     options.Password.RequireLowercase = true;
     options.Password.RequireUppercase = true;
     options.Password.RequiredLength = 8;
-}).AddEntityFrameworkStores<IdentityContext>().AddDefaultTokenProviders();
+}).AddEntityFrameworkStores<IdentityContext>().AddTokenProvider<EmailTokenProvider<IdentityUser>>("TwoFactor");
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 builder.Services.ConfigureApplicationCookie(options =>
