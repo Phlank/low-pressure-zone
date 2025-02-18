@@ -13,6 +13,9 @@
           :disabled="isSubmitting"
           text="Code" />
       </IftaLabel>
+      <Checkbox
+        v-model:model-value="formState.rememberMe"
+        name="Remember Me" />
       <div v-if="errorMessage">
         <Message
           class="input--medium"
@@ -32,20 +35,25 @@
 import api from '@/api/api'
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { KeyName } from '@/constants/keys'
-import router, { LOGIN_REDIRECT } from '@/router'
+import router, { defaultLoginRedirect } from '@/router'
 import { useUserStore } from '@/stores/userStore'
 import { onKeyDown } from '@vueuse/core'
-import { Button, IftaLabel, InputText, Message, Panel, Password } from 'primevue'
+import { Button, IftaLabel, InputText, Message, Panel, Checkbox } from 'primevue'
 import { reactive, ref } from 'vue'
 
 const formState = reactive({
-  code: ''
+  code: '',
+  rememberMe: false
 })
 
 onKeyDown(KeyName.Enter, () => handleVerify())
 
 const isSubmitting = ref(false)
 const errorMessage = ref('')
+
+const props = defineProps<{
+  redirect: string
+}>()
 
 const handleVerify = async () => {
   isSubmitting.value = true
@@ -56,8 +64,8 @@ const handleVerify = async () => {
     return
   }
 
-  await useUserStore().loadUserInfo()
+  await useUserStore().load()
   isSubmitting.value = false
-  router.push(LOGIN_REDIRECT)
+  router.push(props.redirect ?? defaultLoginRedirect)
 }
 </script>

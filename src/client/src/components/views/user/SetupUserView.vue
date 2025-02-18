@@ -50,7 +50,7 @@
 import api from '@/api/api'
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { KeyName } from '@/constants/keys'
-import router, { LOGIN_REDIRECT } from '@/router'
+import router, { defaultLoginRedirect } from '@/router'
 import { useUserStore } from '@/stores/userStore'
 import { loginRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
@@ -89,6 +89,6 @@ const handleSetupUser = async () => {
 
   await useUserStore().loadUserInfo()
   isSubmitting.value = false
-  router.push(LOGIN_REDIRECT)
+  router.push(defaultLoginRedirect)
 }
 </script>

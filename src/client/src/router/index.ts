@@ -35,14 +35,14 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   if (to.meta.requiresAuthentication) {
     const userStore = useUserStore()
-    if (!(await userStore.isLoggedIn())) {
-      console.log('User not logged in')
+    await userStore.loadIfNotInitialized()
+    if (!userStore.isLoggedIn()) {
       next(Routes.Login)
       return
     }
 
     const allowedRoles = (to.meta.roles ?? []) as string[]
-    if (await userStore.isInAnySpecifiedRole(...allowedRoles)) {
+    if (userStore.isInAnySpecifiedRole(...allowedRoles)) {
       next()
       return
     }
@@ -54,4 +54,4 @@ router.beforeEach(async (to, from, next) => {
 })
 
 export default router
-export const LOGIN_REDIRECT = '/dashboard'
+export const defaultLoginRedirect = Routes.Schedules

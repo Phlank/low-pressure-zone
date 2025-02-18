@@ -6,7 +6,12 @@ import { computed, ref, type Ref } from 'vue'
 
 export const useUserStore = defineStore('userStore', () => {
   const isLoggedInRef: Ref<boolean | undefined> = ref(undefined)
-  const userResponse: Ref<UserResponse | undefined> = ref(undefined)
+  const userResponse: Ref<UserResponse> = ref({
+    id: '',
+    email: '',
+    username: '',
+    roles: []
+  })
 
   let loadUserInfoPromise: Promise<void> | undefined = undefined
   const load = async () => {
@@ -23,45 +28,31 @@ export const useUserStore = defineStore('userStore', () => {
     const response = await api.users.info.get()
     if (response.status === 0) return
     isLoggedInRef.value = response.isSuccess()
-    userResponse.value = response.data
+    if (response.isSuccess()) {
+      userResponse.value = response.data!
+    }
   }
 
   const loadIfNotInitialized = async () => {
     if (isLoggedInRef.value === undefined) await load()
   }
 
-  const isLoggedIn = async () => {
-    await loadIfNotInitialized()
-    if (isLoggedInRef.value === undefined) return false
-    return isLoggedInRef.value
-  }
+  const isLoggedIn = () => isLoggedInRef.value ?? false
 
-  const getId = async () => {
-    await loadIfNotInitialized()
-    return userResponse.value?.id
-  }
+  const getId = () => userResponse.value.id
 
-  const getEmail = async () => {
-    await loadIfNotInitialized()
-    return userResponse.value?.email
-  }
+  const getEmail = () => userResponse.value.email
 
-  const getUsername = async () => {
-    await loadIfNotInitialized()
-    return userResponse.value?.username
-  }
+  const getUsername = () => userResponse.value.username
 
-  const getRoles = async () => {
-    await loadIfNotInitialized()
-    return userResponse.value?.roles
-  }
+  const getRoles = () => userResponse.value.roles
 
-  const isInAnySpecifiedRole = async (...rolesToCheck: string[]): Promise<boolean> => {
-    if (rolesToCheck.length == 0) return true
-    const userRoles = await getRoles()
-    if (userRoles === undefined) return false
-    for (let i = 0; i < userRoles.length; i++) {
-      if (rolesToCheck.some((roleToCheck) => roleToCheck === userRoles[i])) {
+  const isInAnySpecifiedRole = (...rolesToCheck: string[]): boolean => {
+    if (rolesToCheck.length === 0) return true
+    if (getRoles().length === 0) return false
+
+    for (let i = 0; i < getRoles().length; i++) {
+      if (rolesToCheck.some((roleToCheck) => roleToCheck === getRoles()[i])) {
         return true
       }
     }
@@ -70,7 +61,10 @@ export const useUserStore = defineStore('userStore', () => {
 
   const clear = () => {
     isLoggedInRef.value = false
-    userResponse.value = undefined
+    userResponse.value.id = ''
+    userResponse.value.email = ''
+    userResponse.value.username = ''
+    userResponse.value.roles = []
   }
 
   return {
@@ -84,6 +78,7 @@ export const useUserStore = defineStore('userStore', () => {
     /**
      * @returns `true` if the user is in one of the specified roles or no roles were specified.
      */
-    isInAnySpecifiedRole
+    isInAnySpecifiedRole,
+    clear
   }
 })
