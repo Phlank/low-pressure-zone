@@ -1,10 +1,10 @@
+import type { ErrorMessageDictionary } from '@/api/apiResponse'
 import { ref } from 'vue'
+import { alwaysValid } from '../rules/untypedRules'
 import type { FormValidationState } from './../types/formValidationState'
 import type { PropertyRules } from './../types/propertyRules'
 import { invalid, valid, type ValidationResult } from './../types/validationResult'
 import type { ValidationRule } from './../types/validationRule'
-import type { ErrorMessageDictionary } from '@/api/apiResponse'
-import { alwaysValid } from '../rules/untypedRules'
 
 class FormValidationImplementation<TForm extends object> implements FormValidation<TForm> {
   private formState: TForm

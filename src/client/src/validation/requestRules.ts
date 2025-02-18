@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { AudienceRequest } from '@/api/audiences/audienceRequest'
-import { required, url } from './rules/stringRules'
-import { combineRules } from './types/validationRule'
-import type { PropertyRules } from './types/propertyRules'
 import type { PerformerRequest } from '@/api/performers/performerRequest'
 import type { ScheduleRequest } from '@/api/schedules/scheduleRequest'
 import type { TimeslotRequest } from '@/api/schedules/timeslots/timeslotRequest'
-import { hourOnly, withinRangeOf } from './rules/dateStringRules'
-import type { RequestValidator } from './types/requestValidator'
-import { alwaysValid } from './rules/untypedRules'
 import type { LoginRequest } from '@/api/users/login/loginRequest'
+import { hourOnly, withinRangeOf } from './rules/dateStringRules'
+import { required, url } from './rules/stringRules'
+import { alwaysValid } from './rules/untypedRules'
+import type { PropertyRules } from './types/propertyRules'
+import { combineRules } from './types/validationRule'
 
 export const audienceRequestRules: PropertyRules<AudienceRequest> = {
   name: required(),

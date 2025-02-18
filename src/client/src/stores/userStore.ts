@@ -1,8 +1,7 @@
 import api from '@/api/api'
-import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
 import type { UserResponse } from '@/api/users/userResponse'
 import { defineStore } from 'pinia'
-import { computed, ref, type Ref } from 'vue'
+import { ref, type Ref } from 'vue'
 
 export const useUserStore = defineStore('userStore', () => {
   const isLoggedInRef: Ref<boolean | undefined> = ref(undefined)

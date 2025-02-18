@@ -4,11 +4,11 @@ import DashboardView from '@/components/views/dashboard/DashboardView.vue'
 import DashboardSchedulesView from '@/components/views/dashboard/schedules/DashboardSchedulesView.vue'
 import HomeView from '@/components/views/HomeView.vue'
 import LoginView from '@/components/views/user/LoginView.vue'
+import LogoutView from '@/components/views/user/LogoutView.vue'
 import TwoFactorView from '@/components/views/user/TwoFactorView.vue'
 import { useUserStore } from '@/stores/userStore'
 import { createRouter, createWebHistory } from 'vue-router'
 import { Routes } from './routes'
-import LogoutView from '@/components/views/user/LogoutView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

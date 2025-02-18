@@ -35,12 +35,11 @@ import { KeyName } from '@/constants/keys'
 import router, { defaultLoginRedirect } from '@/router'
 import { useUserStore } from '@/stores/userStore'
 import { onKeyDown } from '@vueuse/core'
-import { Button, IftaLabel, InputText, Message, Panel, Checkbox } from 'primevue'
+import { Button, IftaLabel, InputText, Message, Panel } from 'primevue'
 import { reactive, ref } from 'vue'
 
 const formState = reactive({
-  code: '',
-  rememberMe: false
+  code: ''
 })
 
 onKeyDown(KeyName.Enter, () => handleVerify())

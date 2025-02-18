@@ -31,14 +31,4 @@ public class GetUserInfo : EndpointWithoutRequest<UserResponse>
             Roles = roles
         }, ct);
     }
-
-    //private List<string> GetRolesFromClaim(Claim claim)
-    //{
-    //    var roles = new List<string>();
-    //    if (claim.Value.StartsWith("["))
-    //    {
-    //        roles = JsonSerializer.Deserialize<List<string>>(claim.Value);
-    //    }
-
-    //}
 }

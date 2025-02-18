@@ -1,6 +1,6 @@
 import { sendDelete, sendGet, sendPost, sendPut } from '../fetchFunctions'
-import { type ScheduleResponse } from './scheduleResponse'
 import type { ScheduleRequest } from './scheduleRequest'
+import type { ScheduleResponse } from './scheduleResponse'
 
 const route = (scheduleId?: string) => `/schedules${scheduleId ? '/' + scheduleId : ''}`
 

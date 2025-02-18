@@ -1,7 +1,7 @@
-import type { FormValidation } from '@/validation/types/formValidation'
-import type { ApiResponse } from './apiResponse'
-import type { ToastServiceMethods } from 'primevue'
 import { showApiStatusToast } from '@/utils/toastUtils'
+import type { FormValidation } from '@/validation/types/formValidation'
+import type { ToastServiceMethods } from 'primevue'
+import type { ApiResponse } from './apiResponse'
 
 /**
  * Maps validation issues and creates toasts if a response is unsuccessful.
