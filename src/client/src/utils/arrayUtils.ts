@@ -19,3 +19,20 @@ export const setActiveOnTarget = <T extends { isActive: boolean }, TProperty>(
     item.isActive = false
   })
 }
+
+export const intersection = <T>(a: T[], b: T[]) => {
+  const output: T[] = []
+  if (a.length === 0 || b.length === 0) return output
+  a.forEach((itemA) => {
+    if (b.includes(itemA)) output.push(itemA)
+  })
+  return output
+}
+
+export const hasIntersection = <T>(a: T[], b: T[]) => {
+  if (a.length === 0 || b.length === 0) return false
+  for (let i = 0; i < a.length; i++) {
+    if (b.includes(a[i])) return true
+  }
+  return true
+}

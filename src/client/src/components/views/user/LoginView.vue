@@ -45,7 +45,8 @@
 import api from '@/api/api'
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { KeyName } from '@/constants/keys'
-import router, { defaultLoginRedirect } from '@/router'
+import router from '@/router'
+import { Routes } from '@/router/routes'
 import { useUserStore } from '@/stores/userStore'
 import { loginRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
@@ -64,9 +65,14 @@ onKeyDown(KeyName.Enter, () => handleLogin())
 const isSubmitting = ref(false)
 const errorMessage = ref('')
 
-const props = defineProps<{
-  redirect: string
-}>()
+const props = withDefaults(
+  defineProps<{
+    redirect: string
+  }>(),
+  {
+    redirect: Routes.Schedules
+  }
+)
 
 const handleLogin = async () => {
   const isValid = validationState.validate()
@@ -87,6 +93,6 @@ const handleLogin = async () => {
 
   await useUserStore().load()
   isSubmitting.value = false
-  router.push(props.redirect ?? defaultLoginRedirect)
+  router.push(props.redirect)
 }
 </script>
