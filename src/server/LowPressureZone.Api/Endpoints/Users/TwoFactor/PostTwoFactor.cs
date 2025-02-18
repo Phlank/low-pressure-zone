@@ -18,7 +18,7 @@ public class PostTwoFactor : Endpoint<TwoFactorRequest, EmptyResponse>
 
     public override async Task HandleAsync(TwoFactorRequest req, CancellationToken ct)
     {
-        var result = await SignInManager.TwoFactorSignInAsync("Email", req.Code, true, true);
+        var result = await SignInManager.TwoFactorSignInAsync("TwoFactor", req.Code, true, false);
         if (result.Succeeded)
         {
             await SendNoContentAsync(ct);
