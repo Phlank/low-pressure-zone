@@ -25,7 +25,7 @@ export const useUserStore = defineStore('userStore', () => {
   }
 
   const loadUserInfo = async () => {
-    const response = await api.users.info.get()
+    const response = await api.users.getInfo()
     if (response.status === 0) return
     isLoggedInRef.value = response.isSuccess()
     if (response.isSuccess()) {

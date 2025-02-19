@@ -3,8 +3,7 @@
     :header="header"
     :visible="visible"
     @update:visible="isSubmitting ? undefined : emit('close')"
-    :draggable="false"
-  >
+    :draggable="false">
     <template #default>
       {{ `Delete ${entityType}${entityName == undefined ? '?' : ' ' + entityName + '?'}` }}
     </template>
@@ -13,24 +12,23 @@
         <Button
           class="input"
           label="Cancel"
+          severity="secondary"
           @click="emit('close')"
           :disabled="isSubmitting"
-          outlined
-        />
+          outlined />
         <Button
           class="input"
           severity="danger"
           label="Delete"
           @click="emit('delete')"
-          :disabled="isSubmitting"
-        />
+          :disabled="isSubmitting" />
       </div>
     </template>
   </Dialog>
 </template>
 
 <script lang="ts" setup>
-import { Dialog, Button } from 'primevue'
+import { Button, Dialog } from 'primevue'
 
 defineProps<{
   header: string

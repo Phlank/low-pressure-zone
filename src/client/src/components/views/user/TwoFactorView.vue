@@ -2,28 +2,15 @@
   <Panel class="two-factor single-panel-center">
     <div class="single-panel-center__form">
       <IftaLabel class="input input--medium">
-        <InputText
-          :autofocus="true"
-          id="codeInput"
-          class="input__field"
-          v-model:model-value="formState.code" />
-        <ValidationLabel
-          for="usernameInput"
-          message=""
-          :disabled="isSubmitting"
-          text="Code" />
+        <InputText :autofocus="true" id="codeInput" class="input__field" v-model:model-value="formState.code" />
+        <ValidationLabel for="usernameInput" message="" :disabled="isSubmitting" text="Code" />
       </IftaLabel>
       <div v-if="errorMessage">
-        <Message
-          class="input--medium"
-          severity="error">
+        <Message class="input--medium" severity="error">
           {{ errorMessage }}
         </Message>
       </div>
-      <Button
-        class="input"
-        label="Verify"
-        @click="handleVerify" />
+      <Button class="input" label="Verify" @click="handleVerify" />
     </div>
   </Panel>
 </template>
@@ -59,7 +46,7 @@ const props = withDefaults(
 
 const handleVerify = async () => {
   isSubmitting.value = true
-  const response = await api.users.twoFactor.post(formState)
+  const response = await api.users.twoFactor(formState)
   if (!response.isSuccess()) {
     errorMessage.value = 'Invalid code'
     isSubmitting.value = false

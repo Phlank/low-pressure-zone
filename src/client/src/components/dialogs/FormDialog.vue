@@ -4,26 +4,29 @@
     :visible="visible"
     :header="header"
     @update:visible="isSubmitting ? undefined : emit('close')"
-    :draggable="false"
-  >
+    :draggable="false">
     <template #default><slot></slot></template>
     <template #footer>
       <div class="form-dialog__footer">
         <Button
           class="input"
           label="Cancel"
+          severity="secondary"
           @click="emit('close')"
           :disabled="isSubmitting"
-          outlined
-        />
-        <Button class="input" label="Save" @click="emit('save')" :disabled="isSubmitting" />
+          outlined />
+        <Button
+          class="input"
+          label="Save"
+          @click="emit('save')"
+          :disabled="isSubmitting" />
       </div>
     </template>
   </Dialog>
 </template>
 
 <script lang="ts" setup>
-import { Dialog, Button } from 'primevue'
+import { Button, Dialog } from 'primevue'
 
 defineProps<{
   header: string

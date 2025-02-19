@@ -3,9 +3,11 @@ import type { AudienceRequest } from '@/api/audiences/audienceRequest'
 import type { PerformerRequest } from '@/api/performers/performerRequest'
 import type { ScheduleRequest } from '@/api/schedules/scheduleRequest'
 import type { TimeslotRequest } from '@/api/schedules/timeslots/timeslotRequest'
-import type { LoginRequest } from '@/api/users/login/loginRequest'
+import type { InviteRequest } from '@/api/users/inviteRequest'
+import type { LoginRequest } from '@/api/users/loginRequest'
+import type { TwoFactorRequest } from '@/api/users/twoFactorRequest'
 import { hourOnly, withinRangeOf } from './rules/dateStringRules'
-import { required, url } from './rules/stringRules'
+import { emailAddress, required, url } from './rules/stringRules'
 import { alwaysValid } from './rules/untypedRules'
 import type { PropertyRules } from './types/propertyRules'
 import { combineRules } from './types/validationRule'
@@ -53,4 +55,12 @@ export const timeslotRequestRules = (
 export const loginRequestRules: PropertyRules<LoginRequest> = {
   username: required(),
   password: required()
+}
+
+export const twoFactorRequestRules: PropertyRules<TwoFactorRequest> = {
+  code: required()
+}
+
+export const inviteRequestRules: PropertyRules<InviteRequest> = {
+  email: combineRules(required(), emailAddress())
 }
