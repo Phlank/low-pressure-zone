@@ -30,7 +30,7 @@ public sealed class PutAudience : Endpoint<AudienceRequest, EmptyResponse, Audie
         var isNameInUse = DataContext.Audiences.Any(a => a.Name == req.Name && a.Id != id);
         if (isNameInUse)
         {
-            ThrowError(new ValidationFailure(nameof(id), ValidationMessages.Unique));
+            ThrowError(new ValidationFailure(nameof(id), Errors.Unique));
         }
 
         if (existingAudience.Name != req.Name || existingAudience.Url != req.Url)

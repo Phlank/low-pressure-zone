@@ -21,7 +21,7 @@ public sealed class PostPerformer : Endpoint<PerformerRequest, EmptyResponse, Pe
         var isNameInUse = DataContext.Performers.Any(p => p.Name == req.Name);
         if (isNameInUse)
         {
-            ThrowError(new ValidationFailure(nameof(req.Name), ValidationMessages.Unique, req.Name));
+            ThrowError(new ValidationFailure(nameof(req.Name), Errors.Unique, req.Name));
         }
 
         var performer = Map.ToEntity(req);
