@@ -19,7 +19,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Use Node.js ${{ node-version }}
     - run: cd src/client
     - run: corepack enable
     - run: yarn
