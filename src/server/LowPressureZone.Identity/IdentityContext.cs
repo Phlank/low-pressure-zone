@@ -9,7 +9,7 @@ namespace LowPressureZone.Identity;
 
 public class IdentityContext : IdentityDbContext<IdentityUser>
 {
-    public DbSet<Invitation> Invitations { get; set; }
+    public DbSet<Invitation<IdentityUser>> Invitations { get; set; }
 
     public IdentityContext(DbContextOptions<IdentityContext> options) : base(options) { }
 

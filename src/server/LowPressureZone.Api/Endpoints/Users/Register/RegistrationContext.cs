@@ -12,9 +12,9 @@ public class RegistrationContext
     [JsonIgnore]
     public string Encoded => Base64UrlEncoder.Encode(JsonSerializer.Serialize(this, options: JsonSerializerOptions.Web));
 
-    public static RegistrationContext? Decode(string encodedContext)
+    public static RegistrationContext Decode(string encodedContext)
     {
         var serialized = Base64UrlEncoder.Decode(encodedContext);
-        return JsonSerializer.Deserialize<RegistrationContext>(serialized, JsonSerializerOptions.Web);
+        return JsonSerializer.Deserialize<RegistrationContext>(serialized, JsonSerializerOptions.Web) ?? throw new Exception();
     }
 }

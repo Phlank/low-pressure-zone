@@ -56,6 +56,7 @@ import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import router from '@/router'
 import { Routes } from '@/router/routes'
+import { useUserStore } from '@/stores/userStore'
 import { registerRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { Button, IftaLabel, InputText, Panel, Password, useToast } from 'primevue'
@@ -73,21 +74,28 @@ const formState = reactive({
 })
 const validation = createFormValidation(formState, registerRequestRules(formState))
 
-onMounted(() => {
+const userStore = useUserStore()
+onMounted(async () => {
   if (!props.context) {
     router.replace(Routes.Home)
   }
+  await api.users.logout()
+  userStore.clear()
 })
 
 const isSubmitting = ref(false)
 const toast = useToast()
 const handleRegister = async () => {
+  const isValid = validation.validate()
+  if (!isValid) return
+
   isSubmitting.value = true
   const response = await api.users.register(formState)
   isSubmitting.value = false
 
   if (tryHandleUnsuccessfulResponse(response, toast, validation)) return
 
-  router.push(Routes.Schedules)
+  toast.add({ detail: 'Successfully registered.' })
+  router.push(Routes.Login)
 }
 </script>

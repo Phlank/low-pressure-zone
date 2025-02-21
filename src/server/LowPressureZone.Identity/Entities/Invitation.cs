@@ -6,15 +6,14 @@ using System.Threading.Tasks;
 
 namespace LowPressureZone.Identity.Entities;
 
-public class Invitation
+public class Invitation<TUser> where TUser : class
 {
     public Guid Id { get; set; } = Guid.NewGuid();
-    public Guid UserId { get; set; }
-    public required string Email { get; set; }
-    public required string NormalizedEmail { get; set; }
+    public required string UserId { get; set; }
+    public virtual TUser? User { get; set; }
     public required DateTime InvitationDate { get; set; } = DateTime.UtcNow;
-    public required bool IsRegistered { get; set; } = false;
+    public bool IsRegistered { get; set; } = false;
     public DateTime? RegistrationDate { get; set; }
-    public required bool IsCancelled { get; set; } = false;
+    public bool IsCancelled { get; set; } = false;
     public DateTime? CancellationDate { get; set; }
 }

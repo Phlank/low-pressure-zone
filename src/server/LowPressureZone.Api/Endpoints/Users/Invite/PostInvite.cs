@@ -4,6 +4,7 @@ using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Constants;
+using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.Endpoints.Users.Invite;
@@ -50,6 +51,15 @@ public class PostInvite : Endpoint<InviteRequest, EmptyResponse>
         var inviteToken = await UserManager.GenerateUserTokenAsync(user, TokenProviders.Default, TokenPurposes.Invite);
         var inviteUrl = UriService.GetRegisterUri(req.Email, inviteToken);
         await EmailService.SendInviteEmail(req.Email, inviteUrl.AbsoluteUri);
+
+        var invitation = new Invitation<IdentityUser>()
+        {
+            UserId = user.Id,
+            InvitationDate = DateTime.UtcNow
+        };
+        await IdentityContext.Invitations.AddAsync(invitation, ct);
+        await IdentityContext.SaveChangesAsync(ct);
+
         await SendNoContentAsync(ct);
     }
 }

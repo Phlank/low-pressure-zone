@@ -10,6 +10,7 @@ public class RegisterRequestValidator : Validator<RegisterRequest>
 {
     public RegisterRequestValidator()
     {
+        RuleFor(r => r.Context).NotEmpty();
         RuleFor(r => r.Username).Username();
         RuleFor(r => r.Password).Password();
         RuleFor(r => r.ConfirmPassword).Must((request, confirmPassword) => request.Password == confirmPassword).WithMessage("Does not match");

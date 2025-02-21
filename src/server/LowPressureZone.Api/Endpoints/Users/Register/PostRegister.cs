@@ -1,6 +1,8 @@
 ﻿using FastEndpoints;
+using FluentEmail.Core;
 using FluentValidation.Results;
 using LowPressureZone.Api.Constants;
+using LowPressureZone.Api.Extensions;
 using LowPressureZone.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -12,58 +14,62 @@ public class PostRegister : Endpoint<RegisterRequest>
     public required UserManager<IdentityUser> UserManager { get; set; }
     public required SignInManager<IdentityUser> SignInManager { get; set; }
     public required IdentityContext IdentityContext { get; set; }
+    private DateTime _requestTime = DateTime.UtcNow;
 
     public override void Configure()
     {
         Post("/users/register");
+        Throttle(1, 5);
         AllowAnonymous();
     }
 
     public override async Task HandleAsync(RegisterRequest req, CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(req.Context))
-        {
-            Logger.LogError("{ClassName}: Registration attempted with empty or null context.", nameof(PostRegister));
-            await SendForbiddenAsync(ct);
-            return;
-        }
         RegistrationContext? context = null;
         try
         {
             context = RegistrationContext.Decode(req.Context);
-            if (context == null)
-            {
-                await SendForbiddenAsync(ct);
-                return;
-            }
         }
         catch (Exception e)
         {
-            Logger.LogError(e, "{ClassName}: Registration attempted with invalid context.", nameof(PostRegister));
-            await SendForbiddenAsync(ct);
+            await this.SendDelayedForbiddenAsync(_requestTime, ct);
             return;
         }
 
         var user = await UserManager.FindByEmailAsync(context.Email);
         if (user == null)
         {
-            await SendForbiddenAsync(ct);
+            await this.SendDelayedForbiddenAsync(_requestTime, ct);
             return;
         }
+
         var isValidToken = await UserManager.VerifyUserTokenAsync(user, TokenProviders.Default, TokenPurposes.Invite, context.Token);
         if (!isValidToken)
         {
-            await SendForbiddenAsync(ct);
+            await this.SendDelayedForbiddenAsync(_requestTime, ct);
             return;
         }
+        
         var isUsernameInUse = await IdentityContext.Users.AnyAsync(u => u.NormalizedUserName == req.Username.ToUpper());
         if (isUsernameInUse)
         {
             ThrowError(new ValidationFailure(nameof(req.Username), Errors.Unique));
         }
-        await UserManager.SetUserNameAsync(user, req.Username);
-        await UserManager.AddPasswordAsync(user, req.Password);
-        await SignInManager.SignInAsync(user, false);
+        
+        var setUsernameResult = await UserManager.SetUserNameAsync(user, req.Username);
+        setUsernameResult.Errors.Select(e => e.Description).ForEach((message) =>
+        {
+            AddError(new ValidationFailure(nameof(req.Username), message));
+        });
+        ThrowIfAnyErrors();
+        
+        var setPasswordResult = await UserManager.AddPasswordAsync(user, req.Password);
+        setPasswordResult.Errors.Select(e => e.Description).ForEach((message) =>
+        {
+            AddError(new ValidationFailure(nameof(req.Password), message));
+        });
+        ThrowIfAnyErrors();
+
         await SendOkAsync(ct);
     }
 }

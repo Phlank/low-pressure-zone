@@ -20,7 +20,7 @@ public static class RuleBuilderExtensions
             if (invalidCharacterMatches.Count > 0)
             {
                 var invalidCharacters = invalidCharacterMatches.Select(match => match.Value).Distinct();
-                context.AddFailure(nameof(username), $"Invalid characters: {string.Join(' ', invalidCharacters)}");
+                context.AddFailure(nameof(username), Errors.UsernameInvalidCharacters(invalidCharacters));
             }
         });
     }
