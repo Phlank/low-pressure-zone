@@ -19,7 +19,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Use Node.js 22.x
-      uses: actions/setup-node@v4
-    - run: yarn
-    - run: yarn build
+    - name: Install dependencies
+      run: sudo apt install nodejs
+      run: sudo apt install npm
+      run: yarn
+    - name: Build static files
+      run: yarn build
