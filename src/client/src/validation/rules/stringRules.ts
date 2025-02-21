@@ -38,7 +38,7 @@ export const equals =
 export const allowedCharacters =
   (charSet: string): ValidationRule<string> =>
   (arg: string) => {
-    const regex = new RegExp('[' + charSet + ']')
+    const regex = new RegExp(`[^${charSet}]`)
     const matches = regex.exec(arg)
     if (!matches) return valid
     var characters = distinct(matches.map((match) => match))
@@ -48,7 +48,7 @@ export const allowedCharacters =
 export const requireAnyCharacter =
   (charSet: string, msg: string): ValidationRule<string> =>
   (arg: string) => {
-    const regex = new RegExp('[' + charSet + ']')
+    const regex = new RegExp(`[${charSet}]`)
     if (regex.test(arg)) return valid
     return invalid(msg)
   }
@@ -56,7 +56,7 @@ export const requireAnyCharacter =
 export const requireAnyOtherCharacter =
   (charSet: string, msg: string): ValidationRule<string> =>
   (arg: string) => {
-    const regex = new RegExp('[^' + charSet + ']')
+    const regex = new RegExp(`[^${charSet}]`)
     if (regex.test(arg)) return valid
     return invalid(msg)
   }

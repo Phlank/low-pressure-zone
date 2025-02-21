@@ -1,16 +1,30 @@
 <template>
   <Panel class="two-factor single-panel-center">
     <div class="single-panel-center__form">
+      <Message class="input">A two-factor code has been emailed to you.</Message>
       <IftaLabel class="input input--medium">
-        <InputText :autofocus="true" id="codeInput" class="input__field" v-model:model-value="formState.code" />
-        <ValidationLabel for="usernameInput" message="" :disabled="isSubmitting" text="Code" />
+        <InputText
+          :autofocus="true"
+          id="codeInput"
+          class="input__field"
+          v-model:model-value="formState.code" />
+        <ValidationLabel
+          for="usernameInput"
+          message=""
+          :disabled="isSubmitting"
+          text="Code" />
       </IftaLabel>
       <div v-if="errorMessage">
-        <Message class="input--medium" severity="error">
+        <Message
+          class="input--medium"
+          severity="error">
           {{ errorMessage }}
         </Message>
       </div>
-      <Button class="input" label="Verify" @click="handleVerify" />
+      <Button
+        class="input"
+        label="Verify"
+        @click="handleVerify" />
     </div>
   </Panel>
 </template>

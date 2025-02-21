@@ -49,5 +49,5 @@ export interface ValidationProblemDetails<TRequest extends object> {
 }
 
 export type ErrorMessageDictionary<TRequest extends object> = {
-  [key in keyof TRequest | 'none']?: string[]
+  [key in keyof TRequest | 'generalErrors']?: string[]
 }

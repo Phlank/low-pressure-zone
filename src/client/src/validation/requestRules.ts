@@ -80,19 +80,13 @@ export const registerRequestRules = (
 ): PropertyRules<RegisterRequest> => {
   return {
     context: alwaysValid(),
-    username: combineRules(
-      required(),
-      allowedCharacters('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._@+')
-    ),
+    username: combineRules(required(), allowedCharacters('A-Za-z0-9\-\.\_\@\+')),
     password: combineRules(
       minimumLength(8),
-      requireAnyCharacter('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'Requires uppercase'),
-      requireAnyCharacter('abcdefghijklmnopqrstuvwxyz', 'Requires lowercase'),
-      requireAnyCharacter('0123456789', 'Requires number'),
-      requireAnyOtherCharacter(
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
-        'Requires symbol'
-      )
+      requireAnyCharacter('A-Z', 'Requires uppercase'),
+      requireAnyCharacter('a-z', 'Requires lowercase'),
+      requireAnyCharacter('0-9', 'Requires number'),
+      requireAnyOtherCharacter('A-Za-z0-9', 'Requires symbol')
     ),
     confirmPassword: equals(() => formState.password)
   }

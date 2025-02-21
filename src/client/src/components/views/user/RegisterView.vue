@@ -95,7 +95,7 @@ const handleRegister = async () => {
 
   if (tryHandleUnsuccessfulResponse(response, toast, validation)) return
 
-  toast.add({ detail: 'Successfully registered.' })
+  toast.add({ detail: 'Successfully registered.', severity: 'success' })
   router.push(Routes.Login)
 }
 </script>

@@ -44,11 +44,10 @@ public class PostRegister : Endpoint<RegisterRequest>
             return;
         }
 
-        var isValidToken = await UserManager.VerifyUserTokenAsync(user, TokenProviders.Default, TokenPurposes.Invite, context.Token);
-        if (!isValidToken)
+        var invitation = await IdentityContext.Invitations.FirstOrDefaultAsync(i => i.UserId == user.Id);
+        if (invitation == null)
         {
-            await TaskUtilities.DelaySensitiveResponse(_requestTime);
-            ThrowError(Errors.ExpiredToken);
+            await this.SendDelayedForbiddenAsync(_requestTime, ct);
             return;
         }
         
@@ -57,7 +56,15 @@ public class PostRegister : Endpoint<RegisterRequest>
         {
             ThrowError(new ValidationFailure(nameof(req.Username), Errors.Unique));
         }
-        
+
+        var isValidToken = await UserManager.VerifyUserTokenAsync(user, TokenProviders.Default, TokenPurposes.Invite, context.Token);
+        if (!isValidToken)
+        {
+            await TaskUtilities.DelaySensitiveResponse(_requestTime);
+            ThrowError(new ValidationFailure(null, Errors.ExpiredToken));
+            return;
+        }
+
         var setUsernameResult = await UserManager.SetUserNameAsync(user, req.Username);
         setUsernameResult.Errors.Select(e => e.Description).ForEach((message) =>
         {
@@ -72,8 +79,13 @@ public class PostRegister : Endpoint<RegisterRequest>
         });
         ThrowIfAnyErrors();
 
+        user.EmailConfirmed = true;
+        await UserManager.UpdateAsync(user);
 
+        invitation.IsRegistered = true;
+        invitation.RegistrationDate = DateTime.UtcNow;
+        await IdentityContext.SaveChangesAsync(ct);
 
-        await SendOkAsync(ct);
+        await SendNoContentAsync(ct);
     }
 }
