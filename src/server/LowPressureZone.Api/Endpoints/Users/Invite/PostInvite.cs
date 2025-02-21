@@ -31,12 +31,6 @@ public class PostInvite : Endpoint<InviteRequest, EmptyResponse>
             ThrowError(new ValidationFailure(nameof(req.Email), Errors.Unique));
         }
 
-        var isInvited = IdentityContext.Invitations.Any(i => !i.IsCancelled);
-        if (isInvited)
-        {
-            ThrowError(new ValidationFailure(nameof(req.Email), Errors.EmailAlreadyInvited));
-        }
-
         var user = new IdentityUser(Guid.NewGuid().ToString())
         {
             Email = req.Email,

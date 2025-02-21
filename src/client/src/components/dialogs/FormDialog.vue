@@ -4,7 +4,8 @@
     :visible="visible"
     :header="header"
     @update:visible="isSubmitting ? undefined : emit('close')"
-    :draggable="false">
+    :draggable="false"
+    @show="emit('show')">
     <template #default><slot></slot></template>
     <template #footer>
       <div class="form-dialog__footer">
@@ -37,5 +38,6 @@ defineProps<{
 const emit = defineEmits<{
   close: []
   save: []
+  show: []
 }>()
 </script>

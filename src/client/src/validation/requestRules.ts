@@ -8,7 +8,16 @@ import type { LoginRequest } from '@/api/users/loginRequest'
 import type { RegisterRequest } from '@/api/users/registerRequest'
 import type { TwoFactorRequest } from '@/api/users/twoFactorRequest'
 import { hourOnly, withinRangeOf } from './rules/dateStringRules'
-import { emailAddress, equals, required, url } from './rules/stringRules'
+import {
+  allowedCharacters,
+  emailAddress,
+  equals,
+  minimumLength,
+  requireAnyCharacter,
+  requireAnyOtherCharacter,
+  required,
+  url
+} from './rules/stringRules'
 import { alwaysValid } from './rules/untypedRules'
 import type { PropertyRules } from './types/propertyRules'
 import { combineRules } from './types/validationRule'
@@ -71,8 +80,20 @@ export const registerRequestRules = (
 ): PropertyRules<RegisterRequest> => {
   return {
     context: alwaysValid(),
-    username: required(),
-    password: required(),
+    username: combineRules(
+      required(),
+      allowedCharacters('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._@+')
+    ),
+    password: combineRules(
+      minimumLength(8),
+      requireAnyCharacter('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'Requires uppercase'),
+      requireAnyCharacter('abcdefghijklmnopqrstuvwxyz', 'Requires lowercase'),
+      requireAnyCharacter('0123456789', 'Requires number'),
+      requireAnyOtherCharacter(
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
+        'Requires symbol'
+      )
+    ),
     confirmPassword: equals(() => formState.password)
   }
 }

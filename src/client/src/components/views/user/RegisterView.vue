@@ -21,7 +21,7 @@
           class="input__field"
           :feedback="false"
           :invalid="!validation.isValid('password')"
-          @change="validation.validate('password')"
+          @change="validation.validateIfDirty('password')"
           v-model:model-value="formState.password" />
         <ValidationLabel
           for="passwordInput"
@@ -34,7 +34,7 @@
           class="input__field"
           :feedback="false"
           :invalid="!validation.isValid('confirmPassword')"
-          @change="validation.validate('confirmPassword')"
+          @change="validation.validateIfDirty('confirmPassword')"
           v-model:model-value="formState.confirmPassword" />
         <ValidationLabel
           for="confirmPasswordInput"
@@ -43,7 +43,7 @@
       </IftaLabel>
       <Button
         class="input"
-        label="Login"
+        label="Register"
         :disabled="isSubmitting"
         @click="handleRegister" />
     </div>

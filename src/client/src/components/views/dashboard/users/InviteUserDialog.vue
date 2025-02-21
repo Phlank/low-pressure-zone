@@ -56,6 +56,7 @@ const handleSubmit = async () => {
 
   if (tryHandleUnsuccessfulResponse(response, toast, validation)) return
 
+  toast.add({ detail: 'Successfully invited new user: ' + formState.email, severity: 'success' })
   formState.email = ''
   emit('close')
 }

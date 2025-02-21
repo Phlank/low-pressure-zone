@@ -36,3 +36,9 @@ export const hasIntersection = <T>(a: T[], b: T[]) => {
   }
   return true
 }
+
+export const distinct = <T>(array: T[]) => {
+  return array.filter((value, index) => {
+    return array.indexOf(value) === index
+  })
+}
