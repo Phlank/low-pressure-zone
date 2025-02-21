@@ -10,13 +10,11 @@ public class EmailService
 {
     private readonly string _fromAddress;
     private readonly MailgunSender _sender;
-    private readonly string _registerUrl;
 
     public EmailService(EmailServiceConfiguration configuration, MailgunSender sender)
     {
         _fromAddress = configuration.FromAddress;
         _sender = sender;
-        _registerUrl = configuration.RegisterUrl;
     }
 
     private async Task Send(string toAddress, string subject, string body)
@@ -35,10 +33,10 @@ public class EmailService
         await Send(toAddress, subject, message);
     }
 
-    public async Task SendInviteEmail(string toAddress)
+    public async Task SendInviteEmail(string toAddress, string registerUrl)
     {
         var subject = "Welcome | Low Pressure Zone";
-        var message = $"You've been invited to register a new user at Low Pressure Zone. Follow the link below and use this email address to create your new user.\n\n{_registerUrl}";
+        var message = $"You've been invited to register a new user at Low Pressure Zone. Follow the link below to create your user.\n\n{registerUrl}\n\nThis link will be valid for 24 hours.";
         await Send(toAddress, subject, message);
     }
 }

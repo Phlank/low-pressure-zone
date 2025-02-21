@@ -45,5 +45,7 @@ public static class ServiceCollectionExtensions
         builder.Services.AddSingleton(new MailgunSender(builder.Configuration.GetValue<string>("Email:MailgunDomain"),
                                                         builder.Configuration.GetValue<string>("Email:MailgunApiKey")));
         builder.Services.AddSingleton<EmailService>();
+        builder.Services.AddSingleton(builder.Configuration.GetRequiredSection("Url").Get<UriServiceConfiguration>() ?? throw new ArgumentNullException());
+        builder.Services.AddSingleton<UriService>();
     }
 }

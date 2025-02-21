@@ -13,6 +13,7 @@ public class PostInvite : Endpoint<InviteRequest, EmptyResponse>
     public required UserManager<IdentityUser> UserManager { get; set; }
     public required IdentityContext IdentityContext { get; set; }
     public required EmailService EmailService { get; set; }
+    public required UriService UriService { get; set; }
 
     public override void Configure()
     {
@@ -29,12 +30,26 @@ public class PostInvite : Endpoint<InviteRequest, EmptyResponse>
             ThrowError(new ValidationFailure(nameof(req.Email), Errors.Unique));
         }
 
-        var isInvited = IdentityContext.Invitations.Any(i => !i.IsCancelled && i.NormalizedEmail == normalizedEmail);
+        var isInvited = IdentityContext.Invitations.Any(i => !i.IsCancelled);
         if (isInvited)
         {
             ThrowError(new ValidationFailure(nameof(req.Email), Errors.EmailAlreadyInvited));
         }
 
-        await EmailService.SendInviteEmail(req.Email);
+        var user = new IdentityUser(Guid.NewGuid().ToString())
+        {
+            Email = req.Email,
+            NormalizedEmail = normalizedEmail,
+        };
+        var createResult = await UserManager.CreateAsync(user);
+        if (!createResult.Succeeded)
+        {
+            throw new Exception();
+        }
+
+        var inviteToken = await UserManager.GenerateUserTokenAsync(user, TokenProviders.Default, TokenPurposes.Invite);
+        var inviteUrl = UriService.GetRegisterUri(req.Email, inviteToken);
+        await EmailService.SendInviteEmail(req.Email, inviteUrl.AbsoluteUri);
+        await SendNoContentAsync(ct);
     }
 }

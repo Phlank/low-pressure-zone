@@ -17,7 +17,7 @@ export const url =
   }
 
 const emailRegex =
-  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/g
+  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
 
 export const emailAddress =
   (msg?: string): ValidationRule<string> =>
@@ -26,3 +26,8 @@ export const emailAddress =
     if (emailRegex.test(arg)) return valid
     return invalid(msg ?? 'Invalid email')
   }
+
+export const equals = (selector: () => string, msg?: string) => (arg: string) => {
+  if (arg === selector()) return valid
+  return invalid(msg ?? 'Does not match')
+}

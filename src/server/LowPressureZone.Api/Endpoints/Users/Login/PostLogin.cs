@@ -1,4 +1,5 @@
 ﻿using FastEndpoints;
+using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Api.Utilities;
 using Microsoft.AspNetCore.Identity;
@@ -43,7 +44,7 @@ public class PostLogin : Endpoint<LoginRequest, LoginResponse>
 
         if (signInResult.RequiresTwoFactor)
         {
-            var token = await UserManager.GenerateTwoFactorTokenAsync(user, "TwoFactor");
+            var token = await UserManager.GenerateTwoFactorTokenAsync(user, TokenProviders.Email);
             await SendOkAsync(new LoginResponse
             {
                 RequiresTwoFactor = true,

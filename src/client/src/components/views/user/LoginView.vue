@@ -2,21 +2,41 @@
   <Panel class="login single-panel-center">
     <div class="single-panel-center__form">
       <IftaLabel class="input input--medium">
-        <InputText :autofocus="true" id="usernameInput" class="input__field" :disabled="isSubmitting"
+        <InputText
+          :autofocus="true"
+          id="usernameInput"
+          class="input__field"
+          :disabled="isSubmitting"
           v-model:model-value="formState.username" />
-        <ValidationLabel for="usernameInput" message="" text="Username" />
+        <ValidationLabel
+          for="usernameInput"
+          message=""
+          text="Username" />
       </IftaLabel>
       <IftaLabel class="input input--medium">
-        <Password id="passwordInput" class="input__field" :feedback="false" :disabled="isSubmitting"
+        <Password
+          id="passwordInput"
+          class="input__field"
+          :feedback="false"
+          :disabled="isSubmitting"
           v-model:model-value="formState.password" />
-        <ValidationLabel for="passwordInput" message="" text="Password" />
+        <ValidationLabel
+          for="passwordInput"
+          message=""
+          text="Password" />
       </IftaLabel>
       <div v-if="errorMessage">
-        <Message class="input--medium" severity="error">
+        <Message
+          class="input--medium"
+          severity="error">
           {{ errorMessage }}
         </Message>
       </div>
-      <Button class="input" label="Login" :disabled="isSubmitting" @click="handleLogin" />
+      <Button
+        class="input"
+        label="Login"
+        :disabled="isSubmitting"
+        @click="handleLogin" />
     </div>
   </Panel>
 </template>

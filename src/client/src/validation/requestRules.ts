@@ -5,9 +5,10 @@ import type { ScheduleRequest } from '@/api/schedules/scheduleRequest'
 import type { TimeslotRequest } from '@/api/schedules/timeslots/timeslotRequest'
 import type { InviteRequest } from '@/api/users/inviteRequest'
 import type { LoginRequest } from '@/api/users/loginRequest'
+import type { RegisterRequest } from '@/api/users/registerRequest'
 import type { TwoFactorRequest } from '@/api/users/twoFactorRequest'
 import { hourOnly, withinRangeOf } from './rules/dateStringRules'
-import { emailAddress, required, url } from './rules/stringRules'
+import { emailAddress, equals, required, url } from './rules/stringRules'
 import { alwaysValid } from './rules/untypedRules'
 import type { PropertyRules } from './types/propertyRules'
 import { combineRules } from './types/validationRule'
@@ -63,4 +64,15 @@ export const twoFactorRequestRules: PropertyRules<TwoFactorRequest> = {
 
 export const inviteRequestRules: PropertyRules<InviteRequest> = {
   email: combineRules(required(), emailAddress())
+}
+
+export const registerRequestRules = (
+  formState: RegisterRequest
+): PropertyRules<RegisterRequest> => {
+  return {
+    context: alwaysValid(),
+    username: required(),
+    password: required(),
+    confirmPassword: equals(() => formState.password)
+  }
 }
