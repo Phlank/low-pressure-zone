@@ -1,5 +1,6 @@
 import api from '@/api/api'
 import type { UserResponse } from '@/api/users/userResponse'
+import { hasIntersection } from '@/utils/arrayUtils'
 import { defineStore } from 'pinia'
 import { ref, type Ref } from 'vue'
 
@@ -24,7 +25,7 @@ export const useUserStore = defineStore('userStore', () => {
   }
 
   const loadUserInfo = async () => {
-    const response = await api.users.info.get()
+    const response = await api.users.getInfo()
     if (response.status === 0) return
     isLoggedInRef.value = response.isSuccess()
     if (response.isSuccess()) {
@@ -50,12 +51,7 @@ export const useUserStore = defineStore('userStore', () => {
     if (rolesToCheck.length === 0) return true
     if (getRoles().length === 0) return false
 
-    for (let i = 0; i < getRoles().length; i++) {
-      if (rolesToCheck.some((roleToCheck) => roleToCheck === getRoles()[i])) {
-        return true
-      }
-    }
-    return false
+    return hasIntersection(rolesToCheck, getRoles())
   }
 
   const clear = () => {

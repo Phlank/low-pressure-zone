@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import UpcomingSchedules from '../data/UpcomingSchedules.vue'
+import UpcomingSchedules from './UpcomingSchedules.vue'
 </script>
 
 <style lang="scss" scoped>

@@ -1,6 +1,7 @@
 <template>
   <Panel class="two-factor single-panel-center">
     <div class="single-panel-center__form">
+      <Message class="input">A two-factor code has been emailed to you.</Message>
       <IftaLabel class="input input--medium">
         <InputText
           :autofocus="true"
@@ -32,7 +33,8 @@
 import api from '@/api/api'
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { KeyName } from '@/constants/keys'
-import router, { defaultLoginRedirect } from '@/router'
+import router from '@/router'
+import { Routes } from '@/router/routes'
 import { useUserStore } from '@/stores/userStore'
 import { onKeyDown } from '@vueuse/core'
 import { Button, IftaLabel, InputText, Message, Panel } from 'primevue'
@@ -47,13 +49,18 @@ onKeyDown(KeyName.Enter, () => handleVerify())
 const isSubmitting = ref(false)
 const errorMessage = ref('')
 
-const props = defineProps<{
-  redirect: string
-}>()
+const props = withDefaults(
+  defineProps<{
+    redirect?: string
+  }>(),
+  {
+    redirect: Routes.Schedules
+  }
+)
 
 const handleVerify = async () => {
   isSubmitting.value = true
-  const response = await api.users.twoFactor.post(formState)
+  const response = await api.users.twoFactor(formState)
   if (!response.isSuccess()) {
     errorMessage.value = 'Invalid code'
     isSubmitting.value = false
@@ -62,6 +69,6 @@ const handleVerify = async () => {
 
   await useUserStore().load()
   isSubmitting.value = false
-  router.push(props.redirect ?? defaultLoginRedirect)
+  router.push(props.redirect)
 }
 </script>

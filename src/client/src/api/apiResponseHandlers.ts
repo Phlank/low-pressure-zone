@@ -31,7 +31,7 @@ const tryHandleInvalidResponse = <TRequest extends object, TResponse>(
   if (validation != null) {
     validation.mapApiValidationErrors(response.getValidationErrors())
   }
-  const unmappedErrors = response.getValidationErrors()['none'] ?? []
+  const unmappedErrors = response.getValidationErrors()['generalErrors'] ?? []
   if (unmappedErrors.length > 0) {
     toast.add({
       severity: 'error',

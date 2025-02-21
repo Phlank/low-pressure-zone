@@ -21,7 +21,7 @@ public sealed class PostAudience : Endpoint<AudienceRequest, EmptyResponse, Audi
         var isNameInUse = DataContext.Audiences.Any(a => a.Name == req.Name);
         if (isNameInUse)
         {
-            ThrowError(new ValidationFailure(nameof(req.Name), ValidationMessages.Unique, req.Name));
+            ThrowError(new ValidationFailure(nameof(req.Name), Errors.Unique, req.Name));
         }
 
         var entity = Map.ToEntity(req);

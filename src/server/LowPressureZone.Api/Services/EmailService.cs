@@ -32,4 +32,11 @@ public class EmailService
         var message = $"Hey {username}, there was a login request made at Low Pressure Zone using your username and password.\n\nYour two factor authentication code is {code}.\n\nIf you weren't the one making the request, take the time to go to the site and change your password. Hope your day is going alright.";
         await Send(toAddress, subject, message);
     }
+
+    public async Task SendInviteEmail(string toAddress, string registerUrl)
+    {
+        var subject = "Welcome | Low Pressure Zone";
+        var message = $"You've been invited to register a new user at Low Pressure Zone. Follow the link below to create your user.\n\n{registerUrl}\n\nThis link will be valid for 24 hours.";
+        await Send(toAddress, subject, message);
+    }
 }

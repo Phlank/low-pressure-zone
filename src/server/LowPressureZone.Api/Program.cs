@@ -1,7 +1,6 @@
 using System.Text.Json;
 using FastEndpoints;
 using FastEndpoints.Swagger;
-using Humanizer;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -31,12 +30,12 @@ builder.AddServices();
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
     options.Password.RequireNonAlphanumeric = true;
-    options.Password.RequiredUniqueChars = 1;
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireUppercase = true;
     options.Password.RequiredLength = 8;
-}).AddEntityFrameworkStores<IdentityContext>().AddTokenProvider<EmailTokenProvider<IdentityUser>>("TwoFactor");
+    options.User.RequireUniqueEmail = true;
+}).AddEntityFrameworkStores<IdentityContext>().AddDefaultTokenProviders();
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 builder.Services.ConfigureApplicationCookie(options =>

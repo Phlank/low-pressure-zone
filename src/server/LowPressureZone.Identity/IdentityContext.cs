@@ -1,4 +1,5 @@
 ﻿using LowPressureZone.Identity.Constants;
+using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,8 @@ namespace LowPressureZone.Identity;
 
 public class IdentityContext : IdentityDbContext<IdentityUser>
 {
+    public DbSet<Invitation<IdentityUser>> Invitations { get; set; }
+
     public IdentityContext(DbContextOptions<IdentityContext> options) : base(options) { }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -19,7 +22,13 @@ public class IdentityContext : IdentityDbContext<IdentityUser>
             {
                 if (!roles.Any(r => r.Name == role))
                 {
-                    context.Set<IdentityRole>().Add(new IdentityRole(role));
+                    context.Set<IdentityRole>().Add(new IdentityRole
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = role,
+                        NormalizedName = role.ToUpper(),
+                        ConcurrencyStamp = Guid.NewGuid().ToString()
+                    });
                 }
             }
 

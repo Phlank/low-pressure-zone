@@ -1,44 +1,50 @@
 <template>
-  <Panel
-    class="upcoming-schedules"
-    :header="title">
-    <div
-      v-if="isLoaded && schedules.length === 0"
-      class="upcoming-schedules__content--none">
-      No upcoming schedule to display.
-    </div>
-    <div
-      v-else-if="scheduleData"
-      class="upcoming-schedules__content">
-      <DataTable
-        :loading="!isLoaded"
-        :value="scheduleData!.timeslots">
-        <Column
-          field="start"
-          header="Time">
-          <template #body="{ data }">
-            {{ formatTimeslot(data.start) }}
-          </template>
-        </Column>
-        <Column
-          field="performer"
-          header="Performer" />
-        <Column
-          v-if="!isMobile"
-          field="type"
-          header="Type" />
-      </DataTable>
-    </div>
-  </Panel>
+  <div class="upcoming-schedules">
+    <Skeleton
+      v-if="!isLoaded"
+      height="250px" />
+    <Panel
+      v-else
+      class="upcoming-schedules"
+      :header="title">
+      <div
+        v-if="schedules.length === 0"
+        class="upcoming-schedules__content--none">
+        No upcoming schedule to display.
+      </div>
+      <div
+        v-else
+        class="upcoming-schedules__content">
+        <DataTable
+          :loading="!isLoaded"
+          :value="scheduleData!.timeslots">
+          <Column
+            field="start"
+            header="Time">
+            <template #body="{ data }">
+              {{ formatTimeslot(data.start) }}
+            </template>
+          </Column>
+          <Column
+            field="performer"
+            header="Performer" />
+          <Column
+            v-if="!isMobile"
+            field="type"
+            header="Type" />
+        </DataTable>
+      </div>
+    </Panel>
+  </div>
 </template>
 
 <script lang="ts" setup>
-import type { ScheduleResponse } from '@/api/schedules/scheduleResponse'
-import { computed, inject, onMounted, ref, type ComputedRef, type Ref } from 'vue'
-import { DataTable, Panel, Column, useToast } from 'primevue'
 import api from '@/api/api'
-import { formatTimeslot, getPreviousHour, hoursBetween, parseDate } from '@/utils/dateUtils'
 import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
+import type { ScheduleResponse } from '@/api/schedules/scheduleResponse'
+import { formatTimeslot, getPreviousHour, hoursBetween, parseDate } from '@/utils/dateUtils'
+import { Column, DataTable, Panel, Skeleton, useToast } from 'primevue'
+import { computed, inject, onMounted, ref, type ComputedRef, type Ref } from 'vue'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const schedules: Ref<ScheduleResponse[]> = ref([])
@@ -108,7 +114,7 @@ onMounted(async () => {
   if (tryHandleUnsuccessfulResponse(response, toast)) return
   if (response.isSuccess() && response.data) {
     schedules.value = response.data.sort((a, b) => Date.parse(a.end) - Date.parse(b.end))
+    isLoaded.value = true
   }
-  isLoaded.value = true
 })
 </script>

@@ -1,13 +1,19 @@
-import info from './info/info'
-import login from './login/login'
-import logout from './logout/logout'
-import twoFactor from './two-factor/twoFactor'
+import { sendGet, sendPost } from '../fetchFunctions'
+import type { InviteRequest } from './inviteRequest'
+import type { LoginRequest } from './loginRequest'
+import type { LoginResponse } from './loginResponse'
+import type { RegisterRequest } from './registerRequest'
+import type { TwoFactorRequest } from './twoFactorRequest'
+import type { UserResponse } from './userResponse'
 
-const route = (userId?: string) => '/user' + (userId ? `/${userId}` : '')
+const route = (userId?: string) => '/users' + (userId ? `/${userId}` : '')
 
 export default {
-  info,
-  login,
-  logout,
-  twoFactor
+  getInfo: () => sendGet<UserResponse>(`${route()}/info`),
+  login: (request: LoginRequest) =>
+    sendPost<LoginRequest, LoginResponse>(`${route()}/login`, request),
+  logout: () => sendGet<never>(`${route()}/logout`),
+  twoFactor: (request: TwoFactorRequest) => sendPost(`${route()}/twofactor`, request),
+  invite: (request: InviteRequest) => sendPost(`${route()}/invite`, request),
+  register: (request: RegisterRequest) => sendPost(`${route()}/register`, request)
 }
