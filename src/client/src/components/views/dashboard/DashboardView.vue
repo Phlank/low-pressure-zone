@@ -79,6 +79,12 @@ const menuItems: MenuItem[] = [
     icon: 'pi pi-user',
     route: '/dashboard/users',
     roles: [Role.Admin]
+  },
+  {
+    label: 'Invites',
+    icon: 'pi pi-envelope',
+    route: '/dashboard/invites',
+    roles: [Role.Admin, Role.Organizer]
   }
 ]
 

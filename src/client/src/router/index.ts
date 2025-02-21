@@ -1,6 +1,7 @@
 import DashboardAudiencesView from '@/components/views/dashboard/DashboardAudiencesView.vue'
 import DashboardPerformersView from '@/components/views/dashboard/DashboardPerformersView.vue'
 import DashboardView from '@/components/views/dashboard/DashboardView.vue'
+import DashboardInvitesView from '@/components/views/dashboard/invites/DashboardInvitesView.vue'
 import DashboardSchedulesView from '@/components/views/dashboard/schedules/DashboardSchedulesView.vue'
 import DashboardUsersView from '@/components/views/dashboard/users/DashboardUsersView.vue'
 import HomeView from '@/components/views/home/HomeView.vue'
@@ -37,6 +38,12 @@ const router = createRouter({
           name: 'Users',
           component: DashboardUsersView,
           meta: { auth: true, roles: [Role.Admin] }
+        },
+        {
+          path: 'invites',
+          name: 'Invites',
+          component: DashboardInvitesView,
+          meta: { auth: true, roles: [Role.Admin, Role.Organizer] }
         }
       ],
       meta: {
