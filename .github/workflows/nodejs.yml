@@ -19,9 +19,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Install dependencies
+    - name: Install Node.js
       run: sudo apt install nodejs
+    - name: Install npm
       run: sudo apt install npm
+    - name: Install dependencies
       run: yarn
     - name: Build static files
       run: yarn build
