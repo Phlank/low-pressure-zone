@@ -16,7 +16,7 @@ jobs:
 
     steps:
     - run: sudo apt install nodejs
-    - run: sudo apt install corepack
+    - run: sudo apt install npm
     - run: cd src/client
     - run: corepack enable
     - run: yarn
