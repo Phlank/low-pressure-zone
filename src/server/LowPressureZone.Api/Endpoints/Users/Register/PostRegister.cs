@@ -3,6 +3,7 @@ using FluentEmail.Core;
 using FluentValidation.Results;
 using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Extensions;
+using LowPressureZone.Api.Utilities;
 using LowPressureZone.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -30,7 +31,7 @@ public class PostRegister : Endpoint<RegisterRequest>
         {
             context = RegistrationContext.Decode(req.Context);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             await this.SendDelayedForbiddenAsync(_requestTime, ct);
             return;
@@ -46,7 +47,8 @@ public class PostRegister : Endpoint<RegisterRequest>
         var isValidToken = await UserManager.VerifyUserTokenAsync(user, TokenProviders.Default, TokenPurposes.Invite, context.Token);
         if (!isValidToken)
         {
-            await this.SendDelayedForbiddenAsync(_requestTime, ct);
+            await TaskUtilities.DelaySensitiveResponse(_requestTime);
+            ThrowError(Errors.ExpiredToken);
             return;
         }
         
@@ -69,6 +71,8 @@ public class PostRegister : Endpoint<RegisterRequest>
             AddError(new ValidationFailure(nameof(req.Password), message));
         });
         ThrowIfAnyErrors();
+
+
 
         await SendOkAsync(ct);
     }

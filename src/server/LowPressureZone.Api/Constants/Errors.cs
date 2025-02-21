@@ -1,4 +1,6 @@
-﻿namespace LowPressureZone.Api.Constants;
+﻿using FluentValidation.Results;
+
+namespace LowPressureZone.Api.Constants;
 
 // These get mapped onto field labels, so they should remain as short as possible while being descriptive enough to solve the issues
 public static class Errors
@@ -16,4 +18,5 @@ public static class Errors
     public const string PasswordUppeercase = "Requires uppercase";
     public const string PasswordLowercase = "Requires lowercase";
     public const string PasswordSymbol = "Requires symbol";
+    public const string ExpiredToken = "Your user registration link has expired. Please request a new one.";
 }
