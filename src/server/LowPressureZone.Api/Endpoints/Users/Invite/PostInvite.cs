@@ -1,4 +1,5 @@
 ﻿using FastEndpoints;
+using FluentEmail.Core;
 using FluentValidation.Results;
 using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Services;
@@ -19,11 +20,14 @@ public class PostInvite : Endpoint<InviteRequest, EmptyResponse>
     public override void Configure()
     {
         Post("/users/invite");
-        Roles(RoleNames.Admin);
+        Roles(RoleNames.Admin, RoleNames.Organizer);
     }
 
     public override async Task HandleAsync(InviteRequest req, CancellationToken ct)
     {
+        ValidateAccessForAssignedRole(req);
+        ThrowIfAnyErrors();
+
         var normalizedEmail = req.Email.ToUpper();
         var isInUse = IdentityContext.Users.Any(u => u.NormalizedEmail == normalizedEmail);
         if (isInUse)
@@ -37,10 +41,12 @@ public class PostInvite : Endpoint<InviteRequest, EmptyResponse>
             NormalizedEmail = normalizedEmail,
         };
         var createResult = await UserManager.CreateAsync(user);
-        if (!createResult.Succeeded)
-        {
-            throw new Exception();
-        }
+        createResult.Errors.Select(e => e.Description).ForEach(e => AddError(e));
+        ThrowIfAnyErrors();
+
+        var addToRoleResult = await UserManager.AddToRoleAsync(user, req.Role);
+        addToRoleResult.Errors.Select(e => e.Description).ForEach(e => AddError(e));
+        ThrowIfAnyErrors();
 
         var inviteToken = await UserManager.GenerateUserTokenAsync(user, TokenProviders.Default, TokenPurposes.Invite);
         var inviteUrl = UriService.GetRegisterUri(req.Email, inviteToken);
@@ -55,5 +61,13 @@ public class PostInvite : Endpoint<InviteRequest, EmptyResponse>
         await IdentityContext.SaveChangesAsync(ct);
 
         await SendNoContentAsync(ct);
+    }
+
+    private void ValidateAccessForAssignedRole(InviteRequest req)
+    {
+        if (User.IsInRole(RoleNames.Organizer))
+        {
+            if (req.Role == RoleNames.Admin) AddError(nameof(req.Role), Errors.InvalidRole);
+        }
     }
 }

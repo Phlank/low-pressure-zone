@@ -90,7 +90,6 @@ const menuItems: MenuItem[] = [
 
 onMounted(async () => {
   await userStore.loadIfNotInitialized()
-  console.log(userStore.getRoles())
 })
 </script>
 

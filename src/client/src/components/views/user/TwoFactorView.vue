@@ -51,7 +51,7 @@ const errorMessage = ref('')
 
 const props = withDefaults(
   defineProps<{
-    redirect: string
+    redirect?: string
   }>(),
   {
     redirect: Routes.Schedules

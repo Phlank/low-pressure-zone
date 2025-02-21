@@ -19,4 +19,5 @@ public static class Errors
     public const string PasswordLowercase = "Requires lowercase";
     public const string PasswordSymbol = "Requires symbol";
     public const string ExpiredToken = "Your user registration link has expired. Please request a new one.";
+    public const string InvalidRole = "Invalid role";
 }

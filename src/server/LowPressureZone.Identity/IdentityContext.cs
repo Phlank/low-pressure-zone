@@ -22,7 +22,13 @@ public class IdentityContext : IdentityDbContext<IdentityUser>
             {
                 if (!roles.Any(r => r.Name == role))
                 {
-                    context.Set<IdentityRole>().Add(new IdentityRole(role));
+                    context.Set<IdentityRole>().Add(new IdentityRole
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = role,
+                        NormalizedName = role.ToUpper(),
+                        ConcurrencyStamp = Guid.NewGuid().ToString()
+                    });
                 }
             }
 

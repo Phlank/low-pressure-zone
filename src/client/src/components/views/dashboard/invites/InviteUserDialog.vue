@@ -18,6 +18,18 @@
           :message="validation.message('email')"
           text="Email" />
       </IftaLabel>
+      <IftaLabel class="input input--small">
+        <Select
+          class="input__field"
+          id="roleInput"
+          :options="roleItems.filter((item) => userStore.isInAnySpecifiedRole(...item.availableTo))"
+          option-label="name"
+          option-value="name"
+          data-key="name"
+          :default-value="Role.Performer"
+          v-model:model-value="formState.role" />
+        <label for="roleInput">Role</label>
+      </IftaLabel>
     </div>
   </FormDialog>
 </template>
@@ -27,15 +39,38 @@ import api from '@/api/api'
 import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
 import FormDialog from '@/components/dialogs/FormDialog.vue'
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
+import { Role } from '@/constants/roles'
+import { useUserStore } from '@/stores/userStore'
 import { inviteRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
-import { IftaLabel, InputText, useToast } from 'primevue'
+import { IftaLabel, InputText, Select, useToast } from 'primevue'
 import { reactive, ref, watch } from 'vue'
 
 const toast = useToast()
+const userStore = useUserStore()
+
+interface RoleItem {
+  name: Role
+  availableTo: Role[]
+}
+const roleItems: RoleItem[] = [
+  {
+    name: Role.Performer,
+    availableTo: [Role.Admin, Role.Organizer]
+  },
+  {
+    name: Role.Organizer,
+    availableTo: [Role.Admin, Role.Organizer]
+  },
+  {
+    name: Role.Admin,
+    availableTo: [Role.Admin]
+  }
+]
 
 const formState = reactive({
-  email: ''
+  email: '',
+  role: Role.Performer
 })
 const validation = createFormValidation(formState, inviteRequestRules)
 
@@ -70,6 +105,7 @@ watch(
 
 const reset = () => {
   formState.email = ''
+  formState.role = Role.Performer
   validation.reset()
 }
 </script>
