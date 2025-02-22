@@ -4,5 +4,5 @@ export enum Routes {
   TwoFactor = '/user/twofactor',
   Schedules = '/dashboard',
   Audiences = '/dashboard/audiences',
-  Performers = '/dashboard/perforers'
+  Performers = '/dashboard/performers'
 }

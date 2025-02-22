@@ -13,6 +13,7 @@ public sealed class PerformerRequestMapper : RequestMapper<PerformerRequest, Dom
             Url = r.Url.Trim(),
             CreatedDate = DateTime.UtcNow,
             LastModifiedDate = DateTime.UtcNow,
+            LinkedUserIds = new()
         };
     }
 }

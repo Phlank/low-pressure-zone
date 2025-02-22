@@ -5,4 +5,5 @@ export interface PerformerResponse {
   createdDate: string
   modifiedDate: string
   canDelete: boolean
+  isLinked: boolean
 }

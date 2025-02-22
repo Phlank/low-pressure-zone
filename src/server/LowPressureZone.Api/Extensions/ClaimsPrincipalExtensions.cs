@@ -21,4 +21,11 @@ public static class ClaimsPrincipalExtensions
         IEnumerable<string>? roles = principal.Identities.FirstOrDefault()?.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value);
         return roles ?? [];
     }
+
+    public static Guid GetIdOrDefault(this ClaimsPrincipal principal)
+    {
+        var id = principal.Identities.FirstOrDefault()?.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+        if (id == null) return default;
+        return new Guid(id);
+    }
 }

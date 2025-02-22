@@ -1,4 +1,6 @@
-﻿using FastEndpoints;
+﻿using System.Security.Claims;
+using FastEndpoints;
+using LowPressureZone.Api.Extensions;
 
 namespace LowPressureZone.Api.Endpoints.Performers;
 
@@ -11,8 +13,8 @@ public sealed class PerformerResponseMapper : ResponseMapper<PerformerResponse, 
             Id = e.Id,
             Name = e.Name,
             Url = e.Url,
-            CreatedDate = e.CreatedDate,
-            ModifiedDate = e.LastModifiedDate
+            CanDelete = false,
+            IsLinked = false
         };
     }
 }
