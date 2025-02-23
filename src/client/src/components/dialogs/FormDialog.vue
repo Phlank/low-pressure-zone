@@ -6,7 +6,7 @@
     @update:visible="isSubmitting ? undefined : emit('close')"
     :draggable="false"
     @show="emit('show')">
-    <template #default><slot></slot></template>
+    <slot></slot>
     <template #footer>
       <div class="form-dialog__footer">
         <Button

@@ -50,9 +50,6 @@ export const useUserStore = defineStore('userStore', () => {
   const isInAnySpecifiedRole = (...rolesToCheck: string[]): boolean => {
     if (rolesToCheck.length === 0) return true
     if (getRoles().length === 0) return false
-    console.log('Roles to checK: ' + JSON.stringify(rolesToCheck))
-    console.log(JSON.stringify(getRoles()))
-    console.log(hasIntersection(rolesToCheck, getRoles()))
 
     return hasIntersection(rolesToCheck, getRoles())
   }
