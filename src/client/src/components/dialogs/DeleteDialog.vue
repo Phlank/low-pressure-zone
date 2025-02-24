@@ -1,5 +1,6 @@
 <template>
   <Dialog
+    modal
     :header="header"
     :visible="visible"
     @update:visible="isSubmitting ? undefined : emit('close')"
@@ -9,13 +10,6 @@
     </template>
     <template #footer>
       <div class="form-dialog__footer">
-        <Button
-          class="input"
-          label="Cancel"
-          severity="secondary"
-          @click="emit('close')"
-          :disabled="isSubmitting"
-          outlined />
         <Button
           class="input"
           severity="danger"

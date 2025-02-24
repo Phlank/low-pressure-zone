@@ -4,7 +4,7 @@
       <RouterLink
         :to="'/'"
         class="header__title">
-        Low Pressure Zone
+        {{ title }}
       </RouterLink>
     </template>
     <template #end>
@@ -16,8 +16,10 @@
 
 <script lang="ts" setup>
 import { Toolbar } from 'primevue'
-import DarkModeToggle from '../controls/DarkModeToggle.vue'
-import SiteNavMenu from '../controls/SiteNavMenu.vue'
+import DarkModeToggle from '../../controls/DarkModeToggle.vue'
+import SiteNavMenu from '../../controls/SiteNavMenu.vue'
+
+const title = import.meta.env.VITE_SITE_NAME
 </script>
 
 <style lang="scss" scoped>

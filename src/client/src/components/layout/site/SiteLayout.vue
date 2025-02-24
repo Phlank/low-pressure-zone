@@ -11,8 +11,9 @@
 </template>
 
 <script lang="ts" setup>
-import SiteHeader from './SiteHeader.vue'
+import { RouterView } from 'vue-router'
 import SiteFooter from './SiteFooter.vue'
+import SiteHeader from './SiteHeader.vue'
 </script>
 
 <style lang="scss" scoped>
@@ -22,14 +23,14 @@ import SiteFooter from './SiteFooter.vue'
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100vh;
+  height: 100dvh;
 
   &__header {
     margin-bottom: variables.$space-m;
     font-size: 1.2rem;
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: 100;
     border-top: 0;
     border-left: 0;
     border-right: 0;
@@ -39,7 +40,7 @@ import SiteFooter from './SiteFooter.vue'
   &__footer {
     position: sticky;
     margin-top: auto;
-    bottom: variables.$space-m;
+    // bottom: variables.$space-m;
     text-align: center;
     width: 100%;
   }

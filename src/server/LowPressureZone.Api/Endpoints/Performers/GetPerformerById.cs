@@ -1,4 +1,5 @@
 ﻿using FastEndpoints;
+using LowPressureZone.Api.Extensions;
 using LowPressureZone.Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,6 +29,7 @@ public sealed class GetPerformerById : Endpoint<EmptyRequest, PerformerResponse,
 
         var response = Map.FromEntity(performer);
         response.CanDelete = !await DataContext.Timeslots.AnyAsync(t => t.PerformerId == id, ct);
+        response.IsLinked = performer.LinkedUserIds.Contains(User.GetIdOrDefault());
         await SendOkAsync(Map.FromEntity(performer), ct);
     }
 }

@@ -1,5 +1,7 @@
 <template>
-  <Toolbar class="footer" style="border-style: none; background-color: inherit">
+  <Toolbar
+    class="footer"
+    style="border-style: none; background-color: inherit">
     <template #center>
       <PlayButton />
     </template>
@@ -8,7 +10,7 @@
 
 <script lang="ts" setup>
 import { Toolbar } from 'primevue'
-import PlayButton from '../controls/PlayButton.vue'
+import PlayButton from '../../controls/PlayButton.vue'
 </script>
 
 <style lang="scss" scoped>
@@ -17,6 +19,5 @@ import PlayButton from '../controls/PlayButton.vue'
 .footer {
   position: sticky;
   bottom: 0;
-  padding: variables.$space-l;
 }
 </style>

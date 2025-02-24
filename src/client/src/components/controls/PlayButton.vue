@@ -5,8 +5,7 @@
     @click="handleControlClick"
     :label="controlLabel"
     size="large"
-    rounded
-  ></Button>
+    rounded></Button>
 </template>
 
 <script lang="ts" setup>

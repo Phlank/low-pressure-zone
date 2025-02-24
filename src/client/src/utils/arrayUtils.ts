@@ -34,7 +34,7 @@ export const hasIntersection = <T>(a: T[], b: T[]) => {
   for (let i = 0; i < a.length; i++) {
     if (b.includes(a[i])) return true
   }
-  return true
+  return false
 }
 
 export const distinct = <T>(array: T[]) => {

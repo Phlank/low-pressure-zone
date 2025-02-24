@@ -1,21 +1,15 @@
 <template>
   <Dialog
+    modal
     class="form-dialog"
     :visible="visible"
     :header="header"
     @update:visible="isSubmitting ? undefined : emit('close')"
     :draggable="false"
     @show="emit('show')">
-    <template #default><slot></slot></template>
+    <slot></slot>
     <template #footer>
       <div class="form-dialog__footer">
-        <Button
-          class="input"
-          label="Cancel"
-          severity="secondary"
-          @click="emit('close')"
-          :disabled="isSubmitting"
-          outlined />
         <Button
           class="input"
           label="Save"

@@ -4,6 +4,10 @@
   margin: variables.$space-m variables.$space-s;
   height: fit-content;
 
+  @include variables.mobile {
+    margin: variables.$space-m 0;
+  }
+
   &--small.p-iftalabel {
     width: variables.$input-width-s;
     @include variables.mobile {

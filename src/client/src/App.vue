@@ -8,7 +8,7 @@
 <script setup lang="ts">
 import { Toast } from 'primevue'
 import { computed, onMounted, onUnmounted, provide, ref, type ComputedRef, type Ref } from 'vue'
-import SiteLayout from './components/layout/SiteLayout.vue'
+import SiteLayout from './components/layout/site/SiteLayout.vue'
 
 const screenWidth: Ref<number> = ref(1000)
 
