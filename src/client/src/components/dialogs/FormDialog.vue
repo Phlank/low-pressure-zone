@@ -1,5 +1,6 @@
 <template>
   <Dialog
+    modal
     class="form-dialog"
     :visible="visible"
     :header="header"

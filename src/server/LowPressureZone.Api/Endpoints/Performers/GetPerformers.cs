@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Performers;
 
-public sealed class GetPerformers : EndpointWithoutRequest<List<PerformerResponse>, PerformerResponseMapper>
+public sealed class GetPerformers : EndpointWithoutRequest<IEnumerable<PerformerResponse>, PerformerResponseMapper>
 {
     public required DataContext DataContext { get; set; }
 
@@ -30,6 +30,6 @@ public sealed class GetPerformers : EndpointWithoutRequest<List<PerformerRespons
             response.CanDelete = !performerIdsInUse.Contains(response.Id);
             response.IsLinked = linkedPerformerIds.Contains(response.Id);
         }
-        await SendOkAsync(responses, ct);
+        await SendOkAsync(responses.OrderBy(r => r.Name), ct);
     }
 }

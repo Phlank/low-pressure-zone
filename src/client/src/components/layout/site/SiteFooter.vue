@@ -19,6 +19,5 @@ import PlayButton from '../../controls/PlayButton.vue'
 .footer {
   position: sticky;
   bottom: 0;
-  padding: variables.$space-l;
 }
 </style>

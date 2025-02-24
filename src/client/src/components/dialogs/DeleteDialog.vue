@@ -1,5 +1,6 @@
 <template>
   <Dialog
+    modal
     :header="header"
     :visible="visible"
     @update:visible="isSubmitting ? undefined : emit('close')"

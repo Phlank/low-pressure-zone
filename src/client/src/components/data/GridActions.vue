@@ -1,30 +1,94 @@
 <template>
   <div class="grid-actions">
-    <Button
-      v-if="props.showEdit"
-      size="small"
-      class="grid-actions__item"
-      icon="pi pi-pencil"
-      severity="secondary"
-      @click="emit('edit')"
-      :disabled="props.disabled"
-      rounded
-      outlined />
-    <Button
-      v-if="props.showDelete"
-      size="small"
-      class="grid-actions__item"
-      icon="pi pi-trash"
-      severity="danger"
-      @click="emit('delete')"
-      :disabled="props.disabled"
-      rounded
-      outlined />
+    <div class="grid-actions__buttons">
+      <Button
+        v-if="props.showCreate && !isCombinedIcon"
+        size="small"
+        class="grid-actions__buttons__item"
+        icon="pi pi-plus"
+        severity="secondary"
+        @click="emit('create')"
+        :disabled="props.disabled"
+        rounded
+        outlined />
+      <Button
+        v-if="props.showEdit && !isCombinedIcon"
+        size="small"
+        class="grid-actions__buttons__item"
+        icon="pi pi-pencil"
+        severity="secondary"
+        @click="emit('edit')"
+        :disabled="props.disabled"
+        rounded
+        outlined />
+      <Button
+        v-if="props.showDelete && !isCombinedIcon"
+        size="small"
+        class="grid-actions__buttons__item"
+        icon="pi pi-trash"
+        severity="danger"
+        @click="emit('delete')"
+        :disabled="props.disabled"
+        rounded
+        outlined />
+      <Button
+        v-if="isCombinedIcon"
+        size="small"
+        class="grid-actions__buttons__item"
+        icon="pi pi-ellipsis-h"
+        severity="secondary"
+        @click="handleCombinedClick"
+        :disabled="props.disabled"
+        rounded
+        outlined />
+    </div>
+    <Drawer
+      v-if="isMobile"
+      class="grid-actions__drawer"
+      position="bottom"
+      v-model:visible="showActionSelectDrawer"
+      :show-close-icon="false">
+      <div
+        v-for="(action, index) in visibleActions"
+        key="name">
+        <ListItem
+          class="grid-actions__drawer__item"
+          @click="handleDrawerClick(action.name)"
+          v-ripple>
+          <template #left>
+            <div class="grid-actions__drawer__item__left">
+              <i :class="action.icon"></i>
+              <span>{{ action.name }}</span>
+            </div>
+          </template>
+          <template #right>
+            <i class="pi pi-chevron-right"></i>
+          </template>
+        </ListItem>
+        <Divider v-if="index < visibleActions.length - 1" />
+      </div>
+    </Drawer>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Button } from 'primevue'
+import { Button, Divider, Drawer } from 'primevue'
+import { computed, inject, ref } from 'vue'
+import ListItem from './ListItem.vue'
+
+const isMobile = inject('isMobile')
+
+const visibleActions = computed(() => {
+  let actions: { name: string; icon: string; severity: 'success' | 'danger' | 'secondary' }[] = []
+  if (props.showCreate) actions.push({ name: 'Create', icon: 'pi pi-plus', severity: 'success' })
+  if (props.showEdit) actions.push({ name: 'Edit', icon: 'pi pi-pencil', severity: 'secondary' })
+  if (props.showDelete) actions.push({ name: 'Delete', icon: 'pi pi-trash', severity: 'danger' })
+  return actions
+})
+const isCombinedIcon = computed(() => {
+  if (!isMobile) return false
+  return visibleActions.value.length >= 2
+})
 
 const props = withDefaults(
   defineProps<{
@@ -41,6 +105,28 @@ const props = withDefaults(
   }
 )
 
+const showActionSelectDrawer = ref(false)
+const handleCombinedClick = () => {
+  showActionSelectDrawer.value = true
+}
+
+const handleDrawerClick = (action: string) => {
+  showActionSelectDrawer.value = false
+  if (action === 'Create') emit('create')
+  else if (action === 'Edit') emit('edit')
+  else if (action === 'Delete') emit('delete')
+}
+
+const handleDrawerEditClick = () => {
+  showActionSelectDrawer.value = false
+  emit('edit')
+}
+
+const handleDrawerDeleteClick = () => {
+  showActionSelectDrawer.value = false
+  emit('delete')
+}
+
 const emit = defineEmits<{
   create: []
   edit: []
@@ -48,19 +134,43 @@ const emit = defineEmits<{
 }>()
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @use '@/assets/styles/variables.scss';
 
 .grid-actions {
-  width: 6.5rem;
-  text-align: center;
+  &__buttons {
+    width: 80px;
+    text-align: center;
 
-  @include variables.mobile {
-    width: fit-content;
+    @include variables.mobile {
+      width: 40px;
+    }
+
+    .grid-actions__item {
+      margin: 0 variables.$space-s;
+      @include variables.mobile {
+        margin: variables.$space-s 0;
+      }
+    }
   }
 
-  .grid-actions__item {
-    margin: variables.$space-s;
+  &__drawer {
+    border-top-left-radius: variables.$space-l;
+    border-top-right-radius: variables.$space-l;
+
+    .p-drawer-header {
+      padding: 20px 0 0 0;
+    }
+
+    &__item {
+      padding: variables.$space-m 0;
+
+      &__left {
+        display: flex;
+        align-items: center;
+        gap: variables.$space-l;
+      }
+    }
   }
 }
 </style>
