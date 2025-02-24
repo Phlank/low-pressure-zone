@@ -12,7 +12,7 @@
           header="URL" />
         <Column
           v-if="props.isEditable"
-          style="width: 6.5rem">
+          style="width: 80px">
           <template #body="slotProps">
             <GridActions
               :show-edit="props.isEditable"

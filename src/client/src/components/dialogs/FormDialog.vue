@@ -12,13 +12,6 @@
       <div class="form-dialog__footer">
         <Button
           class="input"
-          label="Cancel"
-          severity="secondary"
-          @click="emit('close')"
-          :disabled="isSubmitting"
-          outlined />
-        <Button
-          class="input"
           label="Save"
           @click="emit('save')"
           :disabled="isSubmitting" />

@@ -2,33 +2,14 @@
   <div class="grid-actions">
     <div class="grid-actions__buttons">
       <Button
-        v-if="props.showCreate && !isCombinedIcon"
-        size="small"
+        v-if="!isCombinedIcon"
+        v-for="action in visibleActions"
         class="grid-actions__buttons__item"
-        icon="pi pi-plus"
-        severity="secondary"
-        @click="emit('create')"
+        :key="action.name"
+        :icon="action.icon"
+        :severity="action.severity"
         :disabled="props.disabled"
-        rounded
-        outlined />
-      <Button
-        v-if="props.showEdit && !isCombinedIcon"
-        size="small"
-        class="grid-actions__buttons__item"
-        icon="pi pi-pencil"
-        severity="secondary"
-        @click="emit('edit')"
-        :disabled="props.disabled"
-        rounded
-        outlined />
-      <Button
-        v-if="props.showDelete && !isCombinedIcon"
-        size="small"
-        class="grid-actions__buttons__item"
-        icon="pi pi-trash"
-        severity="danger"
-        @click="emit('delete')"
-        :disabled="props.disabled"
+        @click="handleActionClick(action.name)"
         rounded
         outlined />
       <Button
@@ -43,17 +24,16 @@
         outlined />
     </div>
     <Drawer
-      v-if="isMobile"
       class="grid-actions__drawer"
       position="bottom"
       v-model:visible="showActionSelectDrawer"
       :show-close-icon="false">
       <div
         v-for="(action, index) in visibleActions"
-        key="name">
+        :key="action.name">
         <ListItem
           class="grid-actions__drawer__item"
-          @click="handleDrawerClick(action.name)"
+          @click="handleActionClick(action.name)"
           v-ripple>
           <template #left>
             <div class="grid-actions__drawer__item__left">
@@ -73,10 +53,10 @@
 
 <script lang="ts" setup>
 import { Button, Divider, Drawer } from 'primevue'
-import { computed, inject, ref } from 'vue'
+import { computed, inject, ref, type Ref } from 'vue'
 import ListItem from './ListItem.vue'
 
-const isMobile = inject('isMobile')
+const isMobile: Ref<boolean> | undefined = inject('isMobile')
 
 const visibleActions = computed(() => {
   let actions: { name: string; icon: string; severity: 'success' | 'danger' | 'secondary' }[] = []
@@ -86,8 +66,7 @@ const visibleActions = computed(() => {
   return actions
 })
 const isCombinedIcon = computed(() => {
-  if (!isMobile) return false
-  return visibleActions.value.length >= 2
+  return visibleActions.value.length >= 2 && isMobile?.value
 })
 
 const props = withDefaults(
@@ -110,21 +89,11 @@ const handleCombinedClick = () => {
   showActionSelectDrawer.value = true
 }
 
-const handleDrawerClick = (action: string) => {
+const handleActionClick = (action: string) => {
   showActionSelectDrawer.value = false
   if (action === 'Create') emit('create')
   else if (action === 'Edit') emit('edit')
   else if (action === 'Delete') emit('delete')
-}
-
-const handleDrawerEditClick = () => {
-  showActionSelectDrawer.value = false
-  emit('edit')
-}
-
-const handleDrawerDeleteClick = () => {
-  showActionSelectDrawer.value = false
-  emit('delete')
 }
 
 const emit = defineEmits<{
@@ -139,14 +108,14 @@ const emit = defineEmits<{
 
 .grid-actions {
   &__buttons {
-    width: 80px;
+    width: 100px;
     text-align: center;
 
     @include variables.mobile {
       width: 40px;
     }
 
-    .grid-actions__item {
+    &__item {
       margin: 0 variables.$space-s;
       @include variables.mobile {
         margin: variables.$space-s 0;
