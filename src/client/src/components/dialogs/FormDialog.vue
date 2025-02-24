@@ -5,6 +5,7 @@
     :visible="visible"
     :header="header"
     @update:visible="isSubmitting ? undefined : emit('close')"
+    @hide="emit('close')"
     :draggable="false"
     @show="emit('show')">
     <slot></slot>

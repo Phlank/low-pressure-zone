@@ -4,6 +4,7 @@
     :header="header"
     :visible="visible"
     @update:visible="isSubmitting ? undefined : emit('close')"
+    @hide="emit('close')"
     :draggable="false">
     <template #default>
       {{ `Delete ${entityType}${entityName == undefined ? '?' : ' ' + entityName + '?'}` }}
@@ -14,8 +15,7 @@
           class="input"
           severity="danger"
           label="Delete"
-          @click="emit('delete')"
-          :disabled="isSubmitting" />
+          @click="emit('delete')" />
       </div>
     </template>
   </Dialog>

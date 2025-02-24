@@ -1,34 +1,41 @@
 <template>
-  <DataTable data-key="start" :value="rows" size="large">
-    <Column field="start" header="Start">
+  <DataTable
+    data-key="start"
+    :value="rows"
+    size="large">
+    <Column
+      field="start"
+      header="Start">
       <template #body="{ data }">
         {{ formatTimeslot(data.start) }}
       </template>
     </Column>
-    <Column field="timeslot.performer.name" header="Performer" />
-    <Column field="timeslot.performanceType" header="Type" />
-    <Column field="timeslot.name" header="Name" />
+    <Column
+      field="timeslot.performer.name"
+      header="Performer" />
+    <Column
+      field="timeslot.performanceType"
+      header="Type" />
+    <Column
+      field="timeslot.name"
+      header="Name" />
     <Column class="grid-action-col">
       <template #body="{ data }">
         <Button
           class="grid-action-col__item"
           :icon="`pi ${data.timeslot ? 'pi-pencil' : 'pi-plus'}`"
           :severity="data.timeslot ? 'secondary' : 'primary'"
-          :disabled="isDialogOpen || props.disabled"
           @click="handleEditClicked(data)"
           outlined
-          rounded
-        />
+          rounded />
         <Button
           class="grid-action-col__item"
           v-if="data.timeslot"
           icon="pi pi-trash"
           severity="danger"
-          :disabled="isDialogOpen || props.disabled"
           @click="handleDeleteClicked(data)"
           outlined
-          rounded
-        />
+          rounded />
       </template>
     </Column>
   </DataTable>
@@ -37,14 +44,12 @@
     :is-submitting="isSubmitting"
     :visible="showFormDialog"
     @close="showFormDialog = false"
-    @save="handleSave"
-  >
+    @save="handleSave">
     <TimeslotForm
       ref="timeslotForm"
       :initial-state="formInitialValue"
       :performers="performers"
-      :disabled="isSubmitting"
-    />
+      :disabled="isSubmitting" />
   </FormDialog>
   <DeleteDialog
     entity-type="timeslot"
@@ -53,8 +58,7 @@
     :visible="showDeleteDialog"
     :is-submitting="false"
     @close="showDeleteDialog = false"
-    @delete="handleDelete"
-  />
+    @delete="handleDelete" />
 </template>
 
 <script lang="ts" setup>
@@ -82,7 +86,6 @@ const toast = useToast()
 const props = defineProps<{
   schedule: ScheduleResponse
   performers: PerformerResponse[]
-  disabled: boolean
 }>()
 
 const timeslots: Ref<TimeslotResponse[]> = ref(props.schedule.timeslots)
