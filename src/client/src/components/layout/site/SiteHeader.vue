@@ -16,8 +16,8 @@
 
 <script lang="ts" setup>
 import { Toolbar } from 'primevue'
-import DarkModeToggle from '../controls/DarkModeToggle.vue'
-import SiteNavMenu from '../controls/SiteNavMenu.vue'
+import DarkModeToggle from '../../controls/DarkModeToggle.vue'
+import SiteNavMenu from '../../controls/SiteNavMenu.vue'
 
 const title = import.meta.env.VITE_SITE_NAME
 </script>

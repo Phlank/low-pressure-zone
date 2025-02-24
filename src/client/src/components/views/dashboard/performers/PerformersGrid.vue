@@ -1,38 +1,50 @@
 <template>
   <div class="performers-grid">
-    <DataTable
-      :value="performers"
-      data-key="id">
-      <Column
-        field="name"
-        header="Name" />
-      <Column
-        field="url"
-        header="URL" />
-      <Column
-        v-if="props.isEditable"
-        class="grid-action-col">
-        <template #body="slotProps">
-          <Button
-            class="grid-action-col__item"
-            icon="pi pi-pencil"
-            severity="secondary"
-            @click="handleEditActionClick(slotProps.data as PerformerResponse)"
-            :disabled="controlsDisabled"
-            rounded
-            outlined />
-          <Button
-            v-if="slotProps.data.canDelete"
-            class="grid-action-col__item"
-            icon="pi pi-trash"
-            severity="danger"
-            @click="handleDeleteActionClick(slotProps.data as PerformerResponse)"
-            :disabled="controlsDisabled"
-            rounded
-            outlined />
-        </template>
-      </Column>
-    </DataTable>
+    <div v-if="!isMobile">
+      <DataTable
+        :value="performers"
+        data-key="id">
+        <Column
+          field="name"
+          header="Name" />
+        <Column
+          field="url"
+          header="URL" />
+        <Column
+          v-if="props.isEditable"
+          style="width: 6.5rem">
+          <template #body="slotProps">
+            <GridActions
+              :show-edit="props.isEditable"
+              :show-delete="props.isEditable && slotProps.data.canDelete"
+              @edit="handleEditActionClick(slotProps.data)"
+              @delete="handleDeleteActionClick(slotProps.data)" />
+          </template>
+        </Column>
+      </DataTable>
+    </div>
+    <div v-else>
+      <div v-for="(performer, index) in performers">
+        <ListItem>
+          <template #left>
+            <div style="display: flex; flex-direction: column">
+              <span>{{ performer.name }}</span>
+              <span class="text-s">{{ performer.url }}</span>
+            </div>
+          </template>
+          <template
+            #right
+            v-if="props.isEditable">
+            <GridActions
+              :show-edit="props.isEditable"
+              :show-delete="props.isEditable && performer.canDelete"
+              @edit="handleEditActionClick(performer)"
+              @delete="handleDeleteActionClick(performer)" />
+          </template>
+        </ListItem>
+        <Divider v-if="index != performers.length - 1" />
+      </div>
+    </div>
     <FormDialog
       :visible="showEditDialog"
       header="Edit Performer"
@@ -57,15 +69,19 @@
 
 <script lang="ts" setup>
 import api from '@/api/api'
+import GridActions from '@/components/data/GridActions.vue'
 import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
 import type { PerformerRequest } from '@/api/performers/performerRequest'
 import type { PerformerResponse } from '@/api/performers/performerResponse'
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
 import FormDialog from '@/components/dialogs/FormDialog.vue'
 import PerformerForm from '@/components/form/requestForms/PerformerForm.vue'
+import ListItem from '@/components/data/ListItem.vue'
 import { showDeleteSuccessToast, showEditSuccessToast } from '@/utils/toastUtils'
-import { Button, Column, DataTable, useToast } from 'primevue'
-import { ref, useTemplateRef, type Ref } from 'vue'
+import { Button, Card, Column, DataTable, useToast, Divider } from 'primevue'
+import { inject, ref, useTemplateRef, type Ref } from 'vue'
+
+const isMobile: Ref<boolean> | undefined = inject('isMobile')
 
 const toast = useToast()
 const props = withDefaults(

@@ -1,14 +1,27 @@
 <template>
   <div class="performers-dashboard">
-    <Menubar
-      :model="menubarItems"
-      style="width: fit-content" />
-    <LinkedPerformers
-      v-show="isLoaded && selectedItem === 'Mine'"
-      :performers="performers" />
-    <AllPerformers
-      v-show="isLoaded && selectedItem === 'All'"
-      :performers="performers" />
+    <Tabs value="0">
+      <TabList>
+        <Tab
+          value="0"
+          :disabled="controlsDisabled">
+          Mine
+        </Tab>
+        <Tab
+          value="1"
+          :disabled="controlsDisabled">
+          All
+        </Tab>
+      </TabList>
+      <TabPanels v-if="isLoaded">
+        <TabPanel value="0">
+          <LinkedPerformers :performers="performers" />
+        </TabPanel>
+        <TabPanel value="1">
+          <AllPerformers :performers="performers" />
+        </TabPanel>
+      </TabPanels>
+    </Tabs>
     <Skeleton
       v-show="!isLoaded"
       style="height: 300px" />
@@ -18,7 +31,7 @@
 <script lang="ts" setup>
 import api from '@/api/api'
 import type { PerformerResponse } from '@/api/performers/performerResponse'
-import { Menubar, Skeleton } from 'primevue'
+import { Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs } from 'primevue'
 import type { MenuItem } from 'primevue/menuitem'
 import { computed, onMounted, ref, type Ref } from 'vue'
 import AllPerformers from './AllPerformers.vue'
