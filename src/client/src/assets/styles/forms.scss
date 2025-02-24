@@ -26,6 +26,12 @@
       width: 100%;
     }
   }
+  &--xl.p-iftalabel {
+    width: variables.$input-width-xl;
+    @include variables.mobile {
+      width: 100%;
+    }
+  }
 
   @include variables.mobile {
     width: 100%;

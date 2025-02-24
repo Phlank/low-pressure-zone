@@ -11,12 +11,15 @@
         :disabled="disabled"
         :invalid="!validation.isValid('audienceId')"
         :model-value="formState.audienceId"
-        @update:model-value="handleUpdateAudience"
-      />
-      <ValidationLabel for="audienceSelect" :message="validation.message('audienceId')">
+        @update:model-value="handleUpdateAudience" />
+      <ValidationLabel
+        for="audienceSelect"
+        :message="validation.message('audienceId')">
         Audience
       </ValidationLabel>
     </IftaLabel>
+  </div>
+  <div class="schedule-form desktop-inline">
     <IftaLabel class="input input--medium">
       <DatePicker
         class="input__field"
@@ -28,9 +31,10 @@
         :invalid="!validation.isValid('start')"
         @update:model-value="handleUpdateStart"
         show-time
-        fluid
-      />
-      <ValidationLabel for="startTime" :message="validation.message('start')">
+        fluid />
+      <ValidationLabel
+        for="startTime"
+        :message="validation.message('start')">
         Start Time
       </ValidationLabel>
     </IftaLabel>
@@ -46,18 +50,33 @@
         :disabled="disabled || formState.endTime.getTime() < minStartTime.getTime()"
         @update:model-value="handleUpdateEnd"
         show-time
-        fluid
-      />
-      <ValidationLabel for="endTime" :message="validation.message('end')">
+        fluid />
+      <ValidationLabel
+        for="endTime"
+        :message="validation.message('end')">
         End Time
       </ValidationLabel>
+    </IftaLabel>
+  </div>
+  <div class="schedule-form desktop-inline">
+    <IftaLabel class="input input--xl">
+      <Textarea
+        class="input__field"
+        id="descriptionInput"
+        v-model:model-value="formState.description"
+        auto-resize />
+      <ValidationLabel
+        for="descriptionInput"
+        message=""
+        text="Description"
+        optional />
     </IftaLabel>
   </div>
 </template>
 
 <script lang="ts" setup>
 import type { AudienceResponse } from '@/api/audiences/audienceResponse'
-import { DatePicker, IftaLabel, Select } from 'primevue'
+import { DatePicker, IftaLabel, Select, Textarea } from 'primevue'
 import ValidationLabel from '../ValidationLabel.vue'
 import { onMounted, reactive, ref, watch } from 'vue'
 import { createFormValidation } from '@/validation/types/formValidation'
@@ -98,6 +117,7 @@ const formState: ScheduleFormState = reactive({
   audienceId: '',
   startTime: resetStartTime,
   start: resetStartTime.toISOString(),
+  description: '',
   endTime: new Date(resetStartTime.getTime() + DEFAULT_MINUTES * MS_PER_MINUTE),
   end: new Date(resetStartTime.getTime() + DEFAULT_MINUTES * MS_PER_MINUTE).toISOString()
 })
@@ -115,6 +135,7 @@ onMounted(() => {
     formState.audienceId = props.initialState.audienceId
     formState.start = props.initialState.start
     formState.end = props.initialState.end
+    formState.description = props.initialState.description
     formState.startTime = props.initialState.startTime
     formState.endTime = props.initialState.endTime
   }
@@ -150,6 +171,7 @@ const reset = () => {
   formState.audienceId = ''
   formState.startTime = resetStartTime
   formState.start = formState.startTime.toISOString()
+  formState.description = ''
   formState.endTime = new Date(resetStartTime.getTime() + DEFAULT_MINUTES * MS_PER_MINUTE)
   formState.end = formState.endTime.toISOString()
 }

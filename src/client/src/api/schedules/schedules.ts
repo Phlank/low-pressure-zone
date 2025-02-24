@@ -17,5 +17,10 @@ export default {
 
 // Forms will deal with dates, but we don't want to send the actual dates into the API
 const mapRequest = <TSchedule extends ScheduleRequest>(schedule: TSchedule): ScheduleRequest => {
-  return { audienceId: schedule.audienceId, start: schedule.start, end: schedule.end }
+  return {
+    audienceId: schedule.audienceId,
+    start: schedule.start,
+    end: schedule.end,
+    description: schedule.description
+  }
 }

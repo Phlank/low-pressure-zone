@@ -56,6 +56,7 @@ public class PutSchedule : EndpointWithMapper<ScheduleRequest, ScheduleRequestMa
 
         schedule.Start = req.Start;
         schedule.End = req.End;
+        schedule.Description = req.Description;
         schedule.AudienceId = req.AudienceId;
         if (DataContext.ChangeTracker.HasChanges())
         {

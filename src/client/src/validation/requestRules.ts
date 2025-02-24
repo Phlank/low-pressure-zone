@@ -43,7 +43,8 @@ export const scheduleRequestRules = (
       required(),
       hourOnly(),
       withinRangeOf(() => formState.start, 60, 1440, '1 - 24h allowed')
-    )
+    ),
+    description: alwaysValid()
   }
 }
 
