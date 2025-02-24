@@ -82,7 +82,7 @@ export const registerRequestRules = (
 ): PropertyRules<RegisterRequest> => {
   return {
     context: alwaysValid(),
-    username: combineRules(required(), allowedCharacters('A-Za-z0-9\-\.\_\@\+')),
+    username: combineRules(required(), allowedCharacters('A-Za-z0-9-._@+')),
     password: combineRules(
       minimumLength(8),
       requireAnyCharacter('A-Z', 'Requires uppercase'),
