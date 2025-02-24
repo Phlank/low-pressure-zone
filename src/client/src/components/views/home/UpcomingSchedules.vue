@@ -15,6 +15,7 @@
       <div
         v-else
         class="upcoming-schedules__content">
+        <div class="upcoming-schedules__content__description">{{ scheduleData?.description }}</div>
         <DataTable
           :loading="!isLoaded"
           :value="scheduleData!.timeslots">
@@ -55,6 +56,7 @@ const toast = useToast()
 interface ScheduleData {
   id: string
   start: Date
+  description: string
   audience: string
   timeslots: TimeslotData[]
 }
@@ -71,6 +73,7 @@ const scheduleData: ComputedRef<ScheduleData | undefined> = computed(() => {
   return {
     id: schedule.id,
     start: parseDate(schedule.start),
+    description: schedule.description,
     audience: schedule.audience.name,
     timeslots: mapTimeslotDisplayData(schedule)
   }
@@ -118,3 +121,15 @@ onMounted(async () => {
   }
 })
 </script>
+
+<style lang="scss">
+@use '@/assets/styles/variables.scss';
+
+.upcoming-schedules {
+  &__content {
+    &__description {
+      padding: variables.$space-l 0;
+    }
+  }
+}
+</style>

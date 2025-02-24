@@ -1,60 +1,79 @@
 <template>
-  <DataTable data-key="start" :value="rows" size="large">
-    <Column field="start" header="Start">
-      <template #body="{ data }">
-        {{ formatTimeslot(data.start) }}
-      </template>
-    </Column>
-    <Column field="timeslot.performer.name" header="Performer" />
-    <Column field="timeslot.performanceType" header="Type" />
-    <Column field="timeslot.name" header="Name" />
-    <Column class="grid-action-col">
-      <template #body="{ data }">
-        <Button
-          class="grid-action-col__item"
-          :icon="`pi ${data.timeslot ? 'pi-pencil' : 'pi-plus'}`"
-          :severity="data.timeslot ? 'secondary' : 'primary'"
-          :disabled="isDialogOpen || props.disabled"
-          @click="handleEditClicked(data)"
-          outlined
-          rounded
-        />
-        <Button
-          class="grid-action-col__item"
-          v-if="data.timeslot"
-          icon="pi pi-trash"
-          severity="danger"
-          :disabled="isDialogOpen || props.disabled"
-          @click="handleDeleteClicked(data)"
-          outlined
-          rounded
-        />
-      </template>
-    </Column>
-  </DataTable>
-  <FormDialog
-    :header="editingId ? 'Edit Timeslot' : 'Create Timeslot'"
-    :is-submitting="isSubmitting"
-    :visible="showFormDialog"
-    @close="showFormDialog = false"
-    @save="handleSave"
-  >
-    <TimeslotForm
-      ref="timeslotForm"
-      :initial-state="formInitialValue"
-      :performers="performers"
-      :disabled="isSubmitting"
-    />
-  </FormDialog>
-  <DeleteDialog
-    entity-type="timeslot"
-    header="Delete Timeslot"
-    :entity-name="deletingName"
-    :visible="showDeleteDialog"
-    :is-submitting="false"
-    @close="showDeleteDialog = false"
-    @delete="handleDelete"
-  />
+  <div class="timeslots-grid">
+    <div v-if="!isMobile">
+      <DataTable
+        :value="rows"
+        size="large">
+        <Column
+          field="start"
+          header="Start">
+          <template #body="{ data }">
+            {{ formatTimeslot(data.start) }}
+          </template>
+        </Column>
+        <Column
+          field="timeslot.performer.name"
+          header="Performer" />
+        <Column
+          field="timeslot.performanceType"
+          header="Type" />
+        <Column
+          field="timeslot.name"
+          header="Name" />
+        <Column class="grid-action-col">
+          <template #body="{ data }">
+            <GridActions
+              :show-create="!data.timeslot"
+              :show-edit="data.timeslot != undefined"
+              :show-delete="data.timeslot != undefined"
+              @create="handleEditClicked(data)"
+              @edit="handleEditClicked(data)"
+              @delete="handleDeleteClicked(data)" />
+          </template>
+        </Column>
+      </DataTable>
+    </div>
+    <div v-else>
+      <ListItem
+        class="timeslots-grid__item"
+        v-for="(row, index) in rows"
+        :key="row.start.getTime()">
+        <template #left>
+          <div>{{ formatTimeslot(row.start) }}</div>
+          <div>{{ row.timeslot?.performer.name ?? '' }}</div>
+        </template>
+        <template #right>
+          <GridActions
+            :show-create="!row.timeslot"
+            :show-edit="row.timeslot != undefined"
+            :show-delete="row.timeslot != undefined"
+            @create="handleEditClicked(row)"
+            @edit="handleEditClicked(row)"
+            @delete="handleDeleteClicked(row)" />
+        </template>
+      </ListItem>
+    </div>
+    <FormDialog
+      :header="editingId ? 'Edit Timeslot' : 'Create Timeslot'"
+      :is-submitting="isSubmitting"
+      :visible="showFormDialog"
+      @close="showFormDialog = false"
+      @save="handleSave">
+      <TimeslotForm
+        ref="timeslotForm"
+        :initial-state="formInitialValue"
+        :performers="performers"
+        :disabled="isSubmitting" />
+    </FormDialog>
+    <DeleteDialog
+      entity-type="timeslot"
+      header="Delete Timeslot"
+      :entity-name="deletingName"
+      :visible="showDeleteDialog"
+      :is-submitting="false"
+      @close="showDeleteDialog = false"
+      @delete="handleDelete" />
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -66,6 +85,8 @@ import type { ScheduleResponse } from '@/api/schedules/scheduleResponse'
 import { PerformanceType } from '@/api/schedules/timeslots/performanceType'
 import type { TimeslotRequest } from '@/api/schedules/timeslots/timeslotRequest'
 import type { TimeslotResponse } from '@/api/schedules/timeslots/timeslotResponse'
+import GridActions from '@/components/data/GridActions.vue'
+import ListItem from '@/components/data/ListItem.vue'
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
 import FormDialog from '@/components/dialogs/FormDialog.vue'
 import TimeslotForm from '@/components/form/requestForms/TimeslotForm.vue'
@@ -75,16 +96,16 @@ import {
   showDeleteSuccessToast,
   showEditSuccessToast
 } from '@/utils/toastUtils'
-import { Button, Column, DataTable, useToast } from 'primevue'
-import { computed, onMounted, ref, useTemplateRef, watch, type Ref } from 'vue'
+import { Column, DataTable, useToast } from 'primevue'
+import { inject, onMounted, onUpdated, ref, useTemplateRef, watch, type Ref } from 'vue'
 
 const toast = useToast()
 const props = defineProps<{
   schedule: ScheduleResponse
   performers: PerformerResponse[]
-  disabled: boolean
 }>()
 
+const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const timeslots: Ref<TimeslotResponse[]> = ref(props.schedule.timeslots)
 const startDate = ref(parseDate(props.schedule.start))
 const endDate = ref(parseDate(props.schedule.end))
@@ -96,11 +117,6 @@ interface TimeslotRow {
   timeslot?: TimeslotResponse
 }
 
-onMounted(() => {
-  setupRows()
-})
-
-const rows: Ref<TimeslotRow[]> = ref([])
 const setupRows = () => {
   const newRows: TimeslotRow[] = []
   const hours = hoursBetween(startDate.value, endDate.value)
@@ -113,10 +129,18 @@ const setupRows = () => {
   })
   rows.value = newRows
 }
-const updateRows = async () => {
-  timeslots.value = (await api.timeslots.get(props.schedule.id)).data ?? props.schedule.timeslots
+
+onMounted(() => {
   setupRows()
-}
+})
+
+watch(
+  () => props.schedule,
+  () => setupRows(),
+  { deep: true }
+)
+
+const rows: Ref<TimeslotRow[]> = ref([])
 
 const showFormDialog = ref(false)
 let editingId = ''
@@ -136,7 +160,7 @@ const handleEditClicked = (row: TimeslotRow) => {
     end: getNextHour(row.start).toISOString(),
     performerId: row.timeslot?.performer.id ?? '',
     performanceType: row.timeslot?.performanceType ?? PerformanceType.Live,
-    name: row.timeslot?.performanceType ?? ''
+    name: row.timeslot?.name ?? ''
   }
 }
 const handleSave = async () => {
@@ -155,6 +179,8 @@ const handleSave = async () => {
   isSubmitting.value = false
   if (tryHandleUnsuccessfulResponse(response, toast, timeslotForm.value.validation)) return
 
+  showFormDialog.value = false
+
   const requestPerformer = props.performers.find((p) => p.id === request.performerId)
   if (editingId) {
     showEditSuccessToast(
@@ -169,9 +195,14 @@ const handleSave = async () => {
       `${formatTimeslot(parseDate(request.start))} | ${requestPerformer!.name}`
     )
   }
-  updateRows()
+
+  const timeslotResponse = await api.timeslots.get(props.schedule.id)
+  if (timeslotResponse.isSuccess()) {
+    timeslots.value = timeslotResponse.data!
+  }
+
+  emit('update')
   editingId = ''
-  showFormDialog.value = false
 }
 
 const showDeleteDialog = ref(false)
@@ -192,17 +223,23 @@ const handleDelete = async () => {
 
   showDeleteSuccessToast(toast, 'timeslot')
   showDeleteDialog.value = false
+  const index = timeslots.value.findIndex((t) => t.id === deletingId)
+  timeslots.value.splice(index, 1)
+
   deletingId = ''
   deletingName.value = ''
-  updateRows()
+  emit('update')
 }
 
-const emit = defineEmits<{ dialogStateChange: [value: boolean] }>()
-const isDialogOpen = computed(() => showDeleteDialog.value || showFormDialog.value)
-watch(
-  () => isDialogOpen.value,
-  (newValue) => {
-    emit('dialogStateChange', newValue)
-  }
-)
+const emit = defineEmits<{ update: [] }>()
 </script>
+
+<style lang="scss">
+@use '@/assets/styles/variables.scss';
+
+.timeslots-grid {
+  &__item {
+    padding: variables.$space-m 0;
+  }
+}
+</style>

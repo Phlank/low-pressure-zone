@@ -8,7 +8,6 @@
         option-label="name"
         option-value="id"
         :options="audiences"
-        :disabled="disabled"
         :invalid="!validation.isValid('audienceId')"
         :model-value="formState.audienceId"
         @update:model-value="handleUpdateAudience" />
@@ -27,7 +26,7 @@
         hourFormat="12"
         :min-date="minimumDate(formState.startTime, minStartTime)"
         :model-value="formState.startTime"
-        :disabled="disabled || formState.startTime.getTime() < minStartTime.getTime()"
+        :disabled="formState.startTime.getTime() < minStartTime.getTime()"
         :invalid="!validation.isValid('start')"
         @update:model-value="handleUpdateStart"
         show-time
@@ -47,7 +46,7 @@
         :max-date="new Date(formState.startTime.getTime() + MAX_DURATION_MINUTES * MS_PER_MINUTE)"
         :model-value="formState.endTime"
         :invalid="!validation.isValid('end')"
-        :disabled="disabled || formState.endTime.getTime() < minStartTime.getTime()"
+        :disabled="formState.endTime.getTime() < minStartTime.getTime()"
         @update:model-value="handleUpdateEnd"
         show-time
         fluid />
@@ -127,7 +126,6 @@ const validation = createFormValidation(formState, scheduleRequestRules(formStat
 const props = defineProps<{
   initialState?: ScheduleFormState
   audiences: AudienceResponse[]
-  disabled: boolean
 }>()
 
 onMounted(() => {
