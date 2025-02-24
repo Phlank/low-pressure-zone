@@ -3,7 +3,8 @@
     <Menu
       v-if="!isMobile"
       class="flex-variable-space-between__left flex-variable-space-between__left--variable-height"
-      :model="menuItems">
+      :model="menuItems"
+      z-index="99">
       <template #item="{ item, props }">
         <div v-if="userStore.isInAnySpecifiedRole(...item.roles)">
           <RouterLink

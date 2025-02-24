@@ -30,7 +30,7 @@ import SiteHeader from './SiteHeader.vue'
     font-size: 1.2rem;
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: 100;
     border-top: 0;
     border-left: 0;
     border-right: 0;
