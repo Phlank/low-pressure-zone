@@ -8,12 +8,13 @@
       class="input"
       label="Create"
       @click="handleCreateClick"
-      :disabled="controlsDisabled" />
+      :disabled="isSubmitting" />
     <h4>Upcoming Schedules</h4>
     <SchedulesGrid
       :schedules="schedules"
       :audiences="audiences"
-      :performers="performers" />
+      :performers="performers"
+      @update="handleSchedulesUpdate" />
   </div>
 </template>
 
@@ -21,29 +22,19 @@
 import api from '@/api/api'
 import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
 import type { AudienceResponse } from '@/api/audiences/audienceResponse'
-import type { ScheduleResponse } from '@/api/schedules/scheduleResponse'
-import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
-import FormDialog from '@/components/dialogs/FormDialog.vue'
-import ScheduleForm from '@/components/form/requestForms/ScheduleForm.vue'
-import { formatTimeslot, setToNextHour, parseDate } from '@/utils/dateUtils'
-import { showCreateSuccessToast, showEditSuccessToast } from '@/utils/toastUtils'
-import { Button, Column, DataTable, useToast } from 'primevue'
-import { computed, onMounted, reactive, ref, useTemplateRef, type Ref } from 'vue'
-import DashboardSchedulesTimeslotsTable from './DashboardSchedulesTimeslotsTable.vue'
 import type { PerformerResponse } from '@/api/performers/performerResponse'
+import type { ScheduleResponse } from '@/api/schedules/scheduleResponse'
+import ScheduleForm from '@/components/form/requestForms/ScheduleForm.vue'
+import { showCreateSuccessToast } from '@/utils/toastUtils'
+import { Button, useToast } from 'primevue'
+import { onMounted, ref, useTemplateRef, type Ref } from 'vue'
 import SchedulesGrid from './SchedulesGrid.vue'
 
 const toast = useToast()
 const isSubmitting = ref(false)
-const isLoaded = ref(false)
-const isEditingTimeslot = ref(false)
-const controlsDisabled = computed(
-  () => !isLoaded.value || isSubmitting.value || isEditingTimeslot.value
-)
 
 onMounted(async () => {
   await Promise.all([loadSchedules(), loadAudiences(), loadPerformers()])
-  isLoaded.value = true
 })
 
 const schedules: Ref<ScheduleResponse[]> = ref([])
@@ -54,7 +45,6 @@ const loadSchedules = async () =>
 const loadAudiences = async () => (audiences.value = (await api.audiences.get()).data ?? [])
 const loadPerformers = async () => (performers.value = (await api.performers.get()).data ?? [])
 
-// SCHEDULES
 const createForm = useTemplateRef('createForm')
 const handleCreateClick = async () => {
   if (createForm.value == undefined) return
@@ -69,5 +59,20 @@ const handleCreateClick = async () => {
   showCreateSuccessToast(toast, 'schedule')
   await loadSchedules()
   createForm.value.reset()
+}
+
+const handleSchedulesUpdate = async (scheduleId?: string) => {
+  if (scheduleId) {
+    const response = await api.schedules.getById(scheduleId)
+    if (response.isSuccess()) {
+      const index = schedules.value.findIndex((s) => s.id === scheduleId)
+      schedules.value.splice(index, 1, response.data!)
+    }
+  } else {
+    const response = await api.schedules.get({ after: new Date().toISOString() })
+    if (response.isSuccess()) {
+      schedules.value = response.data!
+    }
+  }
 }
 </script>

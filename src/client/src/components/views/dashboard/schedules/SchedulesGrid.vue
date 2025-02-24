@@ -11,7 +11,7 @@
         <template>
           <Column
             expander
-            style="width: 5rem" />
+            style="width: fit-content" />
           <Column
             v-if="!isMobile"
             field="audience.name"
@@ -51,10 +51,11 @@
           </Column>
         </template>
         <template #expansion="rowProps">
-          <DashboardSchedulesTimeslotsTable
+          <TimeslotsGrid
             :schedule="rowProps.data"
             :performers="performers"
-            :disabled="false" />
+            :disabled="false"
+            @update="emit('update', rowProps.data.id)" />
         </template>
       </DataTable>
     </div>
@@ -80,20 +81,20 @@
 </template>
 
 <script lang="ts" setup>
+import api from '@/api/api'
+import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
+import type { AudienceResponse } from '@/api/audiences/audienceResponse'
 import type { PerformerResponse } from '@/api/performers/performerResponse'
 import type { ScheduleResponse } from '@/api/schedules/scheduleResponse'
-import { inject, reactive, ref, useTemplateRef, type Ref } from 'vue'
-import { formatTimeslot, parseDate, setToNextHour } from '@/utils/dateUtils'
-import DashboardSchedulesTimeslotsTable from './DashboardSchedulesTimeslotsTable.vue'
+import GridActions from '@/components/data/GridActions.vue'
+import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
 import FormDialog from '@/components/dialogs/FormDialog.vue'
 import ScheduleForm from '@/components/form/requestForms/ScheduleForm.vue'
-import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
-import type { AudienceResponse } from '@/api/audiences/audienceResponse'
-import GridActions from '@/components/data/GridActions.vue'
-import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
+import { formatTimeslot, parseDate, setToNextHour } from '@/utils/dateUtils'
 import { showEditSuccessToast } from '@/utils/toastUtils'
-import { DataTable, Column, useToast } from 'primevue'
-import api from '@/api/api'
+import { Column, DataTable, useToast } from 'primevue'
+import { inject, reactive, ref, useTemplateRef, type Ref } from 'vue'
+import TimeslotsGrid from './TimeslotsGrid.vue'
 
 const expandedRows = ref({})
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
@@ -151,14 +152,7 @@ const handleEditScheduleSave = async () => {
   const newScheduleResponse = await api.schedules.getById(editingId)
   if (tryHandleUnsuccessfulResponse(newScheduleResponse, toast)) return
 
-  // REPLACE THIS - Needs to be an emit
-  // const indexToSplice = props.schedules.findIndex((s) => s.id == editingId)
-  // schedules.value.splice(indexToSplice, 1, newScheduleResponse.data!)
-  // schedules.value.sort((a, b) => {
-  //   if (a.start > b.start) return -1
-  //   if (a.start < b.start) return 1
-  //   return 0
-  // })
+  emit('update', editingId)
 }
 
 let deletingId = ''
@@ -172,12 +166,10 @@ const handleDelete = async () => {
   const response = await api.schedules.delete(deletingId)
   tryHandleUnsuccessfulResponse(response, toast)
 
-  // REPLACE THIS - Needs to be an emit
-  // schedules.value.splice(
-  //   schedules.value.findIndex((s) => s.id == deletingId),
-  //   1
-  // )
+  emit('update')
 }
+
+const emit = defineEmits<{ update: [scheduleId?: string] }>()
 </script>
 
 <style lang="scss">
