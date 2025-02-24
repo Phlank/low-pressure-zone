@@ -22,10 +22,9 @@ public class ScheduleResponseMapper : ResponseMapper<ScheduleResponse, Domain.En
             Id = s.Id,
             Start = s.Start,
             End = s.End,
+            Description = s.Description,
             Audience = _audienceMapper.FromEntity(s.Audience!),
             Timeslots = s.Timeslots.Select(_timeslotMapper.FromEntity).ToList(),
-            CreatedDate = s.CreatedDate,
-            ModifiedDate = s.LastModifiedDate,
         };
     }
 }

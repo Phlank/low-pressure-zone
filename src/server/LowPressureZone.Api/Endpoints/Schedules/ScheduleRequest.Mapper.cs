@@ -10,7 +10,7 @@ public class ScheduleRequestMapper : RequestMapper<ScheduleRequest, Domain.Entit
         {
             Id = Guid.NewGuid(),
             AudienceId = r.AudienceId,
-            Description = string.Empty,
+            Description = r.Description,
             Start = r.Start.ToUniversalTime(),
             End = r.End.ToUniversalTime()
         };

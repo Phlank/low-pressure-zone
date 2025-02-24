@@ -1,87 +1,95 @@
 <template>
-  <div class="create-form desktop-inline">
-    <ScheduleForm ref="createForm" :audiences="audiences" :disabled="controlsDisabled" />
-    <Button class="input" label="Create" @click="handleCreateClick" :disabled="controlsDisabled" />
-  </div>
-  <DataTable
-    :loading="!isLoaded"
-    data-key="id"
-    :value="schedules"
-    :expanded-rows="expandedRows"
-    sort-field="start"
-    :sort-order="1"
-  >
-    <template #header>
-      <h4>Upcoming Schedules</h4>
-    </template>
-    <template>
-      <Column expander style="width: 5rem" />
-      <Column field="audience.name" header="Audience" />
-      <Column field="start" header="Date" sortable>
-        <template #body="{ data }">
-          {{ parseDate(data.start).toLocaleDateString() }}
-        </template>
-      </Column>
-      <Column field="end" header="Time">
-        <template #body="{ data }">
-          {{ formatTimeslot(parseDate(data.start)) }} - {{ formatTimeslot(parseDate(data.end)) }}
-        </template>
-      </Column>
-      <Column class="grid-action-col">
-        <template #body="{ data }">
-          <Button
-            v-if="canEdit(data)"
-            icon="pi pi-pencil"
-            severity="secondary"
-            :disabled="controlsDisabled"
-            @click="handleEditScheduleActionClick(data)"
-            rounded
-            outlined
-          />
-          <Button
-            v-if="data.timeslots.length === 0"
-            class="grid-action-col__item"
-            icon="pi pi-trash"
-            severity="danger"
-            :disabled="controlsDisabled"
-            @click="handleDeleteScheduleActionClick(data)"
-            rounded
-            outlined
-          />
-        </template>
-      </Column>
-    </template>
-    <template #expansion="rowProps">
-      <DashboardSchedulesTimeslotsTable
-        :schedule="rowProps.data"
-        :performers="performers"
-        :disabled="isSubmitting || showEditScheduleDialog || showDeleteScheduleDialog"
-        @dialog-state-change="(value) => (isEditingTimeslot = value)"
-      />
-    </template>
-  </DataTable>
-  <FormDialog
-    header="Edit Schedule"
-    :is-submitting="isSubmitting"
-    :visible="showEditScheduleDialog"
-    @close="showEditScheduleDialog = false"
-    @save="handleEditScheduleSave"
-  >
+  <div class="dashboard-schedules-view">
+    <h4>Create New Schedule</h4>
     <ScheduleForm
-      ref="scheduleEditForm"
+      ref="createForm"
       :audiences="audiences"
-      :disabled="isSubmitting"
-      :initial-state="editScheduleFormInitialState"
-    />
-  </FormDialog>
-  <DeleteDialog
-    entity-type="schedule"
-    header="Delete Schedule"
-    :is-submitting="isSubmitting"
-    :visible="showDeleteScheduleDialog"
-    @close="showDeleteScheduleDialog = false"
-    @delete="handleDelete"
-  />
+      :disabled="false" />
+    <Button
+      class="input"
+      label="Create"
+      @click="handleCreateClick"
+      :disabled="controlsDisabled" />
+    <DataTable
+      :loading="!isLoaded"
+      data-key="id"
+      :value="schedules"
+      :expanded-rows="expandedRows"
+      sort-field="start"
+      :sort-order="1">
+      <template #header>
+        <h4>Upcoming Schedules</h4>
+      </template>
+      <template>
+        <Column
+          expander
+          style="width: 5rem" />
+        <Column
+          field="audience.name"
+          header="Audience" />
+        <Column
+          field="start"
+          header="Date"
+          sortable>
+          <template #body="{ data }">
+            {{ parseDate(data.start).toLocaleDateString() }}
+          </template>
+        </Column>
+        <Column
+          field="end"
+          header="Time">
+          <template #body="{ data }">
+            {{ formatTimeslot(parseDate(data.start)) }} - {{ formatTimeslot(parseDate(data.end)) }}
+          </template>
+        </Column>
+        <Column class="grid-action-col">
+          <template #body="{ data }">
+            <Button
+              v-if="canEdit(data)"
+              icon="pi pi-pencil"
+              severity="secondary"
+              @click="handleEditScheduleActionClick(data)"
+              rounded
+              outlined />
+            <Button
+              v-if="data.timeslots.length === 0"
+              class="grid-action-col__item"
+              icon="pi pi-trash"
+              severity="danger"
+              @click="handleDeleteScheduleActionClick(data)"
+              rounded
+              outlined />
+          </template>
+        </Column>
+      </template>
+      <template #expansion="rowProps">
+        <DashboardSchedulesTimeslotsTable
+          :schedule="rowProps.data"
+          :performers="performers"
+          :disabled="isSubmitting || showEditScheduleDialog || showDeleteScheduleDialog"
+          @dialog-state-change="(value) => (isEditingTimeslot = value)" />
+      </template>
+    </DataTable>
+    <FormDialog
+      header="Edit Schedule"
+      :is-submitting="isSubmitting"
+      :visible="showEditScheduleDialog"
+      @close="showEditScheduleDialog = false"
+      @save="handleEditScheduleSave">
+      <ScheduleForm
+        ref="scheduleEditForm"
+        :audiences="audiences"
+        :disabled="isSubmitting"
+        :initial-state="editScheduleFormInitialState" />
+    </FormDialog>
+    <DeleteDialog
+      entity-type="schedule"
+      header="Delete Schedule"
+      :is-submitting="isSubmitting"
+      :visible="showDeleteScheduleDialog"
+      @close="showDeleteScheduleDialog = false"
+      @delete="handleDelete" />
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -149,6 +157,7 @@ const editScheduleFormInitialState = reactive({
   audienceId: '',
   start: '',
   end: '',
+  description: '',
   startTime: new Date(),
   endTime: new Date()
 })
@@ -163,6 +172,7 @@ const handleEditScheduleActionClick = (schedule: ScheduleResponse) => {
   editScheduleFormInitialState.audienceId = schedule.audience.id
   editScheduleFormInitialState.start = schedule.start
   editScheduleFormInitialState.end = schedule.end
+  editScheduleFormInitialState.description = schedule.description
   editScheduleFormInitialState.startTime = parseDate(schedule.start)
   editScheduleFormInitialState.endTime = parseDate(schedule.end)
   showEditScheduleDialog.value = true

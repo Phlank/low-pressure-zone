@@ -5,8 +5,7 @@ export interface ScheduleResponse {
   id: string
   start: string
   end: string
+  description: string
   audience: AudienceResponse
   timeslots: TimeslotResponse[]
-  createdDate: string
-  modifiedDate: string
 }

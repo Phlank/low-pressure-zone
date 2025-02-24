@@ -44,5 +44,6 @@ $font-family-header: 'Nunito Sans', 'Helvetica Neue', sans-serif;
 // Inputs
 
 $input-width-s: 200px;
-$input-width-m: calc(1.5 * $input-width-s);
-$input-width-l: calc(2 * $input-width-s);
+$input-width-m: calc(1.5 * $input-width-s + $space-m * 0.5);
+$input-width-l: calc(2 * $input-width-s + $space-m);
+$input-width-xl: calc(3 * $input-width-s + $space-m * 2);
