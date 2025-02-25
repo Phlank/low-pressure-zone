@@ -22,9 +22,7 @@ public class TimeslotResponseMapper : ResponseMapper<TimeslotResponse, Timeslot>
             End = t.End,
             Name = t.Name,
             Performer = _performerMapper.FromEntity(t.Performer!),
-            PerformanceType = t.Type,
-            CreatedDate = t.CreatedDate,
-            ModifiedDate = t.LastModifiedDate
+            PerformanceType = t.Type
         };
     }
 }

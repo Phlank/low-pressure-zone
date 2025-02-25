@@ -8,6 +8,4 @@ export interface TimeslotResponse {
   name: string | null
   start: string
   end: string
-  createdDate: string
-  modifiedDate: string
 }

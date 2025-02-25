@@ -136,7 +136,6 @@ const handleSave = async () => {
   if (performerInGrid) {
     performerInGrid.name = editForm.value.formState.name
     performerInGrid.url = editForm.value.formState.url
-    performerInGrid.modifiedDate = new Date().toLocaleString()
   }
   showEditDialog.value = false
 }

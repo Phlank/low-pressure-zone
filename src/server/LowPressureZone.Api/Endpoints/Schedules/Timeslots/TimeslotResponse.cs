@@ -10,6 +10,4 @@ public class TimeslotResponse
     public string? Name { get; set; }
     public required DateTime Start { get; set; }
     public required DateTime End { get; set; }
-    public required DateTime CreatedDate { get; set; }
-    public required DateTime ModifiedDate { get; set; }
 }
