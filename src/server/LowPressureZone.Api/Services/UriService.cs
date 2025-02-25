@@ -1,16 +1,17 @@
 ﻿using System.Text.Json;
 using LowPressureZone.Api.Endpoints.Users.Register;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace LowPressureZone.Api.Services;
 
 public class UriService
 {
-    private readonly UriServiceConfiguration _config;
+    private readonly string _registerUrl;
     
-    public UriService(UriServiceConfiguration config)
+    public UriService(IOptions<UriServiceOptions> options)
     {
-        _config = config;
+        _registerUrl = options.Value.RegisterUrl;
     }
 
     public Uri GetRegisterUri(string email, string token)
@@ -20,7 +21,7 @@ public class UriService
             Email = email,
             Token = token
         };
-        var builder = new UriBuilder(_config.RegisterUrl);
+        var builder = new UriBuilder(_registerUrl);
         builder.Query = $"?context={context.Encoded}";
         return builder.Uri;
     }

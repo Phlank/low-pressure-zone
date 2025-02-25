@@ -48,10 +48,14 @@
 }
 
 tbody.p-datatable-tbody tr > td.grid-action-col {
-  width: 8.75rem;
   text-align: center;
-
-  .grid-action-col__item {
-    margin: 0 variables.$space-s;
+  &--1 {
+    width: variables.$grid-action-width;
+  }
+  &--2 {
+    width: calc(variables.$grid-action-width * 2);
+  }
+  &--3 {
+    width: calc(variables.$grid-action-width * 3);
   }
 }
