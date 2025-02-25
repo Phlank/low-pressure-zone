@@ -38,7 +38,3 @@ appSettings.*.json
 # SQLite
 
 *.db
-
-# .env
-*.env.development
-*.env.production

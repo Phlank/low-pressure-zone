@@ -20,7 +20,7 @@
         <Column
           field="timeslot.name"
           header="Name" />
-        <Column class="grid-action-col grid-action-col--2">
+        <Column class="grid-action-col">
           <template #body="{ data }">
             <GridActions
               :show-create="!data.timeslot"

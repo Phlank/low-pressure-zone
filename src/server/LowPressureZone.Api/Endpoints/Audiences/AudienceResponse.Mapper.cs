@@ -10,9 +10,7 @@ public sealed class AudienceResponseMapper : ResponseMapper<AudienceResponse, Do
         {
             Id = e.Id,
             Name = e.Name,
-            Url = e.Url,
-            CreatedDate = e.CreatedDate,
-            ModifiedDate = e.LastModifiedDate
+            Url = e.Url
         };
     }
 }

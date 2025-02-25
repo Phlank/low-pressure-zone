@@ -40,7 +40,8 @@
               <div class="text-s ellipsis">{{ data.audience.name }}</div>
             </template>
           </Column>
-          <Column class="grid-action-col grid-action-col--2">
+          <Column
+            :class="'grid-action-col' + isMobile ? 'grid-action-col--1' : 'grid-action-col--2'">
             <template #body="{ data }">
               <GridActions
                 :show-edit="canEdit(data)"

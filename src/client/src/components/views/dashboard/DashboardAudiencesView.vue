@@ -4,23 +4,23 @@
       <AudienceForm
         ref="createForm"
         :initial-state="createFormInitialState"
-        :disabled="controlsDisabled"
-      />
+        :disabled="controlsDisabled" />
       <Button
         class="input"
         label="Create"
         @click="handleCreateAudience"
-        :disabled="controlsDisabled"
-      />
+        :disabled="controlsDisabled" />
     </div>
-    <DataTable :loading="!isLoaded" :value="audiences" data-key="id">
-      <Column field="name" header="Name" />
-      <Column field="url" header="URL" />
-      <Column field="modifiedDate" header="Last Modified">
-        <template #body="slotProps">
-          {{ new Date(slotProps.data.modifiedDate).toLocaleString() }}
-        </template>
-      </Column>
+    <DataTable
+      :loading="!isLoaded"
+      :value="audiences"
+      data-key="id">
+      <Column
+        field="name"
+        header="Name" />
+      <Column
+        field="url"
+        header="URL" />
       <Column class="grid-action-col__item">
         <template #body="slotProps">
           <Button
@@ -30,8 +30,7 @@
             @click="handleEditActionClick(slotProps.data as AudienceResponse)"
             :disabled="controlsDisabled"
             rounded
-            outlined
-          />
+            outlined />
           <Button
             v-if="slotProps.data.canDelete"
             class="grid-action-col__item"
@@ -40,8 +39,7 @@
             @click="handleDeleteActionClick(slotProps.data as AudienceResponse)"
             :disabled="controlsDisabled"
             rounded
-            outlined
-          />
+            outlined />
         </template>
       </Column>
     </DataTable>
@@ -50,9 +48,11 @@
       header="Edit Audience"
       :is-submitting="isSubmitting"
       @close="showEditDialog = false"
-      @save="handleSave"
-    >
-      <AudienceForm ref="editForm" :initial-state="editFormInitialState" :disabled="isSubmitting" />
+      @save="handleSave">
+      <AudienceForm
+        ref="editForm"
+        :initial-state="editFormInitialState"
+        :disabled="isSubmitting" />
     </FormDialog>
     <DeleteDialog
       entity-type="audience"
@@ -61,8 +61,7 @@
       :is-submitting="isSubmitting"
       :visible="showDeleteDialog"
       @close="showDeleteDialog = false"
-      @delete="handleDelete"
-    />
+      @delete="handleDelete" />
   </div>
 </template>
 
@@ -162,7 +161,6 @@ const handleSave = async () => {
   if (audienceInGrid) {
     audienceInGrid.name = editForm.value.formState.name
     audienceInGrid.url = editForm.value.formState.url
-    audienceInGrid.modifiedDate = new Date().toLocaleString()
   }
   showEditDialog.value = false
 }
