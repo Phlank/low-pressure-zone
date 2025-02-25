@@ -41,11 +41,12 @@ public static class ServiceCollectionExtensions
 
     public static void AddServices(this WebApplicationBuilder builder)
     {
-        builder.Services.AddSingleton(builder.Configuration.GetRequiredSection("Email").Get<EmailServiceConfiguration>() ?? throw new ArgumentNullException());
+        builder.Services.Configure<EmailServiceOptions>(builder.Configuration.GetSection(EmailServiceOptions.Name));
         builder.Services.AddSingleton(new MailgunSender(builder.Configuration.GetValue<string>("Email:MailgunDomain"),
                                                         builder.Configuration.GetValue<string>("Email:MailgunApiKey")));
         builder.Services.AddSingleton<EmailService>();
-        builder.Services.AddSingleton(builder.Configuration.GetRequiredSection("Url").Get<UriServiceConfiguration>() ?? throw new ArgumentNullException());
+
+        builder.Services.Configure<UriServiceOptions>(builder.Configuration.GetSection(UriServiceOptions.Name));
         builder.Services.AddSingleton<UriService>();
     }
 }

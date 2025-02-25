@@ -20,7 +20,7 @@
         <Column
           field="timeslot.name"
           header="Name" />
-        <Column class="grid-action-col">
+        <Column class="grid-action-col grid-action-col--2">
           <template #body="{ data }">
             <GridActions
               :show-create="!data.timeslot"
@@ -36,7 +36,7 @@
     <div v-else>
       <ListItem
         class="timeslots-grid__item"
-        v-for="(row, index) in rows"
+        v-for="row in rows"
         :key="row.start.getTime()">
         <template #left>
           <div>{{ formatTimeslot(row.start) }}</div>
@@ -44,7 +44,7 @@
         </template>
         <template #right>
           <GridActions
-            :show-create="!row.timeslot"
+            :show-create="row.timeslot == undefined"
             :show-edit="row.timeslot != undefined"
             :show-delete="row.timeslot != undefined"
             @create="handleEditClicked(row)"

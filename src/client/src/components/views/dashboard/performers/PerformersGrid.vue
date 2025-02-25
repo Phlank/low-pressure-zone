@@ -12,7 +12,7 @@
           header="URL" />
         <Column
           v-if="props.isEditable"
-          style="width: 80px">
+          class="grid-action-col grid-action-col--2">
           <template #body="slotProps">
             <GridActions
               :show-edit="props.isEditable"
@@ -29,7 +29,7 @@
           <template #left>
             <div style="display: flex; flex-direction: column">
               <span>{{ performer.name }}</span>
-              <span class="text-s">{{ performer.url }}</span>
+              <span class="text-s ellipsis">{{ performer.url }}</span>
             </div>
           </template>
           <template

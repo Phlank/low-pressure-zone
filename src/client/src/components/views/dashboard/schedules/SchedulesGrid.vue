@@ -37,10 +37,10 @@
           <Column v-if="isMobile">
             <template #body="{ data }">
               <div>{{ parseDate(data.start).toLocaleDateString() }}</div>
-              <div class="text-s">{{ data.audience.name }}</div>
+              <div class="text-s ellipsis">{{ data.audience.name }}</div>
             </template>
           </Column>
-          <Column>
+          <Column class="grid-action-col grid-action-col--2">
             <template #body="{ data }">
               <GridActions
                 :show-edit="canEdit(data)"

@@ -9,7 +9,7 @@
         :icon="action.icon"
         :severity="action.severity"
         :disabled="props.disabled"
-        @click="handleActionClick(action.name)"
+        @click="emit(action.emit as any)"
         rounded
         outlined />
       <Button
@@ -33,7 +33,7 @@
         :key="action.name">
         <ListItem
           class="grid-actions__drawer__item"
-          @click="handleActionClick(action.name)"
+          @click="emit(action.emit as any)"
           v-ripple>
           <template #left>
             <div class="grid-actions__drawer__item__left">
@@ -58,17 +58,6 @@ import ListItem from './ListItem.vue'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 
-const visibleActions = computed(() => {
-  let actions: { name: string; icon: string; severity: 'success' | 'danger' | 'secondary' }[] = []
-  if (props.showCreate) actions.push({ name: 'Create', icon: 'pi pi-plus', severity: 'success' })
-  if (props.showEdit) actions.push({ name: 'Edit', icon: 'pi pi-pencil', severity: 'secondary' })
-  if (props.showDelete) actions.push({ name: 'Delete', icon: 'pi pi-trash', severity: 'danger' })
-  return actions
-})
-const isCombinedIcon = computed(() => {
-  return visibleActions.value.length >= 2 && isMobile?.value
-})
-
 const props = withDefaults(
   defineProps<{
     showCreate?: boolean
@@ -84,23 +73,58 @@ const props = withDefaults(
   }
 )
 
+interface GridAction {
+  name: string
+  icon: string
+  severity: 'success' | 'danger' | 'secondary'
+  emit: keyof Emits
+}
+
+const availableActions: { [key: string]: GridAction } = {
+  create: {
+    name: 'Create',
+    icon: 'pi pi-plus',
+    severity: 'success',
+    emit: 'create'
+  },
+  edit: {
+    name: 'Edit',
+    icon: 'pi pi-pencil',
+    severity: 'secondary',
+    emit: 'edit'
+  },
+  delete: {
+    name: 'Delete',
+    icon: 'pi pi-trash',
+    severity: 'danger',
+    emit: 'delete'
+  }
+}
+
+const visibleActions = computed(() => {
+  let actions: GridAction[] = []
+  if (props.showCreate) actions.push(availableActions.create)
+  if (props.showEdit) actions.push(availableActions.edit)
+  if (props.showDelete) actions.push(availableActions.delete)
+  return actions
+})
+
+const isCombinedIcon = computed(() => {
+  return isMobile?.value && visibleActions.value.length >= 2
+})
+
 const showActionSelectDrawer = ref(false)
 const handleCombinedClick = () => {
   showActionSelectDrawer.value = true
 }
 
-const handleActionClick = (action: string) => {
-  showActionSelectDrawer.value = false
-  if (action === 'Create') emit('create')
-  else if (action === 'Edit') emit('edit')
-  else if (action === 'Delete') emit('delete')
-}
-
-const emit = defineEmits<{
+interface Emits {
   create: []
   edit: []
   delete: []
-}>()
+}
+
+const emit = defineEmits<Emits>()
 </script>
 
 <style lang="scss">

@@ -11,9 +11,9 @@ public class EmailService
     private readonly string _fromAddress;
     private readonly MailgunSender _sender;
 
-    public EmailService(EmailServiceConfiguration configuration, MailgunSender sender)
+    public EmailService(IOptions<EmailServiceOptions> options, MailgunSender sender)
     {
-        _fromAddress = configuration.FromAddress;
+        _fromAddress = options.Value.FromAddress;
         _sender = sender;
     }
 
