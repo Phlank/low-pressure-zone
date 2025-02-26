@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using FastEndpoints;
-using LowPressureZone.Api.Extensions;
 using LowPressureZone.Domain;
+using LowPressureZone.Identity.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Performers;

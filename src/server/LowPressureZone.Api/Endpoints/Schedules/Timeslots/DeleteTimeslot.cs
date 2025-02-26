@@ -1,5 +1,8 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Domain;
+using LowPressureZone.Domain.BusinessRules;
+using LowPressureZone.Domain.Entities;
+using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
@@ -13,19 +16,30 @@ public class DeleteTimeslot : Endpoint<EmptyRequest>
         Delete("/schedules/{scheduleId}/timeslots/{timeslotId}");
         Description(b => b.Produces(204)
                           .Produces(404));
-        AllowAnonymous();
+        Roles(RoleNames.All);
     }
 
     public override async Task HandleAsync(EmptyRequest req, CancellationToken ct)
     {
         var scheduleId = Route<Guid>("scheduleId");
         var timeslotId = Route<Guid>("timeslotId");
-        var numDeletions = DataContext.Timeslots.Where(t => t.Id == timeslotId && t.ScheduleId == scheduleId).ExecuteDelete();
-        if (numDeletions == 0)
+        var timeslot = await DataContext.Timeslots.AsNoTracking()
+                                                  .Where(t => t.Id == timeslotId && t.ScheduleId == scheduleId)
+                                                  .Include(nameof(Timeslot.Performer))
+                                                  .FirstOrDefaultAsync(ct);
+        if (timeslot == null)
         {
             await SendNotFoundAsync(ct);
             return;
         }
-        await SendNoContentAsync(ct);
+
+        AddBusinessRuleErrors(timeslot);
+        await SendUnauthorizedAsync(ct);
+
+    }
+
+    private void AddBusinessRuleErrors(Timeslot timeslot)
+    {
+        TimeslotRules.CanUserDeleteTimeslot(User, timeslot);
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace LowPressureZone.Domain.Entities;
+﻿using System.Security.Claims;
+
+namespace LowPressureZone.Domain.Entities;
 
 public class Performer : BaseEntity
 {

@@ -1,5 +1,6 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Domain;
+using LowPressureZone.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
@@ -21,7 +22,9 @@ public class GetTimeslotById : EndpointWithoutRequest<TimeslotResponse, Timeslot
         var scheduleId = Route<Guid>("scheduleId");
         var timeslotId = Route<Guid>("timeslotId");
 
-        var timeslot = await DataContext.Timeslots.AsNoTracking().Include("Performer").FirstOrDefaultAsync(t => t.Id == timeslotId && t.ScheduleId == scheduleId, ct);
+        var timeslot = await DataContext.Timeslots.AsNoTracking()
+                                                  .Include(nameof(Timeslot.Performer))
+                                                  .FirstOrDefaultAsync(t => t.Id == timeslotId && t.ScheduleId == scheduleId, ct);
         if (timeslot == null)
         {
             await SendNotFoundAsync(ct);
