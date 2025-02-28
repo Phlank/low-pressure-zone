@@ -1,20 +1,27 @@
-﻿using System.Security.Claims;
-using FastEndpoints;
-using LowPressureZone.Api.Extensions;
+﻿using FastEndpoints;
+using LowPressureZone.Domain.BusinessRules;
+using LowPressureZone.Domain.Entities;
 
 namespace LowPressureZone.Api.Endpoints.Performers;
 
-public sealed class PerformerResponseMapper : ResponseMapper<PerformerResponse, Domain.Entities.Performer>
+public sealed class PerformerResponseMapper : ResponseMapper<PerformerResponse, Performer>
 {
-    public override PerformerResponse FromEntity(Domain.Entities.Performer e)
+    private readonly PerformerRules _rules;
+
+    public PerformerResponseMapper(PerformerRules rules)
+    {
+        _rules = rules;
+    }
+
+    public override PerformerResponse FromEntity(Performer p)
     {
         return new PerformerResponse
         {
-            Id = e.Id,
-            Name = e.Name,
-            Url = e.Url,
-            CanDelete = false,
-            IsLinked = false
+            Id = p.Id,
+            Name = p.Name,
+            Url = p.Url,
+            IsDeletable = _rules.CanUserDeletePerformer(p),
+            IsLinkable = _rules.CanUserLinkPerformer(p),
         };
     }
 }

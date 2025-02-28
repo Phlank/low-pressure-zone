@@ -11,10 +11,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.1" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.1" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.1" />
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\LowPressureZone.Identity\LowPressureZone.Identity.csproj" />
 	</ItemGroup>
 
 </Project>

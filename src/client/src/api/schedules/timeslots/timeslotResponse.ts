@@ -8,4 +8,6 @@ export interface TimeslotResponse {
   name: string | null
   start: string
   end: string
+  isEditable: boolean
+  isDeletable: boolean
 }

@@ -36,7 +36,9 @@ const props = defineProps<{
   performers: PerformerResponse[]
 }>()
 
-const linkedPerformers = computed(() => props.performers.filter((performer) => performer.isLinked))
+const linkedPerformers = computed(() =>
+  props.performers.filter((performer) => performer.isLinkable)
+)
 
 const toast = useToast()
 const createFormInitialState: PerformerRequest = { name: '', url: '' }

@@ -5,10 +5,24 @@ namespace LowPressureZone.Api.Constants;
 // These get mapped onto field labels, so they should remain as short as possible while being descriptive enough to solve the issues
 public static class Errors
 {
-    public static string Required = "Required";
+    public const string Required = "Required";
+    
+    // Entity errors
     public const string Unique = "Already in use";
+    public const string EntityNotLinked = "Not linked to user";
+    public const string DoesNotExist = "Does not exist";
+
+    // String errors
     public const string InvalidUrl = "Invalid URL";
     public static string MinLength(int value) => $"Minimum {value} characters";
+
+    // Performer errors
+
+    // Timeslot errors
+    public const string TimeslotNotEditable = "Timeslot not editable to user";
+    public const string TimeslotNotDeletable = "Timeslot not deletable to user";
+    public const string OverlapsOtherTimeslot = "Overlaps other timeslot";
+    public const string OutOfScheduleRange = "Exceeds schedule";
 
     // User errors
     public const string InvalidEmail = "Invalid email";

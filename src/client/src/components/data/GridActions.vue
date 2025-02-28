@@ -133,6 +133,7 @@ const emit = defineEmits<Emits>()
 .grid-actions {
   &__buttons {
     width: 100px;
+    height: 40px;
     text-align: center;
 
     @include variables.mobile {

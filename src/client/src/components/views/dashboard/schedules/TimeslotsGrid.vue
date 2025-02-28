@@ -7,7 +7,7 @@
         <Column
           field="start"
           header="Start">
-          <template #body="{ data }">
+          <template #body="{ data }: { data: TimeslotRow }">
             {{ formatTimeslot(data.start) }}
           </template>
         </Column>
@@ -20,12 +20,12 @@
         <Column
           field="timeslot.name"
           header="Name" />
-        <Column class="grid-action-col">
-          <template #body="{ data }">
+        <Column class="grid-action-col grid-action-col--2">
+          <template #body="{ data }: { data: TimeslotRow }">
             <GridActions
-              :show-create="!data.timeslot"
-              :show-edit="data.timeslot != undefined"
-              :show-delete="data.timeslot != undefined"
+              :show-create="schedule.isTimeslotCreationAllowed && data.timeslot == undefined"
+              :show-edit="data.timeslot?.isEditable"
+              :show-delete="data.timeslot?.isDeletable"
               @create="handleEditClicked(data)"
               @edit="handleEditClicked(data)"
               @delete="handleDeleteClicked(data)" />
@@ -44,9 +44,9 @@
         </template>
         <template #right>
           <GridActions
-            :show-create="row.timeslot == undefined"
-            :show-edit="row.timeslot != undefined"
-            :show-delete="row.timeslot != undefined"
+            :show-create="schedule.isTimeslotCreationAllowed && row.timeslot == undefined"
+            :show-edit="row.timeslot?.isEditable"
+            :show-delete="row.timeslot?.isDeletable"
             @create="handleEditClicked(row)"
             @edit="handleEditClicked(row)"
             @delete="handleDeleteClicked(row)" />
@@ -97,7 +97,7 @@ import {
   showEditSuccessToast
 } from '@/utils/toastUtils'
 import { Column, DataTable, useToast } from 'primevue'
-import { inject, onMounted, onUpdated, ref, useTemplateRef, watch, type Ref } from 'vue'
+import { inject, onMounted, ref, useTemplateRef, watch, type Ref } from 'vue'
 
 const toast = useToast()
 const props = defineProps<{
@@ -133,12 +133,6 @@ const setupRows = () => {
 onMounted(() => {
   setupRows()
 })
-
-watch(
-  () => props.schedule,
-  () => setupRows(),
-  { deep: true }
-)
 
 const rows: Ref<TimeslotRow[]> = ref([])
 

@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using FastEndpoints;
-using LowPressureZone.Api.Extensions;
 using LowPressureZone.Domain;
+using LowPressureZone.Identity.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Performers;
@@ -27,8 +27,8 @@ public sealed class GetPerformers : EndpointWithoutRequest<IEnumerable<Performer
         Console.WriteLine(JsonSerializer.Serialize(performerIdsInUse));
         foreach (var response in responses)
         {
-            response.CanDelete = !performerIdsInUse.Contains(response.Id);
-            response.IsLinked = linkedPerformerIds.Contains(response.Id);
+            response.IsDeletable = !performerIdsInUse.Contains(response.Id);
+            response.IsLinkable = linkedPerformerIds.Contains(response.Id);
         }
         await SendOkAsync(responses.OrderBy(r => r.Name), ct);
     }

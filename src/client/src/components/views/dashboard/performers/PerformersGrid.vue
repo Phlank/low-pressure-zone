@@ -13,12 +13,12 @@
         <Column
           v-if="props.isEditable"
           class="grid-action-col grid-action-col--2">
-          <template #body="slotProps">
+          <template #body="{ data }: { data: PerformerResponse }">
             <GridActions
               :show-edit="props.isEditable"
-              :show-delete="props.isEditable && slotProps.data.canDelete"
-              @edit="handleEditActionClick(slotProps.data)"
-              @delete="handleDeleteActionClick(slotProps.data)" />
+              :show-delete="props.isEditable && data.isDeletable"
+              @edit="handleEditActionClick(data)"
+              @delete="handleDeleteActionClick(data)" />
           </template>
         </Column>
       </DataTable>
@@ -37,7 +37,7 @@
             v-if="props.isEditable">
             <GridActions
               :show-edit="props.isEditable"
-              :show-delete="props.isEditable && performer.canDelete"
+              :show-delete="props.isEditable && performer.isDeletable"
               @edit="handleEditActionClick(performer)"
               @delete="handleDeleteActionClick(performer)" />
           </template>
@@ -69,16 +69,16 @@
 
 <script lang="ts" setup>
 import api from '@/api/api'
-import GridActions from '@/components/data/GridActions.vue'
 import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
 import type { PerformerRequest } from '@/api/performers/performerRequest'
 import type { PerformerResponse } from '@/api/performers/performerResponse'
+import GridActions from '@/components/data/GridActions.vue'
+import ListItem from '@/components/data/ListItem.vue'
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
 import FormDialog from '@/components/dialogs/FormDialog.vue'
 import PerformerForm from '@/components/form/requestForms/PerformerForm.vue'
-import ListItem from '@/components/data/ListItem.vue'
 import { showDeleteSuccessToast, showEditSuccessToast } from '@/utils/toastUtils'
-import { Button, Card, Column, DataTable, useToast, Divider } from 'primevue'
+import { Column, DataTable, Divider, useToast } from 'primevue'
 import { inject, ref, useTemplateRef, type Ref } from 'vue'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
@@ -94,8 +94,6 @@ const props = withDefaults(
   }
 )
 
-const controlsVisible = ref(true)
-const controlsDisabled = ref(false)
 const isSubmitting = ref(false)
 
 // EDITING PERFORMERS

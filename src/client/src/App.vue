@@ -1,6 +1,6 @@
 <template>
   <div class="app">
-    <Toast />
+    <Toast class="app__toast" />
     <SiteLayout />
   </div>
 </template>
@@ -29,3 +29,12 @@ const mobileWidth = 760
 const isMobile: ComputedRef<boolean> = computed(() => screenWidth.value <= mobileWidth)
 provide('isMobile', isMobile)
 </script>
+
+<style lang="scss">
+@use '@/assets/styles/variables.scss';
+.app {
+  &__toast {
+    max-width: calc(100vw - 2 * variables.$space-l);
+  }
+}
+</style>

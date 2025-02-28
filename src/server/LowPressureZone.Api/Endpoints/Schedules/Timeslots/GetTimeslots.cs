@@ -15,7 +15,6 @@ public class GetTimeslots : EndpointWithoutRequest<IEnumerable<TimeslotResponse>
         Get("/schedules/{scheduleId}/timeslots");
         Description(builder => builder.Produces<IEnumerable<TimeslotResponse>>(200)
                                       .Produces(404));
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

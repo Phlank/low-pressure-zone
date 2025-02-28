@@ -8,4 +8,5 @@ export interface ScheduleResponse {
   description: string
   audience: AudienceResponse
   timeslots: TimeslotResponse[]
+  isTimeslotCreationAllowed: boolean
 }
