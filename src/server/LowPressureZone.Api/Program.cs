@@ -25,8 +25,6 @@ builder.Services.Configure<JsonOptions>(options =>
 {
     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
-builder.AddMappers();
-builder.AddServices();
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
     options.Password.RequireNonAlphanumeric = true;
@@ -46,6 +44,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SameSite = SameSiteMode.Lax;
 });
 builder.Services.AddFastEndpoints();
+builder.Services.AddHttpContextAccessor();
 builder.Services.SwaggerDocument();
 builder.Services.AddCors(options =>
 {
@@ -70,6 +69,10 @@ builder.Services.AddCors(options =>
         });
     }
 });
+
+builder.Services.AddApiModelMappers();
+builder.Services.AddDomainRules();
+builder.ConfigureApiServices();
 
 var app = builder.Build();
 app.UseCors(app.Environment.IsDevelopment() ? "Development" : "Production");

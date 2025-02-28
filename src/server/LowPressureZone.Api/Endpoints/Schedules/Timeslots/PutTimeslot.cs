@@ -5,20 +5,28 @@ using LowPressureZone.Domain;
 using LowPressureZone.Domain.BusinessRules;
 using LowPressureZone.Domain.Entities;
 using LowPressureZone.Domain.Extensions;
+using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
 public class PutTimeslot : EndpointWithMapper<TimeslotRequest, TimeslotRequestMapper>
 {
-    public required DataContext DataContext { get; set; }
+    private readonly DataContext _dataContext;
+    private readonly TimeslotRules _rules;
+
+    public PutTimeslot(DataContext dataContext, TimeslotRules rules)
+    {
+        _dataContext = dataContext;
+        _rules = rules;
+    }
 
     public override void Configure()
     {
         Put("/schedules/{scheduleId}/timeslots/{timeslotId}");
         Description(b => b.Produces(204)
                           .Produces(404));
-        AllowAnonymous();
+        Roles(RoleNames.All);
     }
 
     public override async Task HandleAsync(TimeslotRequest req, CancellationToken ct)
@@ -26,12 +34,12 @@ public class PutTimeslot : EndpointWithMapper<TimeslotRequest, TimeslotRequestMa
         var scheduleId = Route<Guid>("scheduleId");
         var timeslotId = Route<Guid>("timeslotId");
 
-        var timeslot = await DataContext.Timeslots.AsNoTracking()
+        var timeslot = await _dataContext.Timeslots.AsNoTracking()
+                                                  .AsSplitQuery()
                                                   .Include(nameof(Timeslot.Schedule))
-                                                  .Include($"{nameof(Timeslot.Schedule)}.{nameof(Timeslot.Schedule.Timeslots)}")
+                                                  .Include($"{nameof(Timeslot.Schedule)}.{nameof(Schedule.Timeslots)}")
                                                   .Include(nameof(Timeslot.Performer))
                                                   .Where(t => t.Id == timeslotId && t.ScheduleId == scheduleId)
-                                                  .AsSplitQuery()
                                                   .FirstOrDefaultAsync(ct);
         
         if (timeslot == null || timeslot.Schedule == null)
@@ -40,25 +48,25 @@ public class PutTimeslot : EndpointWithMapper<TimeslotRequest, TimeslotRequestMa
             return;
         }
 
-        Performer? requestPerformer = await DataContext.Performers.AsNoTracking()
+        Performer? requestPerformer = await _dataContext.Performers.AsNoTracking()
                                                                   .Where(p => p.Id == req.PerformerId)
                                                                   .FirstOrDefaultAsync(ct);
 
         AddDataValidationErrors(req, timeslot, requestPerformer);
-        AddBusinessRuleErrors(req, timeslot, requestPerformer);
+        AddBusinessRuleErrors(timeslot, requestPerformer);
         ThrowIfAnyErrors();
 
-        var trackedTimeslot = await DataContext.Timeslots.Where(t => t.Id == timeslotId)
-                                                         .FirstOrDefaultAsync(ct);
-        timeslot.Start = req.Start;
-        timeslot.End = req.End;
-        timeslot.PerformerId = req.PerformerId;
-        timeslot.Type = req.PerformanceType;
-        timeslot.Name = req.Name;
-        if (DataContext.ChangeTracker.HasChanges())
+        var trackedTimeslot = await _dataContext.Timeslots.Where(t => t.Id == timeslotId)
+                                                         .FirstAsync(ct);
+        trackedTimeslot.Start = req.Start;
+        trackedTimeslot.End = req.End;
+        trackedTimeslot.PerformerId = req.PerformerId;
+        trackedTimeslot.Type = req.PerformanceType;
+        trackedTimeslot.Name = req.Name;
+        if (_dataContext.ChangeTracker.HasChanges())
         {
-            timeslot.LastModifiedDate = DateTime.UtcNow;
-            DataContext.SaveChanges();
+            trackedTimeslot.LastModifiedDate = DateTime.UtcNow;
+            _dataContext.SaveChanges();
         }
 
         await SendNoContentAsync(ct);
@@ -87,20 +95,19 @@ public class PutTimeslot : EndpointWithMapper<TimeslotRequest, TimeslotRequestMa
         
         if (requestPerformer == null)
         {
-            AddError(new ValidationFailure(nameof(req.PerformerId), Errors.InvalidPerformer));
+            AddError(new ValidationFailure(nameof(req.PerformerId), Errors.DoesNotExist));
         }
     }
 
-    private void AddBusinessRuleErrors(TimeslotRequest req, Timeslot timeslot, Performer? requestPerformer)
+    private void AddBusinessRuleErrors(Timeslot timeslot, Performer? requestPerformer)
     {
-        if (!TimeslotRules.CanUserEditTimeslot(User, timeslot))
+        if (_rules.CanUserEditTimeslot(timeslot))
         {
             AddError(Errors.TimeslotNotEditable);
         }
 
-        if (requestPerformer != null && !PerformerRules.CanUserLinkPerformer(User, requestPerformer))
-        {
-            AddError(new ValidationFailure(nameof(req.PerformerId), Errors.EntityNotLinked));
+        if (requestPerformer != null && !_rules.CanUserLinkPerformerToTimeslot(requestPerformer)) {
+            AddError(new ValidationFailure(nameof(TimeslotRequest.PerformerId), Errors.EntityNotLinked));
         }
     }
 }

@@ -31,7 +31,7 @@ public class GetSchedules : Endpoint<GetSchedulesRequest, IEnumerable<ScheduleRe
             scheduleQuery = scheduleQuery.Where(s => s.End > req.After.Value.ToUniversalTime());
         }
 
-        if (!User.HasAnySpecifiedRole(RoleNames.Admin, RoleNames.Organizer))
+        if (!User.IsInAnyRole(RoleNames.Admin, RoleNames.Organizer))
         {
             scheduleQuery = scheduleQuery.Where(s  => s.End > DateTime.UtcNow);
         }

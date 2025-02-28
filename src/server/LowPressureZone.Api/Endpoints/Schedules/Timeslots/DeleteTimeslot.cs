@@ -1,4 +1,5 @@
 ﻿using FastEndpoints;
+using LowPressureZone.Api.Constants;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.BusinessRules;
 using LowPressureZone.Domain.Entities;
@@ -9,7 +10,14 @@ namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
 public class DeleteTimeslot : Endpoint<EmptyRequest>
 {
-    public required DataContext DataContext { get; set; }
+    private readonly DataContext _dataContext;
+    private readonly TimeslotRules _rules;
+
+    public DeleteTimeslot(DataContext dataContext, TimeslotRules enforcer)
+    {
+        _dataContext = dataContext;
+        _rules = enforcer;
+    }
 
     public override void Configure()
     {
@@ -23,10 +31,10 @@ public class DeleteTimeslot : Endpoint<EmptyRequest>
     {
         var scheduleId = Route<Guid>("scheduleId");
         var timeslotId = Route<Guid>("timeslotId");
-        var timeslot = await DataContext.Timeslots.AsNoTracking()
-                                                  .Where(t => t.Id == timeslotId && t.ScheduleId == scheduleId)
-                                                  .Include(nameof(Timeslot.Performer))
-                                                  .FirstOrDefaultAsync(ct);
+        var timeslot = await _dataContext.Timeslots.AsNoTracking()
+                                                   .Where(t => t.Id == timeslotId && t.ScheduleId == scheduleId)
+                                                   .Include(nameof(Timeslot.Performer))
+                                                   .FirstOrDefaultAsync(ct);
         if (timeslot == null)
         {
             await SendNotFoundAsync(ct);
@@ -40,6 +48,9 @@ public class DeleteTimeslot : Endpoint<EmptyRequest>
 
     private void AddBusinessRuleErrors(Timeslot timeslot)
     {
-        TimeslotRules.CanUserDeleteTimeslot(User, timeslot);
+        if (_rules.CanUserDeleteTimeslot(timeslot))
+        {
+            AddError(Errors.TimeslotNotDeletable);
+        }
     }
 }

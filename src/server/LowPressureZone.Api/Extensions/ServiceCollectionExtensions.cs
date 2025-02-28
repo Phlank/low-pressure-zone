@@ -5,6 +5,7 @@ using LowPressureZone.Api.Endpoints.Schedules;
 using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Domain;
+using LowPressureZone.Domain.BusinessRules;
 using LowPressureZone.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,19 +28,26 @@ public static class ServiceCollectionExtensions
         });
     }
 
-    public static void AddMappers(this WebApplicationBuilder builder)
+    public static void AddApiModelMappers(this IServiceCollection services)
     {
-        builder.Services.AddSingleton<AudienceRequestMapper>();
-        builder.Services.AddSingleton<AudienceResponseMapper>();
-        builder.Services.AddSingleton<ScheduleRequestMapper>();
-        builder.Services.AddSingleton<ScheduleResponseMapper>();
-        builder.Services.AddSingleton<PerformerRequestMapper>();
-        builder.Services.AddSingleton<PerformerResponseMapper>();
-        builder.Services.AddSingleton<TimeslotRequestMapper>();
-        builder.Services.AddSingleton<TimeslotResponseMapper>();
+        services.AddSingleton<AudienceRequestMapper>();
+        services.AddSingleton<AudienceResponseMapper>();
+        services.AddSingleton<ScheduleRequestMapper>();
+        services.AddSingleton<ScheduleResponseMapper>();
+        services.AddSingleton<PerformerRequestMapper>();
+        services.AddSingleton<PerformerResponseMapper>();
+        services.AddSingleton<TimeslotRequestMapper>();
+        services.AddSingleton<TimeslotResponseMapper>();
     }
 
-    public static void AddServices(this WebApplicationBuilder builder)
+    public static void AddDomainRules(this IServiceCollection services)
+    {
+        services.AddSingleton<ScheduleRules>();
+        services.AddSingleton<PerformerRules>();
+        services.AddSingleton<TimeslotRules>();
+    }
+
+    public static void ConfigureApiServices(this WebApplicationBuilder builder)
     {
         builder.Services.Configure<EmailServiceOptions>(builder.Configuration.GetSection(EmailServiceOptions.Name));
         builder.Services.AddSingleton(new MailgunSender(builder.Configuration.GetValue<string>("Email:MailgunDomain"),

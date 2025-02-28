@@ -1,21 +1,55 @@
-﻿using LowPressureZone.Domain.Entities;
+﻿using System.Security.Claims;
+using LowPressureZone.Domain.Entities;
+using LowPressureZone.Domain.Extensions;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
-using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Domain.BusinessRules;
 
-public static class TimeslotRules
+public class TimeslotRules
 {
-    public static bool CanUserDeleteTimeslot(ClaimsPrincipal user, Timeslot timeslot)
+    private readonly IHttpContextAccessor _contextAccessor;
+
+    public TimeslotRules(IHttpContextAccessor contextAccessor)
     {
-        if (timeslot.Performer == null) return user.IsInRole(RoleNames.Admin);
-        return PerformerRules.CanUserLinkPerformer(user, timeslot.Performer);
+        _contextAccessor = contextAccessor;
     }
 
-    public static bool CanUserEditTimeslot(ClaimsPrincipal user, Timeslot timeslot)
+    public bool CanUserDeleteTimeslot(Timeslot timeslot)
     {
-        if (timeslot.Performer == null) return user.IsInRole(RoleNames.Admin);
-        return PerformerRules.CanUserLinkPerformer(user, timeslot.Performer);
+        var user = _contextAccessor.GetAuthenticatedUserOrDefault();
+        if (user == null) return false;
+
+        var dataContext = _contextAccessor.ResolveDataContext();
+        var performer = timeslot.Performer ?? dataContext.Performers.AsNoTracking()
+                                                                    .Where(p => p.Id == timeslot.PerformerId)
+                                                                    .FirstOrDefault();
+        if (performer == null) return false;
+
+        return performer.LinkedUserIds.Contains(user.GetIdOrDefault());
+    }
+
+    public bool CanUserEditTimeslot(Timeslot timeslot)
+    {
+        var user = _contextAccessor.GetAuthenticatedUserOrDefault();
+        if (user == null) return false;
+
+        var dataContext = _contextAccessor.ResolveDataContext();
+        var performer = timeslot.Performer ?? dataContext.Performers.AsNoTracking()
+                                                                    .Where(p => p.Id == timeslot.PerformerId)
+                                                                    .FirstOrDefault();
+        if (performer == null) return false;
+
+        return performer.LinkedUserIds.Contains(user.GetIdOrDefault());
+    }
+
+    public bool CanUserLinkPerformerToTimeslot(Performer performer)
+    {
+        var user = _contextAccessor.GetAuthenticatedUserOrDefault();
+        if (user == null) return false;
+
+        return user.IsInRole(RoleNames.Admin) || performer.LinkedUserIds.Contains(user.GetIdOrDefault());
     }
 }

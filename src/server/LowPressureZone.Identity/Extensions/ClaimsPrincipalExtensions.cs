@@ -4,21 +4,24 @@ namespace LowPressureZone.Identity.Extensions;
 
 public static class ClaimsPrincipalExtensions
 {
-    public static bool HasAnySpecifiedRole(this ClaimsPrincipal principal, params string[] roles)
+    public static bool IsInAnyRole(this ClaimsPrincipal principal, params IEnumerable<string> roles)
     {
-        if (principal == null
-            || !principal.Identities.Any()
-            || !principal.Identities.First().IsAuthenticated)
-        {
-            return false;
-        }
+        if (roles.Count() == 0
+            || principal.Identity == null
+            || !principal.Identity.IsAuthenticated) return false;
 
-        return principal.GetRoles().Intersect(roles).Any();
+        foreach (var role in roles)
+        {
+            if (principal.IsInRole(role)) return true;
+        }
+        return false;
     }
 
     public static IEnumerable<string> GetRoles(this ClaimsPrincipal principal)
     {
-        IEnumerable<string>? roles = principal.Identities.FirstOrDefault()?.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value);
+        IEnumerable<string>? roles = principal.Identities.FirstOrDefault()?.Claims
+                                                         .Where(c => c.Type == ClaimTypes.Role)
+                                                         .Select(c => c.Value);
         return roles ?? [];
     }
 

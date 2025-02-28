@@ -1,24 +1,39 @@
 ﻿using System.Security.Claims;
 using LowPressureZone.Domain.Entities;
+using LowPressureZone.Domain.Extensions;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
+using Microsoft.AspNetCore.Http;
 
 namespace LowPressureZone.Domain.BusinessRules;
 
-public static class PerformerRules
+public class PerformerRules
 {
-    public static bool CanUserLinkPerformer(ClaimsPrincipal user, Performer performer)
+    private readonly IHttpContextAccessor _contextAccessor;
+
+    public PerformerRules(IHttpContextAccessor contextAccessor)
     {
-        return IsUserLinkedOrAdmin(user, performer);
+        _contextAccessor = contextAccessor;
     }
 
-    public static bool CanUserEditPerformer(ClaimsPrincipal user, Performer performer)
+    public bool CanUserLinkPerformer(Performer performer)
     {
-        return IsUserLinkedOrAdmin(user, performer);
+        var user = _contextAccessor.GetAuthenticatedUserOrDefault();
+        if (user == null) return false;
+        return performer.LinkedUserIds.Contains(user.GetIdOrDefault());
     }
 
-    private static bool IsUserLinkedOrAdmin(ClaimsPrincipal user, Performer performer)
+    public bool CanUserEditPerformer(Performer performer)
     {
+        var user = _contextAccessor.GetAuthenticatedUserOrDefault();
+        if (user == null) return false;
+        return user.IsInRole(RoleNames.Admin) || performer.LinkedUserIds.Contains(user.GetIdOrDefault());
+    }
+
+    public bool CanUserDeletePerformer(Performer performer)
+    {
+        var user = _contextAccessor.GetAuthenticatedUserOrDefault();
+        if (user == null) return false;
         return user.IsInRole(RoleNames.Admin) || performer.LinkedUserIds.Contains(user.GetIdOrDefault());
     }
 }
