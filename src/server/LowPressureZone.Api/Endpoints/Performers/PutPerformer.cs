@@ -1,44 +1,52 @@
 ﻿using FastEndpoints;
-using FluentValidation.Results;
-using LowPressureZone.Api.Constants;
 using LowPressureZone.Domain;
+using LowPressureZone.Domain.BusinessRules;
+using LowPressureZone.Identity.Constants;
 
 namespace LowPressureZone.Api.Endpoints.Performers;
 
-public sealed class PutPerformer : Endpoint<PerformerRequest, EmptyResponse, PerformerRequestMapper>
+public sealed class PutPerformer : EndpointWithMapper<PerformerRequest, PerformerRequestMapper>
 {
-    public required DataContext DataContext { get; set; }
+    private readonly DataContext _dataContext;
+    private readonly PerformerRules _rules;
+
+    public PutPerformer(DataContext dataContext, PerformerRules rules)
+    {
+        _dataContext = dataContext;
+        _rules = rules;
+    }
 
     public override void Configure()
     {
         Put("/performers/{id}");
         Description(b => b.Produces(204)
+                          .Produces(401)
                           .Produces(404));
-        AllowAnonymous();
+        Roles(RoleNames.All);
     }
 
     public override async Task HandleAsync(PerformerRequest req, CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        var existingPerformer = DataContext.Performers.Find(id);
+        var existingPerformer = await _dataContext.Performers.FindAsync(id);
         if (existingPerformer == null)
         {
             await SendNotFoundAsync(ct);
             return;
         }
 
-        var isNameInUse = DataContext.Performers.Any(p => p.Name == req.Name && p.Id != id);
-        if (isNameInUse)
+        if (!_rules.CanUserEditPerformer(existingPerformer))
         {
-            ThrowError(new ValidationFailure(nameof(req.Name), Errors.Unique, req.Name));
+            await SendUnauthorizedAsync(ct);
+            return;
         }
 
-        if (req.Name != existingPerformer.Name || req.Url != existingPerformer.Url)
+        existingPerformer.Name = req.Name;
+        existingPerformer.Url = req.Url;
+        if (_dataContext.ChangeTracker.HasChanges())
         {
-            existingPerformer.Name = req.Name;
-            existingPerformer.Url = req.Url;
             existingPerformer.LastModifiedDate = DateTime.UtcNow;
-            DataContext.SaveChanges();
+            _dataContext.SaveChanges();
         }
 
         await SendNoContentAsync(ct);
