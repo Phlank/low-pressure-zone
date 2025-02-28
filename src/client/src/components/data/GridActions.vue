@@ -33,7 +33,7 @@
         :key="action.name">
         <ListItem
           class="grid-actions__drawer__item"
-          @click="emit(action.emit as any)"
+          @click="handleDrawerActionClick(action.emit)"
           v-ripple>
           <template #left>
             <div class="grid-actions__drawer__item__left">
@@ -72,6 +72,14 @@ const props = withDefaults(
     disabled: false
   }
 )
+
+interface Emits {
+  create: []
+  edit: []
+  delete: []
+}
+
+const emit = defineEmits<Emits>()
 
 interface GridAction {
   name: string
@@ -118,13 +126,10 @@ const handleCombinedClick = () => {
   showActionSelectDrawer.value = true
 }
 
-interface Emits {
-  create: []
-  edit: []
-  delete: []
+const handleDrawerActionClick = (emitProperty: keyof Emits) => {
+  showActionSelectDrawer.value = false
+  emit(emitProperty as any)
 }
-
-const emit = defineEmits<Emits>()
 </script>
 
 <style lang="scss">

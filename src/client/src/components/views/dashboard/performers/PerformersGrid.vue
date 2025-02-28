@@ -10,13 +10,11 @@
         <Column
           field="url"
           header="URL" />
-        <Column
-          v-if="props.isEditable"
-          class="grid-action-col grid-action-col--2">
+        <Column class="grid-action-col grid-action-col--2">
           <template #body="{ data }: { data: PerformerResponse }">
             <GridActions
-              :show-edit="props.isEditable"
-              :show-delete="props.isEditable && data.isDeletable"
+              :show-edit="data.isEditable"
+              :show-delete="data.isDeletable"
               @edit="handleEditActionClick(data)"
               @delete="handleDeleteActionClick(data)" />
           </template>
@@ -25,19 +23,19 @@
     </div>
     <div v-else>
       <div v-for="(performer, index) in performers">
-        <ListItem>
+        <ListItem style="width: 100%">
           <template #left>
-            <div style="display: flex; flex-direction: column">
+            <div style="display: flex; flex-direction: column; overflow-x: hidden">
               <span>{{ performer.name }}</span>
-              <span class="text-s ellipsis">{{ performer.url }}</span>
+              <span class="text-s ellipsis">
+                {{ performer.url }}
+              </span>
             </div>
           </template>
-          <template
-            #right
-            v-if="props.isEditable">
+          <template #right>
             <GridActions
-              :show-edit="props.isEditable"
-              :show-delete="props.isEditable && performer.isDeletable"
+              :show-edit="performer.isEditable"
+              :show-delete="performer.isDeletable"
               @edit="handleEditActionClick(performer)"
               @delete="handleDeleteActionClick(performer)" />
           </template>
@@ -84,15 +82,9 @@ import { inject, ref, useTemplateRef, type Ref } from 'vue'
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 
 const toast = useToast()
-const props = withDefaults(
-  defineProps<{
-    performers: PerformerResponse[]
-    isEditable?: boolean
-  }>(),
-  {
-    isEditable: false
-  }
-)
+const props = defineProps<{
+  performers: PerformerResponse[]
+}>()
 
 const isSubmitting = ref(false)
 

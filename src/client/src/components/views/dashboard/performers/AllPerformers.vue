@@ -1,9 +1,7 @@
 <template>
   <div class="all-performers">
     <h4>All Performers</h4>
-    <PerformersGrid
-      :performers="performers"
-      :is-editable="userStore.isInAnySpecifiedRole(Role.Admin)" />
+    <PerformersGrid :performers="performers" />
   </div>
 </template>
 

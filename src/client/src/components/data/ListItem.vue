@@ -22,10 +22,19 @@ const emit = defineEmits<{
   align-items: center;
   justify-content: space-between;
   user-select: none;
+  flex-wrap: nowrap;
+  width: 100%;
   // padding: variables.$space-m 0;
+
+  &__left {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 
   &__right {
     margin-left: auto;
+    // min-width: fit-content;
   }
 }
 </style>

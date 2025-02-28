@@ -21,7 +21,8 @@ public sealed class PerformerResponseMapper : ResponseMapper<PerformerResponse, 
             Name = p.Name,
             Url = p.Url,
             IsDeletable = _rules.CanUserDeletePerformer(p),
-            IsLinkable = _rules.CanUserLinkPerformer(p),
+            IsEditable = _rules.CanUserEditPerformer(p),
+            IsLinked = _rules.IsUserLinkedToPerformer(p),
         };
     }
 }

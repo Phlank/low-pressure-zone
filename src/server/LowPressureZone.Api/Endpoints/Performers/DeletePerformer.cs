@@ -1,5 +1,8 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Domain;
+using LowPressureZone.Domain.BusinessRules;
+using LowPressureZone.Domain.Entities;
+using LowPressureZone.Domain.Extensions;
 using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,12 +10,20 @@ namespace LowPressureZone.Api.Endpoints.Performers;
 
 public class DeletePerformer : EndpointWithoutRequest<EmptyResponse>
 {
-    public required DataContext DataContext { get; set; }
+    private readonly DataContext _dataContext;
+    private readonly PerformerRules _rules;
+
+    public DeletePerformer(DataContext dataContext, PerformerRules rules)
+    {
+        _dataContext = dataContext;
+        _rules = rules;
+    }
 
     public override void Configure()
     {
         Delete("/performers/{id}");
         Description(builder => builder.Produces(204)
+                                      .Produces(401)
                                       .Produces(404));
         Roles(RoleNames.All);
     }
@@ -20,17 +31,19 @@ public class DeletePerformer : EndpointWithoutRequest<EmptyResponse>
     public override async Task HandleAsync(CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        var isLinked = DataContext.Timeslots.Any(t => t.PerformerId == id);
-        if (isLinked)
+        if (!_dataContext.Has<Performer>(id))
         {
-            ThrowError("Cannot delete performer with linked timeslots.");
-        }
-        var deleted = await DataContext.Performers.Where(p => p.Id == id).ExecuteDeleteAsync(ct);
-        if (deleted > 0)
-        {
-            await SendNoContentAsync(ct);
+            await SendNotFoundAsync(ct);
             return;
         }
-        await SendNotFoundAsync(ct);
+        
+        if (!_rules.CanUserDeletePerformer(id))
+        {
+            await SendUnauthorizedAsync(ct);
+            return;
+        }
+
+        var deleted = await _dataContext.Performers.Where(p => p.Id == id).ExecuteDeleteAsync(ct);
+        await SendNoContentAsync(ct);
     }
 }

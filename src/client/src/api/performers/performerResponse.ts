@@ -3,5 +3,6 @@ export interface PerformerResponse {
   name: string
   url: string
   isDeletable: boolean
-  isLinkable: boolean
+  isEditable: boolean
+  isLinked: boolean
 }

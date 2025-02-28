@@ -1,8 +1,6 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Endpoints.Audiences;
 using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
-using LowPressureZone.Api.Extensions;
-using LowPressureZone.Domain;
 using LowPressureZone.Domain.BusinessRules;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;

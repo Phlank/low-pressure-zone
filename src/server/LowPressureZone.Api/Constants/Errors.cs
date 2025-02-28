@@ -24,7 +24,7 @@ public static class Errors
     public const string OverlapsOtherTimeslot = "Overlaps other timeslot";
     public const string OutOfScheduleRange = "Exceeds schedule";
 
-    // User errors
+    // User-event errors
     public const string InvalidEmail = "Invalid email";
     public const string EmailAlreadyInvited = "Already invited";
     public static string UsernameInvalidCharacters(IEnumerable<string> characters) => $"Invalid characters: {string.Join(' ', characters)}";
