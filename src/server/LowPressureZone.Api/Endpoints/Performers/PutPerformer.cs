@@ -2,43 +2,45 @@
 using FluentValidation.Results;
 using LowPressureZone.Api.Constants;
 using LowPressureZone.Domain;
+using LowPressureZone.Domain.BusinessRules;
+using LowPressureZone.Domain.Entities;
+using LowPressureZone.Identity.Constants;
 
 namespace LowPressureZone.Api.Endpoints.Performers;
 
-public sealed class PutPerformer : Endpoint<PerformerRequest, EmptyResponse, PerformerRequestMapper>
+public sealed class PutPerformer : EndpointWithMapper<PerformerRequest, PerformerRequestMapper>
 {
-    public required DataContext DataContext { get; set; }
+    private readonly DataContext _dataContext;
+
+    public PutPerformer(DataContext dataContext)
+    {
+        _dataContext = dataContext;
+    }
 
     public override void Configure()
     {
         Put("/performers/{id}");
         Description(b => b.Produces(204)
                           .Produces(404));
-        AllowAnonymous();
+        Roles(RoleNames.All);
     }
 
     public override async Task HandleAsync(PerformerRequest req, CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        var existingPerformer = DataContext.Performers.Find(id);
+        var existingPerformer = await _dataContext.Performers.FindAsync(id);
         if (existingPerformer == null)
         {
             await SendNotFoundAsync(ct);
             return;
         }
 
-        var isNameInUse = DataContext.Performers.Any(p => p.Name == req.Name && p.Id != id);
-        if (isNameInUse)
+        existingPerformer.Name = req.Name;
+        existingPerformer.Url = req.Url;
+        if (_dataContext.ChangeTracker.HasChanges())
         {
-            ThrowError(new ValidationFailure(nameof(req.Name), Errors.Unique, req.Name));
-        }
-
-        if (req.Name != existingPerformer.Name || req.Url != existingPerformer.Url)
-        {
-            existingPerformer.Name = req.Name;
-            existingPerformer.Url = req.Url;
             existingPerformer.LastModifiedDate = DateTime.UtcNow;
-            DataContext.SaveChanges();
+            _dataContext.SaveChanges();
         }
 
         await SendNoContentAsync(ct);

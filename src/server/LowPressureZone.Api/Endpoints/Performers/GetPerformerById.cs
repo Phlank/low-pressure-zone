@@ -1,11 +1,11 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Domain;
-using LowPressureZone.Identity.Extensions;
+using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Performers;
 
-public sealed class GetPerformerById : Endpoint<EmptyRequest, PerformerResponse, PerformerResponseMapper>
+public sealed class GetPerformerById : EndpointWithoutRequest<PerformerResponse, PerformerResponseMapper>
 {
     public required DataContext DataContext { get; set; }
 
@@ -14,22 +14,20 @@ public sealed class GetPerformerById : Endpoint<EmptyRequest, PerformerResponse,
         Get("/performers/{id}");
         Description(b => b.Produces<PerformerResponse>(200)
                           .Produces(404));
-        AllowAnonymous();
+        Roles(RoleNames.All);
     }
 
-    public override async Task HandleAsync(EmptyRequest req, CancellationToken ct)
+    public override async Task HandleAsync(CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        var performer = await DataContext.Performers.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id, ct);
+        var performer = await DataContext.Performers.AsNoTracking()
+                                                    .Where(p => p.Id == id)
+                                                    .FirstOrDefaultAsync(ct);
         if (performer == null)
         {
             await SendNotFoundAsync(ct);
             return;
         }
-
-        var response = Map.FromEntity(performer);
-        response.IsDeletable = !await DataContext.Timeslots.AnyAsync(t => t.PerformerId == id, ct);
-        response.IsLinkable = performer.LinkedUserIds.Contains(User.GetIdOrDefault());
         await SendOkAsync(Map.FromEntity(performer), ct);
     }
 }

@@ -1,10 +1,8 @@
-﻿using System.Security.Claims;
-using LowPressureZone.Domain.Entities;
+﻿using LowPressureZone.Domain.Entities;
 using LowPressureZone.Domain.Extensions;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Domain.BusinessRules;
 
@@ -25,7 +23,7 @@ public class ScheduleRules
         if (user == null) return false;
         var userId = user.GetIdOrDefault();
 
-        var dataContext = _contextAccessor.ResolveDataContext();
+        var dataContext = _contextAccessor.Resolve<DataContext>();
         if (!dataContext.Performers.Any(p => p.LinkedUserIds.Contains(userId))) return false;
 
         return true;
@@ -36,7 +34,7 @@ public class ScheduleRules
         var user = _contextAccessor.GetAuthenticatedUserOrDefault();
         if (user == null) return false;
 
-        var dataContext = _contextAccessor.ResolveDataContext();
+        var dataContext = _contextAccessor.Resolve<DataContext>();
         var hasTimeslots = dataContext.Timeslots.Where(t => t.ScheduleId == s.Id).Any();
         if (hasTimeslots) return false;
 
@@ -50,5 +48,6 @@ public class ScheduleRules
         if (user == null) return false;
 
         if (!user.IsInAnyRole(RoleNames.Admin, RoleNames.Organizer)) return false;
-        return s.End > DateTime.UtcNow;    }
+        return s.End > DateTime.UtcNow;
+    }
 }

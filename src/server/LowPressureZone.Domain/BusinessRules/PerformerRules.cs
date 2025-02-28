@@ -36,4 +36,11 @@ public class PerformerRules
         if (user == null) return false;
         return user.IsInRole(RoleNames.Admin) || performer.LinkedUserIds.Contains(user.GetIdOrDefault());
     }
+
+    public bool IsNameInUse(string name, Guid? ignoreId = null)
+    {
+        ignoreId = ignoreId ?? Guid.Empty;
+        var dataContext = _contextAccessor.Resolve<DataContext>();
+        return dataContext.Performers.Any(p => p.Name == name && p.Id != ignoreId);
+    }
 }

@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using LowPressureZone.Domain.Entities;
+﻿using LowPressureZone.Domain.Entities;
 using LowPressureZone.Domain.Extensions;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
@@ -22,7 +21,7 @@ public class TimeslotRules
         var user = _contextAccessor.GetAuthenticatedUserOrDefault();
         if (user == null) return false;
 
-        var dataContext = _contextAccessor.ResolveDataContext();
+        var dataContext = _contextAccessor.Resolve<DataContext>();
         var performer = timeslot.Performer ?? dataContext.Performers.AsNoTracking()
                                                                     .Where(p => p.Id == timeslot.PerformerId)
                                                                     .FirstOrDefault();
@@ -36,7 +35,7 @@ public class TimeslotRules
         var user = _contextAccessor.GetAuthenticatedUserOrDefault();
         if (user == null) return false;
 
-        var dataContext = _contextAccessor.ResolveDataContext();
+        var dataContext = _contextAccessor.Resolve<DataContext>();
         var performer = timeslot.Performer ?? dataContext.Performers.AsNoTracking()
                                                                     .Where(p => p.Id == timeslot.PerformerId)
                                                                     .FirstOrDefault();

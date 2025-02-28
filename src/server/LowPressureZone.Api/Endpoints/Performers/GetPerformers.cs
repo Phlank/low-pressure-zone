@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using FastEndpoints;
 using LowPressureZone.Domain;
+using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,22 +15,15 @@ public sealed class GetPerformers : EndpointWithoutRequest<IEnumerable<Performer
     {
         Get("/performers");
         Description(b => b.Produces<List<PerformerResponse>>(200));
-        AllowAnonymous();
+        Roles(RoleNames.All);
     }
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var performers = await DataContext.Performers.AsNoTracking().ToListAsync();
+        var performers = await DataContext.Performers.AsNoTracking()
+                                                     .OrderBy(p => p.Name)
+                                                     .ToListAsync();
         var responses = performers.Select(Map.FromEntity).ToList();
-        var performerIds = performers.Select(p => p.Id).ToHashSet();
-        var linkedPerformerIds = performers.Where(p => p.LinkedUserIds.Contains(User.GetIdOrDefault())).Select(p => p.Id).ToHashSet();
-        var performerIdsInUse = await DataContext.Timeslots.Where(t => performerIds.Contains(t.PerformerId)).Select(t => t.PerformerId).Distinct().ToHashSetAsync();
-        Console.WriteLine(JsonSerializer.Serialize(performerIdsInUse));
-        foreach (var response in responses)
-        {
-            response.IsDeletable = !performerIdsInUse.Contains(response.Id);
-            response.IsLinkable = linkedPerformerIds.Contains(response.Id);
-        }
-        await SendOkAsync(responses.OrderBy(r => r.Name), ct);
+        await SendOkAsync(responses, ct);
     }
 }

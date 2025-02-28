@@ -12,7 +12,8 @@ public class GetScheduleById : EndpointWithoutRequest<ScheduleResponse, Schedule
     public override void Configure()
     {
         Get("/schedules/{id}");
-        Description(b => b.Produces<ScheduleResponse>(200));
+        Description(b => b.Produces<ScheduleResponse>(200)
+                          .Produces(404));
         Roles(RoleNames.All);
     }
 
