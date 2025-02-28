@@ -2,6 +2,7 @@
 using FluentValidation.Results;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Extensions;
+using LowPressureZone.Identity.Constants;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
@@ -13,7 +14,7 @@ public class PostSchedule : EndpointWithMapper<ScheduleRequest, ScheduleRequestM
     {
         Post("/schedules");
         Description(b => b.Produces(201));
-        AllowAnonymous();
+        Roles(RoleNames.Admin, RoleNames.Organizer);
     }
 
     public override async Task HandleAsync(ScheduleRequest req, CancellationToken ct)

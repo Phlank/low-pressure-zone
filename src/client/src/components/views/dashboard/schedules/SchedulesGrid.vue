@@ -21,7 +21,7 @@
             field="start"
             header="Date"
             sortable>
-            <template #body="{ data }">
+            <template #body="{ data }: { data: ScheduleResponse }">
               {{ parseDate(data.start).toLocaleDateString() }}
             </template>
           </Column>
@@ -29,23 +29,23 @@
             v-if="!isMobile"
             field="end"
             header="Time">
-            <template #body="{ data }">
+            <template #body="{ data }: { data: ScheduleResponse }">
               {{ formatTimeslot(parseDate(data.start)) }} -
               {{ formatTimeslot(parseDate(data.end)) }}
             </template>
           </Column>
           <Column v-if="isMobile">
-            <template #body="{ data }">
+            <template #body="{ data }: { data: ScheduleResponse }">
               <div>{{ parseDate(data.start).toLocaleDateString() }}</div>
               <div class="text-s ellipsis">{{ data.audience.name }}</div>
             </template>
           </Column>
           <Column
             :class="'grid-action-col' + isMobile ? 'grid-action-col--1' : 'grid-action-col--2'">
-            <template #body="{ data }">
+            <template #body="{ data }: { data: ScheduleResponse }">
               <GridActions
-                :show-edit="canEdit(data)"
-                :show-delete="data.timeslots.length === 0"
+                :show-edit="data.isEditable"
+                :show-delete="data.isDeletable"
                 @edit="handleEditScheduleActionClick(data)"
                 @delete="handleDeleteScheduleActionClick(data)" />
             </template>
@@ -107,13 +107,6 @@ const props = defineProps<{
   performers: PerformerResponse[]
   audiences: AudienceResponse[]
 }>()
-
-const editLimit = new Date() // Schedule times prior to this can't be altered
-setToNextHour(editLimit)
-editLimit.setDate(editLimit.getDate() - 1)
-const canEdit = (schedule: ScheduleResponse) => {
-  return Date.parse(schedule.end) > editLimit.getTime()
-}
 
 const scheduleEditForm = useTemplateRef('scheduleEditForm')
 const showEditScheduleDialog = ref(false)

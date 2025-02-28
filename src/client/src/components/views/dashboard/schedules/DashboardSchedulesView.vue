@@ -1,14 +1,18 @@
 <template>
   <div class="dashboard-schedules-view">
-    <h4>Create New Schedule</h4>
-    <ScheduleForm
-      ref="createForm"
-      :audiences="audiences" />
-    <Button
-      class="input"
-      label="Create"
-      @click="handleCreateClick"
-      :disabled="isSubmitting" />
+    <div
+      class="dashboard-schedules-view__new-schedules-form"
+      v-show="userStore.isInAnySpecifiedRole(Role.Admin, Role.Organizer)">
+      <h4>Create New Schedule</h4>
+      <ScheduleForm
+        ref="createForm"
+        :audiences="audiences" />
+      <Button
+        class="input"
+        label="Create"
+        @click="handleCreateClick"
+        :disabled="isSubmitting" />
+    </div>
     <h4>Upcoming Schedules</h4>
     <SchedulesGrid
       :schedules="schedules"
@@ -29,7 +33,10 @@ import { showCreateSuccessToast } from '@/utils/toastUtils'
 import { Button, useToast } from 'primevue'
 import { onMounted, ref, useTemplateRef, type Ref } from 'vue'
 import SchedulesGrid from './SchedulesGrid.vue'
+import { useUserStore } from '@/stores/userStore'
+import { Role } from '@/constants/roles'
 
+const userStore = useUserStore()
 const toast = useToast()
 const isSubmitting = ref(false)
 
