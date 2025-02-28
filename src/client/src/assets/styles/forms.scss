@@ -49,6 +49,7 @@
 
 tbody.p-datatable-tbody tr > td.grid-action-col {
   text-align: center;
+  height: 40px;
   &--1 {
     width: variables.$grid-action-width;
   }

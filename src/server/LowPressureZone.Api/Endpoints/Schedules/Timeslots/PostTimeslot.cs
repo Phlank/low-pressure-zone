@@ -86,7 +86,7 @@ public class PostTimeslot : Endpoint<TimeslotRequest, EmptyResponse, TimeslotReq
 
     private void AddBusinessRuleErrors(Performer? requestPerformer)
     {
-        if (requestPerformer != null && _performerEnforcer.CanUserLinkPerformer(requestPerformer))
+        if (requestPerformer != null && !_performerEnforcer.CanUserLinkPerformer(requestPerformer))
         {
             AddError(new ValidationFailure(nameof(TimeslotRequest.PerformerId), Errors.EntityNotLinked));
         }

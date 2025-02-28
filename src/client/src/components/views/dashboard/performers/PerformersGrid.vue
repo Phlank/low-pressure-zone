@@ -94,8 +94,6 @@ const props = withDefaults(
   }
 )
 
-const controlsVisible = ref(true)
-const controlsDisabled = ref(false)
 const isSubmitting = ref(false)
 
 // EDITING PERFORMERS

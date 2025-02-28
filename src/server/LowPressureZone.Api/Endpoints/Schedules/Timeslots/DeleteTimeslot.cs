@@ -42,13 +42,21 @@ public class DeleteTimeslot : Endpoint<EmptyRequest>
         }
 
         AddBusinessRuleErrors(timeslot);
-        await SendUnauthorizedAsync(ct);
+        ThrowIfAnyErrors();
 
+        var deleted = await _dataContext.Timeslots.Where(t => t.Id == timeslotId).ExecuteDeleteAsync(ct);
+        if (deleted > 0)
+        {
+            await SendNoContentAsync(ct);
+            return;
+        }
+
+        await SendNotFoundAsync(ct);
     }
 
     private void AddBusinessRuleErrors(Timeslot timeslot)
     {
-        if (_rules.CanUserDeleteTimeslot(timeslot))
+        if (!_rules.CanUserDeleteTimeslot(timeslot))
         {
             AddError(Errors.TimeslotNotDeletable);
         }

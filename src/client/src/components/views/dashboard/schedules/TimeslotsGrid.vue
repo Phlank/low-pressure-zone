@@ -20,7 +20,7 @@
         <Column
           field="timeslot.name"
           header="Name" />
-        <Column class="grid-action-col">
+        <Column class="grid-action-col grid-action-col--2">
           <template #body="{ data }: { data: TimeslotRow }">
             <GridActions
               :show-create="schedule.isTimeslotCreationAllowed && data.timeslot == undefined"

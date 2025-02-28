@@ -28,7 +28,7 @@ public class TimeslotRules
                                                                     .FirstOrDefault();
         if (performer == null) return false;
 
-        return performer.LinkedUserIds.Contains(user.GetIdOrDefault());
+        return user.IsInRole(RoleNames.Admin) || performer.LinkedUserIds.Contains(user.GetIdOrDefault());
     }
 
     public bool CanUserEditTimeslot(Timeslot timeslot)
@@ -50,6 +50,6 @@ public class TimeslotRules
         var user = _contextAccessor.GetAuthenticatedUserOrDefault();
         if (user == null) return false;
 
-        return user.IsInRole(RoleNames.Admin) || performer.LinkedUserIds.Contains(user.GetIdOrDefault());
+        return performer.LinkedUserIds.Contains(user.GetIdOrDefault());
     }
 }
