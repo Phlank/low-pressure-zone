@@ -1,6 +1,7 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.QueryableExtensions;
+using LowPressureZone.Identity.Constants;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
@@ -12,7 +13,7 @@ public class GetScheduleById : EndpointWithoutRequest<ScheduleResponse, Schedule
     {
         Get("/schedules/{id}");
         Description(b => b.Produces<ScheduleResponse>(200));
-        AllowAnonymous();
+        Roles(RoleNames.All);
     }
 
     public override async Task HandleAsync(CancellationToken ct)

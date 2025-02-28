@@ -3,6 +3,7 @@ using FluentValidation.Results;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Entities;
 using LowPressureZone.Domain.Extensions;
+using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
@@ -16,7 +17,7 @@ public class DeleteSchedule : EndpointWithoutRequest<EmptyResponse>
         Delete("/schedules/{id}");
         Description(builder => builder.Produces(204)
                                       .Produces(404));
-        AllowAnonymous();
+        Roles(RoleNames.Admin, RoleNames.Organizer);
     }
 
     public override async Task HandleAsync(CancellationToken ct)

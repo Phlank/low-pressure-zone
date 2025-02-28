@@ -9,7 +9,7 @@ namespace LowPressureZone.Api.Endpoints.Schedules;
 
 public class ScheduleResponseMapper : ResponseMapper<ScheduleResponse, Domain.Entities.Schedule>
 {
-    private readonly ScheduleRules _enforcer;
+    private readonly ScheduleRules _rules;
     private readonly TimeslotResponseMapper _timeslotMapper;
     private readonly AudienceResponseMapper _audienceMapper;
 
@@ -17,7 +17,7 @@ public class ScheduleResponseMapper : ResponseMapper<ScheduleResponse, Domain.En
                                   TimeslotResponseMapper timeslotMapper,
                                   AudienceResponseMapper audienceMapper)
     {
-        _enforcer = enforcer;
+        _rules = enforcer;
         _timeslotMapper = timeslotMapper;
         _audienceMapper = audienceMapper;
     }
@@ -32,7 +32,9 @@ public class ScheduleResponseMapper : ResponseMapper<ScheduleResponse, Domain.En
             Description = s.Description,
             Audience = _audienceMapper.FromEntity(s.Audience!),
             Timeslots = s.Timeslots.Select(_timeslotMapper.FromEntity).ToList(),
-            IsTimeslotCreationAllowed = _enforcer.CanUserAddTimeslotsToSchedule(s)
+            IsEditable = _rules.CanUserEditSchedule(s),
+            IsDeletable = _rules.CanUserDeleteSchedule(s),
+            IsTimeslotCreationAllowed = _rules.CanUserAddTimeslotsToSchedule(s)
         };
     }
 }
