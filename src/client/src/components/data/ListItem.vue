@@ -24,6 +24,7 @@ const emit = defineEmits<{
   user-select: none;
   flex-wrap: nowrap;
   width: 100%;
+  gap: variables.$space-l;
   // padding: variables.$space-m 0;
 
   &__left {

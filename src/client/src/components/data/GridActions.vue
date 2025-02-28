@@ -13,7 +13,7 @@
         rounded
         outlined />
       <Button
-        v-if="isCombinedIcon"
+        v-else
         size="small"
         class="grid-actions__buttons__item"
         icon="pi pi-ellipsis-h"
@@ -138,7 +138,7 @@ const handleDrawerActionClick = (emitProperty: keyof Emits) => {
 .grid-actions {
   &__buttons {
     width: 100px;
-    height: 40px;
+    min-height: 40px;
     text-align: center;
 
     @include variables.mobile {
