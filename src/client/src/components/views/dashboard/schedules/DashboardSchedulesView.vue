@@ -2,7 +2,7 @@
   <div class="dashboard-schedules-view">
     <div
       class="dashboard-schedules-view__new-schedules-form"
-      v-if="userStore.isInAnySpecifiedRole(Role.Admin, Role.Organizer)">
+      v-show="userStore.isInAnySpecifiedRole(Role.Admin, Role.Organizer)">
       <h4>Create New Schedule</h4>
       <ScheduleForm
         ref="createForm"
