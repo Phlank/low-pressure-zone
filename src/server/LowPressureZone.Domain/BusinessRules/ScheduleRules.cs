@@ -49,6 +49,6 @@ public class ScheduleRules
         var user = _contextAccessor.GetAuthenticatedUserOrDefault();
         if (user == null) return false;
 
-        return user.IsInAnyRole(RoleNames.Admin, RoleNames.Organizer);
-    }
+        if (!user.IsInAnyRole(RoleNames.Admin, RoleNames.Organizer)) return false;
+        return s.End > DateTime.UtcNow;    }
 }

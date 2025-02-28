@@ -7,7 +7,9 @@ public class ScheduleRequestValidator : Validator<ScheduleRequest>
 {
     public ScheduleRequestValidator()
     {
-        RuleFor(s => s.Start).GreaterThan(DateTime.UtcNow.AddDays(-1)).WithMessage("Prior to last day").LessThan(s => s.End).WithMessage("Greater than end");
-        RuleFor(s => s.End).GreaterThan(DateTime.UtcNow).GreaterThan(s => s.Start).WithMessage("Less than start");
+        RuleFor(s => s.End).GreaterThan(DateTime.UtcNow)
+                           .WithMessage("Cannot update schedules in the past")
+                           .GreaterThan(s => s.Start)
+                           .WithMessage("Less than start");
     }
 }
