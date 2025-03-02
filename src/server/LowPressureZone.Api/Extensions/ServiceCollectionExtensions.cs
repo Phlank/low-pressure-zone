@@ -1,4 +1,5 @@
-﻿using FluentEmail.Mailgun;
+﻿using FluentEmail.Core.Interfaces;
+using FluentEmail.Mailgun;
 using LowPressureZone.Api.Endpoints.Audiences;
 using LowPressureZone.Api.Endpoints.Performers;
 using LowPressureZone.Api.Endpoints.Schedules;
@@ -50,9 +51,10 @@ public static class ServiceCollectionExtensions
 
     public static void ConfigureApiServices(this WebApplicationBuilder builder)
     {
-        builder.Services.Configure<EmailServiceOptions>(builder.Configuration.GetSection(EmailServiceOptions.Name));
-        builder.Services.AddSingleton(new MailgunSender(builder.Configuration.GetValue<string>("Email:MailgunDomain"),
-                                                        builder.Configuration.GetValue<string>("Email:MailgunApiKey")));
+        var emailOptions = builder.Configuration.GetRequiredSection("Email").Get<EmailServiceOptions>()
+                           ?? throw new InvalidOperationException("Cannot register email services without configuration"); ;
+        builder.Services.AddFluentEmail(emailOptions.FromAddress)
+                        .AddMailGunSender(emailOptions.MailgunDomain, emailOptions.MailgunApiKey);
         builder.Services.AddSingleton<EmailService>();
 
         builder.Services.Configure<UriServiceOptions>(builder.Configuration.GetSection(UriServiceOptions.Name));
