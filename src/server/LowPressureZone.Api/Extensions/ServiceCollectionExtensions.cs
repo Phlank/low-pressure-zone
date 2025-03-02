@@ -3,6 +3,7 @@ using LowPressureZone.Api.Endpoints.Audiences;
 using LowPressureZone.Api.Endpoints.Performers;
 using LowPressureZone.Api.Endpoints.Schedules;
 using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
+using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.BusinessRules;
@@ -30,8 +31,7 @@ public static class ServiceCollectionExtensions
 
     public static void AddApiModelMappers(this IServiceCollection services)
     {
-        services.AddSingleton<AudienceRequestMapper>();
-        services.AddSingleton<AudienceResponseMapper>();
+        services.AddSingleton<AudienceMapper>();
         services.AddSingleton<ScheduleRequestMapper>();
         services.AddSingleton<ScheduleResponseMapper>();
         services.AddSingleton<PerformerRequestMapper>();
@@ -42,6 +42,7 @@ public static class ServiceCollectionExtensions
 
     public static void AddDomainRules(this IServiceCollection services)
     {
+        services.AddSingleton<AudienceRules>();
         services.AddSingleton<ScheduleRules>();
         services.AddSingleton<PerformerRules>();
         services.AddSingleton<TimeslotRules>();

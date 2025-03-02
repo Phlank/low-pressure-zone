@@ -2,25 +2,26 @@
 using LowPressureZone.Api.Endpoints.Audiences;
 using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 using LowPressureZone.Domain.BusinessRules;
+using LowPressureZone.Domain.Entities;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
-public class ScheduleResponseMapper : ResponseMapper<ScheduleResponse, Domain.Entities.Schedule>
+public class ScheduleResponseMapper : ResponseMapper<ScheduleResponse, Schedule>
 {
     private readonly ScheduleRules _rules;
     private readonly TimeslotResponseMapper _timeslotMapper;
-    private readonly AudienceResponseMapper _audienceMapper;
+    private readonly AudienceMapper _audienceMapper;
 
     public ScheduleResponseMapper(ScheduleRules rules,
                                   TimeslotResponseMapper timeslotMapper,
-                                  AudienceResponseMapper audienceMapper)
+                                  AudienceMapper audienceMapper)
     {
         _rules = rules;
         _timeslotMapper = timeslotMapper;
         _audienceMapper = audienceMapper;
     }
 
-    public override ScheduleResponse FromEntity(Domain.Entities.Schedule s)
+    public override ScheduleResponse FromEntity(Schedule s)
     {
         return new ScheduleResponse
         {

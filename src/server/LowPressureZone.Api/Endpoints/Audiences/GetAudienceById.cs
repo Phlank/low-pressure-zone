@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Audiences;
 
-public sealed class GetAudienceById : Endpoint<EmptyRequest, AudienceResponse, AudienceResponseMapper>
+public sealed class GetAudienceById : EndpointWithoutRequest<AudienceResponse, AudienceMapper>
 {
     public required DataContext DataContext { get; set; }
 
@@ -16,7 +16,7 @@ public sealed class GetAudienceById : Endpoint<EmptyRequest, AudienceResponse, A
         AllowAnonymous();
     }
 
-    public override async Task HandleAsync(EmptyRequest req, CancellationToken ct)
+    public override async Task HandleAsync(CancellationToken ct)
     {
         var id = Route<Guid>("id");
         var audience = DataContext.Audiences.AsNoTracking().FirstOrDefault(aud => aud.Id == id);
@@ -27,7 +27,6 @@ public sealed class GetAudienceById : Endpoint<EmptyRequest, AudienceResponse, A
         }
 
         var response = Map.FromEntity(audience);
-        response.CanDelete = !DataContext.Schedules.Any(s => s.AudienceId == audience.Id);
 
         await SendOkAsync(Map.FromEntity(audience), ct);
     }

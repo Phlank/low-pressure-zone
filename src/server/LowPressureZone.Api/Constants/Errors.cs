@@ -1,12 +1,12 @@
-﻿using FluentValidation.Results;
+﻿namespace LowPressureZone.Api.Constants;
 
-namespace LowPressureZone.Api.Constants;
-
-// These get mapped onto field labels, so they should remain as short as possible while being descriptive enough to solve the issues
 public static class Errors
 {
     public const string Required = "Required";
-    
+
+    // Mapper errors
+    public const string NoAuthorizedUserForMap = "Cannot map request to domain entity without an authorized user";
+
     // Entity errors
     public const string Unique = "Already in use";
     public const string EntityNotLinked = "Not linked to user";
