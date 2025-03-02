@@ -4,7 +4,7 @@ import { hasIntersection } from '@/utils/arrayUtils'
 import { defineStore } from 'pinia'
 import { ref, type Ref } from 'vue'
 
-export const useUserStore = defineStore('userStore', () => {
+export const useAuthStore = defineStore('authStore', () => {
   const isLoggedInRef: Ref<boolean | undefined> = ref(undefined)
   const userResponse: Ref<UserResponse> = ref({
     id: '',

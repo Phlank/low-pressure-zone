@@ -2,30 +2,30 @@
   <div class="performers-dashboard">
     <Tabs v-model:value="tabValue">
       <TabList>
-        <Tab
-          value="0"
-          :disabled="controlsDisabled">
-          Mine
-        </Tab>
-        <Tab
-          value="1"
-          :disabled="controlsDisabled">
-          All
-        </Tab>
-        <Tab
-          value="2"
-          :disabled="controlsDisabled">
-          Create
-        </Tab>
+        <Tab value="0"> Mine </Tab>
+        <Tab value="1"> All </Tab>
+        <Tab value="2"> Create </Tab>
       </TabList>
       <TabPanels v-if="isLoaded">
         <TabPanel value="0">
-          <LinkedPerformers
-            :performers="performers"
-            @to-new-performer="tabValue = '2'" />
+          <div class="performers-dashboard__linked">
+            <h4>Your Performers</h4>
+            <PerformersGrid
+              v-if="linkedPerformers.length > 0"
+              :performers="linkedPerformers" />
+            <div v-else>
+              <p>You do not currently have any linked performers.</p>
+              <Button
+                @click="tabValue = '2'"
+                label="Create Performer" />
+            </div>
+          </div>
         </TabPanel>
         <TabPanel value="1">
-          <AllPerformers :performers="performers" />
+          <div class="performers-dashboard__all">
+            <h4>All Performers</h4>
+            <PerformersGrid :performers="performers" />
+          </div>
         </TabPanel>
         <TabPanel value="2">
           <CreatePerformer @created-performer="loadPerformers()" />
@@ -41,19 +41,16 @@
 <script lang="ts" setup>
 import api from '@/api/api'
 import type { PerformerResponse } from '@/api/performers/performerResponse'
-import { Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs } from 'primevue'
+import { Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs, Button } from 'primevue'
 import { computed, onMounted, ref, type Ref } from 'vue'
-import AllPerformers from './AllPerformers.vue'
 import CreatePerformer from './CreatePerformer.vue'
-import LinkedPerformers from './LinkedPerformers.vue'
+import PerformersGrid from './PerformersGrid.vue'
 
-const tabValue = ref('0')
+const tabValue: Ref<string | number> = ref('0')
 const isLoaded = ref(false)
-const isSubmitting = ref(false)
-const isDialogOpen = ref(false)
-const controlsDisabled = computed(() => !isLoaded.value || isSubmitting.value || isDialogOpen.value)
 
 const performers: Ref<PerformerResponse[]> = ref([])
+const linkedPerformers = computed(() => performers.value.filter((p) => p.isLinked))
 
 onMounted(async () => {
   await loadPerformers()

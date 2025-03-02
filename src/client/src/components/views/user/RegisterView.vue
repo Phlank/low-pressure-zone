@@ -56,7 +56,7 @@ import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import router from '@/router'
 import { Routes } from '@/router/routes'
-import { useUserStore } from '@/stores/userStore'
+import { useAuthStore } from '@/stores/authStore'
 import { registerRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { Button, IftaLabel, InputText, Panel, Password, useToast } from 'primevue'
@@ -74,13 +74,13 @@ const formState = reactive({
 })
 const validation = createFormValidation(formState, registerRequestRules(formState))
 
-const userStore = useUserStore()
+const authStore = useAuthStore()
 onMounted(async () => {
   if (!props.context) {
     router.replace(Routes.Home)
   }
   await api.users.logout()
-  userStore.clear()
+  authStore.clear()
 })
 
 const isSubmitting = ref(false)

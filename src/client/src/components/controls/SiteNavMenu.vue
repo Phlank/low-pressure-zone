@@ -42,17 +42,17 @@
 </template>
 
 <script lang="ts" setup>
-import { useUserStore } from '@/stores/userStore'
+import { useAuthStore } from '@/stores/authStore'
 import { Button, Menu } from 'primevue'
 import type { MenuItem } from 'primevue/menuitem'
 import { computed, onMounted, useTemplateRef } from 'vue'
 import { RouterLink } from 'vue-router'
 
 const navMenuRef = useTemplateRef('navMenuRef')
-const userStore = useUserStore()
+const authStore = useAuthStore()
 
 const navMenuItems = computed(() => {
-  if (userStore.isLoggedIn()) {
+  if (authStore.isLoggedIn()) {
     return loggedInNavMenuItems
   } else {
     return loggedOutNavMenuItems
@@ -84,7 +84,7 @@ const loggedOutNavMenuItems: MenuItem[] = [
 ]
 
 onMounted(async () => {
-  await userStore.loadIfNotInitialized()
+  await authStore.loadIfNotInitialized()
 })
 
 const toggleMenu = (event: MouseEvent) => {

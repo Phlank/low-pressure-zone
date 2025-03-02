@@ -1,4 +1,4 @@
-import DashboardAudiencesView from '@/components/views/dashboard/DashboardAudiencesView.vue'
+import DashboardAudiencesView from '@/components/views/dashboard/audiences/DashboardAudiencesView.vue'
 import DashboardView from '@/components/views/dashboard/DashboardView.vue'
 import DashboardInvitesView from '@/components/views/dashboard/invites/DashboardInvitesView.vue'
 import DashboardPerformersView from '@/components/views/dashboard/performers/DashboardPerformersView.vue'
@@ -10,7 +10,7 @@ import LogoutView from '@/components/views/user/LogoutView.vue'
 import RegisterView from '@/components/views/user/RegisterView.vue'
 import TwoFactorView from '@/components/views/user/TwoFactorView.vue'
 import { allRoles, Role } from '@/constants/roles'
-import { useUserStore } from '@/stores/userStore'
+import { useAuthStore } from '@/stores/authStore'
 import { createRouter, createWebHistory } from 'vue-router'
 import { Routes } from './routes'
 
@@ -56,15 +56,15 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   if (to.meta.auth) {
-    const userStore = useUserStore()
-    await userStore.loadIfNotInitialized()
-    if (!userStore.isLoggedIn()) {
+    const authStore = useAuthStore()
+    await authStore.loadIfNotInitialized()
+    if (!authStore.isLoggedIn()) {
       next(Routes.Login)
       return
     }
 
     const allowedRoles = (to.meta.roles ?? []) as string[]
-    if (userStore.isInAnySpecifiedRole(...allowedRoles)) {
+    if (authStore.isInAnySpecifiedRole(...allowedRoles)) {
       next()
       return
     }

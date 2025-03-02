@@ -1,27 +1,33 @@
 <template>
-  <div class="performer-form desktop-inline">
-    <IftaLabel class="input input--small">
-      <InputText
-        id="name"
-        class="input__field"
-        :value="formState.name"
-        @update:model-value="handleNameUpdate"
-        :disabled="disabled"
-        :invalid="!validation.isValid('name')"
-      />
-      <ValidationLabel for="name" :message="validation.message('name')">Name</ValidationLabel>
-    </IftaLabel>
-    <IftaLabel class="input input--large">
-      <InputText
-        class="input__field"
-        id="url"
-        :value="formState.url"
-        @update:model-value="handleUrlUpdate"
-        :disabled="disabled"
-        :invalid="!validation.isValid('url')"
-      />
-      <ValidationLabel for="url" :message="validation.message('url')">URL</ValidationLabel>
-    </IftaLabel>
+  <div class="audience-form">
+    <div class="desktop-inline">
+      <IftaLabel class="input input--small">
+        <InputText
+          id="nameInput"
+          class="input__field"
+          :value="formState.name"
+          @update:model-value="handleNameUpdate"
+          :disabled="disabled"
+          :invalid="!validation.isValid('name')" />
+        <ValidationLabel
+          for="nameInput"
+          :message="validation.message('name')"
+          text="Name" />
+      </IftaLabel>
+      <IftaLabel class="input input--large">
+        <InputText
+          class="input__field"
+          id="urlInput"
+          :value="formState.url"
+          @update:model-value="handleUrlUpdate"
+          :disabled="disabled"
+          :invalid="!validation.isValid('url')" />
+        <ValidationLabel
+          for="urlInput"
+          :message="validation.message('url')"
+          text="URL" />
+      </IftaLabel>
+    </div>
   </div>
 </template>
 

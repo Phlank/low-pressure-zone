@@ -2,21 +2,46 @@
   <Panel class="setup-user single-panel-center">
     <div class="single-panel-center__form">
       <IftaLabel class="input input--medium">
-        <InputText :autofocus="true" id="usernameInput" class="input__field" :disabled="isSubmitting"
+        <InputText
+          :autofocus="true"
+          id="usernameInput"
+          class="input__field"
+          :disabled="isSubmitting"
           v-model:model-value="formState.username" />
-        <ValidationLabel for="usernameInput" message="" text="Username" />
+        <ValidationLabel
+          for="usernameInput"
+          message=""
+          text="Username" />
       </IftaLabel>
       <IftaLabel class="input input--medium">
-        <Password id="passwordInput" class="input__field" :feedback="false" :disabled="isSubmitting"
+        <Password
+          id="passwordInput"
+          class="input__field"
+          :feedback="false"
+          :disabled="isSubmitting"
           v-model:model-value="formState.password" />
-        <ValidationLabel for="passwordInput" message="" text="Password" />
+        <ValidationLabel
+          for="passwordInput"
+          message=""
+          text="Password" />
       </IftaLabel>
       <IftaLabel class="input input--medium">
-        <Password id="confirmPasswordInput" class="input__field" :feedback="false" :disabled="isSubmitting"
+        <Password
+          id="confirmPasswordInput"
+          class="input__field"
+          :feedback="false"
+          :disabled="isSubmitting"
           v-model:model-value="formState.password" />
-        <ValidationLabel for="confirmPasswordInput" message="" text="Password" />
+        <ValidationLabel
+          for="confirmPasswordInput"
+          message=""
+          text="Password" />
       </IftaLabel>
-      <Button class="input" label="Setup User" :disabled="isSubmitting" @click="handleSetupUser" />
+      <Button
+        class="input"
+        label="Setup User"
+        :disabled="isSubmitting"
+        @click="handleSetupUser" />
     </div>
   </Panel>
 </template>
@@ -26,7 +51,7 @@ import api from '@/api/api'
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { KeyName } from '@/constants/keys'
 import router, { defaultLoginRedirect } from '@/router'
-import { useUserStore } from '@/stores/userStore'
+import { useAuthStore } from '@/stores/authStore'
 import { loginRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { onKeyDown } from '@vueuse/core'
@@ -62,7 +87,7 @@ const handleSetupUser = async () => {
     return
   }
 
-  await useUserStore().load()
+  await useAuthStore().load()
   isSubmitting.value = false
   router.push(defaultLoginRedirect)
 }
