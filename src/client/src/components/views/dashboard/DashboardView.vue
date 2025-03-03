@@ -6,7 +6,7 @@
       :model="menuItems"
       z-index="99">
       <template #item="{ item, props }">
-        <div v-if="userStore.isInAnySpecifiedRole(...item.roles)">
+        <div v-if="authStore.isInAnySpecifiedRole(...item.roles)">
           <RouterLink
             v-if="item.route"
             v-slot="{ href, navigate }"
@@ -48,12 +48,12 @@
 <script setup lang="ts">
 import TitledNavMenu from '@/components/controls/TitledNavMenu.vue'
 import { allRoles, Role } from '@/constants/roles'
-import { useUserStore } from '@/stores/userStore'
+import { useAuthStore } from '@/stores/authStore'
 import { Menu, Panel } from 'primevue'
 import type { MenuItem } from 'primevue/menuitem'
 import { inject, onMounted, type Ref } from 'vue'
 
-const userStore = useUserStore()
+const authStore = useAuthStore()
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const menuItems: MenuItem[] = [
@@ -90,7 +90,7 @@ const menuItems: MenuItem[] = [
 ]
 
 onMounted(async () => {
-  await userStore.loadIfNotInitialized()
+  await authStore.loadIfNotInitialized()
 })
 </script>
 

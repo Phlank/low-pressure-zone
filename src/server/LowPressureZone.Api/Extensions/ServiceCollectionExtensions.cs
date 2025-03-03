@@ -1,8 +1,10 @@
-﻿using FluentEmail.Mailgun;
+﻿using FluentEmail.Core.Interfaces;
+using FluentEmail.Mailgun;
 using LowPressureZone.Api.Endpoints.Audiences;
 using LowPressureZone.Api.Endpoints.Performers;
 using LowPressureZone.Api.Endpoints.Schedules;
 using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
+using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.BusinessRules;
@@ -30,8 +32,7 @@ public static class ServiceCollectionExtensions
 
     public static void AddApiModelMappers(this IServiceCollection services)
     {
-        services.AddSingleton<AudienceRequestMapper>();
-        services.AddSingleton<AudienceResponseMapper>();
+        services.AddSingleton<AudienceMapper>();
         services.AddSingleton<ScheduleRequestMapper>();
         services.AddSingleton<ScheduleResponseMapper>();
         services.AddSingleton<PerformerRequestMapper>();
@@ -42,6 +43,7 @@ public static class ServiceCollectionExtensions
 
     public static void AddDomainRules(this IServiceCollection services)
     {
+        services.AddSingleton<AudienceRules>();
         services.AddSingleton<ScheduleRules>();
         services.AddSingleton<PerformerRules>();
         services.AddSingleton<TimeslotRules>();
@@ -49,9 +51,10 @@ public static class ServiceCollectionExtensions
 
     public static void ConfigureApiServices(this WebApplicationBuilder builder)
     {
+        var emailOptions = builder.Configuration.GetRequiredSection(EmailServiceOptions.Name).Get<EmailServiceOptions>()
+                           ?? throw new InvalidOperationException("Cannot register email services without configuration"); ;
         builder.Services.Configure<EmailServiceOptions>(builder.Configuration.GetSection(EmailServiceOptions.Name));
-        builder.Services.AddSingleton(new MailgunSender(builder.Configuration.GetValue<string>("Email:MailgunDomain"),
-                                                        builder.Configuration.GetValue<string>("Email:MailgunApiKey")));
+        builder.Services.AddSingleton<ISender>(new MailgunSender(emailOptions.MailgunDomain, emailOptions.MailgunApiKey));
         builder.Services.AddSingleton<EmailService>();
 
         builder.Services.Configure<UriServiceOptions>(builder.Configuration.GetSection(UriServiceOptions.Name));

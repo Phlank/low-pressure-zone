@@ -7,9 +7,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace LowPressureZone.Identity;
 
-public class IdentityContext : IdentityDbContext<IdentityUser>
+public class IdentityContext : IdentityDbContext<AppUser, AppRole, Guid>
 {
-    public DbSet<Invitation<IdentityUser>> Invitations { get; set; }
+    public DbSet<Invitation<Guid, AppUser>> Invitations { get; set; }
 
     public IdentityContext(DbContextOptions<IdentityContext> options) : base(options) { }
 
@@ -17,29 +17,34 @@ public class IdentityContext : IdentityDbContext<IdentityUser>
     {
         optionsBuilder.UseSeeding((context, _) =>
         {
-            var roles = context.Set<IdentityRole>().ToList();
-            foreach (var role in RoleNames.All)
+            var roles = context.Set<AppRole>();
+            foreach (var roleName in RoleNames.All)
             {
-                if (!roles.Any(r => r.Name == role))
+                Console.WriteLine($"Checking for {roleName} role...");
+                if (!roles.Any(r => r.Name == roleName))
                 {
-                    context.Set<IdentityRole>().Add(new IdentityRole
+                    Console.WriteLine($"Did not find {roleName} role. Adding {roleName} role...");
+                    roles.Add(new AppRole
                     {
-                        Id = Guid.NewGuid().ToString(),
-                        Name = role,
-                        NormalizedName = role.ToUpper(),
+                        Id = Guid.NewGuid(),
+                        Name = roleName,
+                        NormalizedName = roleName.ToUpper(),
                         ConcurrencyStamp = Guid.NewGuid().ToString()
                     });
                 }
             }
+            context.SaveChanges();
 
-            var adminRole = context.Set<IdentityRole>().First(r => r.Name == RoleNames.Admin);
-            if (!context.Set<IdentityUser>().Any())
+            Console.WriteLine("Retrieving admin role...");
+            var adminRole = roles.First(r => r.Name == RoleNames.Admin);
+            var users = context.Set<AppUser>();
+            if (!users.Any())
             {
                 var seedData = GetSeedData();
-                var hasher = new PasswordHasher<IdentityUser>();
-                var user = new IdentityUser()
+                var hasher = new PasswordHasher<AppUser>();
+                var user = new AppUser()
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = Guid.NewGuid(),
                     AccessFailedCount = 0,
                     ConcurrencyStamp = Guid.NewGuid().ToString(),
                     Email = seedData.AdminEmail,
@@ -56,12 +61,10 @@ public class IdentityContext : IdentityDbContext<IdentityUser>
                 };
                 var passwordHash = hasher.HashPassword(user, seedData.AdminPassword);
                 user.PasswordHash = passwordHash;
-                context.Set<IdentityUser>().Add(user);
-                context.Set<IdentityUserRole<string>>().Add(new IdentityUserRole<string>
-                {
-                    RoleId = adminRole.Id,
-                    UserId = user.Id
-                });
+                users.Add(user);
+
+                var userRoles = context.Set<IdentityUserRole<Guid>>();
+                userRoles.Add(new IdentityUserRole<Guid> { UserId = user.Id, RoleId = adminRole.Id });
             }
             context.SaveChanges();
         });

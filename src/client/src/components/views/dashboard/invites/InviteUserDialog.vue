@@ -22,7 +22,7 @@
         <Select
           class="input__field"
           id="roleInput"
-          :options="roleItems.filter((item) => userStore.isInAnySpecifiedRole(...item.availableTo))"
+          :options="roleItems.filter((item) => authStore.isInAnySpecifiedRole(...item.availableTo))"
           option-label="name"
           option-value="name"
           data-key="name"
@@ -40,14 +40,14 @@ import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
 import FormDialog from '@/components/dialogs/FormDialog.vue'
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { Role } from '@/constants/roles'
-import { useUserStore } from '@/stores/userStore'
+import { useAuthStore } from '@/stores/authStore'
 import { inviteRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { IftaLabel, InputText, Select, useToast } from 'primevue'
 import { reactive, ref, watch } from 'vue'
 
 const toast = useToast()
-const userStore = useUserStore()
+const authStore = useAuthStore()
 
 interface RoleItem {
   name: Role

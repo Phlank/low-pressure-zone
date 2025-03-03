@@ -2,7 +2,7 @@
   <div class="dashboard-schedules-view">
     <div
       class="dashboard-schedules-view__new-schedules-form"
-      v-show="userStore.isInAnySpecifiedRole(Role.Admin, Role.Organizer)">
+      v-show="authStore.isInAnySpecifiedRole(Role.Admin, Role.Organizer)">
       <h4>Create New Schedule</h4>
       <ScheduleForm
         ref="createForm"
@@ -33,10 +33,10 @@ import { showCreateSuccessToast } from '@/utils/toastUtils'
 import { Button, useToast } from 'primevue'
 import { onMounted, ref, useTemplateRef, type Ref } from 'vue'
 import SchedulesGrid from './SchedulesGrid.vue'
-import { useUserStore } from '@/stores/userStore'
+import { useAuthStore } from '@/stores/authStore'
 import { Role } from '@/constants/roles'
 
-const userStore = useUserStore()
+const authStore = useAuthStore()
 const toast = useToast()
 const isSubmitting = ref(false)
 

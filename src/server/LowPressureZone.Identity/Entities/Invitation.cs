@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace LowPressureZone.Identity.Entities;
 
-namespace LowPressureZone.Identity.Entities;
-
-public class Invitation<TUser> where TUser : class
+public class Invitation<TKey, TUser> where TUser : class
 {
     public Guid Id { get; set; } = Guid.NewGuid();
-    public required string UserId { get; set; }
+    public required TKey UserId { get; set; }
     public virtual TUser? User { get; set; }
     public required DateTime InvitationDate { get; set; } = DateTime.UtcNow;
     public bool IsRegistered { get; set; } = false;

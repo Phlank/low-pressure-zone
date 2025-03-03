@@ -6,18 +6,18 @@
 import api from '@/api/api'
 import router from '@/router'
 import { Routes } from '@/router/routes'
-import { useUserStore } from '@/stores/userStore'
+import { useAuthStore } from '@/stores/authStore'
 import { Message } from 'primevue'
 import { onMounted } from 'vue'
 
-const userStore = useUserStore()
+const authStore = useAuthStore()
 
 onMounted(async () => {
-  await userStore.loadIfNotInitialized()
-  if (userStore.isLoggedIn()) {
+  await authStore.loadIfNotInitialized()
+  if (authStore.isLoggedIn()) {
     await api.users.logout()
   }
-  await userStore.load()
+  await authStore.load()
   router.push(Routes.Home)
 })
 </script>

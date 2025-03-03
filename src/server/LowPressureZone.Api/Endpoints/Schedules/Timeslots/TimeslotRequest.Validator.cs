@@ -1,6 +1,7 @@
 ﻿using FastEndpoints;
 using FluentValidation;
 using LowPressureZone.Api.Constants;
+using LowPressureZone.Domain;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 

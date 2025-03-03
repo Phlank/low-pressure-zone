@@ -35,7 +35,7 @@ import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { KeyName } from '@/constants/keys'
 import router from '@/router'
 import { Routes } from '@/router/routes'
-import { useUserStore } from '@/stores/userStore'
+import { useAuthStore } from '@/stores/authStore'
 import { onKeyDown } from '@vueuse/core'
 import { Button, IftaLabel, InputText, Message, Panel } from 'primevue'
 import { reactive, ref } from 'vue'
@@ -67,7 +67,7 @@ const handleVerify = async () => {
     return
   }
 
-  await useUserStore().load()
+  await useAuthStore().load()
   isSubmitting.value = false
   router.push(props.redirect)
 }

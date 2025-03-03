@@ -8,5 +8,5 @@ public class RoleNames
     public const string Organizer = "Organizer";
     public const string Performer = "Performer";
 
-    public static string[] All => [Admin, Organizer, Performer];
+    public static List<string> All => [Admin, Organizer, Performer];
 }

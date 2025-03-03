@@ -5,7 +5,7 @@
     @click="handleControlClick"
     :label="controlLabel"
     size="large"
-    rounded></Button>
+    rounded />
 </template>
 
 <script lang="ts" setup>
@@ -43,7 +43,7 @@ const controlIcon = computed(() => {
 const controlLabel = computed(() => `${djName.value} | ${streamType.value}`)
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .play-button {
   width: fit-content;
 }

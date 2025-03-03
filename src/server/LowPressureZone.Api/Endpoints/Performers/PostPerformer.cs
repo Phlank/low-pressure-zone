@@ -21,7 +21,7 @@ public sealed class PostPerformer : EndpointWithMapper<PerformerRequest, Perform
     {
         Post("/performers");
         Description(b => b.Produces(201));
-        Roles(RoleNames.All);
+        Roles(RoleNames.All.ToArray());
     }
 
     public override async Task HandleAsync(PerformerRequest req, CancellationToken ct)

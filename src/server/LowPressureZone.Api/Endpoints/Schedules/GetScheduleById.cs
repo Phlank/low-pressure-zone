@@ -14,7 +14,7 @@ public class GetScheduleById : EndpointWithoutRequest<ScheduleResponse, Schedule
         Get("/schedules/{id}");
         Description(b => b.Produces<ScheduleResponse>(200)
                           .Produces(404));
-        Roles(RoleNames.All);
+        Roles(RoleNames.All.ToArray());
     }
 
     public override async Task HandleAsync(CancellationToken ct)

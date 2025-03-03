@@ -3,13 +3,14 @@ using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Endpoints.Users.Login;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Utilities;
+using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.Endpoints.Users.TwoFactor;
 
 public class PostTwoFactor : Endpoint<TwoFactorRequest, EmptyResponse>
 {
-    public required SignInManager<IdentityUser> SignInManager { get; set; }
+    public required SignInManager<AppUser> SignInManager { get; set; }
     private DateTime _requestStart = DateTime.UtcNow;
 
     public override void Configure()

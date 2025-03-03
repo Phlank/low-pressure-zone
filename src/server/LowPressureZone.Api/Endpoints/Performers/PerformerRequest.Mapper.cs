@@ -1,4 +1,5 @@
 ﻿using FastEndpoints;
+using LowPressureZone.Api.Constants;
 using LowPressureZone.Domain.Extensions;
 using LowPressureZone.Identity.Extensions;
 
@@ -15,8 +16,7 @@ public sealed class PerformerRequestMapper : RequestMapper<PerformerRequest, Dom
 
     public override Domain.Entities.Performer ToEntity(PerformerRequest r)
     {
-        var user = _contextAccessor.GetAuthenticatedUserOrDefault();
-        if (user == null) throw new Exception("HttpContext is null or holds no authenticated user");
+        var user = _contextAccessor.GetAuthenticatedUserOrDefault() ?? throw Exceptions.NoAuthorizedUserForToEntityMap;
 
         return new Domain.Entities.Performer
         {

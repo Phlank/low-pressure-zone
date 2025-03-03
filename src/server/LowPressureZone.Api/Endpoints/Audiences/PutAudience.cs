@@ -5,7 +5,7 @@ using LowPressureZone.Domain;
 
 namespace LowPressureZone.Api.Endpoints.Audiences;
 
-public sealed class PutAudience : Endpoint<AudienceRequest, EmptyResponse, AudienceRequestMapper>
+public sealed class PutAudience : Endpoint<AudienceRequest, EmptyResponse, AudienceMapper>
 {
     public required DataContext DataContext { get; set; }
 

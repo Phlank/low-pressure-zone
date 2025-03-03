@@ -12,7 +12,7 @@ namespace LowPressureZone.Api.Endpoints.Users.Invite;
 
 public class PostInvite : Endpoint<InviteRequest, EmptyResponse>
 {
-    public required UserManager<IdentityUser> UserManager { get; set; }
+    public required UserManager<AppUser> UserManager { get; set; }
     public required IdentityContext IdentityContext { get; set; }
     public required EmailService EmailService { get; set; }
     public required UriService UriService { get; set; }
@@ -35,7 +35,7 @@ public class PostInvite : Endpoint<InviteRequest, EmptyResponse>
             ThrowError(new ValidationFailure(nameof(req.Email), Errors.Unique));
         }
 
-        var user = new IdentityUser(Guid.NewGuid().ToString())
+        var user = new AppUser()
         {
             Email = req.Email,
             NormalizedEmail = normalizedEmail,
@@ -52,7 +52,7 @@ public class PostInvite : Endpoint<InviteRequest, EmptyResponse>
         var inviteUrl = UriService.GetRegisterUri(req.Email, inviteToken);
         await EmailService.SendInviteEmail(req.Email, inviteUrl.AbsoluteUri);
 
-        var invitation = new Invitation<IdentityUser>()
+        var invitation = new Invitation<Guid, AppUser>()
         {
             UserId = user.Id,
             InvitationDate = DateTime.UtcNow

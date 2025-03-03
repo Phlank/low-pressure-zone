@@ -2,5 +2,7 @@ export interface AudienceResponse {
   id: string
   name: string
   url: string
-  canDelete: boolean
+  isEditable: boolean
+  isDeletable: boolean
+  isLinkableToSchedule: boolean
 }

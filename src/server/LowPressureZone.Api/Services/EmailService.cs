@@ -1,7 +1,5 @@
-﻿using System.Text.Json;
-using FluentEmail.Core;
-using FluentEmail.Mailgun;
-using Microsoft.AspNetCore.Identity;
+﻿using FluentEmail.Core;
+using FluentEmail.Core.Interfaces;
 using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Api.Services;
@@ -9,9 +7,9 @@ namespace LowPressureZone.Api.Services;
 public class EmailService
 {
     private readonly string _fromAddress;
-    private readonly MailgunSender _sender;
+    private readonly ISender _sender;
 
-    public EmailService(IOptions<EmailServiceOptions> options, MailgunSender sender)
+    public EmailService(IOptions<EmailServiceOptions> options, ISender sender)
     {
         _fromAddress = options.Value.FromAddress;
         _sender = sender;

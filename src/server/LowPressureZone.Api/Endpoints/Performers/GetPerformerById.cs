@@ -14,7 +14,7 @@ public sealed class GetPerformerById : EndpointWithoutRequest<PerformerResponse,
         Get("/performers/{id}");
         Description(b => b.Produces<PerformerResponse>(200)
                           .Produces(404));
-        Roles(RoleNames.All);
+        Roles(RoleNames.All.ToArray());
     }
 
     public override async Task HandleAsync(CancellationToken ct)

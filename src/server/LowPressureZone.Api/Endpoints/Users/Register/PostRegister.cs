@@ -5,6 +5,7 @@ using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Utilities;
 using LowPressureZone.Identity;
+using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,15 +13,15 @@ namespace LowPressureZone.Api.Endpoints.Users.Register;
 
 public class PostRegister : Endpoint<RegisterRequest>
 {
-    public required UserManager<IdentityUser> UserManager { get; set; }
-    public required SignInManager<IdentityUser> SignInManager { get; set; }
+    public required UserManager<AppUser> UserManager { get; set; }
+    public required SignInManager<AppUser> SignInManager { get; set; }
     public required IdentityContext IdentityContext { get; set; }
     private DateTime _requestTime = DateTime.UtcNow;
 
     public override void Configure()
     {
         Post("/users/register");
-        Throttle(1, 5);
+        Throttle(5, 60);
         AllowAnonymous();
     }
 
