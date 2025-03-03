@@ -17,23 +17,28 @@ public class IdentityContext : IdentityDbContext<AppUser, AppRole, Guid>
     {
         optionsBuilder.UseSeeding((context, _) =>
         {
-            var roles = context.Set<AppRole>().ToList();
-            foreach (var role in RoleNames.All)
+            var roles = context.Set<AppRole>();
+            foreach (var roleName in RoleNames.All)
             {
-                if (!roles.Any(r => r.Name == role))
+                Console.WriteLine($"Checking for {roleName} role...");
+                if (!roles.Any(r => r.Name == roleName))
                 {
-                    context.Set<AppRole>().Add(new AppRole
+                    Console.WriteLine($"Did not find {roleName} role. Adding {roleName} role...");
+                    roles.Add(new AppRole
                     {
                         Id = Guid.NewGuid(),
-                        Name = role,
-                        NormalizedName = role.ToUpper(),
+                        Name = roleName,
+                        NormalizedName = roleName.ToUpper(),
                         ConcurrencyStamp = Guid.NewGuid().ToString()
                     });
                 }
             }
+            context.SaveChanges();
 
-            var adminRole = context.Set<IdentityRole>().First(r => r.Name == RoleNames.Admin);
-            if (!context.Set<AppUser>().Any())
+            Console.WriteLine("Retrieving admin role...");
+            var adminRole = roles.First(r => r.Name == RoleNames.Admin);
+            var users = context.Set<AppUser>();
+            if (!users.Any())
             {
                 var seedData = GetSeedData();
                 var hasher = new PasswordHasher<AppUser>();
@@ -56,8 +61,10 @@ public class IdentityContext : IdentityDbContext<AppUser, AppRole, Guid>
                 };
                 var passwordHash = hasher.HashPassword(user, seedData.AdminPassword);
                 user.PasswordHash = passwordHash;
-                context.Set<AppUser>().Add(user);
-                
+                users.Add(user);
+
+                var userRoles = context.Set<IdentityUserRole<Guid>>();
+                userRoles.Add(new IdentityUserRole<Guid> { UserId = user.Id, RoleId = adminRole.Id });
             }
             context.SaveChanges();
         });

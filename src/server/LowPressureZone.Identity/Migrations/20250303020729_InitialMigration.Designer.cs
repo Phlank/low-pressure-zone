@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LowPressureZone.Identity.Migrations
 {
     [DbContext(typeof(IdentityContext))]
-    [Migration("20250303015439_CleanupIdentityChanges")]
-    partial class CleanupIdentityChanges
+    [Migration("20250303020729_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
