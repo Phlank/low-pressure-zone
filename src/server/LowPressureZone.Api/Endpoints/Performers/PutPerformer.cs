@@ -22,7 +22,7 @@ public sealed class PutPerformer : EndpointWithMapper<PerformerRequest, Performe
         Description(b => b.Produces(204)
                           .Produces(401)
                           .Produces(404));
-        Roles(RoleNames.All);
+        Roles(RoleNames.All.ToArray());
     }
 
     public override async Task HandleAsync(PerformerRequest req, CancellationToken ct)

@@ -51,10 +51,10 @@ public static class ServiceCollectionExtensions
 
     public static void ConfigureApiServices(this WebApplicationBuilder builder)
     {
-        var emailOptions = builder.Configuration.GetRequiredSection("Email").Get<EmailServiceOptions>()
+        var emailOptions = builder.Configuration.GetRequiredSection(EmailServiceOptions.Name).Get<EmailServiceOptions>()
                            ?? throw new InvalidOperationException("Cannot register email services without configuration"); ;
-        builder.Services.AddFluentEmail(emailOptions.FromAddress)
-                        .AddMailGunSender(emailOptions.MailgunDomain, emailOptions.MailgunApiKey);
+        builder.Services.Configure<EmailServiceOptions>(builder.Configuration.GetSection(EmailServiceOptions.Name));
+        builder.Services.AddSingleton<ISender>(new MailgunSender(emailOptions.MailgunDomain, emailOptions.MailgunApiKey));
         builder.Services.AddSingleton<EmailService>();
 
         builder.Services.Configure<UriServiceOptions>(builder.Configuration.GetSection(UriServiceOptions.Name));

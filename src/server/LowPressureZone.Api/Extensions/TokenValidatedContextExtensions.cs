@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using LowPressureZone.Identity;
+using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Extensions;
@@ -14,14 +14,14 @@ public static class TokenValidatedContextExtensions
         return context.Principal.Claims.FirstOrDefault(c => c.Type.Contains("email"))?.Value ?? throw new Exception("No email claim on token.");
     }
 
-    public static async Task<IdentityUser?> GetUser(this TokenValidatedContext context, string email)
+    public static async Task<AppUser?> GetUser(this TokenValidatedContext context, string email)
     {
         var identityContext = context.HttpContext.RequestServices.GetRequiredService<IdentityContext>();
         var user = await identityContext.Users.FirstOrDefaultAsync(u => u.Email != null && u.Email.ToLower() == email.ToLower());
         return user;
     }
 
-    public static async Task AddUserRolesToPrincipal(this TokenValidatedContext context, IdentityUser user)
+    public static async Task AddUserRolesToPrincipal(this TokenValidatedContext context, AppUser user)
     {
         var identityContext = context.HttpContext.RequestServices.GetRequiredService<IdentityContext>();
         var roleIds = await identityContext.UserRoles.Where(ur => ur.UserId == user.Id).Select(ur => ur.RoleId).ToListAsync();

@@ -21,7 +21,7 @@ public sealed class AudienceMapper : Mapper<AudienceRequest, AudienceResponse, A
 
     public override Audience ToEntity(AudienceRequest r)
     {
-        var user = _accessor.GetAuthenticatedUserOrDefault() ?? throw Exceptions.NoAuthorizedUserInToEntityMap;
+        var user = _accessor.GetAuthenticatedUserOrDefault() ?? throw Exceptions.NoAuthorizedUserForToEntityMap;
         return new Audience
         {
             Id = Guid.NewGuid(),

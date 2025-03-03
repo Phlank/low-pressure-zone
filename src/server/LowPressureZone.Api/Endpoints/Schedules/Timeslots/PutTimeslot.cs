@@ -26,7 +26,7 @@ public class PutTimeslot : EndpointWithMapper<TimeslotRequest, TimeslotRequestMa
         Put("/schedules/{scheduleId}/timeslots/{timeslotId}");
         Description(b => b.Produces(204)
                           .Produces(404));
-        Roles(RoleNames.All);
+        Roles(RoleNames.All.ToArray());
     }
 
     public override async Task HandleAsync(TimeslotRequest req, CancellationToken ct)

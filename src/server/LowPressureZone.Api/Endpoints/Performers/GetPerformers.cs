@@ -15,7 +15,7 @@ public sealed class GetPerformers : EndpointWithoutRequest<IEnumerable<Performer
     {
         Get("/performers");
         Description(b => b.Produces<List<PerformerResponse>>(200));
-        Roles(RoleNames.All);
+        Roles(RoleNames.All.ToArray());
     }
 
     public override async Task HandleAsync(CancellationToken ct)

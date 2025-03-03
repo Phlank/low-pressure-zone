@@ -25,7 +25,7 @@ public class DeletePerformer : EndpointWithoutRequest<EmptyResponse>
         Description(builder => builder.Produces(204)
                                       .Produces(401)
                                       .Produces(404));
-        Roles(RoleNames.All);
+        Roles(RoleNames.All.ToArray());
     }
 
     public override async Task HandleAsync(CancellationToken ct)

@@ -7,9 +7,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace LowPressureZone.Identity;
 
-public class IdentityContext : IdentityDbContext<IdentityUser>
+public class IdentityContext : IdentityDbContext<AppUser, AppRole, Guid>
 {
-    public DbSet<Invitation<IdentityUser>> Invitations { get; set; }
+    public DbSet<Invitation<Guid, AppUser>> Invitations { get; set; }
 
     public IdentityContext(DbContextOptions<IdentityContext> options) : base(options) { }
 
@@ -17,14 +17,14 @@ public class IdentityContext : IdentityDbContext<IdentityUser>
     {
         optionsBuilder.UseSeeding((context, _) =>
         {
-            var roles = context.Set<IdentityRole>().ToList();
+            var roles = context.Set<AppRole>().ToList();
             foreach (var role in RoleNames.All)
             {
                 if (!roles.Any(r => r.Name == role))
                 {
-                    context.Set<IdentityRole>().Add(new IdentityRole
+                    context.Set<AppRole>().Add(new AppRole
                     {
-                        Id = Guid.NewGuid().ToString(),
+                        Id = Guid.NewGuid(),
                         Name = role,
                         NormalizedName = role.ToUpper(),
                         ConcurrencyStamp = Guid.NewGuid().ToString()
@@ -33,13 +33,13 @@ public class IdentityContext : IdentityDbContext<IdentityUser>
             }
 
             var adminRole = context.Set<IdentityRole>().First(r => r.Name == RoleNames.Admin);
-            if (!context.Set<IdentityUser>().Any())
+            if (!context.Set<AppUser>().Any())
             {
                 var seedData = GetSeedData();
-                var hasher = new PasswordHasher<IdentityUser>();
-                var user = new IdentityUser()
+                var hasher = new PasswordHasher<AppUser>();
+                var user = new AppUser()
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = Guid.NewGuid(),
                     AccessFailedCount = 0,
                     ConcurrencyStamp = Guid.NewGuid().ToString(),
                     Email = seedData.AdminEmail,
@@ -56,12 +56,8 @@ public class IdentityContext : IdentityDbContext<IdentityUser>
                 };
                 var passwordHash = hasher.HashPassword(user, seedData.AdminPassword);
                 user.PasswordHash = passwordHash;
-                context.Set<IdentityUser>().Add(user);
-                context.Set<IdentityUserRole<string>>().Add(new IdentityUserRole<string>
-                {
-                    RoleId = adminRole.Id,
-                    UserId = user.Id
-                });
+                context.Set<AppUser>().Add(user);
+                
             }
             context.SaveChanges();
         });

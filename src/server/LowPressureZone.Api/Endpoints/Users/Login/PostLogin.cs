@@ -3,21 +3,22 @@ using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Api.Utilities;
+using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.Endpoints.Users.Login;
 
 public class PostLogin : Endpoint<LoginRequest, LoginResponse>
 {
-    public required SignInManager<IdentityUser> SignInManager { get; set; }
-    public required UserManager<IdentityUser> UserManager { get; set; }
+    public required SignInManager<AppUser> SignInManager { get; set; }
+    public required UserManager<AppUser> UserManager { get; set; }
     public required EmailService EmailService { get; set; }
     private DateTime _requestStart = DateTime.UtcNow;
 
     public override void Configure()
     {
         Post("/users/login");
-        Throttle(1, 5);
+        Throttle(10, 60);
         AllowAnonymous();
     }
 
