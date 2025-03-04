@@ -5,6 +5,8 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UserSecretsId>9d2c548d-3c62-4409-9c65-fe1fa2b047b1</UserSecretsId>
+		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+		<AnalysisLevel>latest-recommended</AnalysisLevel>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -18,6 +20,7 @@
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Minerals.StringCases" Version="0.2.1" />
+		<PackageReference Include="Shouldly" Version="4.3.0" />
 	</ItemGroup>
 
 	<ItemGroup>

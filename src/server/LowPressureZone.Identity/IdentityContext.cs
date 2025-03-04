@@ -7,11 +7,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace LowPressureZone.Identity;
 
-public class IdentityContext : IdentityDbContext<AppUser, AppRole, Guid>
+public class IdentityContext(DbContextOptions<IdentityContext> options) : IdentityDbContext<AppUser, AppRole, Guid>(options)
 {
     public DbSet<Invitation<Guid, AppUser>> Invitations { get; set; }
-
-    public IdentityContext(DbContextOptions<IdentityContext> options) : base(options) { }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -28,7 +26,7 @@ public class IdentityContext : IdentityDbContext<AppUser, AppRole, Guid>
                     {
                         Id = Guid.NewGuid(),
                         Name = roleName,
-                        NormalizedName = roleName.ToUpper(),
+                        NormalizedName = roleName.ToUpperInvariant(),
                         ConcurrencyStamp = Guid.NewGuid().ToString()
                     });
                 }
@@ -48,7 +46,7 @@ public class IdentityContext : IdentityDbContext<AppUser, AppRole, Guid>
                     AccessFailedCount = 0,
                     ConcurrencyStamp = Guid.NewGuid().ToString(),
                     Email = seedData.AdminEmail,
-                    NormalizedEmail = seedData.AdminEmail.ToUpper(),
+                    NormalizedEmail = seedData.AdminEmail.ToUpperInvariant(),
                     EmailConfirmed = true,
                     LockoutEnabled = false,
                     LockoutEnd = null,
@@ -57,7 +55,7 @@ public class IdentityContext : IdentityDbContext<AppUser, AppRole, Guid>
                     SecurityStamp = Guid.NewGuid().ToString(),
                     TwoFactorEnabled = true,
                     UserName = seedData.AdminUsername,
-                    NormalizedUserName = seedData.AdminUsername.ToUpper(),
+                    NormalizedUserName = seedData.AdminUsername.ToUpperInvariant(),
                 };
                 var passwordHash = hasher.HashPassword(user, seedData.AdminPassword);
                 user.PasswordHash = passwordHash;
@@ -70,13 +68,13 @@ public class IdentityContext : IdentityDbContext<AppUser, AppRole, Guid>
         });
     }
 
-    private IdentitySeedData GetSeedData()
+    private static IdentitySeedData GetSeedData()
     {
         IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json")
                                                               .AddJsonFile("appsettings.Development.json", optional: true)
                                                               .AddJsonFile("appsettings.Production.json", optional: true)
                                                               .Build();
-        var section = config.GetRequiredSection("SeedData:Identity") ?? throw new Exception("No admin email specified in configuration.");
-        return section.Get<IdentitySeedData>() ?? throw new NullReferenceException("Seed data missing from configuration.");
+        var section = config.GetRequiredSection("SeedData:Identity") ?? throw new InvalidOperationException("No admin email specified in configuration.");
+        return section.Get<IdentitySeedData>() ?? throw new InvalidOperationException("Seed data missing from configuration.");
     }
 }

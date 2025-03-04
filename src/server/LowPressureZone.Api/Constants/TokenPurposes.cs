@@ -1,6 +1,6 @@
 ﻿namespace LowPressureZone.Api.Constants;
 
-public class TokenPurposes
+internal static class TokenPurposes
 {
     public const string Invite = "Invite";
 }

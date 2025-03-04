@@ -50,7 +50,7 @@ const tabValue: Ref<string | number> = ref('0')
 const isLoaded = ref(false)
 
 const performers: Ref<PerformerResponse[]> = ref([])
-const linkedPerformers = computed(() => performers.value.filter((p) => p.isLinked))
+const linkedPerformers = computed(() => performers.value.filter((p) => p.isLinkableToTimeslot))
 
 onMounted(async () => {
   await loadPerformers()

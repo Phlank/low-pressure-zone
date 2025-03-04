@@ -1,6 +1,6 @@
 ﻿namespace LowPressureZone.Api.Constants;
 
-public static class Errors
+internal static class Errors
 {
     public const string Required = "Required";
 
@@ -16,13 +16,18 @@ public static class Errors
     public const string InvalidUrl = "Invalid URL";
     public static string MinLength(int value) => $"Minimum {value} characters";
 
-    // Performer errors
+    // Time errors
+    public static string MinDuration(int hours) => $"Minimum duration is {hours}h";
+    public static string MaxDuration(int hours) => $"Maximum duration is {hours}h";
+    public const string TimeInPast = "Cannot be in the past";
 
     // Timeslot errors
-    public const string TimeslotNotEditable = "Timeslot not editable to user";
-    public const string TimeslotNotDeletable = "Timeslot not deletable to user";
     public const string OverlapsOtherTimeslot = "Overlaps other timeslot";
     public const string OutOfScheduleRange = "Exceeds schedule";
+
+    // Schedule errors
+    public const string OverlapsOtherSchedule = "Overlaps other schedule";
+    public const string ExcludesTimeslots = "Excludes timeslots";
 
     // User-event errors
     public const string InvalidEmail = "Invalid email";

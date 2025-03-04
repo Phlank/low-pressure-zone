@@ -4,5 +4,4 @@ public sealed class PerformerRequest
 {
     public required string Name { get; set; }
     public required string Url { get; set; }
-    public string Description { get; set; } = string.Empty;
 }

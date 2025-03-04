@@ -1,16 +1,13 @@
 ﻿using FastEndpoints;
+using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain;
-using LowPressureZone.Domain.QueryableExtensions;
-using LowPressureZone.Identity.Constants;
-using LowPressureZone.Identity.Extensions;
+using LowPressureZone.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
-public class GetSchedules : Endpoint<GetSchedulesRequest, IEnumerable<ScheduleResponse>, ScheduleResponseMapper>
+public class GetSchedules(DataContext dataContext, ScheduleRules rules) : Endpoint<GetSchedulesRequest, IEnumerable<ScheduleResponse>, ScheduleMapper>
 {
-    public required DataContext DataContext { get; set; }
-
     public override void Configure()
     {
         Get("/schedules");
@@ -20,27 +17,21 @@ public class GetSchedules : Endpoint<GetSchedulesRequest, IEnumerable<ScheduleRe
 
     public override async Task HandleAsync(GetSchedulesRequest req, CancellationToken ct)
     {
-        var scheduleQuery = DataContext.Schedules.IncludeConnectingProperties().AsNoTracking();
-        
-        if (req.Before.HasValue)
-        {
-            scheduleQuery = scheduleQuery.Where(s => s.End < req.Before.Value.ToUniversalTime());
-        }
-        if (req.After.HasValue)
-        {
-            scheduleQuery = scheduleQuery.Where(s => s.End > req.After.Value.ToUniversalTime());
-        }
+        IQueryable<Schedule> scheduleQuery = dataContext.Schedules.AsNoTracking()
+                                                                  .AsSplitQuery()
+                                                                  .OrderBy(s => s.StartsAt)
+                                                                  .Include(s => s.Audience)
+                                                                  .Include(s => s.Timeslots.OrderBy(t => t.StartsAt))
+                                                                  .ThenInclude(t => t.Performer);
 
-        if (!User.IsInAnyRole(RoleNames.Admin, RoleNames.Organizer))
-        {
-            scheduleQuery = scheduleQuery.Where(s  => s.End > DateTime.UtcNow);
-        }
+        if (req.Before.HasValue)
+            scheduleQuery = scheduleQuery.Where(s => s.EndsAt < req.Before.Value.ToUniversalTime());
+        if (req.After.HasValue)
+            scheduleQuery = scheduleQuery.Where(s => s.EndsAt > req.After.Value.ToUniversalTime());
 
         var schedules = await scheduleQuery.ToListAsync(ct);
-        foreach (var schedule in schedules)
-        {
-            schedule.Timeslots = schedule.Timeslots.OrderBy(t => t.Start).ToList();
-        }
+        schedules.RemoveAll(rules.IsHiddenFromApi);
+
         await SendOkAsync(schedules.Select(Map.FromEntity), ct);
     }
 }

@@ -28,7 +28,7 @@ public class PostInvite : Endpoint<InviteRequest, EmptyResponse>
         ValidateAccessForAssignedRole(req);
         ThrowIfAnyErrors();
 
-        var normalizedEmail = req.Email.ToUpper();
+        var normalizedEmail = req.Email.ToUpperInvariant();
         var isInUse = IdentityContext.Users.Any(u => u.NormalizedEmail == normalizedEmail);
         if (isInUse)
         {

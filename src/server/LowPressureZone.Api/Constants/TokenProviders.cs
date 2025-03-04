@@ -1,6 +1,6 @@
 ﻿namespace LowPressureZone.Api.Constants;
 
-public class TokenProviders
+internal static class TokenProviders
 {
     public const string Email = "Email";
     public const string Default = "Default";

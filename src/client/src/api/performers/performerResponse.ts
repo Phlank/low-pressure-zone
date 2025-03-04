@@ -4,5 +4,5 @@ export interface PerformerResponse {
   url: string
   isDeletable: boolean
   isEditable: boolean
-  isLinked: boolean
+  isLinkableToTimeslot: boolean
 }

@@ -58,11 +58,13 @@ namespace LowPressureZone.Domain.Migrations
                 name: "IX_Schedules_Start",
                 table: "Schedules");
 
+#pragma warning disable CA1861 // Avoid constant arrays as arguments
             migrationBuilder.CreateIndex(
                 name: "IX_Schedules_Start_End",
                 table: "Schedules",
                 columns: new[] { "Start", "End" },
                 unique: true);
+#pragma warning restore CA1861 // Avoid constant arrays as arguments
         }
     }
 }

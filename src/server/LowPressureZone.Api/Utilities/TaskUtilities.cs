@@ -1,6 +1,6 @@
 ﻿namespace LowPressureZone.Api.Utilities;
 
-public static class TaskUtilities
+internal static class TaskUtilities
 {
     private const int RESPONSE_DELAY_MS = 3000;
     public static Task DelaySensitiveResponse(DateTime requestTime)

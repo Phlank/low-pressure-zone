@@ -4,24 +4,15 @@ using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Api.Services;
 
-public class EmailService
+public class EmailService(IOptions<EmailServiceOptions> options, UriService uriService, ISender sender)
 {
-    private readonly string _fromAddress;
-    private readonly ISender _sender;
-
-    public EmailService(IOptions<EmailServiceOptions> options, ISender sender)
-    {
-        _fromAddress = options.Value.FromAddress;
-        _sender = sender;
-    }
-
     private async Task Send(string toAddress, string subject, string body)
     {
-        var email = Email.From(_fromAddress)
+        var email = Email.From(options.Value.FromAddress)
                          .To(toAddress)
                          .Subject(subject)
                          .Body(body);
-        var response = await _sender.SendAsync(email);
+        var response = await sender.SendAsync(email);
     }
 
     public async Task SendTwoFactorEmail(string toAddress, string username, string code)
@@ -31,10 +22,11 @@ public class EmailService
         await Send(toAddress, subject, message);
     }
 
-    public async Task SendInviteEmail(string toAddress, string registerUrl)
+    public async Task SendInviteEmail(string toAddress, string token)
     {
+        var uri = uriService.GetRegisterUri(toAddress, token);
         var subject = "Welcome | Low Pressure Zone";
-        var message = $"You've been invited to register a new user at Low Pressure Zone. Follow the link below to create your user.\n\n{registerUrl}\n\nThis link will be valid for 24 hours.";
+        var message = $"You've been invited to register a new user at Low Pressure Zone. Follow the link below to create your user.\n\n{uri}\n\nThis link will be valid for 24 hours.";
         await Send(toAddress, subject, message);
     }
 }

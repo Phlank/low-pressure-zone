@@ -6,7 +6,7 @@ using LowPressureZone.Identity.Constants;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
-public class PostSchedule : EndpointWithMapper<ScheduleRequest, ScheduleRequestMapper>
+public class PostSchedule : EndpointWithMapper<ScheduleRequest, ScheduleMapper>
 {
     public required DataContext DataContext { get; set; }
 
@@ -23,8 +23,8 @@ public class PostSchedule : EndpointWithMapper<ScheduleRequest, ScheduleRequestM
         var doesOverlapOtherSchedule = DataContext.Schedules.WhereOverlaps(schedule).Any();
         if (doesOverlapOtherSchedule)
         {
-            AddError(new ValidationFailure(nameof(req.Start), "Overlaps other schedule"));
-            AddError(new ValidationFailure(nameof(req.End), "Overlaps other schedule"));
+            AddError(new ValidationFailure(nameof(req.StartsAt), "Overlaps other schedule"));
+            AddError(new ValidationFailure(nameof(req.EndsAt), "Overlaps other schedule"));
         }
         var doesAudienceExist = DataContext.Audiences.Any(a => a.Id == req.AudienceId);
         if (!doesAudienceExist)
@@ -34,7 +34,7 @@ public class PostSchedule : EndpointWithMapper<ScheduleRequest, ScheduleRequestM
         ThrowIfAnyErrors();
 
         DataContext.Schedules.Add(schedule);
-        DataContext.SaveChanges();
+        await DataContext.SaveChangesAsync(ct);
         await SendCreatedAtAsync<GetScheduleById>(new { schedule.Id }, Response, cancellation: ct);
     }
 }

@@ -1,4 +1,5 @@
-﻿using FastEndpoints;
+﻿using System.Text.Json;
+using FastEndpoints;
 using FluentEmail.Core;
 using FluentValidation.Results;
 using LowPressureZone.Api.Constants;
@@ -11,12 +12,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Users.Register;
 
-public class PostRegister : Endpoint<RegisterRequest>
+public class PostRegister(UserManager<AppUser> userManager, IdentityContext identityContext) : Endpoint<RegisterRequest>
 {
-    public required UserManager<AppUser> UserManager { get; set; }
-    public required SignInManager<AppUser> SignInManager { get; set; }
-    public required IdentityContext IdentityContext { get; set; }
-    private DateTime _requestTime = DateTime.UtcNow;
+    private readonly DateTime _requestTime = DateTime.UtcNow;
 
     public override void Configure()
     {
@@ -31,34 +29,39 @@ public class PostRegister : Endpoint<RegisterRequest>
         try
         {
             context = RegistrationContext.Decode(req.Context);
+            if (context == null)
+            {
+                await this.SendDelayedForbiddenAsync(_requestTime, ct);
+                return;
+            }
         }
-        catch (Exception)
+        catch (JsonException)
         {
             await this.SendDelayedForbiddenAsync(_requestTime, ct);
-            return;
+            throw;
         }
 
-        var user = await UserManager.FindByEmailAsync(context.Email);
+        var user = await userManager.FindByEmailAsync(context.Email);
         if (user == null)
         {
             await this.SendDelayedForbiddenAsync(_requestTime, ct);
             return;
         }
 
-        var invitation = await IdentityContext.Invitations.FirstOrDefaultAsync(i => i.UserId == user.Id);
+        var invitation = await identityContext.Invitations.FirstOrDefaultAsync(i => i.UserId == user.Id, ct);
         if (invitation == null)
         {
             await this.SendDelayedForbiddenAsync(_requestTime, ct);
             return;
         }
         
-        var isUsernameInUse = await IdentityContext.Users.AnyAsync(u => u.NormalizedUserName == req.Username.ToUpper());
+        var isUsernameInUse = await identityContext.Users.AnyAsync(u => req.Username.Equals(u.UserName, StringComparison.OrdinalIgnoreCase), ct);
         if (isUsernameInUse)
         {
             ThrowError(new ValidationFailure(nameof(req.Username), Errors.Unique));
         }
 
-        var isValidToken = await UserManager.VerifyUserTokenAsync(user, TokenProviders.Default, TokenPurposes.Invite, context.Token);
+        var isValidToken = await userManager.VerifyUserTokenAsync(user, TokenProviders.Default, TokenPurposes.Invite, context.Token);
         if (!isValidToken)
         {
             await TaskUtilities.DelaySensitiveResponse(_requestTime);
@@ -66,14 +69,14 @@ public class PostRegister : Endpoint<RegisterRequest>
             return;
         }
 
-        var setUsernameResult = await UserManager.SetUserNameAsync(user, req.Username);
+        var setUsernameResult = await userManager.SetUserNameAsync(user, req.Username);
         setUsernameResult.Errors.Select(e => e.Description).ForEach((message) =>
         {
             AddError(new ValidationFailure(nameof(req.Username), message));
         });
         ThrowIfAnyErrors();
         
-        var setPasswordResult = await UserManager.AddPasswordAsync(user, req.Password);
+        var setPasswordResult = await userManager.AddPasswordAsync(user, req.Password);
         setPasswordResult.Errors.Select(e => e.Description).ForEach((message) =>
         {
             AddError(new ValidationFailure(nameof(req.Password), message));
@@ -81,11 +84,11 @@ public class PostRegister : Endpoint<RegisterRequest>
         ThrowIfAnyErrors();
 
         user.EmailConfirmed = true;
-        await UserManager.UpdateAsync(user);
+        await userManager.UpdateAsync(user);
 
         invitation.IsRegistered = true;
         invitation.RegistrationDate = DateTime.UtcNow;
-        await IdentityContext.SaveChangesAsync(ct);
+        await identityContext.SaveChangesAsync(ct);
 
         await SendNoContentAsync(ct);
     }

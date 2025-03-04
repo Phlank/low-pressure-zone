@@ -8,7 +8,7 @@ public static class RuleBuilderExtensions
 {
     public static IRuleBuilder<T, string> AbsoluteHttpUri<T>(this IRuleBuilder<T, string> ruleBuilder)
     {
-        return ruleBuilder.Must(e => Uri.IsWellFormedUriString(e, UriKind.Absolute)).WithMessage(Errors.InvalidUrl).Must(e => e.StartsWith("https://") || e.StartsWith("http://")).WithMessage(Errors.InvalidUrl);
+        return ruleBuilder.Must(e => Uri.IsWellFormedUriString(e, UriKind.Absolute)).WithMessage(Errors.InvalidUrl).Must(e => e.StartsWith("https://", StringComparison.InvariantCulture) || e.StartsWith("http://", StringComparison.InvariantCulture)).WithMessage(Errors.InvalidUrl);
     }
 
     private static readonly Regex InvalidUsernameCharactersRegex = new Regex("[^A-Za-z0-9-._@+]", RegexOptions.Compiled);
