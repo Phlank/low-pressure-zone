@@ -38,11 +38,11 @@ export const scheduleRequestRules = (
 ): PropertyRules<ScheduleRequest> => {
   return {
     audienceId: required(),
-    start: combineRules(required(), hourOnly()),
-    end: combineRules(
+    startsAt: combineRules(required(), hourOnly()),
+    endsAt: combineRules(
       required(),
       hourOnly(),
-      withinRangeOf(() => formState.start, 60, 1440, '1 - 24h allowed')
+      withinRangeOf(() => formState.startsAt, 60, 1440, '1 - 24h allowed')
     ),
     description: alwaysValid()
   }
@@ -55,11 +55,11 @@ export const timeslotRequestRules = (
     performerId: required(),
     performanceType: required(),
     name: alwaysValid(),
-    start: combineRules(required(), hourOnly()),
-    end: combineRules(
+    startsAt: combineRules(required(), hourOnly()),
+    endsAt: combineRules(
       required(),
       hourOnly(),
-      withinRangeOf(() => formState.start, 60, 180, '1 - 3h allowed')
+      withinRangeOf(() => formState.startsAt, 60, 180, '1 - 3h allowed')
     )
   }
 }

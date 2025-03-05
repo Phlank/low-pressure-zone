@@ -2,7 +2,6 @@
 using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Services;
-using LowPressureZone.Api.Utilities;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 

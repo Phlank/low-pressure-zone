@@ -1,4 +1,6 @@
-﻿namespace LowPressureZone.Api.Constants;
+﻿using LowPressureZone.Identity.Constants;
+
+namespace LowPressureZone.Api.Constants;
 
 internal static class Errors
 {
@@ -29,6 +31,9 @@ internal static class Errors
     public const string OverlapsOtherSchedule = "Overlaps other schedule";
     public const string ExcludesTimeslots = "Excludes timeslots";
 
+    // User errors
+    public static string InvalidRole => $"Allowed roles are {string.Join(" | ", RoleNames.All)}";
+
     // User-event errors
     public const string InvalidEmail = "Invalid email";
     public const string EmailAlreadyInvited = "Already invited";
@@ -38,5 +43,4 @@ internal static class Errors
     public const string PasswordLowercase = "Requires lowercase";
     public const string PasswordSymbol = "Requires symbol";
     public const string ExpiredToken = "Your user registration link has expired. Please request a new one.";
-    public const string InvalidRole = "Invalid role";
 }

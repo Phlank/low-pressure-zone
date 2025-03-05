@@ -54,8 +54,9 @@ public class PostRegister(UserManager<AppUser> userManager, IdentityContext iden
             await this.SendDelayedForbiddenAsync(_requestTime, ct);
             return;
         }
-        
-        var isUsernameInUse = await identityContext.Users.AnyAsync(u => req.Username.Equals(u.UserName, StringComparison.OrdinalIgnoreCase), ct);
+
+        var normalizedRequestUsername = req.Username.ToUpperInvariant();
+        var isUsernameInUse = await identityContext.Users.AnyAsync(u => u.NormalizedUserName == normalizedRequestUsername, ct);
         if (isUsernameInUse)
         {
             ThrowError(new ValidationFailure(nameof(req.Username), Errors.Unique));

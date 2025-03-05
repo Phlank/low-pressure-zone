@@ -22,7 +22,7 @@
             header="Date"
             sortable>
             <template #body="{ data }: { data: ScheduleResponse }">
-              {{ parseDate(data.start).toLocaleDateString() }}
+              {{ parseDate(data.startsAt).toLocaleDateString() }}
             </template>
           </Column>
           <Column
@@ -30,13 +30,13 @@
             field="end"
             header="Time">
             <template #body="{ data }: { data: ScheduleResponse }">
-              {{ formatTimeslot(parseDate(data.start)) }} -
-              {{ formatTimeslot(parseDate(data.end)) }}
+              {{ formatTimeslot(parseDate(data.startsAt)) }} -
+              {{ formatTimeslot(parseDate(data.endsAt)) }}
             </template>
           </Column>
           <Column v-if="isMobile">
             <template #body="{ data }: { data: ScheduleResponse }">
-              <div>{{ parseDate(data.start).toLocaleDateString() }}</div>
+              <div>{{ parseDate(data.startsAt).toLocaleDateString() }}</div>
               <div class="text-s ellipsis">{{ data.audience.name }}</div>
             </template>
           </Column>
@@ -113,8 +113,8 @@ const showEditScheduleDialog = ref(false)
 let editingId = ''
 const editScheduleFormInitialState = reactive({
   audienceId: '',
-  start: '',
-  end: '',
+  startsAt: '',
+  endsAt: '',
   description: '',
   startTime: new Date(),
   endTime: new Date()
@@ -123,11 +123,11 @@ const editScheduleFormInitialState = reactive({
 const handleEditScheduleActionClick = (schedule: ScheduleResponse) => {
   editingId = schedule.id
   editScheduleFormInitialState.audienceId = schedule.audience.id
-  editScheduleFormInitialState.start = schedule.start
-  editScheduleFormInitialState.end = schedule.end
+  editScheduleFormInitialState.startsAt = schedule.startsAt
+  editScheduleFormInitialState.endsAt = schedule.endsAt
   editScheduleFormInitialState.description = schedule.description
-  editScheduleFormInitialState.startTime = parseDate(schedule.start)
-  editScheduleFormInitialState.endTime = parseDate(schedule.end)
+  editScheduleFormInitialState.startTime = parseDate(schedule.startsAt)
+  editScheduleFormInitialState.endTime = parseDate(schedule.endsAt)
   showEditScheduleDialog.value = true
 }
 const handleEditScheduleSave = async () => {

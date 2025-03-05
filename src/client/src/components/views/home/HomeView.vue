@@ -17,7 +17,7 @@
 import UpcomingSchedules from './UpcomingSchedules.vue'
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @use '@/assets/styles/variables.scss';
 
 .discord-iframe {

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-variable-space-between">
+  <div class="dashboard-view flex-variable-space-between">
     <Menu
       v-if="!isMobile"
       class="flex-variable-space-between__left flex-variable-space-between__left--variable-height"
@@ -35,7 +35,7 @@
       </template>
     </Menu>
     <Panel
-      class="flex-variable-space-between__right flex-variable-space-between__right--full-width"
+      class="dashboard-view__content flex-variable-space-between__right flex-variable-space-between__right--full-width"
       :header="isMobile ? '' : (($router.currentRoute.value.name as string) ?? '')">
       <TitledNavMenu
         v-if="isMobile"
@@ -94,11 +94,11 @@ onMounted(async () => {
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @use '@/assets/styles/variables.scss';
 
-.flex-variable-space-between__right {
-  :deep(div.p-panel-header) {
+.dashboard-view {
+  &__content {
     @include variables.mobile {
       padding-bottom: 0;
     }

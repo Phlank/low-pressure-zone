@@ -72,7 +72,7 @@ const scheduleData: ComputedRef<ScheduleData | undefined> = computed(() => {
   const schedule = schedules.value[scheduleIndex.value]
   return {
     id: schedule.id,
-    start: parseDate(schedule.start),
+    start: parseDate(schedule.startsAt),
     description: schedule.description,
     audience: schedule.audience.name,
     timeslots: mapTimeslotDisplayData(schedule)
@@ -91,18 +91,18 @@ const mapTimeslotDisplayData = (schedule: ScheduleResponse) => {
   const timeslotData: TimeslotData[] = []
   if (timeslots.length === 0) return timeslotData
 
-  const startFirst = parseDate(timeslots[0].start)
-  const endLast = parseDate(timeslots[timeslots.length - 1].end)
+  const startFirst = parseDate(timeslots[0].startsAt)
+  const endLast = parseDate(timeslots[timeslots.length - 1].endsAt)
   const hours = hoursBetween(startFirst, endLast)
-  if (startFirst > parseDate(schedule.start)) {
+  if (startFirst > parseDate(schedule.startsAt)) {
     hours.unshift(getPreviousHour(startFirst))
   }
-  if (endLast < parseDate(schedule.end)) {
+  if (endLast < parseDate(schedule.endsAt)) {
     hours.push(endLast)
   }
 
   hours.forEach((hour) => {
-    const slot = timeslots.find((t) => Date.parse(t.start) === hour.getTime())
+    const slot = timeslots.find((t) => Date.parse(t.startsAt) === hour.getTime())
     timeslotData.push({
       start: hour,
       performer: slot?.performer.name ?? '',
@@ -116,7 +116,7 @@ onMounted(async () => {
   const response = await api.schedules.get({ after: new Date().toISOString() })
   if (tryHandleUnsuccessfulResponse(response, toast)) return
   if (response.isSuccess() && response.data) {
-    schedules.value = response.data.sort((a, b) => Date.parse(a.end) - Date.parse(b.end))
+    schedules.value = response.data.sort((a, b) => Date.parse(a.endsAt) - Date.parse(b.endsAt))
     isLoaded.value = true
   }
 })

@@ -22,25 +22,23 @@ import SiteNavMenu from '../../controls/SiteNavMenu.vue'
 const title = import.meta.env.VITE_SITE_NAME
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @use '@/assets/styles/variables.scss';
 
-.header {
+.site-header {
   &__dark-mode-toggle {
     @include variables.tiny {
       display: none;
     }
   }
-}
-
-.p-button {
-  margin: 0 variables.$space-s;
-}
-
-:deep(.p-toolbar-start) {
-  a {
-    text-decoration: none;
-    color: inherit;
+  .p-button {
+    margin: 0 variables.$space-s;
+  }
+  .p-toolbar-start {
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
   }
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <Toolbar
-    class="footer"
+    class="site-footer"
     style="border-style: none; background-color: inherit">
     <template #center>
       <PlayButton />
@@ -13,10 +13,10 @@ import { Toolbar } from 'primevue'
 import PlayButton from '../../controls/PlayButton.vue'
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @use '@/assets/styles/variables.scss';
 
-.footer {
+.site-footer {
   position: sticky;
   bottom: 0;
 }

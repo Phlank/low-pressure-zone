@@ -55,8 +55,8 @@ public class TimeslotMapper(IHttpContextAccessor contextAccessor,
         return new TimeslotResponse
         {
             Id = timeslot.Id,
-            Start = timeslot.StartsAt,
-            End = timeslot.EndsAt,
+            StartsAt = timeslot.StartsAt,
+            EndsAt = timeslot.EndsAt,
             Name = timeslot.Name,
             Performer = performerMapper.FromEntity(timeslot.Performer!),
             PerformanceType = timeslot.Type,

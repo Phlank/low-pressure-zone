@@ -52,8 +52,8 @@ public class ScheduleMapper(AudienceMapper audienceMapper,
         return new ScheduleResponse
         {
             Id = schedule.Id,
-            Start = schedule.StartsAt,
-            End = schedule.EndsAt,
+            StartsAt = schedule.StartsAt,
+            EndsAt = schedule.EndsAt,
             Description = schedule.Description,
             Audience = audienceMapper.FromEntity(schedule.Audience!),
             Timeslots = schedule.Timeslots.Select(timeslotMapper.FromEntity),

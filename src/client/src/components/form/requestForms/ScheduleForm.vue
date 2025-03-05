@@ -27,13 +27,13 @@
         :min-date="minimumDate(formState.startTime, minStartTime)"
         :model-value="formState.startTime"
         :disabled="formState.startTime.getTime() < minStartTime.getTime()"
-        :invalid="!validation.isValid('start')"
+        :invalid="!validation.isValid('startsAt')"
         @update:model-value="handleUpdateStart"
         show-time
         fluid />
       <ValidationLabel
         for="startTime"
-        :message="validation.message('start')">
+        :message="validation.message('startsAt')">
         Start Time
       </ValidationLabel>
     </IftaLabel>
@@ -45,14 +45,14 @@
         :min-date="formState.startTime"
         :max-date="new Date(formState.startTime.getTime() + MAX_DURATION_MINUTES * MS_PER_MINUTE)"
         :model-value="formState.endTime"
-        :invalid="!validation.isValid('end')"
+        :invalid="!validation.isValid('endsAt')"
         :disabled="formState.endTime.getTime() < minStartTime.getTime()"
         @update:model-value="handleUpdateEnd"
         show-time
         fluid />
       <ValidationLabel
         for="endTime"
-        :message="validation.message('end')">
+        :message="validation.message('endsAt')">
         End Time
       </ValidationLabel>
     </IftaLabel>
@@ -115,12 +115,12 @@ export interface ScheduleFormState extends ScheduleRequest {
 const formState: ScheduleFormState = reactive({
   audienceId: '',
   startTime: resetStartTime,
-  start: resetStartTime.toISOString(),
+  startsAt: resetStartTime.toISOString(),
   description: '',
   endTime: new Date(resetStartTime.getTime() + DEFAULT_MINUTES * MS_PER_MINUTE),
-  end: new Date(resetStartTime.getTime() + DEFAULT_MINUTES * MS_PER_MINUTE).toISOString()
+  endsAt: new Date(resetStartTime.getTime() + DEFAULT_MINUTES * MS_PER_MINUTE).toISOString()
 })
-const startRef = ref(formState.start)
+const startRef = ref(formState.startsAt)
 const validation = createFormValidation(formState, scheduleRequestRules(formState))
 
 const props = defineProps<{
@@ -131,8 +131,8 @@ const props = defineProps<{
 onMounted(() => {
   if (props.initialState != undefined) {
     formState.audienceId = props.initialState.audienceId
-    formState.start = props.initialState.start
-    formState.end = props.initialState.end
+    formState.startsAt = props.initialState.startsAt
+    formState.endsAt = props.initialState.endsAt
     formState.description = props.initialState.description
     formState.startTime = props.initialState.startTime
     formState.endTime = props.initialState.endTime
@@ -149,35 +149,35 @@ const handleUpdateStart = (value: Date | Date[] | (Date | null)[] | null | undef
   const newStart = value as Date
   setToHour(newStart)
   formState.startTime = newStart
-  formState.start = formState.startTime.toISOString()
+  formState.startsAt = formState.startTime.toISOString()
   formState.endTime = new Date(formState.startTime.getTime() + duration)
-  formState.end = formState.endTime.toISOString()
-  validation.validateIfDirty('start')
-  validation.validateIfDirty('end')
+  formState.endsAt = formState.endTime.toISOString()
+  validation.validateIfDirty('startsAt')
+  validation.validateIfDirty('endsAt')
 }
 
 const handleUpdateEnd = (value: Date | Date[] | (Date | null)[] | null | undefined) => {
   const newEnd = value as Date
   setToHour(newEnd)
   formState.endTime = newEnd
-  formState.end = formState.endTime.toISOString()
-  validation.validateIfDirty('end')
+  formState.endsAt = formState.endTime.toISOString()
+  validation.validateIfDirty('endsAt')
 }
 
 const reset = () => {
   now = new Date()
   formState.audienceId = ''
   formState.startTime = resetStartTime
-  formState.start = formState.startTime.toISOString()
+  formState.startsAt = formState.startTime.toISOString()
   formState.description = ''
   formState.endTime = new Date(resetStartTime.getTime() + DEFAULT_MINUTES * MS_PER_MINUTE)
-  formState.end = formState.endTime.toISOString()
+  formState.endsAt = formState.endTime.toISOString()
 }
 
 defineExpose({ formState, validation, reset })
 
 watch(
-  () => formState.start,
+  () => formState.startsAt,
   (newValue: string) => {
     startRef.value = newValue
   }

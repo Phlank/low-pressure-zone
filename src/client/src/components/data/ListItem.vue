@@ -13,7 +13,7 @@ const emit = defineEmits<{
 }>()
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @use '@/assets/styles/variables.scss';
 
 .list-item {
