@@ -6,7 +6,7 @@ public static class ClaimsPrincipalExtensions
 {
     public static bool IsInAnyRole(this ClaimsPrincipal principal, params IEnumerable<string> roles)
     {
-        if (roles.Count() == 0
+        if (!roles.Any()
             || principal.Identity == null
             || !principal.Identity.IsAuthenticated) return false;
 

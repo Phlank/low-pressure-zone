@@ -6,6 +6,6 @@ public static class DateTimeRangeExtensions
 {
     public static bool IsWithin(this IDateTimeRange self, IDateTimeRange other)
     {
-        return self.Start >= other.Start && self.End <= other.End;
+        return self.StartsAt >= other.StartsAt && self.EndsAt <= other.EndsAt;
     }
 }

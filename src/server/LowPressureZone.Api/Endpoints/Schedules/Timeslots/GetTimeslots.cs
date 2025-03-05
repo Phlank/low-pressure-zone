@@ -6,10 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
-public class GetTimeslots : EndpointWithoutRequest<IEnumerable<TimeslotResponse>, TimeslotResponseMapper>
+public class GetTimeslots(DataContext dataContext) : EndpointWithoutRequest<IEnumerable<TimeslotResponse>, TimeslotMapper>
 {
-    public required DataContext DataContext { get; set; }
-
     public override void Configure()
     {
         Get("/schedules/{scheduleId}/timeslots");
@@ -20,12 +18,17 @@ public class GetTimeslots : EndpointWithoutRequest<IEnumerable<TimeslotResponse>
     public override async Task HandleAsync(CancellationToken ct)
     {
         var scheduleId = Route<Guid>("scheduleId");
-        if (!DataContext.Has<Schedule>(scheduleId))
+        if (!dataContext.Has<Schedule>(scheduleId))
         {
             await SendNotFoundAsync(ct);
             return;
         }
-        var timeslots = await DataContext.Timeslots.AsNoTracking().Include("Performer").Where(t => t.ScheduleId == scheduleId).OrderBy(t => t.Start).ToListAsync();
-        await SendOkAsync(timeslots.Select(Map.FromEntity));
+
+        var timeslots = await dataContext.Timeslots.AsNoTracking()
+                                                   .Include(t => t.Performer)
+                                                   .Where(t => t.ScheduleId == scheduleId)
+                                                   .OrderBy(t => t.StartsAt)
+                                                   .ToListAsync(ct);
+        await SendOkAsync(timeslots.Select(Map.FromEntity), ct);
     }
 }

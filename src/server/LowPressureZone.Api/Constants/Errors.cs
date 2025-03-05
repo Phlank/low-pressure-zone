@@ -1,6 +1,8 @@
-﻿namespace LowPressureZone.Api.Constants;
+﻿using LowPressureZone.Identity.Constants;
 
-public static class Errors
+namespace LowPressureZone.Api.Constants;
+
+internal static class Errors
 {
     public const string Required = "Required";
 
@@ -16,13 +18,21 @@ public static class Errors
     public const string InvalidUrl = "Invalid URL";
     public static string MinLength(int value) => $"Minimum {value} characters";
 
-    // Performer errors
+    // Time errors
+    public static string MinDuration(int hours) => $"Minimum duration is {hours}h";
+    public static string MaxDuration(int hours) => $"Maximum duration is {hours}h";
+    public const string TimeInPast = "Cannot be in the past";
 
     // Timeslot errors
-    public const string TimeslotNotEditable = "Timeslot not editable to user";
-    public const string TimeslotNotDeletable = "Timeslot not deletable to user";
     public const string OverlapsOtherTimeslot = "Overlaps other timeslot";
     public const string OutOfScheduleRange = "Exceeds schedule";
+
+    // Schedule errors
+    public const string OverlapsOtherSchedule = "Overlaps other schedule";
+    public const string ExcludesTimeslots = "Excludes timeslots";
+
+    // User errors
+    public static string InvalidRole => $"Allowed roles are {string.Join(" | ", RoleNames.All)}";
 
     // User-event errors
     public const string InvalidEmail = "Invalid email";
@@ -33,5 +43,4 @@ public static class Errors
     public const string PasswordLowercase = "Requires lowercase";
     public const string PasswordSymbol = "Requires symbol";
     public const string ExpiredToken = "Your user registration link has expired. Please request a new one.";
-    public const string InvalidRole = "Invalid role";
 }

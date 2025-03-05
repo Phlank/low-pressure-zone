@@ -16,7 +16,7 @@ public static class HttpContextAccessorExtensions
 
     public static T Resolve<T>(this IHttpContextAccessor accessor)
     {
-        if (accessor.HttpContext == null) throw new ArgumentException(nameof(accessor), "HttpContext is null");
+        if (accessor.HttpContext == null) throw new ArgumentException($"{nameof(accessor)}.HttpContext is null");
         return (T?)accessor.HttpContext?.RequestServices.GetService(typeof(T)) ?? throw new InvalidOperationException("Unable to resolve service");
     }
 

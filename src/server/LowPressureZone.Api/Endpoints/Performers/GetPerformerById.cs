@@ -1,14 +1,13 @@
 ﻿using FastEndpoints;
+using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain;
 using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Performers;
 
-public sealed class GetPerformerById : EndpointWithoutRequest<PerformerResponse, PerformerResponseMapper>
+public sealed class GetPerformerById(DataContext dataContext, PerformerRules rules) : EndpointWithoutRequest<PerformerResponse, PerformerMapper>
 {
-    public required DataContext DataContext { get; set; }
-
     public override void Configure()
     {
         Get("/performers/{id}");
@@ -20,14 +19,16 @@ public sealed class GetPerformerById : EndpointWithoutRequest<PerformerResponse,
     public override async Task HandleAsync(CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        var performer = await DataContext.Performers.AsNoTracking()
+        var performer = await dataContext.Performers.AsNoTracking()
                                                     .Where(p => p.Id == id)
                                                     .FirstOrDefaultAsync(ct);
-        if (performer == null)
+        if (performer == null || rules.IsHiddenFromApi(performer))
         {
             await SendNotFoundAsync(ct);
             return;
         }
-        await SendOkAsync(Map.FromEntity(performer), ct);
+
+        var response = await Map.FromEntityAsync(performer, ct);
+        await SendOkAsync(response, ct);
     }
 }

@@ -32,6 +32,9 @@ namespace LowPressureZone.Domain.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -63,6 +66,9 @@ namespace LowPressureZone.Domain.Migrations
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("timestamp with time zone");
@@ -103,23 +109,23 @@ namespace LowPressureZone.Domain.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("End")
+                    b.Property<DateTime>("EndsAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("Start")
+                    b.Property<DateTime>("StartsAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AudienceId");
 
-                    b.HasIndex("End")
+                    b.HasIndex("EndsAt")
                         .IsUnique();
 
-                    b.HasIndex("Start")
+                    b.HasIndex("StartsAt")
                         .IsUnique();
 
                     b.ToTable("Schedules");
@@ -134,7 +140,7 @@ namespace LowPressureZone.Domain.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("End")
+                    b.Property<DateTime>("EndsAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("LastModifiedDate")
@@ -149,7 +155,7 @@ namespace LowPressureZone.Domain.Migrations
                     b.Property<Guid>("ScheduleId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("Start")
+                    b.Property<DateTime>("StartsAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Type")
@@ -158,14 +164,14 @@ namespace LowPressureZone.Domain.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("End")
+                    b.HasIndex("EndsAt")
                         .IsUnique();
 
                     b.HasIndex("PerformerId");
 
                     b.HasIndex("ScheduleId");
 
-                    b.HasIndex("Start")
+                    b.HasIndex("StartsAt")
                         .IsUnique();
 
                     b.ToTable("Timeslots");

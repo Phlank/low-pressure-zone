@@ -10,13 +10,8 @@ using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.Endpoints.Users.Invite;
 
-public class PostInvite : Endpoint<InviteRequest, EmptyResponse>
+public class PostInvite(UserManager<AppUser> userManager, IdentityContext identityContext, EmailService emailService) : Endpoint<InviteRequest>
 {
-    public required UserManager<AppUser> UserManager { get; set; }
-    public required IdentityContext IdentityContext { get; set; }
-    public required EmailService EmailService { get; set; }
-    public required UriService UriService { get; set; }
-
     public override void Configure()
     {
         Post("/users/invite");
@@ -28,37 +23,40 @@ public class PostInvite : Endpoint<InviteRequest, EmptyResponse>
         ValidateAccessForAssignedRole(req);
         ThrowIfAnyErrors();
 
-        var normalizedEmail = req.Email.ToUpper();
-        var isInUse = IdentityContext.Users.Any(u => u.NormalizedEmail == normalizedEmail);
+        var normalizedEmail = req.Email.ToUpperInvariant();
+        var isInUse = identityContext.Users.Any(u => u.NormalizedEmail == normalizedEmail);
         if (isInUse)
         {
             ThrowError(new ValidationFailure(nameof(req.Email), Errors.Unique));
         }
 
+        var username = Guid.NewGuid().ToString();
+        var normalizedUsername = username.ToUpperInvariant();
         var user = new AppUser()
         {
             Email = req.Email,
             NormalizedEmail = normalizedEmail,
+            UserName = username,
+            NormalizedUserName = username.ToUpperInvariant()
         };
-        var createResult = await UserManager.CreateAsync(user);
+        var createResult = await userManager.CreateAsync(user);
         createResult.Errors.Select(e => e.Description).ForEach(e => AddError(e));
         ThrowIfAnyErrors();
 
-        var addToRoleResult = await UserManager.AddToRoleAsync(user, req.Role);
+        var addToRoleResult = await userManager.AddToRoleAsync(user, req.Role);
         addToRoleResult.Errors.Select(e => e.Description).ForEach(e => AddError(e));
         ThrowIfAnyErrors();
 
-        var inviteToken = await UserManager.GenerateUserTokenAsync(user, TokenProviders.Default, TokenPurposes.Invite);
-        var inviteUrl = UriService.GetRegisterUri(req.Email, inviteToken);
-        await EmailService.SendInviteEmail(req.Email, inviteUrl.AbsoluteUri);
+        var inviteToken = await userManager.GenerateUserTokenAsync(user, TokenProviders.Default, TokenPurposes.Invite);
+        await emailService.SendInviteEmail(req.Email, inviteToken);
 
         var invitation = new Invitation<Guid, AppUser>()
         {
             UserId = user.Id,
             InvitationDate = DateTime.UtcNow
         };
-        await IdentityContext.Invitations.AddAsync(invitation, ct);
-        await IdentityContext.SaveChangesAsync(ct);
+        await identityContext.Invitations.AddAsync(invitation, ct);
+        await identityContext.SaveChangesAsync(ct);
 
         await SendNoContentAsync(ct);
     }

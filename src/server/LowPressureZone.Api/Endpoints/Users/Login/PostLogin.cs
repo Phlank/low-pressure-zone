@@ -2,18 +2,14 @@
 using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Services;
-using LowPressureZone.Api.Utilities;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.Endpoints.Users.Login;
 
-public class PostLogin : Endpoint<LoginRequest, LoginResponse>
+public class PostLogin(SignInManager<AppUser> signInManager, UserManager<AppUser> userManager, EmailService emailService) : Endpoint<LoginRequest, LoginResponse>
 {
-    public required SignInManager<AppUser> SignInManager { get; set; }
-    public required UserManager<AppUser> UserManager { get; set; }
-    public required EmailService EmailService { get; set; }
-    private DateTime _requestStart = DateTime.UtcNow;
+    private readonly DateTime _requestStart = DateTime.UtcNow;
 
     public override void Configure()
     {
@@ -32,22 +28,22 @@ public class PostLogin : Endpoint<LoginRequest, LoginResponse>
 
         if (User.Identities.Any(e => e.IsAuthenticated))
         {
-            await SignInManager.SignOutAsync();
+            await signInManager.SignOutAsync();
         }
 
-        var user = await UserManager.FindByNameAsync(req.Username);
+        var user = await userManager.FindByNameAsync(req.Username);
         if (user == null || user.Email == null)
         {
             await this.SendDelayedForbiddenAsync(_requestStart, ct);
             return;
         }
 
-        var signInResult = await SignInManager.PasswordSignInAsync(req.Username, req.Password, true, false);
+        var signInResult = await signInManager.PasswordSignInAsync(req.Username, req.Password, true, false);
 
         if (signInResult.RequiresTwoFactor)
         {
-            var token = await UserManager.GenerateTwoFactorTokenAsync(user, TokenProviders.Email);
-            await EmailService.SendTwoFactorEmail(user.Email, req.Username, token);
+            var token = await userManager.GenerateTwoFactorTokenAsync(user, TokenProviders.Email);
+            await emailService.SendTwoFactorEmail(user.Email, req.Username, token);
             await SendOkAsync(new LoginResponse
             {
                 RequiresTwoFactor = true,

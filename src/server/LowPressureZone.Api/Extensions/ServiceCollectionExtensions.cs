@@ -1,4 +1,6 @@
-﻿using FluentEmail.Core.Interfaces;
+﻿using FastEndpoints;
+using FastEndpoints.Swagger;
+using FluentEmail.Core.Interfaces;
 using FluentEmail.Mailgun;
 using LowPressureZone.Api.Endpoints.Audiences;
 using LowPressureZone.Api.Endpoints.Performers;
@@ -7,9 +9,11 @@ using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Domain;
-using LowPressureZone.Domain.BusinessRules;
 using LowPressureZone.Identity;
+using LowPressureZone.Identity.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Api.Extensions;
 
@@ -19,7 +23,7 @@ public static class ServiceCollectionExtensions
     {
         var identityConnectionString = builder.Configuration.GetConnectionString("Identity");
         var dataConnectionString = builder.Configuration.GetConnectionString("Data");
-        
+
         builder.Services.AddDbContext<IdentityContext>(options =>
         {
             options.UseNpgsql(identityConnectionString);
@@ -30,34 +34,70 @@ public static class ServiceCollectionExtensions
         });
     }
 
-    public static void AddApiModelMappers(this IServiceCollection services)
+    public static void ConfigureIdentity(this IServiceCollection services)
     {
-        services.AddSingleton<AudienceMapper>();
-        services.AddSingleton<ScheduleRequestMapper>();
-        services.AddSingleton<ScheduleResponseMapper>();
-        services.AddSingleton<PerformerRequestMapper>();
-        services.AddSingleton<PerformerResponseMapper>();
-        services.AddSingleton<TimeslotRequestMapper>();
-        services.AddSingleton<TimeslotResponseMapper>();
+        services.AddIdentity<AppUser, AppRole>(options =>
+        {
+            options.Password.RequireNonAlphanumeric = true;
+            options.Password.RequireDigit = true;
+            options.Password.RequireLowercase = true;
+            options.Password.RequireUppercase = true;
+            options.Password.RequiredLength = 8;
+            options.User.RequireUniqueEmail = true;
+        }).AddEntityFrameworkStores<IdentityContext>().AddDefaultTokenProviders();
+        services.AddAuthentication();
+        services.AddAuthorization();
+        services.ConfigureApplicationCookie(options =>
+        {
+            options.Cookie.Name = "LowPressureZoneCookie";
+            options.Cookie.HttpOnly = true;
+            options.ExpireTimeSpan = TimeSpan.FromDays(1);
+            options.Cookie.SameSite = SameSiteMode.Lax;
+        });
     }
 
-    public static void AddDomainRules(this IServiceCollection services)
+    public static void ConfigureWebApi(this IServiceCollection services)
     {
+        services.AddFastEndpoints();
+        services.AddHttpContextAccessor();
+        services.SwaggerDocument();
+        services.AddCors(options =>
+        {
+            options.AddPolicy("Development", builder =>
+            {
+                builder.WithOrigins("http://localhost:4001")
+                       .AllowAnyHeader()
+                       .WithMethods("GET", "PUT", "POST", "DELETE")
+                       .AllowCredentials();
+            });
+            options.AddPolicy("Production", builder =>
+            {
+                builder.WithOrigins("https://lowpressurezone.com")
+                       .AllowAnyHeader()
+                       .WithMethods("GET", "PUT", "POST", "DELETE")
+                       .AllowCredentials();
+            });
+        });
+    }
+
+    public static void AddApiServices(this IServiceCollection services)
+    {
+        services.AddSingleton<AudienceMapper>();
+        services.AddSingleton<ScheduleMapper>();
+        services.AddSingleton<PerformerMapper>();
+        services.AddSingleton<TimeslotMapper>();
+
         services.AddSingleton<AudienceRules>();
         services.AddSingleton<ScheduleRules>();
         services.AddSingleton<PerformerRules>();
         services.AddSingleton<TimeslotRules>();
-    }
 
-    public static void ConfigureApiServices(this WebApplicationBuilder builder)
-    {
-        var emailOptions = builder.Configuration.GetRequiredSection(EmailServiceOptions.Name).Get<EmailServiceOptions>()
-                           ?? throw new InvalidOperationException("Cannot register email services without configuration"); ;
-        builder.Services.Configure<EmailServiceOptions>(builder.Configuration.GetSection(EmailServiceOptions.Name));
-        builder.Services.AddSingleton<ISender>(new MailgunSender(emailOptions.MailgunDomain, emailOptions.MailgunApiKey));
-        builder.Services.AddSingleton<EmailService>();
-
-        builder.Services.Configure<UriServiceOptions>(builder.Configuration.GetSection(UriServiceOptions.Name));
-        builder.Services.AddSingleton<UriService>();
+        services.AddSingleton<ISender>((services) =>
+        {
+            var options = services.GetRequiredService<IOptions<EmailServiceOptions>>();
+            return new MailgunSender(options.Value.MailgunDomain, options.Value.MailgunApiKey);
+        });
+        services.AddSingleton<EmailService>();
+        services.AddSingleton<UriService>();
     }
 }

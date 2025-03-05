@@ -6,7 +6,7 @@
       <h4>Create New Schedule</h4>
       <ScheduleForm
         ref="createForm"
-        :audiences="audiences" />
+        :audiences="audiences.filter((a) => a.isLinkableToSchedule)" />
       <Button
         class="input"
         label="Create"

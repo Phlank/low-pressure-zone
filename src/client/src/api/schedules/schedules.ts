@@ -19,8 +19,8 @@ export default {
 const mapRequest = <TSchedule extends ScheduleRequest>(schedule: TSchedule): ScheduleRequest => {
   return {
     audienceId: schedule.audienceId,
-    start: schedule.start,
-    end: schedule.end,
+    startsAt: schedule.startsAt,
+    endsAt: schedule.endsAt,
     description: schedule.description
   }
 }

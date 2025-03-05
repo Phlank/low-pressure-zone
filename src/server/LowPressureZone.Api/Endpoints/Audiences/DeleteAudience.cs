@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Audiences;
 
-public class DeleteAudience : EndpointWithoutRequest<EmptyResponse>
+public class DeleteAudience : EndpointWithoutRequest
 {
     private readonly DataContext _dataContext;
     private readonly AudienceRules _rules;
@@ -29,12 +29,12 @@ public class DeleteAudience : EndpointWithoutRequest<EmptyResponse>
     {
         var id = Route<Guid>("id");
         var audience = await _dataContext.Audiences.AsNoTracking()
-                                                  .Where(a => a.Id == id)
-                                                  .FirstOrDefaultAsync(ct);
+                                                   .Where(a => a.Id == id)
+                                                   .FirstOrDefaultAsync(ct);
 
-        if (audience == null)
+        if (audience == null || audience.IsDeleted)
         {
-            await SendNotFoundAsync();
+            await SendNotFoundAsync(ct);
             return;
         }
 
@@ -44,10 +44,10 @@ public class DeleteAudience : EndpointWithoutRequest<EmptyResponse>
             return;
         }
 
-        await _rules.ValidateDeleteAsync(audience, ct);
-        ThrowIfAnyErrors();
-
-        await _dataContext.Audiences.Where(a => a.Id == id).ExecuteDeleteAsync(ct);
-        await SendNotFoundAsync(ct);
+        await _dataContext.Schedules.Where(s => s.StartsAt > DateTime.UtcNow).ExecuteDeleteAsync(ct);
+        audience.IsDeleted = true;
+        audience.LastModifiedDate = DateTime.UtcNow;
+        await _dataContext.SaveChangesAsync(ct);
+        await SendNoContentAsync(ct);
     }
 }

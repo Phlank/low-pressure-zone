@@ -1,22 +1,11 @@
 ﻿using FastEndpoints;
-using FluentValidation.Results;
-using LowPressureZone.Api.Constants;
 using LowPressureZone.Domain;
-using LowPressureZone.Domain.BusinessRules;
 using LowPressureZone.Identity.Constants;
-using LowPressureZone.Identity.Extensions;
 
 namespace LowPressureZone.Api.Endpoints.Performers;
 
-public sealed class PostPerformer : EndpointWithMapper<PerformerRequest, PerformerRequestMapper>
+public sealed class PostPerformer(DataContext dataContext) : EndpointWithMapper<PerformerRequest, PerformerMapper>
 {
-    private readonly DataContext _dataContext;
-
-    public PostPerformer(DataContext dataContext)
-    {
-        _dataContext = dataContext;
-    }
-
     public override void Configure()
     {
         Post("/performers");
@@ -26,9 +15,9 @@ public sealed class PostPerformer : EndpointWithMapper<PerformerRequest, Perform
 
     public override async Task HandleAsync(PerformerRequest req, CancellationToken ct)
     {
-        var performer = Map.ToEntity(req);
-        _dataContext.Performers.Add(performer);
-        _dataContext.SaveChanges();
-        await SendCreatedAtAsync<GetPerformerById>(new { performer.Id }, Response);
+        var performer = await Map.ToEntityAsync(req, ct);
+        dataContext.Performers.Add(performer);
+        await dataContext.SaveChangesAsync(ct);
+        await SendCreatedAtAsync<GetPerformerById>(new { performer.Id }, Response, cancellation: ct);
     }
 }

@@ -62,7 +62,7 @@
       <TimeslotForm
         ref="timeslotForm"
         :initial-state="formInitialValue"
-        :performers="performers"
+        :performers="performers.filter((p) => p.isLinkableToTimeslot)"
         :disabled="isSubmitting" />
     </FormDialog>
     <DeleteDialog
@@ -107,9 +107,11 @@ const props = defineProps<{
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const timeslots: Ref<TimeslotResponse[]> = ref(props.schedule.timeslots)
-const startDate = ref(parseDate(props.schedule.start))
-const endDate = ref(parseDate(props.schedule.end))
+const startDate = ref(parseDate(props.schedule.startsAt))
+const endDate = ref(parseDate(props.schedule.endsAt))
 const isSubmitting = ref(false)
+
+const allowedPerformers = ref(props.performers.filter((p) => p.isLinkableToTimeslot))
 
 interface TimeslotRow {
   start: Date
@@ -124,7 +126,7 @@ const setupRows = () => {
     newRows.push({
       start: hour,
       isEditing: false,
-      timeslot: timeslots.value.find((t) => Date.parse(t.start) === hour.getTime())
+      timeslot: timeslots.value.find((t) => Date.parse(t.startsAt) === hour.getTime())
     })
   })
   rows.value = newRows
@@ -139,8 +141,8 @@ const rows: Ref<TimeslotRow[]> = ref([])
 const showFormDialog = ref(false)
 let editingId = ''
 const formInitialValue: Ref<TimeslotRequest> = ref({
-  start: '',
-  end: '',
+  startsAt: '',
+  endsAt: '',
   performerId: '',
   performanceType: PerformanceType.Live,
   name: ''
@@ -150,8 +152,8 @@ const handleEditClicked = (row: TimeslotRow) => {
   showFormDialog.value = true
   editingId = row.timeslot?.id ?? ''
   formInitialValue.value = {
-    start: row.start.toISOString(),
-    end: getNextHour(row.start).toISOString(),
+    startsAt: row.start.toISOString(),
+    endsAt: getNextHour(row.start).toISOString(),
     performerId: row.timeslot?.performer.id ?? '',
     performanceType: row.timeslot?.performanceType ?? PerformanceType.Live,
     name: row.timeslot?.name ?? ''
@@ -180,13 +182,13 @@ const handleSave = async () => {
     showEditSuccessToast(
       toast,
       'timeslot',
-      `${formatTimeslot(parseDate(request.start))} | ${requestPerformer!.name}`
+      `${formatTimeslot(parseDate(request.startsAt))} | ${requestPerformer!.name}`
     )
   } else {
     showCreateSuccessToast(
       toast,
       'timeslot',
-      `${formatTimeslot(parseDate(request.start))} | ${requestPerformer!.name}`
+      `${formatTimeslot(parseDate(request.startsAt))} | ${requestPerformer!.name}`
     )
   }
 
@@ -205,7 +207,7 @@ const deletingName = ref('')
 const handleDeleteClicked = async (row: TimeslotRow) => {
   if (!row.timeslot) return
   deletingId = row.timeslot!.id
-  deletingName.value = `${formatTimeslot(parseDate(row.timeslot.start))} - ${row.timeslot.performer.name}`
+  deletingName.value = `${formatTimeslot(parseDate(row.timeslot.startsAt))} - ${row.timeslot.performer.name}`
   showDeleteDialog.value = true
 }
 const handleDelete = async () => {

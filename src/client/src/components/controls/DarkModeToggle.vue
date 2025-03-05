@@ -4,8 +4,7 @@
     <ToggleSwitch
       :model-value="isDarkMode"
       @value-change="handleDarkModeToggle"
-      class="dark-mode-toggle"
-    />
+      class="dark-mode-toggle" />
     <i class="pi pi-moon"></i>
   </div>
 </template>
@@ -47,7 +46,7 @@ const handleDarkModeToggle = () => {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @use '@/assets/styles/variables.scss';
 
 .dark-mode-toggle {

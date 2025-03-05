@@ -2,13 +2,13 @@
 using FluentValidation.Results;
 using LowPressureZone.Api.Constants;
 using LowPressureZone.Domain;
+using LowPressureZone.Identity.Constants;
+using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Audiences;
 
-public sealed class PutAudience : Endpoint<AudienceRequest, EmptyResponse, AudienceMapper>
+public sealed class PutAudience(DataContext dataContext) : EndpointWithMapper<AudienceRequest, AudienceMapper>
 {
-    public required DataContext DataContext { get; set; }
-
     public override void Configure()
     {
         Put("/audiences/{id}");
@@ -20,27 +20,14 @@ public sealed class PutAudience : Endpoint<AudienceRequest, EmptyResponse, Audie
     public override async Task HandleAsync(AudienceRequest req, CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        var existingAudience = DataContext.Audiences.Find(id);
-        if (existingAudience == null)
+        var audience = await dataContext.Audiences.FirstOrDefaultAsync(a => a.Id == id, ct);
+        if (audience == null || (audience.IsDeleted && !User.IsInRole(RoleNames.Admin)))
         {
-            await SendNotFoundAsync();
+            await SendNotFoundAsync(ct);
             return;
         }
 
-        var isNameInUse = DataContext.Audiences.Any(a => a.Name == req.Name && a.Id != id);
-        if (isNameInUse)
-        {
-            ThrowError(new ValidationFailure(nameof(id), Errors.Unique));
-        }
-
-        if (existingAudience.Name != req.Name || existingAudience.Url != req.Url)
-        {
-            existingAudience.Name = req.Name;
-            existingAudience.Url = req.Url;
-            existingAudience.LastModifiedDate = DateTime.UtcNow;
-            DataContext.SaveChanges();
-        }
-
-        await SendNoContentAsync();
+        await Map.UpdateEntityAsync(req, audience, ct);
+        await SendNoContentAsync(ct);
     }
 }

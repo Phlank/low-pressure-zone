@@ -1,48 +1,61 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Rules;
+using LowPressureZone.Domain;
 using LowPressureZone.Domain.Entities;
 using LowPressureZone.Domain.Extensions;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
+using Microsoft.EntityFrameworkCore;
+using static FastEndpoints.Ep;
 
 namespace LowPressureZone.Api.Endpoints.Audiences;
 
-public sealed class AudienceMapper : Mapper<AudienceRequest, AudienceResponse, Audience>, IRequestMapper, IResponseMapper
+public sealed class AudienceMapper(IHttpContextAccessor accessor, AudienceRules rules) : Mapper<AudienceRequest, AudienceResponse, Audience>, IRequestMapper, IResponseMapper
 {
-    private readonly IHttpContextAccessor _accessor;
-    private readonly AudienceRules _rules;
-
-    public AudienceMapper(IHttpContextAccessor accessor, AudienceRules rules)
+    public override Audience ToEntity(AudienceRequest req)
     {
-        _accessor = accessor;
-        _rules = rules;
-    }
-
-    public override Audience ToEntity(AudienceRequest r)
-    {
-        var user = _accessor.GetAuthenticatedUserOrDefault() ?? throw Exceptions.NoAuthorizedUserForToEntityMap;
+        var user = accessor.GetAuthenticatedUserOrDefault() ?? throw Exceptions.NoAuthorizedUserForToEntityMap;
         return new Audience
         {
             Id = Guid.NewGuid(),
-            Name = r.Name.Trim(),
-            Url = r.Url.Trim(),
+            Name = req.Name.Trim(),
+            Url = req.Url.Trim(),
             LinkedUserIds = new() { user.GetIdOrDefault() },
             CreatedDate = DateTime.UtcNow,
             LastModifiedDate = DateTime.UtcNow
         };
     }
 
-    public override AudienceResponse FromEntity(Audience e)
+    public override Task<Audience> ToEntityAsync(AudienceRequest r, CancellationToken ct = default)
+        => Task.FromResult(ToEntity(r));
+
+    public override async Task<Audience> UpdateEntityAsync(AudienceRequest req, Audience audience, CancellationToken ct = default)
+    {
+        var dataContext = Resolve<DataContext>();
+        audience.Name = req.Name;
+        audience.Url = req.Url;
+        if (dataContext.ChangeTracker.HasChanges())
+        {
+            audience.LastModifiedDate = DateTime.UtcNow;
+            await dataContext.SaveChangesAsync(ct);
+        }
+        return audience;
+    }
+
+    public override AudienceResponse FromEntity(Audience audience)
     {
         return new AudienceResponse
         {
-            Id = e.Id,
-            Name = e.Name,
-            Url = e.Url,
-            IsEditable = _rules.IsEditAuthorized(e),
-            IsDeletable = _rules.IsDeleteAuthorized(e),
-            IsLinkableToSchedule = _rules.IsScheduleLinkAuthorized(e)
+            Id = audience.Id,
+            Name = audience.Name,
+            Url = audience.Url,
+            IsEditable = rules.IsEditAuthorized(audience),
+            IsDeletable = rules.IsDeleteAuthorized(audience) && !audience.IsDeleted,
+            IsLinkableToSchedule = rules.IsScheduleLinkAuthorized(audience)
         };
     }
+
+    public override Task<AudienceResponse> FromEntityAsync(Audience audience, CancellationToken ct = default)
+        => Task.FromResult(FromEntity(audience));
 }

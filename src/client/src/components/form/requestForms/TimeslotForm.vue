@@ -5,9 +5,8 @@
         <InputText
           class="input__field"
           id="startInput"
-          :model-value="formatTimeslot(parseDate(formState.start))"
-          disabled
-        />
+          :model-value="formatTimeslot(parseDate(formState.startsAt))"
+          disabled />
         <label for="startInput">Start</label>
       </IftaLabel>
       <IftaLabel class="input input--medium">
@@ -20,13 +19,11 @@
           :options="performers"
           v-model:model-value="formState.performerId"
           @change="() => validation.validateIfDirty('performerId')"
-          :invalid="!validation.isValid('performerId')"
-        />
+          :invalid="!validation.isValid('performerId')" />
         <ValidationLabel
           for="timeslotPerformerSelect"
           text="Performer"
-          :message="validation.message('performerId')"
-        />
+          :message="validation.message('performerId')" />
       </IftaLabel>
       <IftaLabel class="input input--small">
         <Select
@@ -36,13 +33,11 @@
           :options="performanceTypes"
           v-model:model-value="formState.performanceType"
           @change="() => validation.validateIfDirty('performanceType')"
-          :invalid="!validation.isValid('performanceType')"
-        />
+          :invalid="!validation.isValid('performanceType')" />
         <ValidationLabel
           for="timeslotTypeSelect"
           text="Type"
-          :message="validation.message('performanceType')"
-        />
+          :message="validation.message('performanceType')" />
       </IftaLabel>
     </div>
     <div class="desktop-inline">
@@ -53,14 +48,12 @@
           :disabled="isSubmitting || disabled"
           v-model:model-value="formState.name"
           @change="() => validation.validateIfDirty('name')"
-          :invalid="!validation.isValid('name')"
-        />
+          :invalid="!validation.isValid('name')" />
         <ValidationLabel
           for="timeslotNameInput"
           text="Name"
           :message="validation.message('name')"
-          optional
-        />
+          optional />
       </IftaLabel>
     </div>
   </div>
@@ -89,8 +82,8 @@ const defaultStartPerformerId = computed(() => {
 })
 
 const formState: TimeslotRequest = reactive({
-  start: '',
-  end: '',
+  startsAt: '',
+  endsAt: '',
   performerId: '',
   performanceType: PerformanceType.Live,
   name: null
@@ -104,8 +97,8 @@ onMounted(() => {
 })
 
 const reset = () => {
-  formState.start = props.initialState.start
-  formState.end = props.initialState.end
+  formState.startsAt = props.initialState.startsAt
+  formState.endsAt = props.initialState.endsAt
   formState.performerId = defaultStartPerformerId.value ?? props.initialState.performerId
   formState.performanceType = props.initialState.performanceType
   formState.name = props.initialState.name

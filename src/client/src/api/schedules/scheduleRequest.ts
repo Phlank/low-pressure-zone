@@ -1,6 +1,6 @@
 export interface ScheduleRequest {
-  start: string
-  end: string
+  startsAt: string
+  endsAt: string
   description: string
   audienceId: string
 }

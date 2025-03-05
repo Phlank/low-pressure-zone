@@ -3,8 +3,8 @@ import type { TimeslotResponse } from '@/api/schedules/timeslots/timeslotRespons
 
 export interface ScheduleResponse {
   id: string
-  start: string
-  end: string
+  startsAt: string
+  endsAt: string
   description: string
   audience: AudienceResponse
   timeslots: TimeslotResponse[]

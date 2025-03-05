@@ -6,8 +6,8 @@ export interface TimeslotResponse {
   performer: PerformerResponse
   performanceType: PerformanceType
   name: string | null
-  start: string
-  end: string
+  startsAt: string
+  endsAt: string
   isEditable: boolean
   isDeletable: boolean
 }

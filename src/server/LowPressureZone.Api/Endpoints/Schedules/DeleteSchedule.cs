@@ -1,17 +1,13 @@
 ﻿using FastEndpoints;
-using FluentValidation.Results;
+using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain;
-using LowPressureZone.Domain.Entities;
-using LowPressureZone.Domain.Extensions;
 using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
-public class DeleteSchedule : EndpointWithoutRequest<EmptyResponse>
+public class DeleteSchedule(DataContext dataContext, ScheduleRules rules) : EndpointWithoutRequest
 {
-    public required DataContext DataContext { get; set; }
-
     public override void Configure()
     {
         Delete("/schedules/{id}");
@@ -23,16 +19,23 @@ public class DeleteSchedule : EndpointWithoutRequest<EmptyResponse>
     public override async Task HandleAsync(CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        if (DataContext.Schedules.Where(s => s.Id == id && s.Timeslots.Any()).Any())
+        var schedule = await dataContext.Schedules.AsNoTracking()
+                                                  .Include(s => s.Audience)
+                                                  .Where(s => s.Id == id)
+                                                  .FirstOrDefaultAsync(ct);
+        if (schedule == null)
         {
-            ThrowError(new ValidationFailure(null, "Cannot delete schedule with timeslots"));
-        }
-        var deleted = await DataContext.Schedules.Where(s => s.Id == id).ExecuteDeleteAsync(ct);
-        if (deleted > 0)
-        {
-            await SendNoContentAsync();
+            await SendNotFoundAsync(ct);
             return;
         }
-        await SendNotFoundAsync();
+
+        if (!rules.IsDeleteAuthorized(schedule))
+        {
+            await SendUnauthorizedAsync(ct);
+            return;
+        }
+
+        await dataContext.Schedules.Where(s => s.Id == id).ExecuteDeleteAsync(ct);
+        await SendNoContentAsync(ct);
     }
 }

@@ -2,9 +2,7 @@ using System.Text.Json;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Identity;
-using LowPressureZone.Identity.Entities;
-using Microsoft.AspNetCore.Identity;
+using LowPressureZone.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Minerals.StringCases;
 
@@ -20,60 +18,17 @@ if (builder.Environment.IsProduction())
 {
     builder.Configuration.AddJsonFile("appsettings.Production.json", optional: true);
 }
+builder.Services.Configure<EmailServiceOptions>(builder.Configuration.GetSection(EmailServiceOptions.Name));
+builder.Services.Configure<UriServiceOptions>(builder.Configuration.GetSection(UriServiceOptions.Name));
 
 builder.AddDatabases();
 builder.Services.Configure<JsonOptions>(options =>
 {
     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
-builder.Services.AddIdentity<AppUser, AppRole>(options =>
-{
-    options.Password.RequireNonAlphanumeric = true;
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequiredLength = 8;
-    options.User.RequireUniqueEmail = true;
-}).AddEntityFrameworkStores<IdentityContext>().AddDefaultTokenProviders();
-builder.Services.AddAuthentication();
-builder.Services.AddAuthorization();
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.Cookie.Name = "LowPressureZoneCookie";
-    options.Cookie.HttpOnly = true;
-    options.ExpireTimeSpan = TimeSpan.FromDays(1);
-    options.Cookie.SameSite = SameSiteMode.Lax;
-});
-builder.Services.AddFastEndpoints();
-builder.Services.AddHttpContextAccessor();
-builder.Services.SwaggerDocument();
-builder.Services.AddCors(options =>
-{
-    if (builder.Environment.IsDevelopment())
-    {
-        options.AddPolicy("Development", builder =>
-        {
-            builder.WithOrigins("http://localhost:4001")
-                   .AllowAnyHeader()
-                   .WithMethods("GET", "PUT", "POST", "DELETE")
-                   .AllowCredentials();
-        });
-    }
-    else
-    {
-        options.AddPolicy("Production", builder =>
-        {
-            builder.WithOrigins("https://lowpressurezone.com")
-                   .AllowAnyHeader()
-                   .WithMethods("GET", "PUT", "POST", "DELETE")
-                   .AllowCredentials();
-        });
-    }
-});
-
-builder.Services.AddApiModelMappers();
-builder.Services.AddDomainRules();
-builder.ConfigureApiServices();
+builder.Services.ConfigureIdentity();
+builder.Services.ConfigureWebApi();
+builder.Services.AddApiServices();
 
 var app = builder.Build();
 app.UseCors(app.Environment.IsDevelopment() ? "Development" : "Production");
