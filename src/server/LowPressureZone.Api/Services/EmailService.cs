@@ -1,5 +1,6 @@
 ﻿using FluentEmail.Core;
 using FluentEmail.Core.Interfaces;
+using LowPressureZone.Identity;
 using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Api.Services;
@@ -12,7 +13,7 @@ public class EmailService(IOptions<EmailServiceOptions> options, UriService uriS
                          .To(toAddress)
                          .Subject(subject)
                          .Body(body);
-        var response = await sender.SendAsync(email);
+        await sender.SendAsync(email);
     }
 
     public async Task SendTwoFactorEmail(string toAddress, string username, string code)
@@ -22,9 +23,9 @@ public class EmailService(IOptions<EmailServiceOptions> options, UriService uriS
         await Send(toAddress, subject, message);
     }
 
-    public async Task SendInviteEmail(string toAddress, string token)
+    public async Task SendInviteEmail(string toAddress, TokenContext context)
     {
-        var uri = uriService.GetRegisterUri(toAddress, token);
+        var uri = uriService.GetInviteUrl(context);
         var subject = "Welcome | Low Pressure Zone";
         var message = $"You've been invited to register a new user at Low Pressure Zone. Follow the link below to create your user.\n\n{uri}\n\nThis link will be valid for 24 hours.";
         await Send(toAddress, subject, message);

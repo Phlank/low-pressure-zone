@@ -1,4 +1,8 @@
-﻿using System.Security.Claims;
+﻿using System.Reflection.Metadata.Ecma335;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using LowPressureZone.Identity.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Identity.Extensions;
 
@@ -37,5 +41,13 @@ public static class ClaimsPrincipalExtensions
         var name = principal.Identities.FirstOrDefault()?.Claims.First(c => c.Type == ClaimTypes.Name).Value;
         if (name == null) return default;
         return name;
+    }
+
+    public static async Task<AppUser?> GetAppUserOrDefaultAsync(this ClaimsPrincipal principal, UserManager<AppUser> userManager)
+    {
+        var username = principal.Identity?.Name;
+        if (username == null) return null;
+
+        return await userManager.FindByNameAsync(username);
     }
 }

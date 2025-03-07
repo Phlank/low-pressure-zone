@@ -1,10 +1,10 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using System.Text.Json;
 using Microsoft.IdentityModel.Tokens;
 
-namespace LowPressureZone.Api.Endpoints.Users.Register;
+namespace LowPressureZone.Identity;
 
-public class RegistrationContext
+public class TokenContext
 {
     public required string Email { get; set; }
     public required string Token { get; set; }
@@ -12,9 +12,9 @@ public class RegistrationContext
     [JsonIgnore]
     public string Encoded => Base64UrlEncoder.Encode(JsonSerializer.Serialize(this, options: JsonSerializerOptions.Web));
 
-    public static RegistrationContext? Decode(string encodedContext)
+    public static TokenContext? Decode(string encodedContext)
     {
         var serialized = Base64UrlEncoder.Decode(encodedContext);
-        return JsonSerializer.Deserialize<RegistrationContext>(serialized, JsonSerializerOptions.Web);
+        return JsonSerializer.Deserialize<TokenContext>(serialized, JsonSerializerOptions.Web);
     }
 }

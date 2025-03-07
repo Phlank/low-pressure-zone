@@ -25,10 +25,10 @@ public class PostRegister(UserManager<AppUser> userManager, IdentityContext iden
 
     public override async Task HandleAsync(RegisterRequest req, CancellationToken ct)
     {
-        RegistrationContext? context = null;
+        TokenContext? context = null;
         try
         {
-            context = RegistrationContext.Decode(req.Context);
+            context = TokenContext.Decode(req.Context);
             if (context == null)
             {
                 await this.SendDelayedForbiddenAsync(_requestTime, ct);

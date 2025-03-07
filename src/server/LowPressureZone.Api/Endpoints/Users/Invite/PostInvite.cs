@@ -48,7 +48,12 @@ public class PostInvite(UserManager<AppUser> userManager, IdentityContext identi
         ThrowIfAnyErrors();
 
         var inviteToken = await userManager.GenerateUserTokenAsync(user, TokenProviders.Default, TokenPurposes.Invite);
-        await emailService.SendInviteEmail(req.Email, inviteToken);
+        var tokenContext = new TokenContext
+        {
+            Email = req.Email,
+            Token = inviteToken
+        };
+        await emailService.SendInviteEmail(req.Email, tokenContext);
 
         var invitation = new Invitation<Guid, AppUser>()
         {
