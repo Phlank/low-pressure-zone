@@ -16,4 +16,10 @@ public static class EndpointExtensions
         await TaskUtilities.DelaySensitiveResponse(requestTime);
         await endpoint.HttpContext.Response.SendForbiddenAsync(ct);
     }
+
+    public static async Task SendDelayedNoContentAsync(this BaseEndpoint endpoint, DateTime requestTime, CancellationToken ct = default)
+    {
+        await TaskUtilities.DelaySensitiveResponse(requestTime);
+        await endpoint.HttpContext.Response.SendNoContentAsync(ct);
+    }
 }

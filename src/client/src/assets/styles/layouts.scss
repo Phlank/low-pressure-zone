@@ -64,12 +64,26 @@
 
 .single-panel-center {
   margin: auto;
-  margin-top: calc(min(20vh));
+  margin-top: calc(min(20dvh));
   width: fit-content;
+
+  &__message {
+    width: variables.$input-width-m;
+    margin: variables.$space-m;
+  }
 
   &__form {
     display: flex;
     flex-direction: column;
     align-items: center;
+  }
+
+  &--no-header {
+    .p-panel-header {
+      display: none;
+    }
+    .p-panel-content {
+      padding: 1.125rem;
+    }
   }
 }

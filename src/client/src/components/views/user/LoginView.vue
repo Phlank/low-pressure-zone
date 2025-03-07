@@ -1,5 +1,5 @@
 <template>
-  <Panel class="login single-panel-center">
+  <Panel class="login single-panel-center single-panel-center--no-header">
     <div class="single-panel-center__form">
       <IftaLabel class="input input--medium">
         <InputText

@@ -54,6 +54,7 @@
 import api from '@/api/api'
 import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
+import { TokenPurpose } from '@/constants/tokenPurpose'
 import router from '@/router'
 import { Routes } from '@/router/routes'
 import { useAuthStore } from '@/stores/authStore'
@@ -67,7 +68,7 @@ const props = defineProps<{
 }>()
 
 const formState = reactive({
-  context: props.context,
+  context: '',
   username: '',
   password: '',
   confirmPassword: ''
@@ -81,6 +82,16 @@ onMounted(async () => {
   }
   await api.users.logout()
   authStore.clear()
+
+  var response = await api.users.verifyToken({
+    context: props.context,
+    purpose: TokenPurpose.Invite
+  })
+  if (!response.isSuccess()) {
+    router.replace(Routes.ResendInvite)
+    return
+  }
+  formState.context = props.context
 })
 
 const isSubmitting = ref(false)

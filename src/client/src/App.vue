@@ -33,6 +33,7 @@ provide('isMobile', isMobile)
 <style lang="scss">
 @use '@/assets/styles/variables.scss';
 .app {
+  min-width: 100vw;
   &__toast {
     max-width: calc(100vw - 2 * variables.$space-l);
   }

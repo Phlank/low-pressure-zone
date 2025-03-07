@@ -4,7 +4,11 @@
       <TabList>
         <Tab value="0"> Mine </Tab>
         <Tab value="1"> All </Tab>
-        <Tab value="2"> Create </Tab>
+        <Tab
+          value="2"
+          v-if="authStore.isInAnySpecifiedRole(Role.Admin)">
+          Create
+        </Tab>
       </TabList>
       <TabPanels v-if="isLoaded">
         <TabPanel value="0">
@@ -45,7 +49,10 @@ import { Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs } from 'primevue'
 import { computed, onMounted, ref, type Ref } from 'vue'
 import AudiencesGrid from './AudiencesGrid.vue'
 import CreateAudience from './CreateAudience.vue'
+import { useAuthStore } from '@/stores/authStore'
+import { Role } from '@/constants/roles'
 
+const authStore = useAuthStore()
 const isLoaded = ref(false)
 const audiences: Ref<AudienceResponse[]> = ref([])
 const linkedAudiences = computed(() => audiences.value.filter((a) => a.isLinkableToSchedule))

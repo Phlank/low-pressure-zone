@@ -1,15 +1,17 @@
 <template>
-  <Toolbar class="header">
+  <Toolbar class="site-header">
     <template #start>
       <RouterLink
         :to="'/'"
-        class="header__title">
+        class="site-header__title">
         {{ title }}
       </RouterLink>
     </template>
     <template #end>
-      <DarkModeToggle class="header__dark-mode-toggle" />
-      <SiteNavMenu />
+      <div class="site-header__end">
+        <DarkModeToggle class="site-header__dark-mode-toggle" />
+        <SiteNavMenu />
+      </div>
     </template>
   </Toolbar>
 </template>
@@ -31,8 +33,9 @@ const title = import.meta.env.VITE_SITE_NAME
       display: none;
     }
   }
-  .p-button {
-    margin: 0 variables.$space-s;
+  &__end {
+    display: flex;
+    gap: variables.$space-m;
   }
   .p-toolbar-start {
     a {

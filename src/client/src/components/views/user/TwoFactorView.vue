@@ -1,7 +1,11 @@
 <template>
-  <Panel class="two-factor single-panel-center">
+  <Panel class="two-factor single-panel-center single-panel-center--no-header">
+    <Message
+      class="single-panel-center__message"
+      severity="info">
+      A two-factor code has been emailed to you.
+    </Message>
     <div class="single-panel-center__form">
-      <Message class="input">A two-factor code has been emailed to you.</Message>
       <IftaLabel class="input input--medium">
         <InputText
           :autofocus="true"

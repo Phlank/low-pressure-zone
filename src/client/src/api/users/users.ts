@@ -1,10 +1,11 @@
-import { sendGet, sendPost } from '../fetchFunctions'
+import { sendGet, sendPost, type QueryParameters } from '../fetchFunctions'
 import type { InviteRequest } from './inviteRequest'
 import type { LoginRequest } from './loginRequest'
 import type { LoginResponse } from './loginResponse'
 import type { RegisterRequest } from './registerRequest'
 import type { TwoFactorRequest } from './twoFactorRequest'
 import type { UserResponse } from './userResponse'
+import type { VerifyTokenRequest } from './verifyTokenRequest'
 
 const route = (userId?: string) => '/users' + (userId ? `/${userId}` : '')
 
@@ -15,5 +16,7 @@ export default {
   logout: () => sendGet<never>(`${route()}/logout`),
   twoFactor: (request: TwoFactorRequest) => sendPost(`${route()}/twofactor`, request),
   invite: (request: InviteRequest) => sendPost(`${route()}/invite`, request),
-  register: (request: RegisterRequest) => sendPost(`${route()}/register`, request)
+  resendInvite: (email: string) => sendGet<never>(`${route()}/resendinvite`, { email: email }),
+  register: (request: RegisterRequest) => sendPost(`${route()}/register`, request),
+  verifyToken: (request: VerifyTokenRequest) => sendGet(`${route()}/verifytoken`, { ...request })
 }

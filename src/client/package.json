@@ -37,6 +37,8 @@
     "eslint-plugin-vue": "^9.30.0",
     "naive-ui": "^2.40.3",
     "npm-run-all2": "^7.0.1",
+    "postcss": "^8.5.3",
+    "postcss-html": "^1.8.0",
     "prettier": "^3.3.3",
     "stylelint": "^16.11.0",
     "stylelint-config-standard": "^36.0.1",
@@ -48,5 +50,5 @@
     "vite-plugin-vue-devtools": "^7.6.5",
     "vue-tsc": "^2.1.10"
   },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "packageManager": "yarn@4.7.0+sha512.5a0afa1d4c1d844b3447ee3319633797bcd6385d9a44be07993ae52ff4facabccafb4af5dcd1c2f9a94ac113e5e9ff56f6130431905884414229e284e37bb7c9"
 }
