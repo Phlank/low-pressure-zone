@@ -28,16 +28,13 @@ const sendRequest = async <TRequest extends object, TResponse = never>(
         (await response.json()) as ValidationProblemDetails<TRequest>
       )
     }
-    if (request) {
-      return new ApiResponse<TRequest, TResponse>(response.status)
-    }
     return new ApiResponse<TRequest, TResponse>(response.status)
   } catch (error: any) {
     return new ApiResponse<TRequest, TResponse>(0)
   }
 }
 
-export const sendGet = async <TResponse>(route: string, params?: QueryParameters) => {
+export const sendGet = async <TResponse = never>(route: string, params?: QueryParameters) => {
   if (params) route = route + toQueryString(params)
   return await sendRequest<never, TResponse>('GET', route)
 }
@@ -57,7 +54,7 @@ export const sendDelete = async (route: string) => {
   return await sendRequest<never, never>('DELETE', route)
 }
 
-export type QueryParameters = { [key: string]: string | number | boolean | null | undefined }
+export type QueryParameters = Record<string, string | number | boolean | null | undefined>
 
 export const toQueryString = (params: QueryParameters) => {
   const searchParams = new URLSearchParams()

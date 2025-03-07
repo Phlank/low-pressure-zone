@@ -6,25 +6,28 @@ import DashboardSchedulesView from '@/components/views/dashboard/schedules/Dashb
 import DashboardUsersView from '@/components/views/dashboard/users/DashboardUsersView.vue'
 import HomeView from '@/components/views/home/HomeView.vue'
 import LoginView from '@/components/views/user/LoginView.vue'
-import LogoutView from '@/components/views/user/LogoutView.vue'
 import RegisterView from '@/components/views/user/RegisterView.vue'
 import TwoFactorView from '@/components/views/user/TwoFactorView.vue'
 import { allRoles, Role } from '@/constants/roles'
 import { useAuthStore } from '@/stores/authStore'
 import { createRouter, createWebHistory } from 'vue-router'
 import { Routes } from './routes'
+import ResendInviteView from '@/components/views/user/ResendInviteView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     { path: '/', component: HomeView },
     { path: '/user/login', component: LoginView },
-    { path: '/user/logout', component: LogoutView },
     { path: '/user/twofactor', component: TwoFactorView },
     {
       path: '/user/register',
       component: RegisterView,
       props: (route) => ({ context: route.query.context })
+    },
+    {
+      path: '/user/resendinvite',
+      component: ResendInviteView
     },
     {
       path: '/dashboard',

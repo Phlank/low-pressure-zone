@@ -5,6 +5,7 @@
       size="large"
       @click="toggleMenu"
       outlined
+      severity="secondary"
       aria-controls="navigation-menu" />
     <Menu
       id="navigation-menu"
@@ -27,21 +28,24 @@
             <span class="ml-2">{{ item.label }}</span>
           </a>
         </RouterLink>
-        <a
-          v-else
-          v-ripple
-          :href="item.url"
-          :target="item.target"
-          v-bind="props.action">
-          <span :class="item.icon" />
-          <span class="ml-2">{{ item.label }}</span>
-        </a>
+        <div v-else>
+          <a
+            v-ripple
+            class="p-menu-item-link"
+            @click="item.callback">
+            <span :class="item.icon" />
+            <span class="ml-2">{{ item.label }}</span>
+          </a>
+        </div>
       </template>
     </Menu>
   </div>
 </template>
 
 <script lang="ts" setup>
+import api from '@/api/api'
+import router from '@/router'
+import { Routes } from '@/router/routes'
 import { useAuthStore } from '@/stores/authStore'
 import { Button, Menu } from 'primevue'
 import type { MenuItem } from 'primevue/menuitem'
@@ -70,7 +74,14 @@ const loggedInNavMenuItems: MenuItem[] = [
     label: 'Logout',
     labelString: 'Logout',
     icon: 'pi pi-sign-out',
-    route: '/user/logout'
+    callback: async () => {
+      await authStore.loadIfNotInitialized()
+      if (authStore.isLoggedIn()) {
+        await api.users.logout()
+      }
+      await authStore.load()
+      router.push(Routes.Home)
+    }
   }
 ]
 
