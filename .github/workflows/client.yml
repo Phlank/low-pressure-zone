@@ -24,6 +24,8 @@ jobs:
     - uses: actions/checkout@v4
     - name: Install Node.js
       run: sudo apt install nodejs
+    - name: Corepack enable
+      run: corepack enable
     - name: Install dependencies
       run: yarn
     - name: Build static files
