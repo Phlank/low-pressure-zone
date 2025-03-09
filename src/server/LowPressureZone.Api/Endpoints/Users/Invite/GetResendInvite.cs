@@ -7,17 +7,17 @@ using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Shouldly;
-using System.Threading.Tasks;
 
 namespace LowPressureZone.Api.Endpoints.Users.Invite;
 
 public class GetResendInvite(UserManager<AppUser> userManager, IdentityContext identityContext, EmailService emailService) : Endpoint<GetResendInviteRequest>
 {
-    private readonly DateTime start = DateTime.UtcNow;
+    private readonly DateTime _start = DateTime.UtcNow;
 
     public override void Configure()
     {
         Get("/users/resendinvite");
+        Throttle(3, 60);
         AllowAnonymous();
     }
 
@@ -26,14 +26,14 @@ public class GetResendInvite(UserManager<AppUser> userManager, IdentityContext i
         var user = await userManager.FindByEmailAsync(req.Email);
         if (user == null)
         {
-            await this.SendDelayedNoContentAsync(start, ct);
+            await this.SendDelayedNoContentAsync(_start, ct);
             return;
         }
 
         var invite = await identityContext.Invitations.FirstOrDefaultAsync(i => i.UserId == user.Id && !i.IsCancelled && !i.IsRegistered, ct);
         if (invite == null)
         {
-            await this.SendDelayedNoContentAsync(start, ct);
+            await this.SendDelayedNoContentAsync(_start, ct);
             return;
         }
 
@@ -45,6 +45,6 @@ public class GetResendInvite(UserManager<AppUser> userManager, IdentityContext i
             Token = inviteToken
         };
         await emailService.SendInviteEmail(user.Email, tokenContext);
-        await this.SendDelayedNoContentAsync(start, ct);
+        await this.SendDelayedNoContentAsync(_start, ct);
     }
 }

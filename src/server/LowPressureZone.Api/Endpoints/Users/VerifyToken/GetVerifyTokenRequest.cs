@@ -4,4 +4,5 @@ public class GetVerifyTokenRequest
 {
     public required string Context { get; set; }
     public required string Purpose { get; set; }
+    public required string Provider { get; set; }
 }

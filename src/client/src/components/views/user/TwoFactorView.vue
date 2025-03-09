@@ -25,10 +25,12 @@
           {{ errorMessage }}
         </Message>
       </div>
-      <Button
-        class="input"
-        label="Verify"
-        @click="handleVerify" />
+      <div class="buttons">
+        <Button
+          class="input"
+          label="Verify"
+          @click="handleVerify" />
+      </div>
     </div>
   </Panel>
 </template>

@@ -77,8 +77,8 @@ public class PostRegister(UserManager<AppUser> userManager, IdentityContext iden
         });
         ThrowIfAnyErrors();
         
-        var setPasswordResult = await userManager.AddPasswordAsync(user, req.Password);
-        setPasswordResult.Errors.Select(e => e.Description).ForEach((message) =>
+        var addPasswordResult = await userManager.AddPasswordAsync(user, req.Password);
+        addPasswordResult.Errors.Select(e => e.Description).ForEach((message) =>
         {
             AddError(new ValidationFailure(nameof(req.Password), message));
         });

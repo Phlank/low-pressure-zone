@@ -44,6 +44,7 @@
       <Button
         class="input"
         label="Register"
+        :loading="isSubmitting"
         :disabled="isSubmitting"
         @click="handleRegister" />
     </div>
@@ -54,14 +55,18 @@
 import api from '@/api/api'
 import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
-import { TokenPurpose } from '@/constants/tokenPurpose'
+import { KeyName } from '@/constants/keys'
+import { TokenProvider, TokenPurpose } from '@/constants/tokens'
 import router from '@/router'
 import { Routes } from '@/router/routes'
 import { useAuthStore } from '@/stores/authStore'
 import { registerRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
+import { onKeyDown } from '@vueuse/core'
 import { Button, IftaLabel, InputText, Panel, Password, useToast } from 'primevue'
 import { onMounted, reactive, ref } from 'vue'
+
+onKeyDown(KeyName.Enter, () => handleRegister())
 
 const props = defineProps<{
   context: string
@@ -85,7 +90,8 @@ onMounted(async () => {
 
   var response = await api.users.verifyToken({
     context: props.context,
-    purpose: TokenPurpose.Invite
+    purpose: TokenPurpose.Invite,
+    provider: TokenProvider.Default
   })
   if (!response.isSuccess()) {
     router.replace(Routes.ResendInvite)

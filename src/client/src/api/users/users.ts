@@ -2,7 +2,9 @@ import { sendGet, sendPost, type QueryParameters } from '../fetchFunctions'
 import type { InviteRequest } from './inviteRequest'
 import type { LoginRequest } from './loginRequest'
 import type { LoginResponse } from './loginResponse'
+import resetPassword from './passwordReset/resetPassword'
 import type { RegisterRequest } from './registerRequest'
+import type { RequestPasswordResetRequest } from './requestPasswordResetRequest'
 import type { TwoFactorRequest } from './twoFactorRequest'
 import type { UserResponse } from './userResponse'
 import type { VerifyTokenRequest } from './verifyTokenRequest'
@@ -18,5 +20,6 @@ export default {
   invite: (request: InviteRequest) => sendPost(`${route()}/invite`, request),
   resendInvite: (email: string) => sendGet<never>(`${route()}/resendinvite`, { email: email }),
   register: (request: RegisterRequest) => sendPost(`${route()}/register`, request),
-  verifyToken: (request: VerifyTokenRequest) => sendGet(`${route()}/verifytoken`, { ...request })
+  verifyToken: (request: VerifyTokenRequest) => sendGet(`${route()}/verifytoken`, { ...request }),
+  resetPassword
 }

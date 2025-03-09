@@ -13,6 +13,8 @@ import { useAuthStore } from '@/stores/authStore'
 import { createRouter, createWebHistory } from 'vue-router'
 import { Routes } from './routes'
 import ResendInviteView from '@/components/views/user/ResendInviteView.vue'
+import ResetPasswordRequestView from '@/components/views/user/ResetPasswordRequestView.vue'
+import ResetPasswordView from '@/components/views/user/ResetPasswordView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,6 +30,15 @@ const router = createRouter({
     {
       path: '/user/resendinvite',
       component: ResendInviteView
+    },
+    {
+      path: '/user/resetpassword/request',
+      component: ResetPasswordRequestView
+    },
+    {
+      path: '/user/resetpassword',
+      component: ResetPasswordView,
+      props: (route) => ({ context: route.query.context })
     },
     {
       path: '/dashboard',
