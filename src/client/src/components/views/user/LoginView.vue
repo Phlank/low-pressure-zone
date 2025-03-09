@@ -32,11 +32,18 @@
           {{ errorMessage }}
         </Message>
       </div>
-      <Button
-        class="input"
-        label="Login"
-        :disabled="isSubmitting"
-        @click="handleLogin" />
+      <div class="buttons">
+        <Button
+          label="Login"
+          :loading="isSubmitting"
+          :disabled="isSubmitting"
+          @click="handleLogin" />
+        <Button
+          label="Reset"
+          :disabled="isSubmitting"
+          @click="router.push(Routes.RequestPasswordReset)"
+          outlined />
+      </div>
     </div>
   </Panel>
 </template>
@@ -96,3 +103,16 @@ const handleLogin = async () => {
   router.push(props.redirect)
 }
 </script>
+
+<style lang="scss">
+@use '@/assets/styles/variables.scss';
+
+.login {
+  .buttons {
+    display: flex;
+    max-width: variables.$input-width-m;
+    margin-top: variables.$space-m;
+    gap: variables.$space-m;
+  }
+}
+</style>

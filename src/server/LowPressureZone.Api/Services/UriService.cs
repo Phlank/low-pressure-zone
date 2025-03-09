@@ -13,4 +13,13 @@ public class UriService(IOptions<UriServiceOptions> options)
         };
         return builder.Uri;
     }
+
+    public Uri GetResetPasswordUrl(TokenContext context)
+    {
+        var builder = new UriBuilder(options.Value.ResetPasswordUrl)
+        {
+            Query = $"?context={context.Encoded}"
+        };
+        return builder.Uri;
+    }
 }

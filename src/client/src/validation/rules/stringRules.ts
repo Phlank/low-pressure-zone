@@ -1,6 +1,6 @@
 import { distinct } from '@/utils/arrayUtils'
 import { invalid, valid } from '@/validation/types/validationResult'
-import type { ValidationRule } from '@/validation/types/validationRule'
+import { combineRules, type ValidationRule } from '@/validation/types/validationRule'
 
 export const required =
   (msg?: string): ValidationRule<string> =>
@@ -65,3 +65,11 @@ export const minimumLength = (length: number, msg?: string) => (arg: string) => 
   if (arg.length < length) return invalid(msg ?? `Minimum ${length} characters`)
   return valid
 }
+
+export const password = combineRules(
+  minimumLength(8),
+  requireAnyCharacter('A-Z', 'Requires uppercase'),
+  requireAnyCharacter('a-z', 'Requires lowercase'),
+  requireAnyCharacter('0-9', 'Requires number'),
+  requireAnyOtherCharacter('A-Za-z0-9', 'Requires symbol')
+)

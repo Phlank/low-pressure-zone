@@ -23,6 +23,7 @@
         class="input"
         label="Resend Invite"
         @click="handleResendInviteClick"
+        :disabled="isSubmitting"
         :loading="isSubmitting" />
     </div>
   </Panel>
