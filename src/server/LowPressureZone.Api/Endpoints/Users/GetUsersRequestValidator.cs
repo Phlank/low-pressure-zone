@@ -9,7 +9,7 @@ public class GetUsersRequestValidator : Validator<GetUsersRequest>
 {
     public GetUsersRequestValidator()
     {
-        RuleFor(r => r.Roles).Must(roles => roles == null || roles.All(role => RoleNames.All.Contains(role)))
+        RuleFor(r => r.Roles).Must(roles => (roles ?? new List<string>()).All(role => RoleNames.All.Contains(role)))
                              .WithMessage(Errors.InvalidRole);
     }
 }

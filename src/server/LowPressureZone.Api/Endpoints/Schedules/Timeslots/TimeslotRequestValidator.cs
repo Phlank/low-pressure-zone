@@ -14,6 +14,7 @@ public class TimeslotRequestValidator : Validator<TimeslotRequest>
     {
         RuleFor(t => t.PerformanceType).Must(t => PerformanceTypes.All.Contains(t))
                                        .WithMessage("Invalid type");
+        RuleFor(t => t.StartsAt).GreaterThan(DateTime.UtcNow).WithMessage(Errors.TimeInPast);
         RuleFor(t => t.EndsAt).GreaterThan(t => t.StartsAt);
 
         RuleFor(t => t).CustomAsync(async (req, ctx, ct) =>

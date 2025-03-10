@@ -23,7 +23,11 @@
         <Column class="grid-action-col grid-action-col--2">
           <template #body="{ data }: { data: TimeslotRow }">
             <GridActions
-              :show-create="schedule.isTimeslotCreationAllowed && data.timeslot == undefined"
+              :show-create="
+                schedule.isTimeslotCreationAllowed &&
+                data.timeslot == undefined &&
+                data.start.getTime() > new Date().getTime()
+              "
               :show-edit="data.timeslot?.isEditable"
               :show-delete="data.timeslot?.isDeletable"
               @create="handleEditClicked(data)"
@@ -44,7 +48,11 @@
         </template>
         <template #right>
           <GridActions
-            :show-create="schedule.isTimeslotCreationAllowed && row.timeslot == undefined"
+            :show-create="
+              schedule.isTimeslotCreationAllowed &&
+              row.timeslot == undefined &&
+              row.start.getTime() > new Date().getTime()
+            "
             :show-edit="row.timeslot?.isEditable"
             :show-delete="row.timeslot?.isDeletable"
             @create="handleEditClicked(row)"

@@ -12,6 +12,7 @@ import type { VerifyTokenRequest } from './verifyTokenRequest'
 const route = (userId?: string) => '/users' + (userId ? `/${userId}` : '')
 
 export default {
+  get: () => sendGet<UserResponse[]>(route()),
   getInfo: () => sendGet<UserResponse>(`${route()}/info`),
   login: (request: LoginRequest) =>
     sendPost<LoginRequest, LoginResponse>(`${route()}/login`, request),

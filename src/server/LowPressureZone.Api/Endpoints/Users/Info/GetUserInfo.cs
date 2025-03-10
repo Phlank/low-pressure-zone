@@ -28,6 +28,7 @@ public class GetUserInfo : EndpointWithoutRequest<UserResponse>
             Id = id,
             Username = username,
             Email = email,
+            RegistrationDate = null,
             Roles = roles
         }, ct);
     }
