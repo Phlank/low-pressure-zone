@@ -86,7 +86,7 @@ const handleSubmit = async () => {
   if (!isValid) return
 
   isSubmitting.value = true
-  const response = await api.users.invite(formState)
+  const response = await api.users.invites.post(formState)
   isSubmitting.value = false
 
   if (tryHandleUnsuccessfulResponse(response, toast, validation)) return

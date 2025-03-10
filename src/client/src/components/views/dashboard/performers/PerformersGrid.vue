@@ -22,7 +22,9 @@
       </DataTable>
     </div>
     <div v-else>
-      <div v-for="(performer, index) in performers">
+      <div
+        v-for="(performer, index) in performers"
+        :key="performer.id">
         <ListItem style="width: 100%">
           <template #left>
             <div style="display: flex; flex-direction: column; overflow-x: hidden">

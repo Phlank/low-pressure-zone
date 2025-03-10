@@ -16,7 +16,7 @@ public class GetResendInvite(UserManager<AppUser> userManager, IdentityContext i
 
     public override void Configure()
     {
-        Get("/users/resendinvite");
+        Get("/users/invites/resend");
         Throttle(3, 60);
         AllowAnonymous();
     }

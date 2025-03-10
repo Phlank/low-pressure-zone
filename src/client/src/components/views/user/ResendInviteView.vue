@@ -52,7 +52,7 @@ const validation = createFormValidation(formState, {
 const handleResendInviteClick = async () => {
   const isValid = validation.validate()
   isSubmitting.value = true
-  const response = await api.users.resendInvite(formState.email)
+  const response = await api.users.invites.resend(formState.email)
   isSubmitting.value = false
 
   if (!response.isSuccess()) {

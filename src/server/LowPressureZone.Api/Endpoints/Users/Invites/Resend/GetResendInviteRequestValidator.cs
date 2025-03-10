@@ -2,7 +2,7 @@
 using FluentValidation;
 using LowPressureZone.Api.Constants;
 
-namespace LowPressureZone.Api.Endpoints.Users.Invite;
+namespace LowPressureZone.Api.Endpoints.Users.Invites.Resend;
 
 public class GetResendInviteRequestValidator : Validator<GetResendInviteRequest>
 {
