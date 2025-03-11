@@ -40,7 +40,6 @@
           @click="handleLogin" />
         <Button
           label="Reset"
-          :disabled="isSubmitting"
           @click="router.push(Routes.RequestPasswordReset)"
           outlined />
       </div>

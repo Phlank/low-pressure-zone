@@ -10,9 +10,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FastEndpoints" Version="5.34.0" />
-		<PackageReference Include="FastEndpoints.Security" Version="5.34.0" />
-		<PackageReference Include="FastEndpoints.Swagger" Version="5.34.0" />
+		<PackageReference Include="FastEndpoints" Version="5.35.0" />
+		<PackageReference Include="FastEndpoints.Security" Version="5.35.0" />
+		<PackageReference Include="FastEndpoints.Swagger" Version="5.35.0" />
 		<PackageReference Include="FluentEmail.Mailgun" Version="3.0.2" />
 		<PackageReference Include="Google.Apis.Auth.AspNetCore3" Version="1.69.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.2">

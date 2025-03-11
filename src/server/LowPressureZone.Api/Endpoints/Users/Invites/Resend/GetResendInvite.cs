@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Shouldly;
 
-namespace LowPressureZone.Api.Endpoints.Users.Invite;
+namespace LowPressureZone.Api.Endpoints.Users.Invites.Resend;
 
 public class GetResendInvite(UserManager<AppUser> userManager, IdentityContext identityContext, EmailService emailService) : Endpoint<GetResendInviteRequest>
 {
@@ -16,7 +16,7 @@ public class GetResendInvite(UserManager<AppUser> userManager, IdentityContext i
 
     public override void Configure()
     {
-        Get("/users/resendinvite");
+        Get("/users/invites/resend");
         Throttle(3, 60);
         AllowAnonymous();
     }
@@ -45,6 +45,8 @@ public class GetResendInvite(UserManager<AppUser> userManager, IdentityContext i
             Token = inviteToken
         };
         await emailService.SendInviteEmail(user.Email, tokenContext);
+        invite.LastSentDate = DateTime.UtcNow;
+        await identityContext.SaveChangesAsync(ct);
         await this.SendDelayedNoContentAsync(_start, ct);
     }
 }

@@ -1,7 +1,6 @@
-export interface UserResponse {
+export interface UserInfoResponse {
   id: string
   username: string
   email: string
-  registrationDate: string
   roles: string[]
 }

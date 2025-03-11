@@ -14,7 +14,6 @@
         outlined />
       <Button
         v-else
-        size="small"
         class="grid-actions__buttons__item"
         icon="pi pi-ellipsis-h"
         severity="secondary"
@@ -63,12 +62,14 @@ const props = withDefaults(
     showCreate?: boolean
     showEdit?: boolean
     showDelete?: boolean
+    showInfo?: boolean
     disabled?: boolean
   }>(),
   {
     showCreate: false,
     showEdit: false,
     showDelete: false,
+    showInfo: false,
     disabled: false
   }
 )
@@ -77,6 +78,7 @@ interface Emits {
   create: []
   edit: []
   delete: []
+  info: []
 }
 
 const emit = defineEmits<Emits>()
@@ -84,7 +86,7 @@ const emit = defineEmits<Emits>()
 interface GridAction {
   name: string
   icon: string
-  severity: 'success' | 'danger' | 'secondary'
+  severity: 'success' | 'danger' | 'secondary' | 'info'
   emit: keyof Emits
 }
 
@@ -106,6 +108,12 @@ const availableActions: { [key: string]: GridAction } = {
     icon: 'pi pi-trash',
     severity: 'danger',
     emit: 'delete'
+  },
+  info: {
+    name: 'Info',
+    icon: 'pi pi-info',
+    severity: 'info',
+    emit: 'info'
   }
 }
 
@@ -114,6 +122,7 @@ const visibleActions = computed(() => {
   if (props.showCreate) actions.push(availableActions.create)
   if (props.showEdit) actions.push(availableActions.edit)
   if (props.showDelete) actions.push(availableActions.delete)
+  if (props.showInfo) actions.push(availableActions.info)
   return actions
 })
 
@@ -158,7 +167,11 @@ const handleDrawerActionClick = (emitProperty: keyof Emits) => {
     border-top-right-radius: variables.$space-l;
 
     .p-drawer-header {
-      padding: 20px 0 0 0;
+      display: none;
+    }
+
+    .p-drawer-content {
+      padding: variables.$space-l;
     }
 
     &__item {
@@ -170,6 +183,10 @@ const handleDrawerActionClick = (emitProperty: keyof Emits) => {
         gap: variables.$space-l;
       }
     }
+  }
+
+  .p-drawer-bottom .p-drawer {
+    height: calc(min(80dvh, min-content));
   }
 }
 </style>

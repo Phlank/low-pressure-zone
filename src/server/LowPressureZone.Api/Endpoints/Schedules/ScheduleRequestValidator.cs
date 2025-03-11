@@ -1,7 +1,6 @@
 ﻿using FastEndpoints;
 using FluentValidation;
 using LowPressureZone.Api.Constants;
-using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -12,14 +11,17 @@ public class ScheduleRequestValidator : Validator<ScheduleRequest>
 {
     public ScheduleRequestValidator(IHttpContextAccessor contextAccessor)
     {
-        RuleFor(s => s.EndsAt).GreaterThanOrEqualTo(s => s.StartsAt.AddHours(1))
-                           .WithMessage(Errors.MinDuration(1))
-                           .LessThanOrEqualTo(s => s.StartsAt.AddHours(24))
-                           .WithMessage(Errors.MaxDuration(24));
-        RuleFor(s => s).CustomAsync(async (req, ctx, ct) =>
+        RuleFor(req => req.EndsAt).GreaterThanOrEqualTo(s => s.StartsAt.AddHours(1))
+                                  .WithMessage(Errors.MinDuration(1))
+                                  .LessThanOrEqualTo(s => s.StartsAt.AddHours(24))
+                                  .WithMessage(Errors.MaxDuration(24));
+        RuleFor(req => req).CustomAsync(async (req, ctx, ct) =>
         {
             var id = contextAccessor.GetGuidRouteParameterOrDefault("id");
             var dataContext = Resolve<DataContext>();
+
+            if (id == default && req.StartsAt <= DateTime.UtcNow)
+                ctx.AddFailure(nameof(req.StartsAt), Errors.TimeInPast);
 
             var audience = await dataContext.Audiences.FirstOrDefaultAsync(a => a.Id == req.AudienceId, ct);
 
@@ -27,7 +29,7 @@ public class ScheduleRequestValidator : Validator<ScheduleRequest>
                                                       .Include(s => s.Timeslots)
                                                       .Where(s => s.Id == id)
                                                       .FirstOrDefaultAsync(ct);
-            
+
             if (audience == null)
                 ctx.AddFailure(nameof(req.AudienceId), Errors.DoesNotExist);
 

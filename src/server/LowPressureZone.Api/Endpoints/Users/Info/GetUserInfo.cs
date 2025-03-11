@@ -3,7 +3,7 @@ using FastEndpoints;
 
 namespace LowPressureZone.Api.Endpoints.Users.Info;
 
-public class GetUserInfo : EndpointWithoutRequest<UserResponse>
+public class GetUserInfo : EndpointWithoutRequest<UserInfoResponse>
 {
     public override void Configure()
     {
@@ -15,7 +15,7 @@ public class GetUserInfo : EndpointWithoutRequest<UserResponse>
         var id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         var username = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
         var email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-        var roles = User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).ToList();
+        var roles = User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value);
 
         if (id == null || username == null || email == null)
         {
@@ -23,7 +23,7 @@ public class GetUserInfo : EndpointWithoutRequest<UserResponse>
             return;
         }
 
-        await SendOkAsync(new UserResponse()
+        await SendOkAsync(new UserInfoResponse
         {
             Id = id,
             Username = username,

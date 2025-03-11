@@ -1,4 +1,4 @@
-﻿namespace LowPressureZone.Api.Endpoints.Users.Invite;
+﻿namespace LowPressureZone.Api.Endpoints.Users.Invites.Resend;
 
 public class GetResendInviteRequest
 {

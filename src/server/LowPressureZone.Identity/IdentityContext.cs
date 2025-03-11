@@ -15,13 +15,14 @@ public class IdentityContext(DbContextOptions<IdentityContext> options) : Identi
     {
         optionsBuilder.UseSeeding((context, _) =>
         {
+            Console.WriteLine($"{nameof(IdentityContext)}: Seeding db.");
             var roles = context.Set<AppRole>();
             foreach (var roleName in RoleNames.All)
             {
-                Console.WriteLine($"Checking for {roleName} role...");
+                Console.WriteLine($"{nameof(IdentityContext)}: Checking for {roleName} role.");
                 if (!roles.Any(r => r.Name == roleName))
                 {
-                    Console.WriteLine($"Did not find {roleName} role. Adding {roleName} role...");
+                    Console.WriteLine($"{nameof(IdentityContext)}: Did not find {roleName} role. Adding {roleName} role.");
                     roles.Add(new AppRole
                     {
                         Id = Guid.NewGuid(),
@@ -33,11 +34,10 @@ public class IdentityContext(DbContextOptions<IdentityContext> options) : Identi
             }
             context.SaveChanges();
 
-            Console.WriteLine("Retrieving admin role...");
-            var adminRole = roles.First(r => r.Name == RoleNames.Admin);
             var users = context.Set<AppUser>();
             if (!users.Any())
             {
+                Console.WriteLine($"{nameof(IdentityContext)}: No users found. Seeding admin user.");
                 var seedData = GetSeedData();
                 var hasher = new PasswordHasher<AppUser>();
                 var user = new AppUser()
@@ -61,6 +61,7 @@ public class IdentityContext(DbContextOptions<IdentityContext> options) : Identi
                 user.PasswordHash = passwordHash;
                 users.Add(user);
 
+                var adminRole = roles.First(r => r.Name == RoleNames.Admin);
                 var userRoles = context.Set<IdentityUserRole<Guid>>();
                 userRoles.Add(new IdentityUserRole<Guid> { UserId = user.Id, RoleId = adminRole.Id });
             }
@@ -74,7 +75,7 @@ public class IdentityContext(DbContextOptions<IdentityContext> options) : Identi
                                                               .AddJsonFile("appsettings.Development.json", optional: true)
                                                               .AddJsonFile("appsettings.Production.json", optional: true)
                                                               .Build();
-        var section = config.GetRequiredSection("SeedData:Identity") ?? throw new InvalidOperationException("No admin email specified in configuration.");
+        var section = config.GetRequiredSection("SeedData:Identity");
         return section.Get<IdentitySeedData>() ?? throw new InvalidOperationException("Seed data missing from configuration.");
     }
 }
