@@ -2,7 +2,7 @@
   <div class="dashboard-users">
     <Tabs v-model:value="tabValue">
       <TabList>
-        <Tab value="users">Users</Tab>
+        <Tab value="users">Active</Tab>
         <Tab value="pending">Pending</Tab>
         <Tab value="invite">Invite</Tab>
       </TabList>

@@ -60,17 +60,20 @@ const menuItems: MenuItem[] = [
   {
     label: 'Schedules',
     icon: 'pi pi-calendar',
-    route: '/dashboard'
+    route: '/dashboard',
+    roles: []
   },
   {
     label: 'Audiences',
     icon: 'pi pi-globe',
-    route: '/dashboard/audiences'
+    route: '/dashboard/audiences',
+    roles: []
   },
   {
     label: 'Performers',
     icon: 'pi pi-microphone',
-    route: '/dashboard/performers'
+    route: '/dashboard/performers',
+    roles: []
   },
   {
     label: 'Users',

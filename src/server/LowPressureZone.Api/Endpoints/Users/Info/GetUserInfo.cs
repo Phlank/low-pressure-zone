@@ -15,7 +15,7 @@ public class GetUserInfo : EndpointWithoutRequest<UserInfoResponse>
         var id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         var username = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
         var email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-        var roles = User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).ToList();
+        var roles = User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value);
 
         if (id == null || username == null || email == null)
         {

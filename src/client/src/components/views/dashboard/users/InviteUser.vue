@@ -16,9 +16,7 @@
       <Select
         class="input__field"
         id="roleInput"
-        :options="
-          roleItems.filter((item: RoleItem) => authStore.isInAnySpecifiedRole(...item.availableTo))
-        "
+        :options="roleItems"
         option-label="name"
         option-value="name"
         data-key="name"

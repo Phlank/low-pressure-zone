@@ -32,6 +32,7 @@ public class GetUsers(IdentityContext identityContext) : Endpoint<GetUsersReques
         var users = await identityContext.Users.AsNoTracking()
                                                .Include(u => u.Invitation)
                                                .Where(u => userRoles.Keys.Contains(u.Id) && u.UserName != null)
+                                               .Where(u => u.Invitation == null || u.Invitation.IsRegistered)
                                                .Select(u => new { 
                                                    u.Id,
                                                    u.Email,
@@ -40,15 +41,15 @@ public class GetUsers(IdentityContext identityContext) : Endpoint<GetUsersReques
                                                })
                                                .ToDictionaryAsync(u => u.Id, ct);
 
-        var responses = userRoles.Select(ur =>
+        var responses = users.Select(user =>
         {
             return new UserResponse()
             {
-                Id = ur.Key.ToString(),
-                Email = users[ur.Key].Email!,
-                Username = users[ur.Key].UserName!,
-                RegistrationDate = users[ur.Key].RegistrationDate,
-                Roles = ur.Value.Select(roleId => roles[roleId]!)
+                Id = user.Value.Id.ToString(),
+                Email = user.Value.Email!,
+                Username = user.Value.UserName!,
+                RegistrationDate = user.Value.RegistrationDate,
+                Roles = userRoles[user.Value.Id].Select(roleId => roles[roleId]!)
             };
         });
         await SendOkAsync(responses, ct);
