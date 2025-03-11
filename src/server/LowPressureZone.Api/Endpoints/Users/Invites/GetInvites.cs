@@ -18,7 +18,7 @@ public class GetInvites(IdentityContext identityContext) : EndpointWithoutReques
         var invites = await identityContext.Invitations.AsNoTracking()
                                                        .Include(i => i.User)
                                                        .Where(i => !i.IsCancelled && !i.IsRegistered)
-                                                       .OrderBy(i => i.User!.Email)
+                                                       .OrderBy(i => i.InvitationDate)
                                                        .ToListAsync(ct);
         var responses = invites.Select(Map.FromEntity);
         await SendOkAsync(responses, ct);
