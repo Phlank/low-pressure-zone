@@ -1,4 +1,5 @@
 import api from '@/api/api'
+import type { UserInfoResponse } from '@/api/users/userInfoResponse'
 import type { UserResponse } from '@/api/users/userResponse'
 import { hasIntersection } from '@/utils/arrayUtils'
 import { defineStore } from 'pinia'
@@ -6,7 +7,7 @@ import { ref, type Ref } from 'vue'
 
 export const useAuthStore = defineStore('authStore', () => {
   const isLoggedInRef: Ref<boolean | undefined> = ref(undefined)
-  const userResponse: Ref<UserResponse> = ref({
+  const userInfo: Ref<UserInfoResponse> = ref({
     id: '',
     email: '',
     username: '',
@@ -25,11 +26,11 @@ export const useAuthStore = defineStore('authStore', () => {
   }
 
   const loadUserInfo = async () => {
-    const response = await api.users.getInfo()
+    const response = await api.users.info()
     if (response.status === 0) return
     isLoggedInRef.value = response.isSuccess()
     if (response.isSuccess()) {
-      userResponse.value = response.data!
+      userInfo.value = response.data!
     }
   }
 
@@ -39,13 +40,13 @@ export const useAuthStore = defineStore('authStore', () => {
 
   const isLoggedIn = () => isLoggedInRef.value ?? false
 
-  const getId = () => userResponse.value.id
+  const getId = () => userInfo.value.id
 
-  const getEmail = () => userResponse.value.email
+  const getEmail = () => userInfo.value.email
 
-  const getUsername = () => userResponse.value.username
+  const getUsername = () => userInfo.value.username
 
-  const getRoles = () => userResponse.value.roles
+  const getRoles = () => userInfo.value.roles
 
   const isInAnySpecifiedRole = (...rolesToCheck: string[]): boolean => {
     if (rolesToCheck.length === 0) return true
@@ -56,10 +57,10 @@ export const useAuthStore = defineStore('authStore', () => {
 
   const clear = () => {
     isLoggedInRef.value = false
-    userResponse.value.id = ''
-    userResponse.value.email = ''
-    userResponse.value.username = ''
-    userResponse.value.roles = []
+    userInfo.value.id = ''
+    userInfo.value.email = ''
+    userInfo.value.username = ''
+    userInfo.value.roles = []
   }
 
   return {

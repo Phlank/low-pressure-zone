@@ -5,6 +5,7 @@ import type { LoginResponse } from './loginResponse'
 import resetPassword from './passwordReset/resetPassword'
 import type { RegisterRequest } from './registerRequest'
 import type { TwoFactorRequest } from './twoFactorRequest'
+import type { UserInfoResponse } from './userInfoResponse'
 import type { UserResponse } from './userResponse'
 import type { VerifyTokenRequest } from './verifyTokenRequest'
 
@@ -12,7 +13,7 @@ const route = (userId?: string) => '/users' + (userId ? `/${userId}` : '')
 
 export default {
   get: () => sendGet<UserResponse[]>(route()),
-  getInfo: () => sendGet<UserResponse>(`${route()}/info`),
+  info: () => sendGet<UserInfoResponse>(`${route()}/info`),
   login: (request: LoginRequest) =>
     sendPost<LoginRequest, LoginResponse>(`${route()}/login`, request),
   logout: () => sendGet<never>(`${route()}/logout`),

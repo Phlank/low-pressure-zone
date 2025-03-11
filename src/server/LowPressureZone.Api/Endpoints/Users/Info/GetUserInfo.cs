@@ -3,7 +3,7 @@ using FastEndpoints;
 
 namespace LowPressureZone.Api.Endpoints.Users.Info;
 
-public class GetUserInfo : EndpointWithoutRequest<UserResponse>
+public class GetUserInfo : EndpointWithoutRequest<UserInfoResponse>
 {
     public override void Configure()
     {
@@ -23,12 +23,11 @@ public class GetUserInfo : EndpointWithoutRequest<UserResponse>
             return;
         }
 
-        await SendOkAsync(new UserResponse()
+        await SendOkAsync(new UserInfoResponse
         {
             Id = id,
             Username = username,
             Email = email,
-            RegistrationDate = null,
             Roles = roles
         }, ct);
     }
