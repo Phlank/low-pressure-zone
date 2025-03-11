@@ -10,8 +10,12 @@
         <TabPanel value="users">
           <UsersGrid :users="users" />
         </TabPanel>
-        <TabPanel value="pending"></TabPanel>
-        <TabPanel value="invite"></TabPanel>
+        <TabPanel value="pending">
+          <InvitesGrid :invites="invites" />
+        </TabPanel>
+        <TabPanel value="invite">
+          <InviteUser />
+        </TabPanel>
       </TabPanels>
     </Tabs>
     <Skeleton
@@ -23,9 +27,12 @@
 <script lang="ts" setup>
 import api from '@/api/api'
 import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
+import type { InviteResponse } from '@/api/users/invites/inviteResponse'
 import type { UserResponse } from '@/api/users/userResponse'
-import { Tab, TabList, TabPanel, TabPanels, Tabs, useToast, Skeleton } from 'primevue'
+import { Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs, useToast } from 'primevue'
 import { onMounted, ref, type Ref } from 'vue'
+import InvitesGrid from './InvitesGrid.vue'
+import InviteUser from './InviteUser.vue'
 import UsersGrid from './UsersGrid.vue'
 
 const isLoaded = ref(false)
@@ -33,11 +40,18 @@ const tabValue: Ref<string | number> = ref('users')
 const toast = useToast()
 
 const users: Ref<UserResponse[]> = ref([])
+const invites: Ref<InviteResponse[]> = ref([])
 
 onMounted(async () => {
   const userResponse = await api.users.get()
-  if (tryHandleUnsuccessfulResponse(userResponse, toast)) return
+  const inviteResponse = await api.users.invites.get()
+  if (
+    tryHandleUnsuccessfulResponse(userResponse, toast) ||
+    tryHandleUnsuccessfulResponse(inviteResponse, toast)
+  )
+    return
   users.value = userResponse.data!
+  invites.value = inviteResponse.data!
   isLoaded.value = true
 })
 </script>

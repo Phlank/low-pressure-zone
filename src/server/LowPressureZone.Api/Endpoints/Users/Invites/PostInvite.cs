@@ -13,7 +13,7 @@ public class PostInvite(UserManager<AppUser> userManager, IdentityContext identi
 {
     public override void Configure()
     {
-        Post("/users/invite");
+        Post("/users/invites");
     }
 
     public override async Task HandleAsync(InviteRequest req, CancellationToken ct)
@@ -44,7 +44,7 @@ public class PostInvite(UserManager<AppUser> userManager, IdentityContext identi
         var tokenContext = new TokenContext
         {
             Email = req.Email,
-            Token = inviteToken
+            Token = inviteToken,
         };
         await emailService.SendInviteEmail(req.Email, tokenContext);
         await identityContext.Invitations.AddAsync(invitation, ct);

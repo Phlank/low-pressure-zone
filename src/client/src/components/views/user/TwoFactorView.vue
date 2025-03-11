@@ -29,6 +29,8 @@
         <Button
           class="input"
           label="Verify"
+          :disabled="isSubmitting"
+          :loading="isSubmitting"
           @click="handleVerify" />
       </div>
     </div>

@@ -13,7 +13,8 @@ public class InviteMapper() : Mapper<InviteRequest, InviteResponse, Invitation<G
         return new Invitation<Guid, AppUser>()
         {
             UserId = Guid.NewGuid(),
-            InvitationDate = DateTime.UtcNow
+            InvitationDate = DateTime.UtcNow,
+            LastSentDate = DateTime.UtcNow,
         };
     }
 
@@ -28,7 +29,8 @@ public class InviteMapper() : Mapper<InviteRequest, InviteResponse, Invitation<G
         return new InviteResponse
         {
             Id = invitation.Id,
-            InviteDate = invitation.InvitationDate,
+            InvitedAt = invitation.InvitationDate,
+            LastSentAt = invitation.LastSentDate,
             Email = invitation.User.Email
         };
     }
