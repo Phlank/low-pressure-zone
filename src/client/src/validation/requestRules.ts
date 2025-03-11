@@ -3,7 +3,6 @@ import type { AudienceRequest } from '@/api/audiences/audienceRequest'
 import type { PerformerRequest } from '@/api/performers/performerRequest'
 import type { ScheduleRequest } from '@/api/schedules/scheduleRequest'
 import type { TimeslotRequest } from '@/api/schedules/timeslots/timeslotRequest'
-import type { InviteRequest } from '@/api/users/inviteRequest'
 import type { LoginRequest } from '@/api/users/loginRequest'
 import type { RegisterRequest } from '@/api/users/registerRequest'
 import type { TwoFactorRequest } from '@/api/users/twoFactorRequest'
@@ -22,6 +21,7 @@ import { alwaysValid, inArray } from './rules/untypedRules'
 import type { PropertyRules } from './types/propertyRules'
 import { combineRules } from './types/validationRule'
 import { allRoles } from '@/constants/roles'
+import type { InviteRequest } from '@/api/users/invites/inviteRequest'
 
 export const audienceRequestRules: PropertyRules<AudienceRequest> = {
   name: required(),
