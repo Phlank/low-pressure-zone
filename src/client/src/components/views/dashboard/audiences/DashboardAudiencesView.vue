@@ -2,7 +2,11 @@
   <div class="audiences-dashboard">
     <Tabs v-model:value="tabValue">
       <TabList>
-        <Tab value="0"> Mine </Tab>
+        <Tab
+          value="0"
+          v-if="!useAuthStore().isInAnySpecifiedRole(Role.Admin)">
+          Mine
+        </Tab>
         <Tab value="1"> All </Tab>
         <Tab
           value="2"
@@ -11,12 +15,14 @@
         </Tab>
       </TabList>
       <TabPanels v-if="isLoaded">
-        <TabPanel value="0">
+        <TabPanel
+          value="0"
+          v-if="!useAuthStore().isInAnySpecifiedRole(Role.Admin)">
           <div class="audiences-dashboard__linked">
             <h4>Your Audiences</h4>
             <AudiencesGrid
               v-if="linkedAudiences.length > 0"
-              :audiences="audiences.filter((a) => a.isLinkableToSchedule)"
+              :audiences="audiences.filter((a) => a.isRelated)"
               @edit-success="loadAudiences()"
               @delete-success="loadAudiences()" />
             <div v-else>You do not currently have any linked audiences.</div>

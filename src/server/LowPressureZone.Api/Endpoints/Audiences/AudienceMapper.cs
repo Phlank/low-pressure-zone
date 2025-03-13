@@ -42,6 +42,7 @@ public sealed class AudienceMapper(AudienceRules rules) : Mapper<AudienceRequest
             Id = audience.Id,
             Name = audience.Name,
             Url = audience.Url,
+            IsRelated = rules.IsRelated(audience),
             IsEditable = rules.IsEditAuthorized(audience),
             IsDeletable = rules.IsDeleteAuthorized(audience) && !audience.IsDeleted,
             IsLinkableToSchedule = rules.IsScheduleLinkAuthorized(audience)

@@ -72,23 +72,18 @@ import AudienceForm from '@/components/form/requestForms/AudienceForm.vue'
 import { showDeleteSuccessToast, showEditSuccessToast } from '@/utils/toastUtils'
 import { Column, DataTable, useToast } from 'primevue'
 import { inject, ref, useTemplateRef, type Ref } from 'vue'
-import GridActions from '@/components/data/GridActions.vue'
+import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import ListItem from '@/components/data/ListItem.vue'
+import { throwIfUndefined } from '@/utils/guards'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const isSubmitting = ref(false)
 const toast = useToast()
 
-const props = defineProps<{
+defineProps<{
   audiences: AudienceResponse[]
 }>()
 
-const emit = defineEmits<{
-  editSuccess: []
-  deleteSuccess: []
-}>()
-
-// EDITING PERFORMERS
 const showEditDialog = ref(false)
 let editingId = ''
 const editFormInitialState: Ref<AudienceRequest> = ref({ name: '', url: '' })
@@ -100,19 +95,11 @@ const handleEditActionClick = (audience: AudienceResponse) => {
   editFormInitialState.value.url = audience.url
   showEditDialog.value = true
 }
-
 const handleSave = async () => {
-  if (editForm.value == undefined) return
+  if (!editForm.value) return
+
   const isValid = editForm.value.validation.validate()
   if (!isValid) return
-
-  if (
-    editForm.value.formState.name === editFormInitialState.value.name &&
-    editForm.value.formState.url === editFormInitialState.value.url
-  ) {
-    showEditDialog.value = false
-    return
-  }
 
   isSubmitting.value = true
   const response = await api.performers.put(editingId, editForm.value.formState)
@@ -120,26 +107,18 @@ const handleSave = async () => {
 
   if (tryHandleUnsuccessfulResponse(response, toast, editForm.value.validation)) return
 
-  showEditSuccessToast(toast, 'performer', editFormInitialState.value.name)
-  const audienceInGrid = props.audiences.find((audience) => audience.id == editingId)
-  if (audienceInGrid) {
-    audienceInGrid.name = editForm.value.formState.name
-    audienceInGrid.url = editForm.value.formState.url
-  }
+  showEditSuccessToast(toast, 'audience', editFormInitialState.value.name)
   showEditDialog.value = false
 }
 
-// DELETING PERFORMERS
 const showDeleteDialog = ref(false)
 let deletingId = ''
 const deletingName = ref('')
-
 const handleDeleteActionClick = (performer: AudienceResponse) => {
   deletingId = performer.id
   deletingName.value = performer.name
   showDeleteDialog.value = true
 }
-
 const handleDelete = async () => {
   isSubmitting.value = true
   const response = await api.audiences.delete(deletingId)
@@ -147,9 +126,7 @@ const handleDelete = async () => {
 
   if (tryHandleUnsuccessfulResponse(response, toast)) return
 
-  const performerInGrid = props.audiences.find((performer) => performer.id == deletingId)
-  props.audiences.splice(props.audiences.indexOf(performerInGrid!), 1)
-  showDeleteSuccessToast(toast, 'performer', deletingName.value)
+  showDeleteSuccessToast(toast, 'audience', deletingName.value)
   showDeleteDialog.value = false
 }
 </script>

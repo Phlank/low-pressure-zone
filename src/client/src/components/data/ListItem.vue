@@ -25,9 +25,10 @@ const emit = defineEmits<{
   flex-wrap: nowrap;
   width: 100%;
   gap: variables.$space-l;
-  // padding: variables.$space-m 0;
 
   &__left {
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -35,7 +36,6 @@ const emit = defineEmits<{
 
   &__right {
     margin-left: auto;
-    // min-width: fit-content;
   }
 }
 </style>

@@ -39,4 +39,12 @@ public class AudienceRules(IHttpContextAccessor contextAccessor)
         if (User == null) return true;
         return !User.IsInRole(RoleNames.Admin) && entity.IsDeleted;
     }
+
+    public bool IsRelated(Audience audience)
+    {
+        audience.Relationships.ShouldNotBeNull();
+        if (audience.IsDeleted) return false;
+        if (User == null) return false;
+        return audience.Relationships.Any(r => r.UserId == User.GetIdOrDefault() && (r.IsPerformer || r.IsOrganizer));
+    }
 }
