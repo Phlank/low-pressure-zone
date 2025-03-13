@@ -1,5 +1,6 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Domain;
+using LowPressureZone.Domain.Entities;
 using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,10 +16,10 @@ public sealed class GetAudiences(DataContext dataContext) : EndpointWithoutReque
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var audiencesQuery = dataContext.Audiences.AsNoTracking();
+        var audiencesQuery = dataContext.Audiences.Include(a => a.Relationships).AsNoTracking();
         if (!User.IsInRole(RoleNames.Admin))
         {
-            audiencesQuery = audiencesQuery.Where(a => !a.IsDeleted);
+            audiencesQuery = audiencesQuery.Where(a => a.IsDeleted);
         }
         var audiences = await audiencesQuery.ToListAsync(ct);
 

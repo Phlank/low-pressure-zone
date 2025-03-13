@@ -1,7 +1,6 @@
 ﻿using FastEndpoints;
 using FluentValidation;
 using LowPressureZone.Api.Constants;
-using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +9,7 @@ namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
 public class TimeslotRequestValidator : Validator<TimeslotRequest>
 {
-    public TimeslotRequestValidator(IHttpContextAccessor contextAccessor, PerformerRules performerRules)
+    public TimeslotRequestValidator(IHttpContextAccessor contextAccessor)
     {
         RuleFor(t => t.PerformanceType).Must(t => PerformanceTypes.All.Contains(t))
                                        .WithMessage("Invalid type");

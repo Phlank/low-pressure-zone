@@ -41,7 +41,7 @@
 
 <script lang="ts" setup>
 import type { UserResponse } from '@/api/users/userResponse'
-import GridActions from '@/components/data/GridActions.vue'
+import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import ListItem from '@/components/data/ListItem.vue'
 import { parseDate } from '@/utils/dateUtils'
 import { DataTable, Column, Divider } from 'primevue'

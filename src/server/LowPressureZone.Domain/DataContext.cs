@@ -6,6 +6,7 @@ namespace LowPressureZone.Domain;
 public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
 {
     public DbSet<Audience> Audiences { get; set; }
+    public DbSet<AudienceRelationship> AudienceRelationships { get; set; }
     public DbSet<Performer> Performers { get; set; }
     public DbSet<Schedule> Schedules { get; set; }
     public DbSet<Timeslot> Timeslots { get; set; }
@@ -21,5 +22,7 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
 
         modelBuilder.Entity<Timeslot>().HasIndex(nameof(Timeslot.StartsAt)).IsUnique();
         modelBuilder.Entity<Timeslot>().HasIndex(nameof(Timeslot.EndsAt)).IsUnique();
+
+        modelBuilder.Entity<AudienceRelationship>().HasIndex(nameof(AudienceRelationship.AudienceId), nameof(AudienceRelationship.UserId)).IsUnique();
     }
 }

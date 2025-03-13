@@ -3,6 +3,7 @@ using LowPressureZone.Domain.Entities;
 using LowPressureZone.Domain.Extensions;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
+using Shouldly;
 
 namespace LowPressureZone.Api.Rules;
 
@@ -12,10 +13,11 @@ public class AudienceRules(IHttpContextAccessor contextAccessor)
 
     public bool IsScheduleLinkAuthorized(Audience audience)
     {
+        audience.Relationships.ShouldNotBeNull();
         if (audience.IsDeleted) return false;
         if (User == null) return false;
         if (User.IsInRole(RoleNames.Admin)) return true;
-        return User.IsInRole(RoleNames.Organizer) && audience.LinkedUserIds.Contains(User.GetIdOrDefault());
+        return User.IsInRole(RoleNames.Organizer) && audience.Relationships.Any(r => r.UserId == User.GetIdOrDefault() && r.IsOrganizer);
     }
 
     public bool IsEditAuthorized(Audience audience)
@@ -36,5 +38,13 @@ public class AudienceRules(IHttpContextAccessor contextAccessor)
     {
         if (User == null) return true;
         return !User.IsInRole(RoleNames.Admin) && entity.IsDeleted;
+    }
+
+    public bool IsRelated(Audience audience)
+    {
+        audience.Relationships.ShouldNotBeNull();
+        if (audience.IsDeleted) return false;
+        if (User == null) return false;
+        return audience.Relationships.Any(r => r.UserId == User.GetIdOrDefault() && (r.IsPerformer || r.IsOrganizer));
     }
 }

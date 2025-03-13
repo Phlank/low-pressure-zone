@@ -21,6 +21,7 @@ public class GetSchedules(DataContext dataContext, ScheduleRules rules) : Endpoi
                                                                   .AsSplitQuery()
                                                                   .OrderBy(s => s.StartsAt)
                                                                   .Include(s => s.Audience)
+                                                                  .ThenInclude(a => a!.Relationships)
                                                                   .Include(s => s.Timeslots.OrderBy(t => t.StartsAt))
                                                                   .ThenInclude(t => t.Performer);
 
