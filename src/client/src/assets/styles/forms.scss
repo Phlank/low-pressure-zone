@@ -54,9 +54,9 @@ tbody.p-datatable-tbody tr > td.grid-action-col {
     width: variables.$grid-action-width;
   }
   &--2 {
-    width: calc(variables.$grid-action-width * 2);
+    width: calc(#{variables.$grid-action-width} * 2);
   }
   &--3 {
-    width: calc(variables.$grid-action-width * 3);
+    width: calc(#{variables.$grid-action-width} * 3);
   }
 }

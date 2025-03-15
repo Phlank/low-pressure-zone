@@ -3,11 +3,11 @@
     <div class="single-panel-center__form">
       <IftaLabel class="input input--medium">
         <InputText
-          :autofocus="true"
           id="usernameInput"
-          class="input__field"
+          v-model:model-value="formState.username"
+          :autofocus="true"
           :disabled="isSubmitting"
-          v-model:model-value="formState.username" />
+          class="input__field" />
         <ValidationLabel
           for="usernameInput"
           message=""
@@ -16,10 +16,10 @@
       <IftaLabel class="input input--medium">
         <Password
           id="passwordInput"
-          class="input__field"
-          :feedback="false"
+          v-model:model-value="formState.password"
           :disabled="isSubmitting"
-          v-model:model-value="formState.password" />
+          :feedback="false"
+          class="input__field" />
         <ValidationLabel
           for="passwordInput"
           message=""
@@ -34,21 +34,20 @@
       </div>
       <div class="buttons">
         <Button
-          label="Login"
-          :loading="isSubmitting"
           :disabled="isSubmitting"
+          :loading="isSubmitting"
+          label="Login"
           @click="handleLogin" />
         <Button
           label="Reset"
-          @click="router.push(Routes.RequestPasswordReset)"
-          outlined />
+          outlined
+          @click="router.push(Routes.RequestPasswordReset)" />
       </div>
     </div>
   </Panel>
 </template>
 
 <script lang="ts" setup>
-import api from '@/api/api'
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { KeyName } from '@/constants/keys'
 import router from '@/router'
@@ -59,8 +58,9 @@ import { createFormValidation } from '@/validation/types/formValidation'
 import { onKeyDown } from '@vueuse/core'
 import { Button, IftaLabel, InputText, Message, Panel, Password } from 'primevue'
 import { reactive, ref } from 'vue'
+import authApi, { type LoginRequest } from '@/api/resources/authApi.ts'
 
-const formState = reactive({
+const formState: LoginRequest = reactive({
   username: '',
   password: ''
 })
@@ -85,7 +85,7 @@ const handleLogin = async () => {
   if (!isValid) return
 
   isSubmitting.value = true
-  const response = await api.users.login(formState)
+  const response = await authApi.postLogin(formState)
   if (!response.isSuccess()) {
     errorMessage.value = 'Invalid credentials'
     isSubmitting.value = false
@@ -93,13 +93,13 @@ const handleLogin = async () => {
   }
 
   if (response.data?.requiresTwoFactor) {
-    router.push('/user/twofactor')
+    await router.push('/user/twoFactor')
     return
   }
 
   await useAuthStore().load()
   isSubmitting.value = false
-  router.push(props.redirect)
+  await router.push(props.redirect)
 }
 </script>
 

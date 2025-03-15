@@ -2,8 +2,8 @@
   <div class="dashboard-view flex-variable-space-between">
     <Menu
       v-if="!isMobile"
-      class="flex-variable-space-between__left flex-variable-space-between__left--variable-height"
       :model="menuItems"
+      class="flex-variable-space-between__left flex-variable-space-between__left--variable-height"
       z-index="99">
       <template #item="{ item, props }">
         <div v-if="authStore.isInAnySpecifiedRole(...item.roles)">
@@ -13,8 +13,8 @@
             :to="item.route"
             custom>
             <a
-              v-ripple
               v-if="item.route"
+              v-ripple
               :href="href"
               v-bind="props.action"
               @click="navigate">
@@ -35,8 +35,8 @@
       </template>
     </Menu>
     <Panel
-      class="dashboard-view__content flex-variable-space-between__right flex-variable-space-between__right--full-width"
-      :header="isMobile ? '' : (($router.currentRoute.value.name as string) ?? '')">
+      :header="isMobile ? '' : ((router.currentRoute.value.name as string) ?? '')"
+      class="dashboard-view__content flex-variable-space-between__right flex-variable-space-between__right--full-width">
       <TitledNavMenu
         v-if="isMobile"
         :items="menuItems" />
@@ -45,13 +45,14 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import TitledNavMenu from '@/components/controls/TitledNavMenu.vue'
-import { allRoles, Role } from '@/constants/roles'
+import { Role } from '@/constants/roles'
 import { useAuthStore } from '@/stores/authStore'
 import { Menu, Panel } from 'primevue'
 import type { MenuItem } from 'primevue/menuitem'
 import { inject, onMounted, type Ref } from 'vue'
+import router from '@/router'
 
 const authStore = useAuthStore()
 
@@ -64,9 +65,9 @@ const menuItems: MenuItem[] = [
     roles: []
   },
   {
-    label: 'Audiences',
+    label: 'Communities',
     icon: 'pi pi-globe',
-    route: '/dashboard/audiences',
+    route: '/dashboard/communities',
     roles: []
   },
   {

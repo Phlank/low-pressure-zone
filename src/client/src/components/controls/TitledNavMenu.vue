@@ -2,7 +2,7 @@
   <Menubar
     :model="props.items"
     class="titled-nav-menu">
-    <template #start>{{ $router.currentRoute.value.name ?? '' }}</template>
+    <template #start>{{ router.currentRoute.value.name ?? '' }}</template>
     <!-- https://primevue.org/menubar/#router -->
     <template #item="{ item, props, hasSubmenu }">
       <RouterLink
@@ -11,8 +11,8 @@
         :to="item.route"
         custom>
         <a
-          v-ripple
           v-if="item.route"
+          v-ripple
           :href="href"
           v-bind="props.action"
           @click="navigate">
@@ -40,6 +40,7 @@
 import { Menubar } from 'primevue'
 import type { MenuItem } from 'primevue/menuitem'
 import { RouterLink } from 'vue-router'
+import router from '../../router'
 
 const props = defineProps<{
   items: MenuItem[]

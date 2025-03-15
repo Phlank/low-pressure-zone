@@ -1,11 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { AudienceRequest } from '@/api/audiences/audienceRequest'
-import type { PerformerRequest } from '@/api/performers/performerRequest'
-import type { ScheduleRequest } from '@/api/schedules/scheduleRequest'
-import type { TimeslotRequest } from '@/api/schedules/timeslots/timeslotRequest'
-import type { LoginRequest } from '@/api/users/loginRequest'
-import type { RegisterRequest } from '@/api/users/registerRequest'
-import type { TwoFactorRequest } from '@/api/users/twoFactorRequest'
 import { hourOnly, withinRangeOf } from './rules/dateStringRules'
 import {
   allowedCharacters,
@@ -21,9 +14,14 @@ import { alwaysValid, inArray } from './rules/untypedRules'
 import type { PropertyRules } from './types/propertyRules'
 import { combineRules } from './types/validationRule'
 import { allRoles } from '@/constants/roles'
-import type { InviteRequest } from '@/api/users/invites/inviteRequest'
+import type { CommunityRequest } from '@/api/resources/communitiesApi.ts'
+import type { PerformerRequest } from '@/api/resources/performersApi.ts'
+import type { ScheduleRequest } from '@/api/resources/schedulesApi.ts'
+import type { TimeslotRequest } from '@/api/resources/timeslotsApi.ts'
+import type { LoginRequest, RegisterRequest } from '@/api/resources/authApi.ts'
+import type { InviteRequest } from '@/api/resources/invitesApi.ts'
 
-export const audienceRequestRules: PropertyRules<AudienceRequest> = {
+export const communityRequestRules: PropertyRules<CommunityRequest> = {
   name: required(),
   url: combineRules(required(), url())
 }
@@ -37,7 +35,7 @@ export const scheduleRequestRules = (
   formState: ScheduleRequest
 ): PropertyRules<ScheduleRequest> => {
   return {
-    audienceId: required(),
+    communityId: required(),
     startsAt: combineRules(required(), hourOnly()),
     endsAt: combineRules(
       required(),
@@ -67,10 +65,6 @@ export const timeslotRequestRules = (
 export const loginRequestRules: PropertyRules<LoginRequest> = {
   username: required(),
   password: required()
-}
-
-export const twoFactorRequestRules: PropertyRules<TwoFactorRequest> = {
-  code: required()
 }
 
 export const inviteRequestRules: PropertyRules<InviteRequest> = {

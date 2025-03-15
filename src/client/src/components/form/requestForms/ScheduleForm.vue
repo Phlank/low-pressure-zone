@@ -2,57 +2,57 @@
   <div class="schedule-form desktop-inline">
     <IftaLabel class="input input--small">
       <Select
+        id="communitySelect"
+        :invalid="!validation.isValid('communityId')"
+        :model-value="formState.communityId"
+        :options="communities"
         class="input__field"
-        id="audienceSelect"
-        placeholder="Select an audience"
         option-label="name"
         option-value="id"
-        :options="audiences"
-        :invalid="!validation.isValid('audienceId')"
-        :model-value="formState.audienceId"
-        @update:model-value="handleUpdateAudience" />
+        placeholder="Select an community"
+        @update:model-value="handleUpdateCommunity" />
       <ValidationLabel
-        for="audienceSelect"
-        :message="validation.message('audienceId')">
-        Audience
+        :message="validation.message('communityId')"
+        for="communitySelect">
+        Community
       </ValidationLabel>
     </IftaLabel>
   </div>
   <div class="schedule-form desktop-inline">
     <IftaLabel class="input input--medium">
       <DatePicker
-        class="input__field"
         id="startTime"
-        hourFormat="12"
-        :min-date="minimumDate(formState.startTime, minStartTime)"
-        :model-value="formState.startTime"
         :disabled="formState.startTime.getTime() < minStartTime.getTime()"
         :invalid="!validation.isValid('startsAt')"
-        @update:model-value="handleUpdateStart"
+        :min-date="minimumDate(formState.startTime, minStartTime)"
+        :model-value="formState.startTime"
+        class="input__field"
+        fluid
+        hourFormat="12"
         show-time
-        fluid />
+        @update:model-value="handleUpdateStart" />
       <ValidationLabel
-        for="startTime"
-        :message="validation.message('startsAt')">
+        :message="validation.message('startsAt')"
+        for="startTime">
         Start Time
       </ValidationLabel>
     </IftaLabel>
     <IftaLabel class="input input--medium">
       <DatePicker
-        class="input__field"
         id="startTime"
-        hourFormat="12"
-        :min-date="formState.startTime"
-        :max-date="new Date(formState.startTime.getTime() + MAX_DURATION_MINUTES * MS_PER_MINUTE)"
-        :model-value="formState.endTime"
-        :invalid="!validation.isValid('endsAt')"
         :disabled="formState.endTime.getTime() < minStartTime.getTime()"
-        @update:model-value="handleUpdateEnd"
+        :invalid="!validation.isValid('endsAt')"
+        :max-date="new Date(formState.startTime.getTime() + MAX_DURATION_MINUTES * MS_PER_MINUTE)"
+        :min-date="formState.startTime"
+        :model-value="formState.endTime"
+        class="input__field"
+        fluid
+        hourFormat="12"
         show-time
-        fluid />
+        @update:model-value="handleUpdateEnd" />
       <ValidationLabel
-        for="endTime"
-        :message="validation.message('endsAt')">
+        :message="validation.message('endsAt')"
+        for="endTime">
         End Time
       </ValidationLabel>
     </IftaLabel>
@@ -60,29 +60,29 @@
   <div class="schedule-form desktop-inline">
     <IftaLabel class="input input--xl">
       <Textarea
-        class="input__field"
         id="descriptionInput"
         v-model:model-value="formState.description"
-        auto-resize />
+        auto-resize
+        class="input__field" />
       <ValidationLabel
         for="descriptionInput"
         message=""
-        text="Description"
-        optional />
+        optional
+        text="Description" />
     </IftaLabel>
   </div>
 </template>
 
 <script lang="ts" setup>
-import type { AudienceResponse } from '@/api/audiences/audienceResponse'
 import { DatePicker, IftaLabel, Select, Textarea } from 'primevue'
 import ValidationLabel from '../ValidationLabel.vue'
 import { onMounted, reactive, ref, watch } from 'vue'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { MS_PER_MINUTE } from '@/constants/times'
-import type { ScheduleRequest } from '@/api/schedules/scheduleRequest'
-import { setToHour, minimumDate } from '@/utils/dateUtils'
+import { minimumDate, setToHour } from '@/utils/dateUtils'
 import { scheduleRequestRules } from '@/validation/requestRules'
+import type { ScheduleRequest } from '@/api/resources/schedulesApi.ts'
+import type { CommunityResponse } from '@/api/resources/communitiesApi.ts'
 
 const MAX_DURATION_MINUTES = 1440
 const DEFAULT_MINUTES = 60
@@ -113,7 +113,7 @@ export interface ScheduleFormState extends ScheduleRequest {
 }
 
 const formState: ScheduleFormState = reactive({
-  audienceId: '',
+  communityId: '',
   startTime: resetStartTime,
   startsAt: resetStartTime.toISOString(),
   description: '',
@@ -125,12 +125,12 @@ const validation = createFormValidation(formState, scheduleRequestRules(formStat
 
 const props = defineProps<{
   initialState?: ScheduleFormState
-  audiences: AudienceResponse[]
+  communities: CommunityResponse[]
 }>()
 
 onMounted(() => {
   if (props.initialState != undefined) {
-    formState.audienceId = props.initialState.audienceId
+    formState.communityId = props.initialState.communityId
     formState.startsAt = props.initialState.startsAt
     formState.endsAt = props.initialState.endsAt
     formState.description = props.initialState.description
@@ -139,9 +139,9 @@ onMounted(() => {
   }
 })
 
-const handleUpdateAudience = (value: string) => {
-  formState.audienceId = value
-  validation.validateIfDirty('audienceId')
+const handleUpdateCommunity = (value: string) => {
+  formState.communityId = value
+  validation.validateIfDirty('communityId')
 }
 
 const handleUpdateStart = (value: Date | Date[] | (Date | null)[] | null | undefined) => {
@@ -166,7 +166,7 @@ const handleUpdateEnd = (value: Date | Date[] | (Date | null)[] | null | undefin
 
 const reset = () => {
   now = new Date()
-  formState.audienceId = ''
+  formState.communityId = ''
   formState.startTime = resetStartTime
   formState.startsAt = formState.startTime.toISOString()
   formState.description = ''

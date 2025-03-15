@@ -4,17 +4,17 @@
       <IftaLabel class="input input--medium">
         <InputText
           id="emailInput"
-          class="input__field"
-          v-model:model-value="formState.email" />
+          v-model:model-value="formState.email"
+          class="input__field" />
         <ValidationLabel
-          text="Email"
+          :message="validation.message('email')"
           for="emailInput"
-          :message="validation.message('email')" />
+          text="Email" />
       </IftaLabel>
-      <div class="buttons">
+      <div class="single-panel-center__form__buttons">
         <Button
-          :loading="isSubmitting"
           :disabled="isSubmitting"
+          :loading="isSubmitting"
           label="Reset Password"
           @click="handleResetPasswordClick" />
       </div>
@@ -23,16 +23,16 @@
 </template>
 
 <script lang="ts" setup>
-import api from '@/api/api'
-import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { KeyName } from '@/constants/keys'
 import { emailAddress, required } from '@/validation/rules/stringRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { combineRules } from '@/validation/types/validationRule'
 import { onKeyDown } from '@vueuse/core'
-import { IftaLabel, InputText, Button, Panel, useToast } from 'primevue'
+import { Button, IftaLabel, InputText, Panel, useToast } from 'primevue'
 import { reactive, ref } from 'vue'
+import authApi from '@/api/resources/authApi.ts'
+import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 
 const isSubmitting = ref(false)
 const toast = useToast()
@@ -50,7 +50,7 @@ const handleResetPasswordClick = async () => {
   if (!isValid) return
 
   isSubmitting.value = true
-  const response = await api.users.resetPassword.get(formState.email)
+  const response = await authApi.getResetPassword(formState.email)
   isSubmitting.value = false
 
   if (tryHandleUnsuccessfulResponse(response, toast)) return
@@ -65,6 +65,7 @@ const handleResetPasswordClick = async () => {
 
 <style lang="scss">
 @use '@/assets/styles/variables.scss';
+
 .request-password-reset {
   .buttons {
     margin-top: variables.$space-m;

@@ -2,52 +2,50 @@
   <div class="invite-user">
     <IftaLabel class="input input--large">
       <InputText
-        class="input__field"
         id="inviteEmailInput"
         v-model="formState.email"
         :invalid="!validation.isValid('email')"
+        class="input__field"
         @change="validation.validateIfDirty('email')" />
       <ValidationLabel
-        for="inviteEmailInput"
         :message="validation.message('email')"
+        for="inviteEmailInput"
         text="Email" />
     </IftaLabel>
     <IftaLabel class="input input--small">
       <Select
-        class="input__field"
         id="roleInput"
-        :options="roleItems"
-        option-label="name"
-        option-value="name"
-        data-key="name"
+        v-model:model-value="formState.role"
         :default-value="Role.Performer"
-        v-model:model-value="formState.role" />
+        :options="roleItems"
+        class="input__field"
+        data-key="name"
+        option-label="name"
+        option-value="name" />
       <label for="roleInput">Role</label>
     </IftaLabel>
     <Button
-      class="input"
-      label="Send Invite"
       :disabled="isSubmitting"
       :loading="isSubmitting"
+      class="input"
+      label="Send Invite"
       @click="handleSubmit" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import api from '@/api/api'
-import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { KeyName } from '@/constants/keys'
 import { Role } from '@/constants/roles'
-import { useAuthStore } from '@/stores/authStore'
 import { inviteRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { onKeyDown } from '@vueuse/core'
-import { IftaLabel, InputText, Select, useToast, Button } from 'primevue'
+import { Button, IftaLabel, InputText, Select, useToast } from 'primevue'
 import { reactive, ref, watch } from 'vue'
+import invitesApi from '@/api/resources/invitesApi.ts'
+import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 
 const toast = useToast()
-const authStore = useAuthStore()
 
 onKeyDown(KeyName.Enter, () => handleSubmit())
 
@@ -55,6 +53,7 @@ interface RoleItem {
   name: Role
   availableTo: Role[]
 }
+
 const roleItems: RoleItem[] = [
   {
     name: Role.Performer,
@@ -88,7 +87,7 @@ const handleSubmit = async () => {
   if (!isValid) return
 
   isSubmitting.value = true
-  const response = await api.users.invites.post(formState)
+  const response = await invitesApi.post(formState)
   isSubmitting.value = false
 
   if (tryHandleUnsuccessfulResponse(response, toast, validation)) return
@@ -100,7 +99,7 @@ const handleSubmit = async () => {
 
 watch(
   () => props.visible,
-  (newValue: boolean) => {
+  () => {
     reset()
   }
 )

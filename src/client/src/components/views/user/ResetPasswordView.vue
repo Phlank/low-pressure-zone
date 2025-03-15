@@ -4,32 +4,32 @@
       <IftaLabel class="input input--medium">
         <Password
           id="passwordInput"
-          class="input__field"
           v-model:model-value="formState.password"
           :feedback="false"
+          class="input__field"
           @change="validation.validateIfDirty('password')" />
         <ValidationLabel
+          :message="validation.message('password')"
           for="passwordInput"
-          text="New Password"
-          :message="validation.message('password')" />
+          text="New Password" />
       </IftaLabel>
       <IftaLabel class="input input--medium">
         <Password
           id="confirmPasswordInput"
-          class="input__field"
           v-model:model-value="formState.confirmPassword"
           :feedback="false"
+          class="input__field"
           @change="validation.validateIfDirty('confirmPassword')" />
         <ValidationLabel
+          :message="validation.message('confirmPassword')"
           for="confirmPasswordInput"
-          text="Confirm New Password"
-          :message="validation.message('confirmPassword')" />
+          text="Confirm New Password" />
       </IftaLabel>
       <div class="buttons">
         <Button
-          label="Update Password"
-          :loading="isSubmitting"
           :disabled="isSubmitting"
+          :loading="isSubmitting"
+          label="Update Password"
           @click="handleUpdatePassword" />
       </div>
     </div>
@@ -37,8 +37,6 @@
 </template>
 
 <script lang="ts" setup>
-import api from '@/api/api'
-import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { KeyName } from '@/constants/keys'
 import router from '@/router'
@@ -46,8 +44,10 @@ import { Routes } from '@/router/routes'
 import { equals, password, required } from '@/validation/rules/stringRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { onKeyDown } from '@vueuse/core'
-import { Panel, IftaLabel, Password, Button, useToast } from 'primevue'
+import { Button, IftaLabel, Panel, Password, useToast } from 'primevue'
 import { reactive, ref } from 'vue'
+import authApi from '@/api/resources/authApi.ts'
+import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 
 const isSubmitting = ref(false)
 const toast = useToast()
@@ -73,7 +73,7 @@ const handleUpdatePassword = async () => {
   if (!isValid) return
 
   isSubmitting.value = true
-  const response = await api.users.resetPassword.post(formState)
+  const response = await authApi.postResetPassword(formState)
   isSubmitting.value = false
 
   if (tryHandleUnsuccessfulResponse(response, toast)) return
@@ -84,12 +84,13 @@ const handleUpdatePassword = async () => {
     severity: 'success'
   })
 
-  router.push(Routes.Login)
+  await router.push(Routes.Login)
 }
 </script>
 
 <style lang="scss">
 @use '@/assets/styles/variables.scss';
+
 .reset-password {
   .buttons {
     margin-top: variables.$space-m;

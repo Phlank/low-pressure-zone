@@ -21,7 +21,7 @@ public class GetScheduleById(DataContext dataContext, ScheduleRules rules) : End
         var id = Route<Guid>("id");
         var schedule = await dataContext.Schedules.AsNoTracking()
                                                   .AsSplitQuery()
-                                                  .Include(s => s.Audience)
+                                                  .Include(s => s.Community)
                                                   .Include(s => s.Timeslots.OrderBy(t => t.StartsAt))
                                                   .ThenInclude(t => t.Performer)
                                                   .Where(s => s.Id == id)

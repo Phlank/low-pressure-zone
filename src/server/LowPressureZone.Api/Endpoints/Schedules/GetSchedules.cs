@@ -20,7 +20,7 @@ public class GetSchedules(DataContext dataContext, ScheduleRules rules) : Endpoi
         IQueryable<Schedule> scheduleQuery = dataContext.Schedules.AsNoTracking()
                                                                   .AsSplitQuery()
                                                                   .OrderBy(s => s.StartsAt)
-                                                                  .Include(s => s.Audience)
+                                                                  .Include(s => s.Community)
                                                                   .ThenInclude(a => a!.Relationships)
                                                                   .Include(s => s.Timeslots.OrderBy(t => t.StartsAt))
                                                                   .ThenInclude(t => t.Performer);

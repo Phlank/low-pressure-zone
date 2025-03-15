@@ -1,9 +1,7 @@
-import api from '@/api/api'
-import type { UserInfoResponse } from '@/api/users/userInfoResponse'
-import type { UserResponse } from '@/api/users/userResponse'
 import { hasIntersection } from '@/utils/arrayUtils'
 import { defineStore } from 'pinia'
 import { ref, type Ref } from 'vue'
+import authApi, { type UserInfoResponse } from '@/api/resources/authApi.ts'
 
 export const useAuthStore = defineStore('authStore', () => {
   const isLoggedInRef: Ref<boolean | undefined> = ref(undefined)
@@ -26,7 +24,7 @@ export const useAuthStore = defineStore('authStore', () => {
   }
 
   const loadUserInfo = async () => {
-    const response = await api.users.info()
+    const response = await authApi.getInfo()
     if (response.status === 0) return
     isLoggedInRef.value = response.isSuccess()
     if (response.isSuccess()) {

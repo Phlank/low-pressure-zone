@@ -68,10 +68,6 @@
 </template>
 
 <script lang="ts" setup>
-import api from '@/api/api'
-import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
-import type { PerformerRequest } from '@/api/performers/performerRequest'
-import type { PerformerResponse } from '@/api/performers/performerResponse'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import ListItem from '@/components/data/ListItem.vue'
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
@@ -80,6 +76,8 @@ import PerformerForm from '@/components/form/requestForms/PerformerForm.vue'
 import { showDeleteSuccessToast, showEditSuccessToast } from '@/utils/toastUtils'
 import { Column, DataTable, Divider, useToast } from 'primevue'
 import { inject, ref, useTemplateRef, type Ref } from 'vue'
+import performersApi, { type PerformerRequest, type PerformerResponse } from '@/api/resources/performersApi.ts'
+import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 
@@ -118,7 +116,7 @@ const handleSave = async () => {
   }
 
   isSubmitting.value = true
-  const response = await api.performers.put(editingId, editForm.value.formState)
+  const response = await performersApi.put(editingId, editForm.value.formState)
   isSubmitting.value = false
 
   if (tryHandleUnsuccessfulResponse(response, toast, editForm.value.validation)) return
@@ -146,7 +144,7 @@ const handleDeleteActionClick = (performer: PerformerResponse) => {
 
 const handleDelete = async () => {
   isSubmitting.value = true
-  const response = await api.performers.delete(deletingId)
+  const response = await performersApi.delete(deletingId)
   isSubmitting.value = false
 
   if (tryHandleUnsuccessfulResponse(response, toast)) return

@@ -6,54 +6,52 @@
       <IftaLabel class="input input--medium">
         <InputText
           id="usernameInput"
-          class="input__field"
+          v-model:model-value="formState.username"
           :invalid="!validation.isValid('username')"
-          @change="validation.validateIfDirty('username')"
-          v-model:model-value="formState.username" />
+          class="input__field"
+          @change="validation.validateIfDirty('username')" />
         <ValidationLabel
-          for="usernameInput"
           :message="validation.message('username')"
+          for="usernameInput"
           text="Username" />
       </IftaLabel>
       <IftaLabel class="input input--medium">
         <Password
           id="passwordInput"
-          class="input__field"
+          v-model:model-value="formState.password"
           :feedback="false"
           :invalid="!validation.isValid('password')"
-          @change="validation.validateIfDirty('password')"
-          v-model:model-value="formState.password" />
+          class="input__field"
+          @change="validation.validateIfDirty('password')" />
         <ValidationLabel
-          for="passwordInput"
           :message="validation.message('password')"
+          for="passwordInput"
           text="Password" />
       </IftaLabel>
       <IftaLabel class="input input--medium">
         <Password
           id="confirmPasswordInput"
-          class="input__field"
+          v-model:model-value="formState.confirmPassword"
           :feedback="false"
           :invalid="!validation.isValid('confirmPassword')"
-          @change="validation.validateIfDirty('confirmPassword')"
-          v-model:model-value="formState.confirmPassword" />
+          class="input__field"
+          @change="validation.validateIfDirty('confirmPassword')" />
         <ValidationLabel
-          for="confirmPasswordInput"
           :message="validation.message('confirmPassword')"
+          for="confirmPasswordInput"
           text="Confirm Password" />
       </IftaLabel>
       <Button
+        :disabled="isSubmitting"
+        :loading="isSubmitting"
         class="input"
         label="Register"
-        :loading="isSubmitting"
-        :disabled="isSubmitting"
         @click="handleRegister" />
     </div>
   </Panel>
 </template>
 
 <script lang="ts" setup>
-import api from '@/api/api'
-import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { KeyName } from '@/constants/keys'
 import { TokenProvider, TokenPurpose } from '@/constants/tokens'
@@ -65,6 +63,8 @@ import { createFormValidation } from '@/validation/types/formValidation'
 import { onKeyDown } from '@vueuse/core'
 import { Button, IftaLabel, InputText, Panel, Password, useToast } from 'primevue'
 import { onMounted, reactive, ref } from 'vue'
+import authApi, { type RegisterRequest } from '@/api/resources/authApi.ts'
+import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 
 onKeyDown(KeyName.Enter, () => handleRegister())
 
@@ -72,7 +72,7 @@ const props = defineProps<{
   context: string
 }>()
 
-const formState = reactive({
+const formState: RegisterRequest = reactive({
   context: '',
   username: '',
   password: '',
@@ -83,18 +83,18 @@ const validation = createFormValidation(formState, registerRequestRules(formStat
 const authStore = useAuthStore()
 onMounted(async () => {
   if (!props.context) {
-    router.replace(Routes.Home)
+    await router.replace(Routes.Home)
   }
-  await api.users.logout()
+  await authApi.getLogout()
   authStore.clear()
 
-  var response = await api.users.verifyToken({
+  const response = await authApi.getVerifyToken({
     context: props.context,
     purpose: TokenPurpose.Invite,
     provider: TokenProvider.Default
   })
   if (!response.isSuccess()) {
-    router.replace(Routes.ResendInvite)
+    await router.replace(Routes.ResendInvite)
     return
   }
   formState.context = props.context
@@ -107,12 +107,12 @@ const handleRegister = async () => {
   if (!isValid) return
 
   isSubmitting.value = true
-  const response = await api.users.register(formState)
+  const response = await authApi.postRegister(formState)
   isSubmitting.value = false
 
   if (tryHandleUnsuccessfulResponse(response, toast, validation)) return
 
   toast.add({ detail: 'Successfully registered.', severity: 'success' })
-  router.push(Routes.Login)
+  await router.push(Routes.Login)
 }
 </script>

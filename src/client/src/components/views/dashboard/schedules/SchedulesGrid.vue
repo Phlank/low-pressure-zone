@@ -2,25 +2,25 @@
   <div class="schedules-grid">
     <div>
       <DataTable
+        :expanded-rows="expandedRows"
+        :sort-order="1"
+        :value="schedules"
         class="schedules-grid__table"
         data-key="id"
-        :value="schedules"
-        :expanded-rows="expandedRows"
-        sort-field="start"
-        :sort-order="1">
+        sort-field="start">
         <template>
           <Column
             expander
             style="width: fit-content" />
           <Column
             v-if="!isMobile"
-            field="audience.name"
-            header="Audience" />
+            field="community.name"
+            header="Community" />
           <Column
             v-if="!isMobile"
             field="start"
             header="Date"
-            sortable>
+            :sortable="true">
             <template #body="{ data }: { data: ScheduleResponse }">
               {{ parseDate(data.startsAt).toLocaleDateString() }}
             </template>
@@ -37,56 +37,51 @@
           <Column v-if="isMobile">
             <template #body="{ data }: { data: ScheduleResponse }">
               <div>{{ parseDate(data.startsAt).toLocaleDateString() }}</div>
-              <div class="text-s ellipsis">{{ data.audience.name }}</div>
+              <div class="text-s ellipsis">{{ data.community.name }}</div>
             </template>
           </Column>
           <Column
             :class="'grid-action-col' + isMobile ? 'grid-action-col--1' : 'grid-action-col--2'">
             <template #body="{ data }: { data: ScheduleResponse }">
               <GridActions
-                :show-edit="data.isEditable"
                 :show-delete="data.isDeletable"
-                @edit="handleEditScheduleActionClick(data)"
-                @delete="handleDeleteScheduleActionClick(data)" />
+                :show-edit="data.isEditable"
+                @delete="handleDeleteScheduleActionClick(data)"
+                @edit="handleEditScheduleActionClick(data)" />
             </template>
           </Column>
         </template>
         <template #expansion="rowProps">
           <TimeslotsGrid
-            :schedule="rowProps.data"
-            :performers="performers"
             :disabled="false"
+            :performers="performers"
+            :schedule="rowProps.data"
             @update="emit('update', rowProps.data.id)" />
         </template>
       </DataTable>
     </div>
     <FormDialog
-      header="Edit Schedule"
-      :visible="showEditScheduleDialog"
       :is-submitting="false"
+      :visible="showEditScheduleDialog"
+      header="Edit Schedule"
       @close="showEditScheduleDialog = false"
       @save="handleEditScheduleSave">
       <ScheduleForm
         ref="scheduleEditForm"
-        :audiences="audiences"
+        :communities="communities"
         :initial-state="editScheduleFormInitialState" />
     </FormDialog>
     <DeleteDialog
-      entity-type="schedule"
-      header="Delete Schedule"
       :is-submitting="false"
       :visible="showDeleteScheduleDialog"
+      entity-type="schedule"
+      header="Delete Schedule"
       @close="showDeleteScheduleDialog = false"
       @delete="handleDelete" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import api from '@/api/api'
-import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
-import type { AudienceResponse } from '@/api/audiences/audienceResponse'
-import type { PerformerResponse } from '@/api/performers/performerResponse'
-import type { ScheduleResponse } from '@/api/schedules/scheduleResponse'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
 import FormDialog from '@/components/dialogs/FormDialog.vue'
@@ -96,23 +91,27 @@ import { showEditSuccessToast } from '@/utils/toastUtils'
 import { Column, DataTable, useToast } from 'primevue'
 import { inject, reactive, ref, useTemplateRef, type Ref } from 'vue'
 import TimeslotsGrid from './TimeslotsGrid.vue'
+import schedulesApi, { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
+import type { PerformerResponse } from '@/api/resources/performersApi.ts'
+import type { CommunityResponse } from '@/api/resources/communitiesApi.ts'
+import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 
 const expandedRows = ref({})
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const isSubmitting = ref(false)
 const toast = useToast()
 
-const props = defineProps<{
+defineProps<{
   schedules: ScheduleResponse[]
   performers: PerformerResponse[]
-  audiences: AudienceResponse[]
+  communities: CommunityResponse[]
 }>()
 
 const scheduleEditForm = useTemplateRef('scheduleEditForm')
 const showEditScheduleDialog = ref(false)
 let editingId = ''
 const editScheduleFormInitialState = reactive({
-  audienceId: '',
+  communityId: '',
   startsAt: '',
   endsAt: '',
   description: '',
@@ -122,7 +121,7 @@ const editScheduleFormInitialState = reactive({
 
 const handleEditScheduleActionClick = (schedule: ScheduleResponse) => {
   editingId = schedule.id
-  editScheduleFormInitialState.audienceId = schedule.audience.id
+  editScheduleFormInitialState.communityId = schedule.community.id
   editScheduleFormInitialState.startsAt = schedule.startsAt
   editScheduleFormInitialState.endsAt = schedule.endsAt
   editScheduleFormInitialState.description = schedule.description
@@ -136,14 +135,14 @@ const handleEditScheduleSave = async () => {
   if (!isValid) return
 
   isSubmitting.value = true
-  const response = await api.schedules.put(editingId, scheduleEditForm.value.formState)
+  const response = await schedulesApi.put(editingId, scheduleEditForm.value.formState)
   isSubmitting.value = false
 
   if (tryHandleUnsuccessfulResponse(response, toast, scheduleEditForm.value.validation)) return
   showEditSuccessToast(toast, 'schedule')
   showEditScheduleDialog.value = false
 
-  const newScheduleResponse = await api.schedules.getById(editingId)
+  const newScheduleResponse = await schedulesApi.getById(editingId)
   if (tryHandleUnsuccessfulResponse(newScheduleResponse, toast)) return
 
   emit('update', editingId)
@@ -157,7 +156,7 @@ const handleDeleteScheduleActionClick = (schedule: ScheduleResponse) => {
 }
 const handleDelete = async () => {
   showDeleteScheduleDialog.value = false
-  const response = await api.schedules.delete(deletingId)
+  const response = await schedulesApi.delete(deletingId)
   tryHandleUnsuccessfulResponse(response, toast)
 
   emit('update')

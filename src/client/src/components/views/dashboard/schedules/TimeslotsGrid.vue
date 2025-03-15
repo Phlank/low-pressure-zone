@@ -85,14 +85,7 @@
 </template>
 
 <script lang="ts" setup>
-import api from '@/api/api'
 import type { ApiResponse } from '@/api/apiResponse'
-import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
-import type { PerformerResponse } from '@/api/performers/performerResponse'
-import type { ScheduleResponse } from '@/api/schedules/scheduleResponse'
-import { PerformanceType } from '@/api/schedules/timeslots/performanceType'
-import type { TimeslotRequest } from '@/api/schedules/timeslots/timeslotRequest'
-import type { TimeslotResponse } from '@/api/schedules/timeslots/timeslotResponse'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import ListItem from '@/components/data/ListItem.vue'
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
@@ -106,6 +99,10 @@ import {
 } from '@/utils/toastUtils'
 import { Column, DataTable, useToast } from 'primevue'
 import { inject, onMounted, ref, useTemplateRef, watch, type Ref } from 'vue'
+import type { ScheduleResponse } from '@/api/resources/schedulesApi.ts'
+import type { PerformerResponse } from '@/api/resources/performersApi.ts'
+import timeslotsApi, { PerformanceType, type TimeslotRequest, type TimeslotResponse } from '@/api/resources/timeslotsApi.ts'
+import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 
 const toast = useToast()
 const props = defineProps<{
@@ -176,9 +173,9 @@ const handleSave = async () => {
   const request = timeslotForm.value.formState
   let response: ApiResponse<TimeslotRequest, never> | undefined = undefined
   if (editingId) {
-    response = await api.timeslots.put(props.schedule.id, editingId, request)
+    response = await timeslotsApi.put(props.schedule.id, editingId, request)
   } else {
-    response = await api.timeslots.post(props.schedule.id, request)
+    response = await timeslotsApi.post(props.schedule.id, request)
   }
   isSubmitting.value = false
   if (tryHandleUnsuccessfulResponse(response, toast, timeslotForm.value.validation)) return
@@ -200,7 +197,7 @@ const handleSave = async () => {
     )
   }
 
-  const timeslotResponse = await api.timeslots.get(props.schedule.id)
+  const timeslotResponse = await timeslotsApi.get(props.schedule.id)
   if (timeslotResponse.isSuccess()) {
     timeslots.value = timeslotResponse.data!
   }
@@ -220,7 +217,7 @@ const handleDeleteClicked = async (row: TimeslotRow) => {
 }
 const handleDelete = async () => {
   isSubmitting.value = true
-  const response = await api.timeslots.delete(props.schedule.id, deletingId)
+  const response = await timeslotsApi.delete(props.schedule.id, deletingId)
   isSubmitting.value = false
 
   if (tryHandleUnsuccessfulResponse(response, toast)) return

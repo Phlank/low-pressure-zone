@@ -39,12 +39,11 @@
 </template>
 
 <script lang="ts" setup>
-import api from '@/api/api'
-import type { PerformerResponse } from '@/api/performers/performerResponse'
 import { Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs, Button } from 'primevue'
 import { computed, onMounted, ref, type Ref } from 'vue'
 import CreatePerformer from './CreatePerformer.vue'
 import PerformersGrid from './PerformersGrid.vue'
+import performersApi, { type PerformerResponse } from '@/api/resources/performersApi.ts'
 
 const tabValue: Ref<string | number> = ref('0')
 const isLoaded = ref(false)
@@ -57,7 +56,7 @@ onMounted(async () => {
 })
 
 const loadPerformers = async () => {
-  const response = await api.performers.get()
+  const response = await performersApi.get()
   isLoaded.value = true
   if (!response.isSuccess()) {
     return

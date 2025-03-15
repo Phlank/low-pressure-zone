@@ -20,22 +20,20 @@ public class ScheduleRequestValidator : Validator<ScheduleRequest>
             var id = contextAccessor.GetGuidRouteParameterOrDefault("id");
             var dataContext = Resolve<DataContext>();
 
-            if (id == default && req.StartsAt <= DateTime.UtcNow)
-                ctx.AddFailure(nameof(req.StartsAt), Errors.TimeInPast);
+            if (id == default && req.StartsAt <= DateTime.UtcNow) ctx.AddFailure(nameof(req.StartsAt), Errors.TimeInPast);
 
-            var audience = await dataContext.Audiences.FirstOrDefaultAsync(a => a.Id == req.AudienceId, ct);
+            var community = await dataContext.Communities.FirstOrDefaultAsync(a => a.Id == req.CommunityId, ct);
 
             var schedule = await dataContext.Schedules.AsSplitQuery()
-                                                      .Include(s => s.Timeslots)
-                                                      .Where(s => s.Id == id)
-                                                      .FirstOrDefaultAsync(ct);
+                                            .Include(s => s.Timeslots)
+                                            .Where(s => s.Id == id)
+                                            .FirstOrDefaultAsync(ct);
 
-            if (audience == null)
-                ctx.AddFailure(nameof(req.AudienceId), Errors.DoesNotExist);
+            if (community == null) ctx.AddFailure(nameof(req.CommunityId), Errors.DoesNotExist);
 
             var isRequestOverlappingOtherSchedule = await dataContext.Schedules.WhereOverlaps(req)
-                                                                               .Where(s => s.Id != id)
-                                                                               .AnyAsync(ct);
+                                                                     .Where(s => s.Id != id)
+                                                                     .AnyAsync(ct);
             if (isRequestOverlappingOtherSchedule)
             {
                 ctx.AddFailure(nameof(req.StartsAt), Errors.OverlapsOtherSchedule);
@@ -44,10 +42,9 @@ public class ScheduleRequestValidator : Validator<ScheduleRequest>
 
             if (schedule != null)
             {
-                if (schedule.Timeslots.Any(t => req.StartsAt > t.StartsAt))
-                    ctx.AddFailure(nameof(req.StartsAt), Errors.ExcludesTimeslots);
-                if (schedule.Timeslots.Any(t => req.EndsAt < t.EndsAt))
-                    ctx.AddFailure(nameof(req.EndsAt), Errors.ExcludesTimeslots);
+                if (schedule.Timeslots.Any(t => req.StartsAt > t.StartsAt)) ctx.AddFailure(nameof(req.StartsAt), Errors.ExcludesTimeslots);
+
+                if (schedule.Timeslots.Any(t => req.EndsAt < t.EndsAt)) ctx.AddFailure(nameof(req.EndsAt), Errors.ExcludesTimeslots);
             }
         });
     }
