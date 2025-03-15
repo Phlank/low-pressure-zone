@@ -10,22 +10,24 @@ public sealed class GetCommunityById(DataContext dataContext)
     public override void Configure()
     {
         Get("/communities/{id}");
-        Description(builder => builder.Produces<CommunityResponse>(200).Produces(404));
+        Description(builder => builder.Produces(404));
         AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        var community = await dataContext.Communities.AsNoTracking()
-            .FirstOrDefaultAsync(community => community.Id == id && !community.IsDeleted, ct);
+        var community = await dataContext.Communities
+                                         .AsNoTracking()
+                                         .Where(community => community.Id == id && !community.IsDeleted)
+                                         .FirstOrDefaultAsync(ct);
         if (community == null)
         {
             await SendNotFoundAsync(ct);
             return;
         }
 
-        var response = await Map.FromEntityAsync(community, ct);
+        var response = Map.FromEntity(community);
         await SendOkAsync(response, ct);
     }
 }

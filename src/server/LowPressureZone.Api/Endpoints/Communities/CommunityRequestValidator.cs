@@ -13,17 +13,18 @@ public sealed class CommunityRequestValidator : Validator<CommunityRequest>
     public CommunityRequestValidator(IHttpContextAccessor accessor)
     {
         RuleFor(request => request.Name).NotEmpty()
-                            .WithMessage(Errors.Required);
-        RuleFor(request => request.Url).NotEmpty().AbsoluteHttpUri();
-        
-        RuleFor(request => request).CustomAsync(async (req, ctx, ct) =>
+                                        .WithMessage(Errors.Required);
+        RuleFor(request => request.Url).NotEmpty()
+                                       .AbsoluteHttpUri();
+
+        RuleFor(request => request).CustomAsync(async (request, validationContext, ct) =>
         {
             var id = accessor.GetGuidRouteParameterOrDefault("id");
             var dataContext = Resolve<DataContext>();
 
-            var isNameInUse = await dataContext.Communities.AnyAsync(a => a.Name == req.Name && a.Id != id, ct);
+            var isNameInUse = await dataContext.Communities.AnyAsync(community => community.Name == request.Name && community.Id != id, ct);
             if (isNameInUse)
-                ctx.AddFailure(nameof(req.Name), Errors.Unique);
+                validationContext.AddFailure(nameof(request.Name), Errors.Unique);
         });
     }
 }

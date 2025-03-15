@@ -1,6 +1,5 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Domain;
-using LowPressureZone.Identity.Constants;
 
 namespace LowPressureZone.Api.Endpoints.Performers;
 
@@ -9,13 +8,12 @@ public sealed class PostPerformer(DataContext dataContext) : EndpointWithMapper<
     public override void Configure()
     {
         Post("/performers");
-        Description(b => b.Produces(201));
-        Roles(RoleNames.All.ToArray());
+        Description(builder => builder.Produces(201));
     }
 
-    public override async Task HandleAsync(PerformerRequest req, CancellationToken ct)
+    public override async Task HandleAsync(PerformerRequest request, CancellationToken ct)
     {
-        var performer = await Map.ToEntityAsync(req, ct);
+        var performer = Map.ToEntity(request);
         dataContext.Performers.Add(performer);
         await dataContext.SaveChangesAsync(ct);
         await SendCreatedAtAsync<GetPerformerById>(new { performer.Id }, Response, cancellation: ct);

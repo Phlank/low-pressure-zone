@@ -3,6 +3,7 @@ using FastEndpoints.Swagger;
 using FluentEmail.Core.Interfaces;
 using FluentEmail.Mailgun;
 using LowPressureZone.Api.Endpoints.Communities;
+using LowPressureZone.Api.Endpoints.Communities.Relationships;
 using LowPressureZone.Api.Endpoints.Performers;
 using LowPressureZone.Api.Endpoints.Schedules;
 using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
@@ -83,6 +84,7 @@ public static class ServiceCollectionExtensions
     public static void AddApiServices(this IServiceCollection services)
     {
         services.AddSingleton<CommunityMapper>();
+        services.AddSingleton<CommunityRelationshipMapper>();
         services.AddSingleton<ScheduleMapper>();
         services.AddSingleton<PerformerMapper>();
         services.AddSingleton<TimeslotMapper>();
@@ -92,9 +94,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<PerformerRules>();
         services.AddSingleton<TimeslotRules>();
 
-        services.AddSingleton<ISender>((services) =>
+        services.AddSingleton<ISender>(serviceProvider =>
         {
-            var options = services.GetRequiredService<IOptions<EmailServiceOptions>>();
+            var options = serviceProvider.GetRequiredService<IOptions<EmailServiceOptions>>();
             return new MailgunSender(options.Value.MailgunDomain, options.Value.MailgunApiKey);
         });
         services.AddSingleton<EmailService>();

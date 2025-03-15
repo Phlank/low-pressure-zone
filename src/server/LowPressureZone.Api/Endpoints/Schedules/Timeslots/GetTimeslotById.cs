@@ -20,16 +20,17 @@ public class GetTimeslotById : EndpointWithoutRequest<TimeslotResponse, Timeslot
         var scheduleId = Route<Guid>("scheduleId");
         var timeslotId = Route<Guid>("timeslotId");
 
-        var timeslot = await DataContext.Timeslots.AsNoTracking()
-                                                  .Include(t => t.Performer)
-                                                  .Where(t => t.Id == timeslotId && t.ScheduleId == scheduleId)
-                                                  .FirstOrDefaultAsync(ct);
+        var timeslot = await DataContext.Timeslots
+                                        .AsNoTracking()
+                                        .Include(timeslot => timeslot.Performer)
+                                        .Where(timeslot => timeslot.Id == timeslotId && timeslot.ScheduleId == scheduleId)
+                                        .FirstOrDefaultAsync(ct);
         if (timeslot == null)
         {
             await SendNotFoundAsync(ct);
             return;
         }
-        var response = await Map.FromEntityAsync(timeslot, ct);
+        var response = Map.FromEntity(timeslot);
         await SendOkAsync(response, ct);
     }
 }

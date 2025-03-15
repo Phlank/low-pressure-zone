@@ -14,7 +14,7 @@ public sealed class PostCommunity(DataContext dataContext) : EndpointWithMapper<
 
     public override async Task HandleAsync(CommunityRequest req, CancellationToken ct)
     {
-        var community = await Map.ToEntityAsync(req, ct);
+        var community = Map.ToEntity(req);
         dataContext.Communities.Add(community);
         await dataContext.SaveChangesAsync(ct);
         await SendCreatedAtAsync<GetCommunities>(new { community.Id }, Response, cancellation: ct);
