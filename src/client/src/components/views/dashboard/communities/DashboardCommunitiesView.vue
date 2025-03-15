@@ -23,8 +23,8 @@
             <CommunitiesGrid
               v-if="linkedCommunities.length > 0"
               :communities="communities.filter((a) => a.isRelated)"
-              @edit-success="loadCommunities()"
-              @delete-success="loadCommunities()" />
+              @deleted="loadCommunities()"
+              @edited="loadCommunities()" />
             <div v-else>You do not currently have any linked communities.</div>
           </div>
         </TabPanel>
@@ -33,8 +33,8 @@
             <h4>All Communities</h4>
             <CommunitiesGrid
               :communities="communities"
-              @edit-success="loadCommunities()"
-              @delete-success="loadCommunities()" />
+              @deleted="loadCommunities()"
+              @edited="loadCommunities()" />
           </div>
         </TabPanel>
         <TabPanel value="create">
@@ -69,6 +69,7 @@ onMounted(async () => {
 })
 
 const loadCommunities = async () => {
+  console.log('loading communities')
   const response = await communitiesApi.get()
   isLoaded.value = true
   if (!response.isSuccess()) {
