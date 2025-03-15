@@ -74,7 +74,6 @@ import communitiesApi, {
   type CommunityRequest,
   type CommunityResponse
 } from '@/api/resources/communitiesApi.ts'
-import performersApi from '@/api/resources/performersApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
@@ -83,6 +82,11 @@ const toast = useToast()
 
 defineProps<{
   communities: CommunityResponse[]
+}>()
+
+const emit = defineEmits<{
+  edited: [id: string]
+  deleted: [id: string]
 }>()
 
 const showEditDialog = ref(false)
@@ -103,21 +107,22 @@ const handleSave = async () => {
   if (!isValid) return
 
   isSubmitting.value = true
-  const response = await performersApi.put(editingId, editForm.value.formState)
+  const response = await communitiesApi.put(editingId, editForm.value.formState)
   isSubmitting.value = false
 
   if (tryHandleUnsuccessfulResponse(response, toast, editForm.value.validation)) return
 
-  showEditSuccessToast(toast, 'community', editFormInitialState.value.name)
+  showEditSuccessToast(toast, 'community', editForm.value.formState.name)
   showEditDialog.value = false
+  emit('edited', editingId)
 }
 
 const showDeleteDialog = ref(false)
 let deletingId = ''
 const deletingName = ref('')
-const handleDeleteActionClick = (performer: CommunityResponse) => {
-  deletingId = performer.id
-  deletingName.value = performer.name
+const handleDeleteActionClick = (community: CommunityResponse) => {
+  deletingId = community.id
+  deletingName.value = community.name
   showDeleteDialog.value = true
 }
 const handleDelete = async () => {
@@ -129,5 +134,6 @@ const handleDelete = async () => {
 
   showDeleteSuccessToast(toast, 'community', deletingName.value)
   showDeleteDialog.value = false
+  emit('deleted', deletingId)
 }
 </script>
