@@ -5,8 +5,8 @@
       height="250px" />
     <Panel
       v-else
-      class="upcoming-schedules"
-      :header="title">
+      :header="title"
+      class="upcoming-schedules">
       <div
         v-if="schedules.length === 0"
         class="upcoming-schedules__content--none">
@@ -40,12 +40,11 @@
 </template>
 
 <script lang="ts" setup>
-import api from '@/api/api'
-import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
-import type { ScheduleResponse } from '@/api/schedules/scheduleResponse'
 import { formatTimeslot, getPreviousHour, hoursBetween, parseDate } from '@/utils/dateUtils'
 import { Column, DataTable, Panel, Skeleton, useToast } from 'primevue'
-import { computed, inject, onMounted, ref, type ComputedRef, type Ref } from 'vue'
+import { computed, type ComputedRef, inject, onMounted, ref, type Ref } from 'vue'
+import schedulesApi, { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
+import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const schedules: Ref<ScheduleResponse[]> = ref([])
@@ -57,7 +56,7 @@ interface ScheduleData {
   id: string
   start: Date
   description: string
-  audience: string
+  community: string
   timeslots: TimeslotData[]
 }
 
@@ -74,14 +73,14 @@ const scheduleData: ComputedRef<ScheduleData | undefined> = computed(() => {
     id: schedule.id,
     start: parseDate(schedule.startsAt),
     description: schedule.description,
-    audience: schedule.audience.name,
+    community: schedule.community.name,
     timeslots: mapTimeslotDisplayData(schedule)
   }
 })
 
 const title: ComputedRef<string> = computed(() => {
   if (scheduleData.value) {
-    return `${scheduleData.value.audience} - ${scheduleData.value.start.toLocaleDateString()}`
+    return `${scheduleData.value.community} - ${scheduleData.value.start.toLocaleDateString()}`
   }
   return 'Upcoming Schedules'
 })
@@ -113,7 +112,7 @@ const mapTimeslotDisplayData = (schedule: ScheduleResponse) => {
 }
 
 onMounted(async () => {
-  const response = await api.schedules.get({ after: new Date().toISOString() })
+  const response = await schedulesApi.get({ after: new Date().toISOString() })
   if (tryHandleUnsuccessfulResponse(response, toast)) return
   if (response.isSuccess() && response.data) {
     schedules.value = response.data.sort((a, b) => Date.parse(a.endsAt) - Date.parse(b.endsAt))

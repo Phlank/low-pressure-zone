@@ -9,35 +9,35 @@
       <IftaLabel class="input input--medium">
         <InputText
           id="emailInput"
-          class="input__field"
+          v-model:model-value="formState.email"
           :disabled="isSubmitting"
           :invalid="!validation.isValid('email')"
-          @change="validation.validateIfDirty('email')"
-          v-model:model-value="formState.email" />
+          class="input__field"
+          @change="validation.validateIfDirty('email')" />
         <ValidationLabel
-          for="usernameInput"
           :message="validation.message('email')"
+          for="usernameInput"
           text="Email" />
       </IftaLabel>
       <Button
+        :disabled="isSubmitting"
+        :loading="isSubmitting"
         class="input"
         label="Resend Invite"
-        @click="handleResendInviteClick"
-        :disabled="isSubmitting"
-        :loading="isSubmitting" />
+        @click="handleResendInviteClick" />
     </div>
   </Panel>
 </template>
 
 <script lang="ts" setup>
-import api from '@/api/api'
-import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { emailAddress, required } from '@/validation/rules/stringRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { combineRules } from '@/validation/types/validationRule'
-import { IftaLabel, Panel, InputText, Button, Message, useToast } from 'primevue'
+import { Button, IftaLabel, InputText, Message, Panel, useToast } from 'primevue'
 import { reactive, ref } from 'vue'
+import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import invitesApi from '@/api/resources/invitesApi.ts'
 
 const toast = useToast()
 const isSubmitting = ref(false)
@@ -51,8 +51,10 @@ const validation = createFormValidation(formState, {
 
 const handleResendInviteClick = async () => {
   const isValid = validation.validate()
+  if (!isValid) return
+
   isSubmitting.value = true
-  const response = await api.users.invites.resend(formState.email)
+  const response = await invitesApi.getResend(formState.email)
   isSubmitting.value = false
 
   if (!response.isSuccess()) {
@@ -66,7 +68,7 @@ const handleResendInviteClick = async () => {
   })
 }
 
-const props = defineProps<{
+defineProps<{
   showExpiredTokenMessage?: boolean
 }>()
 </script>

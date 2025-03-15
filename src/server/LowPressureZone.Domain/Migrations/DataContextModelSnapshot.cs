@@ -23,7 +23,7 @@ namespace LowPressureZone.Domain.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("LowPressureZone.Domain.Entities.Audience", b =>
+            modelBuilder.Entity("LowPressureZone.Domain.Entities.Community", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -51,10 +51,10 @@ namespace LowPressureZone.Domain.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Audiences");
+                    b.ToTable("Communities");
                 });
 
-            modelBuilder.Entity("LowPressureZone.Domain.Entities.AudienceRelationship", b =>
+            modelBuilder.Entity("LowPressureZone.Domain.Entities.CommunityRelationship", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -83,7 +83,7 @@ namespace LowPressureZone.Domain.Migrations
                     b.HasIndex("AudienceId", "UserId")
                         .IsUnique();
 
-                    b.ToTable("AudienceRelationships");
+                    b.ToTable("CommunityRelationships");
                 });
 
             modelBuilder.Entity("LowPressureZone.Domain.Entities.Performer", b =>
@@ -127,7 +127,7 @@ namespace LowPressureZone.Domain.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("AudienceId")
+                    b.Property<Guid>("CommunityId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedDate")
@@ -148,7 +148,7 @@ namespace LowPressureZone.Domain.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AudienceId");
+                    b.HasIndex("CommunityId");
 
                     b.HasIndex("EndsAt")
                         .IsUnique();
@@ -205,9 +205,9 @@ namespace LowPressureZone.Domain.Migrations
                     b.ToTable("Timeslots");
                 });
 
-            modelBuilder.Entity("LowPressureZone.Domain.Entities.AudienceRelationship", b =>
+            modelBuilder.Entity("LowPressureZone.Domain.Entities.CommunityRelationship", b =>
                 {
-                    b.HasOne("LowPressureZone.Domain.Entities.Audience", "Audience")
+                    b.HasOne("LowPressureZone.Domain.Entities.Community", "Audience")
                         .WithMany("Relationships")
                         .HasForeignKey("AudienceId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -218,13 +218,13 @@ namespace LowPressureZone.Domain.Migrations
 
             modelBuilder.Entity("LowPressureZone.Domain.Entities.Schedule", b =>
                 {
-                    b.HasOne("LowPressureZone.Domain.Entities.Audience", "Audience")
+                    b.HasOne("LowPressureZone.Domain.Entities.Community", "Community")
                         .WithMany("Schedules")
-                        .HasForeignKey("AudienceId")
+                        .HasForeignKey("CommunityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Audience");
+                    b.Navigation("Community");
                 });
 
             modelBuilder.Entity("LowPressureZone.Domain.Entities.Timeslot", b =>
@@ -246,7 +246,7 @@ namespace LowPressureZone.Domain.Migrations
                     b.Navigation("Schedule");
                 });
 
-            modelBuilder.Entity("LowPressureZone.Domain.Entities.Audience", b =>
+            modelBuilder.Entity("LowPressureZone.Domain.Entities.Community", b =>
                 {
                     b.Navigation("Relationships");
 

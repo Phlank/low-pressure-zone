@@ -19,7 +19,7 @@ public class PutSchedule(DataContext dataContext, ScheduleRules rules) : Endpoin
     public override async Task HandleAsync(ScheduleRequest req, CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        var schedule = await dataContext.Schedules.Include(s => s.Audience)
+        var schedule = await dataContext.Schedules.Include(s => s.Community)
                                                   .Where(s => s.Id == id)
                                                   .FirstOrDefaultAsync(ct);
         if (schedule == null)

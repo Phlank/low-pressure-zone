@@ -2,11 +2,11 @@
   <div class="invites-grid">
     <DataTable
       v-if="!isMobile"
-      :value="invites"
-      key="id">
+      key="id"
+      :value="invites">
       <Column
-        header="Email"
-        field="email" />
+        field="email"
+        header="Email" />
       <Column header="Invited On">
         <template #body="{ data }: { data: InviteResponse }">
           {{ parseDate(data.invitedAt).toLocaleString() }}
@@ -19,8 +19,8 @@
       </Column>
     </DataTable>
     <div
-      v-else
       v-for="(invite, index) in invites"
+      v-else
       :key="invite.id">
       <ListItem>
         <template #left>
@@ -36,11 +36,11 @@
 </template>
 
 <script lang="ts" setup>
-import type { InviteResponse } from '@/api/users/invites/inviteResponse'
 import ListItem from '@/components/data/ListItem.vue'
 import { parseDate } from '@/utils/dateUtils'
 import { Column, DataTable, Divider } from 'primevue'
 import { inject, type Ref } from 'vue'
+import type { InviteResponse } from '@/api/resources/invitesApi.ts'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 

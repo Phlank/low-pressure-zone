@@ -3,72 +3,75 @@
     <div class="desktop-inline">
       <IftaLabel class="input input--small">
         <InputText
-          class="input__field"
           id="startInput"
           :model-value="formatTimeslot(parseDate(formState.startsAt))"
+          class="input__field"
           disabled />
         <label for="startInput">Start</label>
       </IftaLabel>
       <IftaLabel class="input input--medium">
         <Select
-          class="input__field"
           id="timeslotPerformerSelect"
+          v-model:model-value="formState.performerId"
+          :disabled="isSubmitting || disabled"
+          :invalid="!validation.isValid('performerId')"
+          :options="performers"
+          class="input__field"
           option-label="name"
           option-value="id"
-          :disabled="isSubmitting || disabled"
-          :options="performers"
-          v-model:model-value="formState.performerId"
-          @change="() => validation.validateIfDirty('performerId')"
-          :invalid="!validation.isValid('performerId')" />
+          @change="() => validation.validateIfDirty('performerId')" />
         <ValidationLabel
+          :message="validation.message('performerId')"
           for="timeslotPerformerSelect"
-          text="Performer"
-          :message="validation.message('performerId')" />
+          text="Performer" />
       </IftaLabel>
       <IftaLabel class="input input--small">
         <Select
-          class="input__field"
           id="timeslotTypeSelect"
-          :disabled="isSubmitting || disabled"
-          :options="performanceTypes"
           v-model:model-value="formState.performanceType"
-          @change="() => validation.validateIfDirty('performanceType')"
-          :invalid="!validation.isValid('performanceType')" />
+          :disabled="isSubmitting || disabled"
+          :invalid="!validation.isValid('performanceType')"
+          :options="performanceTypes"
+          class="input__field"
+          @change="() => validation.validateIfDirty('performanceType')" />
         <ValidationLabel
+          :message="validation.message('performanceType')"
           for="timeslotTypeSelect"
-          text="Type"
-          :message="validation.message('performanceType')" />
+          text="Type" />
       </IftaLabel>
     </div>
     <div class="desktop-inline">
       <IftaLabel class="input input--medium">
         <InputText
-          class="input__field"
           id="timeslotNameInput"
-          :disabled="isSubmitting || disabled"
           v-model:model-value="formState.name"
-          @change="() => validation.validateIfDirty('name')"
-          :invalid="!validation.isValid('name')" />
+          :disabled="isSubmitting || disabled"
+          :invalid="!validation.isValid('name')"
+          class="input__field"
+          @change="() => validation.validateIfDirty('name')" />
         <ValidationLabel
-          for="timeslotNameInput"
-          text="Name"
           :message="validation.message('name')"
-          optional />
+          for="timeslotNameInput"
+          optional
+          text="Name" />
       </IftaLabel>
     </div>
   </div>
 </template>
 
-<script setup lang="ts">
-import type { PerformerResponse } from '@/api/performers/performerResponse'
-import type { TimeslotRequest } from '@/api/schedules/timeslots/timeslotRequest'
-import { parseDate, formatTimeslot } from '@/utils/dateUtils'
+<script lang="ts" setup>
+import { formatTimeslot, parseDate } from '@/utils/dateUtils'
 import { timeslotRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
-import { IftaLabel, Select, InputText } from 'primevue'
+import { IftaLabel, InputText, Select } from 'primevue'
 import { computed, onMounted, reactive, ref } from 'vue'
 import ValidationLabel from '../ValidationLabel.vue'
-import { PerformanceType, performanceTypes } from '@/api/schedules/timeslots/performanceType'
+import {
+  PerformanceType,
+  performanceTypes,
+  type TimeslotRequest
+} from '@/api/resources/timeslotsApi.ts'
+import type { PerformerResponse } from '@/api/resources/performersApi.ts'
 
 const props = defineProps<{
   initialState: TimeslotRequest

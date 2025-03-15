@@ -8,14 +8,14 @@
     <div class="single-panel-center__form">
       <IftaLabel class="input input--medium">
         <InputText
-          :autofocus="true"
           id="codeInput"
-          class="input__field"
-          v-model:model-value="formState.code" />
+          v-model:model-value="formState.code"
+          :autofocus="true"
+          class="input__field" />
         <ValidationLabel
+          :disabled="isSubmitting"
           for="usernameInput"
           message=""
-          :disabled="isSubmitting"
           text="Code" />
       </IftaLabel>
       <div v-if="errorMessage">
@@ -27,10 +27,10 @@
       </div>
       <div class="buttons">
         <Button
-          class="input"
-          label="Verify"
           :disabled="isSubmitting"
           :loading="isSubmitting"
+          class="input"
+          label="Verify"
           @click="handleVerify" />
       </div>
     </div>
@@ -38,7 +38,6 @@
 </template>
 
 <script lang="ts" setup>
-import api from '@/api/api'
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { KeyName } from '@/constants/keys'
 import router from '@/router'
@@ -47,6 +46,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { onKeyDown } from '@vueuse/core'
 import { Button, IftaLabel, InputText, Message, Panel } from 'primevue'
 import { reactive, ref } from 'vue'
+import authApi from '@/api/resources/authApi.ts'
 
 const formState = reactive({
   code: ''
@@ -68,7 +68,7 @@ const props = withDefaults(
 
 const handleVerify = async () => {
   isSubmitting.value = true
-  const response = await api.users.twoFactor(formState)
+  const response = await authApi.postTwoFactor(formState.code)
   if (!response.isSuccess()) {
     errorMessage.value = 'Invalid code'
     isSubmitting.value = false

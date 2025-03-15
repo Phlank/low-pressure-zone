@@ -13,32 +13,32 @@ public class ScheduleRules(IHttpContextAccessor contextAccessor)
 
     public bool IsAddingTimeslotsAuthorized(Schedule schedule)
     {
-        schedule.Audience.ShouldNotBeNull();
-        schedule.Audience.Relationships.ShouldNotBeNull();
+        schedule.Community.ShouldNotBeNull();
+        schedule.Community.Relationships.ShouldNotBeNull();
         if (schedule.EndsAt < DateTime.UtcNow) return false;
         if (User == null) return false;
         if (User.IsInRole(RoleNames.Admin)) return true;
-        return schedule.Audience.Relationships.Any(r => r.UserId == User.GetIdOrDefault() && r.IsPerformer);
+        return schedule.Community.Relationships.Any(relationship => relationship.UserId == User.GetIdOrDefault() && relationship.IsPerformer);
     }
 
     public bool IsEditAuthorized(Schedule schedule)
     {
-        schedule.Audience.ShouldNotBeNull();
-        schedule.Audience.Relationships.ShouldNotBeNull();
+        schedule.Community.ShouldNotBeNull();
+        schedule.Community.Relationships.ShouldNotBeNull();
         if (User == null) return false;
         if (schedule.EndsAt < DateTime.UtcNow) return false;
         if (User.IsInRole(RoleNames.Admin)) return true;
-        return schedule.Audience.Relationships.Any(r => r.UserId == User.GetIdOrDefault());
+        return schedule.Community.Relationships.Any(relationship => relationship.UserId == User.GetIdOrDefault());
     }
 
     public bool IsDeleteAuthorized(Schedule schedule)
     {
-        schedule.Audience.ShouldNotBeNull();
-        schedule.Audience.Relationships.ShouldNotBeNull();
+        schedule.Community.ShouldNotBeNull();
+        schedule.Community.Relationships.ShouldNotBeNull();
         if (User == null) return false;
         if (schedule.EndsAt < DateTime.UtcNow) return false;
         if (User.IsInRole(RoleNames.Admin)) return true;
-        return schedule.Audience.Relationships.Any(r => r.UserId == User.GetIdOrDefault());
+        return schedule.Community.Relationships.Any(relationship => relationship.UserId == User.GetIdOrDefault());
     }
 
     public bool IsHiddenFromApi(Schedule schedule)

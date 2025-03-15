@@ -43,7 +43,6 @@
 </template>
 
 <script lang="ts" setup>
-import api from '@/api/api'
 import router from '@/router'
 import { Routes } from '@/router/routes'
 import { useAuthStore } from '@/stores/authStore'
@@ -51,6 +50,7 @@ import { Button, Menu } from 'primevue'
 import type { MenuItem } from 'primevue/menuitem'
 import { computed, onMounted, useTemplateRef } from 'vue'
 import { RouterLink } from 'vue-router'
+import authApi from '@/api/resources/authApi.ts'
 
 const navMenuRef = useTemplateRef('navMenuRef')
 const authStore = useAuthStore()
@@ -77,10 +77,10 @@ const loggedInNavMenuItems: MenuItem[] = [
     callback: async () => {
       await authStore.loadIfNotInitialized()
       if (authStore.isLoggedIn()) {
-        await api.users.logout()
+        await authApi.getLogout()
       }
       await authStore.load()
-      router.push(Routes.Home)
+      await router.push(Routes.Home)
     }
   }
 ]

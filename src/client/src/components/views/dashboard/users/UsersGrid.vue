@@ -40,16 +40,15 @@
 </template>
 
 <script lang="ts" setup>
-import type { UserResponse } from '@/api/users/userResponse'
-import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import ListItem from '@/components/data/ListItem.vue'
 import { parseDate } from '@/utils/dateUtils'
-import { DataTable, Column, Divider } from 'primevue'
+import { Column, DataTable, Divider } from 'primevue'
 import { inject, type Ref } from 'vue'
+import type { UserResponse } from '@/api/resources/usersApi.ts'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 
-const props = defineProps<{
+defineProps<{
   users: UserResponse[]
 }>()
 </script>

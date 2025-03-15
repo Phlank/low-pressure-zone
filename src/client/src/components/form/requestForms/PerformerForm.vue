@@ -4,23 +4,29 @@
       <InputText
         id="name"
         class="input__field"
-        :value="formState.name"
-        @update:model-value="handleNameUpdate"
+        v-model:model-value="formState.name"
+        @update:model-value="validation.validateIfDirty('name')"
         :disabled="disabled"
-        :invalid="!validation.isValid('name')"
-      />
-      <ValidationLabel for="name" :message="validation.message('name')">Name</ValidationLabel>
+        :invalid="!validation.isValid('name')" />
+      <ValidationLabel
+        for="name"
+        :message="validation.message('name')"
+        >Name</ValidationLabel
+      >
     </IftaLabel>
     <IftaLabel class="input input--large">
       <InputText
         id="url"
         class="input__field"
-        :value="formState.url"
-        @update:model-value="handleUrlUpdate"
+        v-model:model-value="formState.url"
+        @update:model-value="validation.validateIfDirty('url')"
         :disabled="disabled"
-        :invalid="!validation.isValid('url')"
-      />
-      <ValidationLabel for="url" :message="validation.message('url')">URL</ValidationLabel>
+        :invalid="!validation.isValid('url')" />
+      <ValidationLabel
+        for="url"
+        :message="validation.message('url')"
+        >URL</ValidationLabel
+      >
     </IftaLabel>
   </div>
 </template>
@@ -29,10 +35,9 @@
 import { createFormValidation } from '@/validation/types/formValidation'
 import { IftaLabel, InputText } from 'primevue'
 import { onMounted, reactive } from 'vue'
-import { createUpdateHandler } from '../formInputHandling'
 import ValidationLabel from '../ValidationLabel.vue'
-import type { PerformerRequest } from '@/api/performers/performerRequest'
 import { performerRequestRules } from '@/validation/requestRules'
+import type { PerformerRequest } from '@/api/resources/performersApi.ts'
 
 const formState: PerformerRequest = reactive({ name: '', url: '' })
 const validation = createFormValidation(formState, performerRequestRules)
@@ -46,9 +51,6 @@ onMounted(() => {
   formState.name = props.initialState.name
   formState.url = props.initialState.url
 })
-
-const handleNameUpdate = createUpdateHandler(formState, validation, 'name', '')
-const handleUrlUpdate = createUpdateHandler(formState, validation, 'url', '')
 
 const reset = () => {
   formState.name = props.initialState.name

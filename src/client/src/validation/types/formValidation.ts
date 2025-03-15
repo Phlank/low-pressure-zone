@@ -7,8 +7,8 @@ import { invalid, valid, type ValidationResult } from './../types/validationResu
 import type { ValidationRule } from './../types/validationRule'
 
 class FormValidationImplementation<TForm extends object> implements FormValidation<TForm> {
-  private formState: TForm
-  private propertyState: FormValidationState<TForm>
+  private readonly formState: TForm
+  private readonly propertyState: FormValidationState<TForm>
 
   constructor(formState: TForm, rules: PropertyRules<TForm>) {
     this.formState = formState
@@ -22,19 +22,6 @@ class FormValidationImplementation<TForm extends object> implements FormValidati
         isDirty: false
       }
     })
-  }
-
-  private setValidity(key: keyof TForm, value: ValidationResult): void {
-    const state = this.propertyState[key]
-    state.isValid.value = value.isValid
-    state.message.value = value.message
-    if (!state.isDirty && !value.isValid) {
-      state.isDirty = true
-    }
-  }
-
-  private getKeys(): (keyof TForm)[] {
-    return Object.keys(this.formState) as (keyof TForm)[]
   }
 
   public message = (key: keyof TForm) => {
@@ -93,6 +80,19 @@ class FormValidationImplementation<TForm extends object> implements FormValidati
       const message = errors[key as unknown as keyof TRequest]!.join(' | ')
       this.setValidity(key, invalid(message))
     })
+  }
+
+  private setValidity(key: keyof TForm, value: ValidationResult): void {
+    const state = this.propertyState[key]
+    state.isValid.value = value.isValid
+    state.message.value = value.message
+    if (!state.isDirty && !value.isValid) {
+      state.isDirty = true
+    }
+  }
+
+  private getKeys(): (keyof TForm)[] {
+    return Object.keys(this.formState) as (keyof TForm)[]
   }
 }
 

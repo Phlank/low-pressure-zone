@@ -20,7 +20,7 @@ public class DeleteSchedule(DataContext dataContext, ScheduleRules rules) : Endp
     {
         var id = Route<Guid>("id");
         var schedule = await dataContext.Schedules.AsNoTracking()
-                                                  .Include(s => s.Audience)
+                                                  .Include(s => s.Community)
                                                   .Where(s => s.Id == id)
                                                   .FirstOrDefaultAsync(ct);
         if (schedule == null)

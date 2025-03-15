@@ -1,6 +1,4 @@
-import DashboardAudiencesView from '@/components/views/dashboard/audiences/DashboardAudiencesView.vue'
 import DashboardView from '@/components/views/dashboard/DashboardView.vue'
-import DashboardInvitesView from '@/components/views/dashboard/invites/DashboardInvitesView.vue'
 import DashboardPerformersView from '@/components/views/dashboard/performers/DashboardPerformersView.vue'
 import DashboardSchedulesView from '@/components/views/dashboard/schedules/DashboardSchedulesView.vue'
 import DashboardUsersView from '@/components/views/dashboard/users/DashboardUsersView.vue'
@@ -15,28 +13,29 @@ import { Routes } from './routes'
 import ResendInviteView from '@/components/views/user/ResendInviteView.vue'
 import ResetPasswordRequestView from '@/components/views/user/ResetPasswordRequestView.vue'
 import ResetPasswordView from '@/components/views/user/ResetPasswordView.vue'
+import DashboardCommunitiesView from '@/components/views/dashboard/communities/DashboardCommunitiesView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     { path: '/', component: HomeView },
     { path: '/user/login', component: LoginView },
-    { path: '/user/twofactor', component: TwoFactorView },
+    { path: '/user/twoFactor', component: TwoFactorView },
     {
       path: '/user/register',
       component: RegisterView,
       props: (route) => ({ context: route.query.context })
     },
     {
-      path: '/user/resendinvite',
+      path: '/user/resendInvite',
       component: ResendInviteView
     },
     {
-      path: '/user/resetpassword/request',
+      path: '/user/resetPassword/request',
       component: ResetPasswordRequestView
     },
     {
-      path: '/user/resetpassword',
+      path: '/user/resetPassword',
       component: ResetPasswordView,
       props: (route) => ({ context: route.query.context })
     },
@@ -45,19 +44,13 @@ const router = createRouter({
       component: DashboardView,
       children: [
         { path: '', name: 'Schedules', component: DashboardSchedulesView },
-        { path: 'audiences', name: 'Audiences', component: DashboardAudiencesView },
+        { path: 'communities', name: 'Communities', component: DashboardCommunitiesView },
         { path: 'performers', name: 'Performers', component: DashboardPerformersView },
         {
           path: 'users',
           name: 'Users',
           component: DashboardUsersView,
           meta: { auth: true, roles: [Role.Admin] }
-        },
-        {
-          path: 'invites',
-          name: 'Invites',
-          component: DashboardInvitesView,
-          meta: { auth: true, roles: [Role.Admin, Role.Organizer] }
         }
       ],
       meta: {

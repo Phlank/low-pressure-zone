@@ -5,9 +5,9 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { Toast } from 'primevue'
-import { computed, onMounted, onUnmounted, provide, ref, type ComputedRef, type Ref } from 'vue'
+import { computed, type ComputedRef, onMounted, onUnmounted, provide, ref, type Ref } from 'vue'
 import SiteLayout from './components/layout/site/SiteLayout.vue'
 
 const screenWidth: Ref<number> = ref(1000)
@@ -32,10 +32,12 @@ provide('isMobile', isMobile)
 
 <style lang="scss">
 @use '@/assets/styles/variables.scss';
+
 .app {
   min-width: 100vw;
+
   &__toast {
-    max-width: calc(100vw - 2 * variables.$space-l);
+    max-width: calc(100vw - 2 * #{variables.$space-l});
   }
 }
 </style>

@@ -41,7 +41,7 @@ export const allowedCharacters =
     const regex = new RegExp(`[^${charSet}]`)
     const matches = regex.exec(arg)
     if (!matches) return valid
-    var characters = distinct(matches.map((match) => match))
+    const characters = distinct(matches.map((match) => match))
     return invalid(`Invalid characters: ${characters.join(' ')}`)
   }
 

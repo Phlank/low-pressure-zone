@@ -26,10 +26,10 @@ public class PostSchedule : EndpointWithMapper<ScheduleRequest, ScheduleMapper>
             AddError(new ValidationFailure(nameof(req.StartsAt), "Overlaps other schedule"));
             AddError(new ValidationFailure(nameof(req.EndsAt), "Overlaps other schedule"));
         }
-        var doesAudienceExist = DataContext.Audiences.Any(a => a.Id == req.AudienceId);
-        if (!doesAudienceExist)
+        var doesCommunityExist = DataContext.Communities.Any(a => a.Id == req.CommunityId);
+        if (!doesCommunityExist)
         {
-            AddError(new ValidationFailure(nameof(req.AudienceId), "Invalid audience"));
+            AddError(new ValidationFailure(nameof(req.CommunityId), "Invalid community"));
         }
         ThrowIfAnyErrors();
 

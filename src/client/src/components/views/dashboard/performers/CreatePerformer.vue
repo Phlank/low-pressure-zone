@@ -16,13 +16,12 @@
 </template>
 
 <script lang="ts" setup>
-import api from '@/api/api'
-import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
-import type { PerformerRequest } from '@/api/performers/performerRequest'
+import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import PerformerForm from '@/components/form/requestForms/PerformerForm.vue'
 import { showCreateSuccessToast } from '@/utils/toastUtils'
 import { Button, useToast } from 'primevue'
 import { computed, ref, useTemplateRef } from 'vue'
+import performersApi, { type PerformerRequest } from '@/api/resources/performersApi.ts'
 
 const toast = useToast()
 const createFormInitialState: PerformerRequest = { name: '', url: '' }
@@ -37,7 +36,7 @@ const handleCreatePerformer = async () => {
   if (!isValid) return
 
   isSubmitting.value = true
-  const response = await api.performers.post(createForm.value.formState)
+  const response = await performersApi.post(createForm.value.formState)
   isSubmitting.value = false
 
   if (tryHandleUnsuccessfulResponse(response, toast, createForm.value.validation)) return

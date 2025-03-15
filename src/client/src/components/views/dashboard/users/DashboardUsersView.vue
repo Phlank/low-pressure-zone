@@ -25,15 +25,14 @@
 </template>
 
 <script lang="ts" setup>
-import api from '@/api/api'
-import { tryHandleUnsuccessfulResponse } from '@/api/apiResponseHandlers'
-import type { InviteResponse } from '@/api/users/invites/inviteResponse'
-import type { UserResponse } from '@/api/users/userResponse'
 import { Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs, useToast } from 'primevue'
 import { onMounted, ref, type Ref } from 'vue'
 import InvitesGrid from './InvitesGrid.vue'
 import InviteUser from './InviteUser.vue'
 import UsersGrid from './UsersGrid.vue'
+import usersApi, { type UserResponse } from '@/api/resources/usersApi.ts'
+import invitesApi, { type InviteResponse } from '@/api/resources/invitesApi.ts'
+import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 
 const isLoaded = ref(false)
 const tabValue: Ref<string | number> = ref('users')
@@ -43,8 +42,8 @@ const users: Ref<UserResponse[]> = ref([])
 const invites: Ref<InviteResponse[]> = ref([])
 
 onMounted(async () => {
-  const userResponse = await api.users.get()
-  const inviteResponse = await api.users.invites.get()
+  const userResponse = await usersApi.get()
+  const inviteResponse = await invitesApi.get()
   if (
     tryHandleUnsuccessfulResponse(userResponse, toast) ||
     tryHandleUnsuccessfulResponse(inviteResponse, toast)

@@ -2,7 +2,7 @@
 using FastEndpoints.Swagger;
 using FluentEmail.Core.Interfaces;
 using FluentEmail.Mailgun;
-using LowPressureZone.Api.Endpoints.Audiences;
+using LowPressureZone.Api.Endpoints.Communities;
 using LowPressureZone.Api.Endpoints.Performers;
 using LowPressureZone.Api.Endpoints.Schedules;
 using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
@@ -82,12 +82,12 @@ public static class ServiceCollectionExtensions
 
     public static void AddApiServices(this IServiceCollection services)
     {
-        services.AddSingleton<AudienceMapper>();
+        services.AddSingleton<CommunityMapper>();
         services.AddSingleton<ScheduleMapper>();
         services.AddSingleton<PerformerMapper>();
         services.AddSingleton<TimeslotMapper>();
 
-        services.AddSingleton<AudienceRules>();
+        services.AddSingleton<CommunityRules>();
         services.AddSingleton<ScheduleRules>();
         services.AddSingleton<PerformerRules>();
         services.AddSingleton<TimeslotRules>();
