@@ -77,6 +77,6 @@ const handleVerify = async () => {
 
   await useAuthStore().load()
   isSubmitting.value = false
-  router.push(props.redirect)
+  await router.push(props.redirect)
 }
 </script>

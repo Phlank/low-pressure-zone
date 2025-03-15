@@ -7,7 +7,15 @@
           value="mine">
           Mine
         </Tab>
-        <Tab value="all"> All</Tab>
+        <Tab value="all">All</Tab>
+        <Tab
+          v-if="
+            authStore.isInAnySpecifiedRole(Role.Admin) ||
+            communities.some((community) => community.isOrganizable)
+          "
+          value="relationships">
+          Relationships
+        </Tab>
         <Tab
           v-if="authStore.isInAnySpecifiedRole(Role.Admin)"
           value="create">
@@ -15,14 +23,12 @@
         </Tab>
       </TabList>
       <TabPanels v-if="isLoaded">
-        <TabPanel
-          v-if="!useAuthStore().isInAnySpecifiedRole(Role.Admin)"
-          value="mine">
+        <TabPanel value="mine">
           <div class="communities-dashboard__linked">
             <h4>Your Communities</h4>
             <CommunitiesGrid
               v-if="linkedCommunities.length > 0"
-              :communities="communities.filter((a) => a.isRelated)"
+              :communities="communities.filter((a) => a.isPerformable || a.isOrganizable)"
               @deleted="loadCommunities()"
               @edited="loadCommunities()" />
             <div v-else>You do not currently have any linked communities.</div>
@@ -36,6 +42,9 @@
               @deleted="loadCommunities()"
               @edited="loadCommunities()" />
           </div>
+        </TabPanel>
+        <TabPanel value="relationships">
+          <CommunityRelationships :communities="communities" />
         </TabPanel>
         <TabPanel value="create">
           <CreateCommunity @created-community="loadCommunities()" />
@@ -56,11 +65,12 @@ import CreateCommunity from './CreateCommunity.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { Role } from '@/constants/roles'
 import communitiesApi, { type CommunityResponse } from '@/api/resources/communitiesApi.ts'
+import CommunityRelationships from '@/components/views/dashboard/communities/CommunityRelationships.vue'
 
 const authStore = useAuthStore()
 const isLoaded = ref(false)
 const communities: Ref<CommunityResponse[]> = ref([])
-const linkedCommunities = computed(() => communities.value.filter((a) => a.isLinkableToSchedule))
+const linkedCommunities = computed(() => communities.value.filter((a) => a.isOrganizable))
 const tabValue: Ref<string | number> = ref('0')
 
 onMounted(async () => {
