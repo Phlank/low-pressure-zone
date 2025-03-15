@@ -4,19 +4,20 @@ using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Entities;
+using LowPressureZone.Domain.Extensions;
 using Shouldly;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
 public class ScheduleMapper(
+    IHttpContextAccessor accessor,
     CommunityMapper communityMapper,
     TimeslotMapper timeslotMapper,
     ScheduleRules rules)
-    : Mapper<ScheduleRequest, ScheduleResponse, Schedule>, IRequestMapper, IResponseMapper
+    : IRequestMapper, IResponseMapper
 {
-    public override Schedule ToEntity(ScheduleRequest req)
-    {
-        return new Schedule
+    public Schedule ToEntity(ScheduleRequest req)
+        => new Schedule
         {
             Id = Guid.NewGuid(),
             CommunityId = req.CommunityId,
@@ -24,31 +25,21 @@ public class ScheduleMapper(
             StartsAt = req.StartsAt.ToUniversalTime(),
             EndsAt = req.EndsAt.ToUniversalTime()
         };
-    }
 
-    public override Task<Schedule> ToEntityAsync(ScheduleRequest req, CancellationToken ct = default)
-    {
-        return Task.FromResult(ToEntity(req));
-    }
-
-    public override async Task<Schedule> UpdateEntityAsync(ScheduleRequest req, Schedule schedule,
+    public async Task UpdateEntityAsync(ScheduleRequest req, Schedule schedule,
         CancellationToken ct = default)
     {
-        var dataContext = Resolve<DataContext>();
+        var dataContext = accessor.Resolve<DataContext>();
         schedule.StartsAt = req.StartsAt;
         schedule.EndsAt = req.EndsAt;
         schedule.CommunityId = req.CommunityId;
         schedule.Description = req.Description;
-        if (dataContext.ChangeTracker.HasChanges())
-        {
-            schedule.LastModifiedDate = DateTime.UtcNow;
-            await dataContext.SaveChangesAsync(ct);
-        }
-
-        return schedule;
+        if (!dataContext.ChangeTracker.HasChanges()) return;
+        schedule.LastModifiedDate = DateTime.UtcNow;
+        await dataContext.SaveChangesAsync(ct);
     }
 
-    public override ScheduleResponse FromEntity(Schedule schedule)
+    public ScheduleResponse FromEntity(Schedule schedule)
     {
         schedule.Community.ShouldNotBeNull();
         schedule.Timeslots.ShouldNotBeNull();
@@ -69,10 +60,5 @@ public class ScheduleMapper(
             IsDeletable = rules.IsDeleteAuthorized(schedule),
             IsTimeslotCreationAllowed = rules.IsAddingTimeslotsAuthorized(schedule)
         };
-    }
-
-    public override Task<ScheduleResponse> FromEntityAsync(Schedule schedule, CancellationToken ct = default)
-    {
-        return Task.FromResult(FromEntity(schedule));
     }
 }

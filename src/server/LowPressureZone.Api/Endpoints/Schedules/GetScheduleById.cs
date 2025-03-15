@@ -19,19 +19,20 @@ public class GetScheduleById(DataContext dataContext, ScheduleRules rules) : End
     public override async Task HandleAsync(CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        var schedule = await dataContext.Schedules.AsNoTracking()
-                                                  .AsSplitQuery()
-                                                  .Include(s => s.Community)
-                                                  .Include(s => s.Timeslots.OrderBy(t => t.StartsAt))
-                                                  .ThenInclude(t => t.Performer)
-                                                  .Where(s => s.Id == id)
-                                                  .FirstOrDefaultAsync(ct);
+        var schedule = await dataContext.Schedules
+                                        .AsNoTracking()
+                                        .AsSplitQuery()
+                                        .Include(schedule => schedule.Community)
+                                        .Include(schedule => schedule.Timeslots.OrderBy(timeslot => timeslot.StartsAt))
+                                        .ThenInclude(timeslot => timeslot.Performer)
+                                        .Where(schedule => schedule.Id == id)
+                                        .FirstOrDefaultAsync(ct);
 
         if (schedule == null || rules.IsHiddenFromApi(schedule))
         {
             await SendNotFoundAsync(ct);
             return;
         }
-        await SendOkAsync(await Map.FromEntityAsync(schedule, ct), ct);
+        await SendOkAsync(Map.FromEntity(schedule), ct);
     }
 }

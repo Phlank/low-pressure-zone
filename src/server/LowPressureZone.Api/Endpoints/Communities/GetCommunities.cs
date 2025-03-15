@@ -11,7 +11,7 @@ public sealed class GetCommunities(DataContext dataContext)
     public override void Configure()
     {
         Get("/communities");
-        Description(b => b.Produces<List<CommunityResponse>>());
+        Description(builder => builder.Produces<List<CommunityResponse>>());
     }
 
     public override async Task HandleAsync(CancellationToken ct)

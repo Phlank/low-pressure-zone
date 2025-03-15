@@ -1,31 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-	<PropertyGroup>
-		<TargetFramework>net9.0</TargetFramework>
-		<Nullable>enable</Nullable>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<UserSecretsId>9d2c548d-3c62-4409-9c65-fe1fa2b047b1</UserSecretsId>
-		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-		<AnalysisLevel>latest-recommended</AnalysisLevel>
-	</PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>9d2c548d-3c62-4409-9c65-fe1fa2b047b1</UserSecretsId>
+        <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+        <AnalysisLevel>latest-recommended</AnalysisLevel>
+    </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="FastEndpoints" Version="5.35.0" />
-		<PackageReference Include="FastEndpoints.Security" Version="5.35.0" />
-		<PackageReference Include="FastEndpoints.Swagger" Version="5.35.0" />
-		<PackageReference Include="FluentEmail.Mailgun" Version="3.0.2" />
-		<PackageReference Include="Google.Apis.Auth.AspNetCore3" Version="1.69.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.2">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Minerals.StringCases" Version="0.2.1" />
-		<PackageReference Include="Shouldly" Version="4.3.0" />
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="FastEndpoints" Version="5.35.0"/>
+        <PackageReference Include="FastEndpoints.Security" Version="5.35.0"/>
+        <PackageReference Include="FastEndpoints.Swagger" Version="5.35.0"/>
+        <PackageReference Include="FluentEmail.Mailgun" Version="3.0.2"/>
+        <PackageReference Include="Google.Apis.Auth.AspNetCore3" Version="1.69.0"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.2">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Minerals.StringCases" Version="0.2.1"/>
+        <PackageReference Include="Shouldly" Version="4.3.0"/>
+    </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\LowPressureZone.Domain\LowPressureZone.Domain.csproj" />
-		<ProjectReference Include="..\LowPressureZone.Identity\LowPressureZone.Identity.csproj" />
-	</ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\LowPressureZone.Domain\LowPressureZone.Domain.csproj"/>
+        <ProjectReference Include="..\LowPressureZone.Identity\LowPressureZone.Identity.csproj"/>
+    </ItemGroup>
 
 </Project>

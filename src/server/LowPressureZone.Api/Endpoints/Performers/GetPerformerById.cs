@@ -20,15 +20,15 @@ public sealed class GetPerformerById(DataContext dataContext, PerformerRules rul
     {
         var id = Route<Guid>("id");
         var performer = await dataContext.Performers.AsNoTracking()
-                                                    .Where(p => p.Id == id)
-                                                    .FirstOrDefaultAsync(ct);
+                                         .Where(p => p.Id == id)
+                                         .FirstOrDefaultAsync(ct);
         if (performer == null || rules.IsHiddenFromApi(performer))
         {
             await SendNotFoundAsync(ct);
             return;
         }
 
-        var response = await Map.FromEntityAsync(performer, ct);
+        var response = Map.FromEntity(performer);
         await SendOkAsync(response, ct);
     }
 }
