@@ -2,15 +2,18 @@ export class ApiResponse<TRequest extends object, TResponse> {
   readonly data?: TResponse
   readonly status: number
   readonly validationProblem?: ValidationProblemDetails<TRequest>
+  readonly error: unknown
 
   constructor(
     status: number,
     data: TResponse | undefined = undefined,
-    validationProblem: ValidationProblemDetails<TRequest> | undefined = undefined
+    validationProblem: ValidationProblemDetails<TRequest> | undefined = undefined,
+    error: unknown = undefined
   ) {
     this.status = status
     this.data = data
     this.validationProblem = validationProblem
+    this.error = error
   }
 
   /**

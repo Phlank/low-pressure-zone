@@ -29,8 +29,8 @@ const sendRequest = async <TRequest extends object, TResponse = never>(
       )
     }
     return new ApiResponse<TRequest, TResponse>(response.status)
-  } catch (error: any) {
-    return new ApiResponse<TRequest, TResponse>(0)
+  } catch (error: unknown) {
+    return new ApiResponse<TRequest, TResponse>(0, undefined, undefined, error)
   }
 }
 

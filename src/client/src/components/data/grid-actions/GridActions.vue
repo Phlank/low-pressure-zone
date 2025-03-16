@@ -1,39 +1,41 @@
 <template>
   <div class="grid-actions">
     <div class="grid-actions__buttons">
-      <Button
+      <div
         v-if="!isCombinedIcon"
-        v-for="action in visibleActions"
-        class="grid-actions__buttons__item"
-        :key="action.name"
-        :icon="action.icon"
-        :severity="action.severity"
-        :disabled="props.disabled"
-        @click="emit(action.emit as any)"
-        rounded
-        outlined />
+        class="grid-actions__buttons__multi">
+        <Button
+          v-for="action in visibleActions"
+          :key="action.name"
+          :disabled="props.disabled"
+          :icon="action.icon"
+          :severity="action.severity"
+          class="grid-actions__buttons__item"
+          outlined
+          rounded
+          @click="emit(action.emit as any)" />
+      </div>
       <Button
         v-else
+        :disabled="props.disabled"
         class="grid-actions__buttons__item"
         icon="pi pi-ellipsis-h"
-        severity="secondary"
-        @click="handleCombinedClick"
-        :disabled="props.disabled"
+        outlined
         rounded
-        outlined />
+        severity="secondary"
+        @click="handleCombinedClick" />
     </div>
     <GridActionsDrawer
+      v-model:visible="showActionSelectDrawer"
       :visible-actions="visibleActions"
-      @action-clicked="handleDrawerActionClick"
-      v-model:visible="showActionSelectDrawer" />
+      @action-clicked="handleDrawerActionClick" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Button, Divider, Drawer } from 'primevue'
+import { Button } from 'primevue'
 import { computed, inject, ref, type Ref } from 'vue'
-import ListItem from '../ListItem.vue'
-import { gridActions, type GridAction, type GridActionEmits } from './gridAction'
+import { type GridAction, type GridActionEmits, gridActions } from './gridAction'
 import GridActionsDrawer from './GridActionsDrawer.vue'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
@@ -58,7 +60,7 @@ const props = withDefaults(
 const emit = defineEmits<GridActionEmits>()
 
 const visibleActions = computed(() => {
-  let actions: GridAction[] = []
+  const actions: GridAction[] = []
   if (props.showCreate) actions.push(gridActions.create)
   if (props.showEdit) actions.push(gridActions.edit)
   if (props.showDelete) actions.push(gridActions.delete)
@@ -77,7 +79,7 @@ const handleCombinedClick = () => {
 
 const handleDrawerActionClick = (action: GridAction) => {
   showActionSelectDrawer.value = false
-  emit(action.emit as any)
+  emit(action.emit as never)
 }
 </script>
 

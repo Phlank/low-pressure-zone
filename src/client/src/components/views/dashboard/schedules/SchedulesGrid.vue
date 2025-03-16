@@ -18,9 +18,9 @@
             header="Community" />
           <Column
             v-if="!isMobile"
+            :sortable="true"
             field="start"
-            header="Date"
-            :sortable="true">
+            header="Date">
             <template #body="{ data }: { data: ScheduleResponse }">
               {{ parseDate(data.startsAt).toLocaleDateString() }}
             </template>
@@ -86,10 +86,10 @@ import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
 import FormDialog from '@/components/dialogs/FormDialog.vue'
 import ScheduleForm from '@/components/form/requestForms/ScheduleForm.vue'
-import { formatTimeslot, parseDate, setToNextHour } from '@/utils/dateUtils'
+import { formatTimeslot, parseDate } from '@/utils/dateUtils'
 import { showEditSuccessToast } from '@/utils/toastUtils'
 import { Column, DataTable, useToast } from 'primevue'
-import { inject, reactive, ref, useTemplateRef, type Ref } from 'vue'
+import { inject, reactive, ref, type Ref, useTemplateRef } from 'vue'
 import TimeslotsGrid from './TimeslotsGrid.vue'
 import schedulesApi, { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
 import type { PerformerResponse } from '@/api/resources/performersApi.ts'

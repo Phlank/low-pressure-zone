@@ -13,10 +13,10 @@
         <Column class="grid-action-col grid-action-col--2">
           <template #body="{ data }: { data: PerformerResponse }">
             <GridActions
-              :show-edit="data.isEditable"
               :show-delete="data.isDeletable"
-              @edit="handleEditActionClick(data)"
-              @delete="handleDeleteActionClick(data)" />
+              :show-edit="data.isEditable"
+              @delete="handleDeleteActionClick(data)"
+              @edit="handleEditActionClick(data)" />
           </template>
         </Column>
       </DataTable>
@@ -36,32 +36,32 @@
           </template>
           <template #right>
             <GridActions
-              :show-edit="performer.isEditable"
               :show-delete="performer.isDeletable"
-              @edit="handleEditActionClick(performer)"
-              @delete="handleDeleteActionClick(performer)" />
+              :show-edit="performer.isEditable"
+              @delete="handleDeleteActionClick(performer)"
+              @edit="handleEditActionClick(performer)" />
           </template>
         </ListItem>
         <Divider v-if="index != performers.length - 1" />
       </div>
     </div>
     <FormDialog
+      :is-submitting="isSubmitting"
       :visible="showEditDialog"
       header="Edit Performer"
-      :is-submitting="isSubmitting"
       @close="showEditDialog = false"
       @save="handleSave">
       <PerformerForm
         ref="editForm"
-        :initial-state="editFormInitialState"
-        :disabled="isSubmitting" />
+        :disabled="isSubmitting"
+        :initial-state="editFormInitialState" />
     </FormDialog>
     <DeleteDialog
-      entity-type="performer"
       :entity-name="deletingName"
-      header="Delete Performer"
       :is-submitting="isSubmitting"
       :visible="showDeleteDialog"
+      entity-type="performer"
+      header="Delete Performer"
       @close="showDeleteDialog = false"
       @delete="handleDelete" />
   </div>
@@ -75,8 +75,11 @@ import FormDialog from '@/components/dialogs/FormDialog.vue'
 import PerformerForm from '@/components/form/requestForms/PerformerForm.vue'
 import { showDeleteSuccessToast, showEditSuccessToast } from '@/utils/toastUtils'
 import { Column, DataTable, Divider, useToast } from 'primevue'
-import { inject, ref, useTemplateRef, type Ref } from 'vue'
-import performersApi, { type PerformerRequest, type PerformerResponse } from '@/api/resources/performersApi.ts'
+import { inject, ref, type Ref, useTemplateRef } from 'vue'
+import performersApi, {
+  type PerformerRequest,
+  type PerformerResponse
+} from '@/api/resources/performersApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
@@ -122,11 +125,6 @@ const handleSave = async () => {
   if (tryHandleUnsuccessfulResponse(response, toast, editForm.value.validation)) return
 
   showEditSuccessToast(toast, 'performer', editFormInitialState.value.name)
-  const performerInGrid = props.performers.find((performer) => performer.id == editingId)
-  if (performerInGrid) {
-    performerInGrid.name = editForm.value.formState.name
-    performerInGrid.url = editForm.value.formState.url
-  }
   showEditDialog.value = false
 }
 
@@ -149,9 +147,6 @@ const handleDelete = async () => {
 
   if (tryHandleUnsuccessfulResponse(response, toast)) return
 
-  const performerInGrid = props.performers.find((performer) => performer.id == deletingId)
-
-  props.performers.splice(props.performers.indexOf(performerInGrid!), 1)
   showDeleteSuccessToast(toast, 'performer', deletingName.value)
   showDeleteDialog.value = false
 }
