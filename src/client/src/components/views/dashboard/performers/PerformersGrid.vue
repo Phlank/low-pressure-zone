@@ -85,7 +85,7 @@ import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.t
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 
 const toast = useToast()
-const props = defineProps<{
+defineProps<{
   performers: PerformerResponse[]
 }>()
 
