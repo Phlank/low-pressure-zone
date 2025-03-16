@@ -53,7 +53,7 @@ const loadPerformers = async () => (performers.value = (await performersApi.get(
 
 const createForm = useTemplateRef('createForm')
 const handleCreateClick = async () => {
-  if (createForm.value == undefined) return
+  if (!createForm.value) return
   const isInvalid = createForm.value.validation.validate()
   if (!isInvalid) return
 

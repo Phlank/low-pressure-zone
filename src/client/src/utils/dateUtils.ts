@@ -31,7 +31,7 @@ export const setToPreviousHour = (date: Date) => {
 }
 
 export const isHour = (date: Date) =>
-  date.getMinutes() == 0 && date.getSeconds() == 0 && date.getMilliseconds() == 0
+  date.getMinutes() === 0 && date.getSeconds() === 0 && date.getMilliseconds() === 0
 
 export const hoursBetween = (start: Date, end: Date) => {
   const out: Date[] = []

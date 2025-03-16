@@ -64,8 +64,7 @@
 }
 
 .single-panel-center {
-  margin: auto;
-  margin-top: calc(min(20dvh));
+  margin: 20dvh auto auto;
   width: fit-content;
 
   &__message {

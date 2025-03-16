@@ -31,7 +31,7 @@ const createFormInitialState: CommunityRequest = { name: '', url: '' }
 const createForm = useTemplateRef('createForm')
 
 const handleCreateCommunity = async () => {
-  if (createForm.value == undefined) return
+  if (!createForm.value) return
   const isValid = createForm.value.validation.validate()
   if (!isValid) return
 

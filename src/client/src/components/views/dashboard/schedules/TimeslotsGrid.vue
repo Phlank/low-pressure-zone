@@ -25,7 +25,7 @@
             <GridActions
               :show-create="
                 schedule.isTimeslotCreationAllowed &&
-                data.timeslot == undefined &&
+                data.timeslot === undefined &&
                 data.start.getTime() > new Date().getTime()
               "
               :show-delete="data.timeslot?.isDeletable"
@@ -50,7 +50,7 @@
           <GridActions
             :show-create="
               schedule.isTimeslotCreationAllowed &&
-              row.timeslot == undefined &&
+              row.timeslot === undefined &&
               row.start.getTime() > new Date().getTime()
             "
             :show-delete="row.timeslot?.isDeletable"

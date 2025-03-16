@@ -4,13 +4,13 @@
     <div class="desktop-inline">
       <PerformerForm
         ref="createForm"
-        :initial-state="createFormInitialState"
-        :disabled="controlsDisabled" />
+        :disabled="controlsDisabled"
+        :initial-state="createFormInitialState" />
       <Button
+        :disabled="controlsDisabled"
         class="input"
         label="Create"
-        @click="handleCreatePerformer"
-        :disabled="controlsDisabled" />
+        @click="handleCreatePerformer" />
     </div>
   </div>
 </template>
@@ -31,7 +31,7 @@ const controlsDisabled = computed(() => false)
 
 const isSubmitting = ref(false)
 const handleCreatePerformer = async () => {
-  if (createForm.value == undefined) return
+  if (!createForm.value) return
   const isValid = createForm.value.validation.validate()
   if (!isValid) return
 

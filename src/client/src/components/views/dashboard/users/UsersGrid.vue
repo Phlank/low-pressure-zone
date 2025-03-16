@@ -33,7 +33,7 @@
             </div>
           </template>
         </ListItem>
-        <Divider v-if="index != users.length - 1" />
+        <Divider v-if="index !== users.length - 1" />
       </div>
     </div>
   </div>

@@ -42,7 +42,7 @@
         id="startTime"
         :disabled="formState.endTime.getTime() < minStartTime.getTime()"
         :invalid="!validation.isValid('endsAt')"
-        :max-date="new Date(formState.startTime.getTime() + MAX_DURATION_MINUTES * MS_PER_MINUTE)"
+        :max-date="new Date(formState.startTime.getTime() + maxDurationMinutes * MS_PER_MINUTE)"
         :min-date="formState.startTime"
         :model-value="formState.endTime"
         class="input__field"
@@ -84,8 +84,8 @@ import { scheduleRequestRules } from '@/validation/requestRules'
 import type { ScheduleRequest } from '@/api/resources/schedulesApi.ts'
 import type { CommunityResponse } from '@/api/resources/communitiesApi.ts'
 
-const MAX_DURATION_MINUTES = 1440
-const DEFAULT_MINUTES = 60
+const maxDurationMinutes = 1440
+const defaultMinutes = 60
 
 let now = new Date()
 const resetStartTime = new Date(
@@ -117,8 +117,8 @@ const formState: ScheduleFormState = reactive({
   startTime: resetStartTime,
   startsAt: resetStartTime.toISOString(),
   description: '',
-  endTime: new Date(resetStartTime.getTime() + DEFAULT_MINUTES * MS_PER_MINUTE),
-  endsAt: new Date(resetStartTime.getTime() + DEFAULT_MINUTES * MS_PER_MINUTE).toISOString()
+  endTime: new Date(resetStartTime.getTime() + defaultMinutes * MS_PER_MINUTE),
+  endsAt: new Date(resetStartTime.getTime() + defaultMinutes * MS_PER_MINUTE).toISOString()
 })
 const startRef = ref(formState.startsAt)
 const validation = createFormValidation(formState, scheduleRequestRules(formState))
@@ -129,7 +129,7 @@ const props = defineProps<{
 }>()
 
 onMounted(() => {
-  if (props.initialState != undefined) {
+  if (props.initialState !== undefined) {
     formState.communityId = props.initialState.communityId
     formState.startsAt = props.initialState.startsAt
     formState.endsAt = props.initialState.endsAt
@@ -170,7 +170,7 @@ const reset = () => {
   formState.startTime = resetStartTime
   formState.startsAt = formState.startTime.toISOString()
   formState.description = ''
-  formState.endTime = new Date(resetStartTime.getTime() + DEFAULT_MINUTES * MS_PER_MINUTE)
+  formState.endTime = new Date(resetStartTime.getTime() + defaultMinutes * MS_PER_MINUTE)
   formState.endsAt = formState.endTime.toISOString()
 }
 

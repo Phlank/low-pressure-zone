@@ -36,7 +36,7 @@ class FormValidationImplementation<TForm extends object> implements FormValidati
   }
 
   public validate = (...keys: (keyof TForm)[]) => {
-    if (keys.length == 0) {
+    if (keys.length === 0) {
       keys = this.getKeys()
     }
     keys.forEach((key) => {
@@ -46,16 +46,16 @@ class FormValidationImplementation<TForm extends object> implements FormValidati
   }
 
   public validateIfDirty = (...keys: (keyof TForm)[]) => {
-    if (keys.length == 0) keys = this.getKeys()
+    if (keys.length === 0) keys = this.getKeys()
     const dirtyKeys = keys.filter((key) => this.propertyState[key].isDirty)
-    if (dirtyKeys.length == 0) {
+    if (dirtyKeys.length === 0) {
       return true
     }
     return this.validate(...dirtyKeys)
   }
 
   public isValid = (...keys: (keyof TForm)[]) => {
-    if (keys.length == 0) keys = this.getKeys()
+    if (keys.length === 0) keys = this.getKeys()
     for (let i = 0; i < keys.length; i++) {
       const isKeyValid = this.propertyState[keys[i]].isValid.value
       if (isKeyValid === false) return false
@@ -64,7 +64,7 @@ class FormValidationImplementation<TForm extends object> implements FormValidati
   }
 
   public reset = (...keys: (keyof TForm)[]) => {
-    if (keys.length == 0) keys = this.getKeys()
+    if (keys.length === 0) keys = this.getKeys()
     keys.forEach((key) => {
       this.setValidity(key, valid)
       this.propertyState[key].isDirty = false
@@ -76,7 +76,7 @@ class FormValidationImplementation<TForm extends object> implements FormValidati
   ) => {
     const keys = this.getKeys()
     keys.forEach((key) => {
-      if (errors[key as unknown as keyof TRequest] == undefined) return
+      if (errors[key as unknown as keyof TRequest] === undefined) return
       const message = errors[key as unknown as keyof TRequest]!.join(' | ')
       this.setValidity(key, invalid(message))
     })

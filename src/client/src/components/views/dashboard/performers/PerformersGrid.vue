@@ -42,7 +42,7 @@
               @edit="handleEditActionClick(performer)" />
           </template>
         </ListItem>
-        <Divider v-if="index != performers.length - 1" />
+        <Divider v-if="index !== performers.length - 1" />
       </div>
     </div>
     <FormDialog
@@ -106,7 +106,7 @@ const handleEditActionClick = (performer: PerformerResponse) => {
 }
 
 const handleSave = async () => {
-  if (editForm.value == undefined) return
+  if (!editForm.value) return
   const isValid = editForm.value.validation.validate()
   if (!isValid) return
 

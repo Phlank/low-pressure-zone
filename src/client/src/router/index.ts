@@ -89,4 +89,3 @@ router.beforeEach(async (to, from, next) => {
 })
 
 export default router
-export const defaultLoginRedirect = Routes.Schedules

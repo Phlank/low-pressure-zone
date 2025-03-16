@@ -35,7 +35,7 @@ const sendRequest = async <TRequest extends object, TResponse = never>(
 }
 
 export const sendGet = async <TResponse = never>(route: string, params?: QueryParameters) => {
-  if (params) route = route + toQueryString(params)
+  if (params) route += toQueryString(params)
   return await sendRequest<never, TResponse>('GET', route)
 }
 
