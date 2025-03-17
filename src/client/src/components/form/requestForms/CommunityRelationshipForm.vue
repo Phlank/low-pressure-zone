@@ -2,7 +2,7 @@
   <div class="community-relationship-form">
     <IftaLabel>
       <Select
-        v-if="!props.user"
+        v-if="!props.initialState"
         id="userInput"
         v-model:model-value="formState.user"
         :options="availableUsers"

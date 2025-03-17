@@ -24,13 +24,14 @@ public class PostInvite(UserManager<AppUser> userManager, IdentityContext identi
         var normalizedEmail = req.Email.ToUpperInvariant();
         var username = Guid.NewGuid().ToString();
         var normalizedUsername = username.ToUpperInvariant();
-        var user = new AppUser()
+        var user = new AppUser
         {
             Id = invitation.UserId,
             Email = req.Email,
             NormalizedEmail = normalizedEmail,
+            DisplayName = username,
             UserName = username,
-            NormalizedUserName = username.ToUpperInvariant()
+            NormalizedUserName = normalizedUsername
         };
         var createResult = await userManager.CreateAsync(user);
         createResult.Errors.ForEach(e => AddError(e.Code + " " + e.Description));
@@ -44,7 +45,7 @@ public class PostInvite(UserManager<AppUser> userManager, IdentityContext identi
         var tokenContext = new TokenContext
         {
             Email = req.Email,
-            Token = inviteToken,
+            Token = inviteToken
         };
         await emailService.SendInviteEmail(req.Email, tokenContext);
         await identityContext.Invitations.AddAsync(invitation, ct);

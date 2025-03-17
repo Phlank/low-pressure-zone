@@ -20,17 +20,15 @@ public class IdentityContext(DbContextOptions<IdentityContext> options) : Identi
             foreach (var roleName in RoleNames.All)
             {
                 Console.WriteLine($"{nameof(IdentityContext)}: Checking for {roleName} role.");
-                if (!roles.Any(r => r.Name == roleName))
+                if (roles.Any(r => r.Name == roleName)) continue;
+                Console.WriteLine($"{nameof(IdentityContext)}: Did not find {roleName} role. Adding {roleName} role.");
+                roles.Add(new AppRole
                 {
-                    Console.WriteLine($"{nameof(IdentityContext)}: Did not find {roleName} role. Adding {roleName} role.");
-                    roles.Add(new AppRole
-                    {
-                        Id = Guid.NewGuid(),
-                        Name = roleName,
-                        NormalizedName = roleName.ToUpperInvariant(),
-                        ConcurrencyStamp = Guid.NewGuid().ToString()
-                    });
-                }
+                    Id = Guid.NewGuid(),
+                    Name = roleName,
+                    NormalizedName = roleName.ToUpperInvariant(),
+                    ConcurrencyStamp = Guid.NewGuid().ToString()
+                });
             }
             context.SaveChanges();
 
@@ -40,7 +38,7 @@ public class IdentityContext(DbContextOptions<IdentityContext> options) : Identi
                 Console.WriteLine($"{nameof(IdentityContext)}: No users found. Seeding admin user.");
                 var seedData = GetSeedData();
                 var hasher = new PasswordHasher<AppUser>();
-                var user = new AppUser()
+                var user = new AppUser
                 {
                     Id = Guid.NewGuid(),
                     AccessFailedCount = 0,
@@ -54,8 +52,9 @@ public class IdentityContext(DbContextOptions<IdentityContext> options) : Identi
                     PhoneNumberConfirmed = false,
                     SecurityStamp = Guid.NewGuid().ToString(),
                     TwoFactorEnabled = true,
+                    DisplayName = seedData.AdminDisplayName,
                     UserName = seedData.AdminUsername,
-                    NormalizedUserName = seedData.AdminUsername.ToUpperInvariant(),
+                    NormalizedUserName = seedData.AdminUsername.ToUpperInvariant()
                 };
                 var passwordHash = hasher.HashPassword(user, seedData.AdminPassword);
                 user.PasswordHash = passwordHash;
@@ -63,7 +62,11 @@ public class IdentityContext(DbContextOptions<IdentityContext> options) : Identi
 
                 var adminRole = roles.First(r => r.Name == RoleNames.Admin);
                 var userRoles = context.Set<IdentityUserRole<Guid>>();
-                userRoles.Add(new IdentityUserRole<Guid> { UserId = user.Id, RoleId = adminRole.Id });
+                userRoles.Add(new IdentityUserRole<Guid>
+                {
+                    UserId = user.Id,
+                    RoleId = adminRole.Id
+                });
             }
             context.SaveChanges();
         });
@@ -71,10 +74,10 @@ public class IdentityContext(DbContextOptions<IdentityContext> options) : Identi
 
     private static IdentitySeedData GetSeedData()
     {
-        IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json")
-                                                              .AddJsonFile("appsettings.Development.json", optional: true)
-                                                              .AddJsonFile("appsettings.Production.json", optional: true)
-                                                              .Build();
+        var config = new ConfigurationBuilder().AddJsonFile("appsettings.json")
+                                               .AddJsonFile("appsettings.Development.json", true)
+                                               .AddJsonFile("appsettings.Production.json", true)
+                                               .Build();
         var section = config.GetRequiredSection("SeedData:Identity");
         return section.Get<IdentitySeedData>() ?? throw new InvalidOperationException("Seed data missing from configuration.");
     }
