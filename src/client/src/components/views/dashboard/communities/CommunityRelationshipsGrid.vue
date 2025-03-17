@@ -1,6 +1,15 @@
 <template>
   <div class="community-relationships-grid">
-    <DataTable :value="relationships">
+    <DataTable
+      :rows="10"
+      :value="relationships"
+      paginator>
+      <template #paginatorstart>
+        <Button
+          :disabled="usernames.length === 0"
+          label="Add User"
+          @click="handleAddUserClick" />
+      </template>
       <Column
         field="username"
         header="Username" />
@@ -18,15 +27,41 @@
           {{ data.isOrganizer ? 'Yes' : '' }}
         </template>
       </Column>
+      <Column class="grid-action-col grid-action-col--1">
+        <template #body="{ data }: { data: CommunityRelationshipResponse }">
+          <GridActions
+            show-edit
+            @edit="handleEditActionClicked(data)" />
+        </template>
+      </Column>
     </DataTable>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Column, DataTable } from 'primevue'
+import { Button, Column, DataTable } from 'primevue'
 import type { CommunityRelationshipResponse } from '@/api/resources/communityRelationshipsApi.ts'
+import { ref, type Ref, watch } from 'vue'
+import type { UsernameResponse } from '@/api/resources/usersApi.ts'
+import GridActions from '@/components/data/grid-actions/GridActions.vue'
 
-defineProps<{
+const selectedUsername: Ref<UsernameResponse | undefined> = ref(undefined)
+
+const props = defineProps<{
   relationships: CommunityRelationshipResponse[]
+  usernames: UsernameResponse[]
 }>()
+
+const handleAddUserClick = async () => {}
+
+const handleEditActionClicked = async (data: CommunityRelationshipResponse) => {}
+
+watch(
+  props.usernames,
+  (newValue) => {
+    if (newValue.length === 0) selectedUsername.value = undefined
+    else selectedUsername.value = newValue[0]
+  },
+  { immediate: true }
+)
 </script>

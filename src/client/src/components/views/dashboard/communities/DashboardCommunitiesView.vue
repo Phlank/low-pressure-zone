@@ -44,7 +44,9 @@
           </div>
         </TabPanel>
         <TabPanel value="relationships">
-          <CommunityRelationships :communities="communities" />
+          <CommunityRelationships
+            :communities="communities"
+            :username-responses="usernames" />
         </TabPanel>
         <TabPanel value="create">
           <CreateCommunity @created-community="loadCommunities()" />
@@ -66,16 +68,19 @@ import { useAuthStore } from '@/stores/authStore'
 import { Role } from '@/constants/roles'
 import communitiesApi, { type CommunityResponse } from '@/api/resources/communitiesApi.ts'
 import CommunityRelationships from '@/components/views/dashboard/communities/CommunityRelationships.vue'
+import usersApi, { type UsernameResponse } from '@/api/resources/usersApi.ts'
 
 const authStore = useAuthStore()
 const isLoaded = ref(false)
 const communities: Ref<CommunityResponse[]> = ref([])
+const usernames: Ref<UsernameResponse[]> = ref([])
 const linkedCommunities = computed(() => communities.value.filter((a) => a.isOrganizable))
 const tabValue: Ref<string | number> = ref('0')
 
 onMounted(async () => {
   if (authStore.isInAnySpecifiedRole(Role.Admin)) tabValue.value = 'all'
   await loadCommunities()
+  await loadUsernames()
 })
 
 const loadCommunities = async () => {
@@ -86,5 +91,11 @@ const loadCommunities = async () => {
     return
   }
   communities.value = response.data!
+}
+
+const loadUsernames = async () => {
+  const response = await usersApi.getUsernames()
+  if (!response.isSuccess()) return
+  usernames.value = response.data!
 }
 </script>
