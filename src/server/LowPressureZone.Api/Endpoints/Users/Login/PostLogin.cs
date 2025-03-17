@@ -20,19 +20,10 @@ public class PostLogin(SignInManager<AppUser> signInManager, UserManager<AppUser
 
     public override async Task HandleAsync(LoginRequest req, CancellationToken ct)
     {
-        if (ValidationFailed)
-        {
-            await this.SendDelayedForbiddenAsync(_requestStart, ct);
-            return;
-        }
-
-        if (User.Identities.Any(e => e.IsAuthenticated))
-        {
-            await signInManager.SignOutAsync();
-        }
+        if (User.Identities.Any(claimsIdentity => claimsIdentity.IsAuthenticated)) await signInManager.SignOutAsync();
 
         var user = await userManager.FindByNameAsync(req.Username);
-        if (user == null || user.Email == null)
+        if (user?.Email == null)
         {
             await this.SendDelayedForbiddenAsync(_requestStart, ct);
             return;
@@ -46,7 +37,7 @@ public class PostLogin(SignInManager<AppUser> signInManager, UserManager<AppUser
             await emailService.SendTwoFactorEmail(user.Email, req.Username, token);
             await SendOkAsync(new LoginResponse
             {
-                RequiresTwoFactor = true,
+                RequiresTwoFactor = true
             }, ct);
             return;
         }

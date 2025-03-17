@@ -44,7 +44,7 @@ public class IdentityContext(DbContextOptions<IdentityContext> options) : Identi
                     AccessFailedCount = 0,
                     ConcurrencyStamp = Guid.NewGuid().ToString(),
                     Email = seedData.AdminEmail,
-                    NormalizedEmail = seedData.AdminEmail.ToUpperInvariant(),
+                    NormalizedEmail = seedData.AdminEmail.ToUpperInvariant().Normalize(),
                     EmailConfirmed = true,
                     LockoutEnabled = false,
                     LockoutEnd = null,
@@ -54,7 +54,7 @@ public class IdentityContext(DbContextOptions<IdentityContext> options) : Identi
                     TwoFactorEnabled = true,
                     DisplayName = seedData.AdminDisplayName,
                     UserName = seedData.AdminUsername,
-                    NormalizedUserName = seedData.AdminUsername.ToUpperInvariant()
+                    NormalizedUserName = seedData.AdminUsername.ToUpperInvariant().Normalize()
                 };
                 var passwordHash = hasher.HashPassword(user, seedData.AdminPassword);
                 user.PasswordHash = passwordHash;

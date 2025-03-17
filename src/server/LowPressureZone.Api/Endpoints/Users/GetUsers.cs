@@ -1,4 +1,5 @@
-﻿using FastEndpoints;
+﻿using System.Diagnostics.CodeAnalysis;
+using FastEndpoints;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ public class GetUsers(IdentityContext identityContext) : EndpointWithoutRequest<
 {
     public override void Configure() => Get("/users");
 
+    [SuppressMessage("Style", "IDE0031:Use null propagation")]
     public override async Task HandleAsync(CancellationToken ct)
     {
         var adminRoleId = await identityContext.Roles
@@ -18,14 +20,13 @@ public class GetUsers(IdentityContext identityContext) : EndpointWithoutRequest<
                                                .FirstAsync(ct);
 
         var userJoinQuery = from user in identityContext.Users
-                            join invitation in identityContext.Invitations on user.Id equals invitation.UserId
                             join userRole in identityContext.UserRoles on user.Id equals userRole.UserId into userRoles
                             select new UserResponse
                             {
                                 Id = user.Id,
                                 DisplayName = user.DisplayName,
                                 IsAdmin = userRoles != null && userRoles.Any(userRole => userRole.RoleId == adminRoleId),
-                                RegistrationDate = invitation.RegistrationDate
+                                RegistrationDate = user.Invitation != null ? user.Invitation.RegistrationDate : null
                             };
         if (!User.IsInRole(RoleNames.Admin)) userJoinQuery = userJoinQuery.Where(user => user.IsAdmin == false);
         var results = await userJoinQuery
