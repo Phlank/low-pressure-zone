@@ -15,6 +15,7 @@
       <div class="form-dialog__footer">
         <Button
           :disabled="isSubmitting"
+          :loading="isSubmitting"
           class="input"
           label="Save"
           @click="emit('save')" />

@@ -15,14 +15,16 @@
     <Divider />
     <CommunityRelationshipsGrid
       :available-users="availableUsers"
-      :relationships="relationships" />
+      :community="selectedCommunity"
+      :relationships="relationships"
+      @update="handleGridUpdate" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { Divider, IftaLabel, Select, useToast } from 'primevue'
 import type { CommunityResponse } from '@/api/resources/communitiesApi.ts'
-import { computed, type ComputedRef, ref, type Ref, watch } from 'vue'
+import { computed, type ComputedRef, onMounted, ref, type Ref, watch } from 'vue'
 import communityRelationshipsApi, {
   type CommunityRelationshipResponse
 } from '@/api/resources/communityRelationshipsApi.ts'
@@ -51,6 +53,14 @@ const availableUsers: ComputedRef<UserResponse[]> = computed(() => {
   return props.users.filter((user) => userIdsInUse.indexOf(user.id) === -1)
 })
 const selectedUsername: Ref<UserResponse | undefined> = ref(undefined)
+
+onMounted(async () => {
+  relationships.value = (await communityRelationshipsApi.get(selectedCommunity.value.id)).data!
+})
+
+const handleGridUpdate = async () => {
+  relationships.value = (await communityRelationshipsApi.get(selectedCommunity.value.id)).data!
+}
 
 watch(
   selectedCommunity,
