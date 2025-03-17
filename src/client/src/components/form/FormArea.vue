@@ -30,16 +30,16 @@ useResizeObserver(formAreaRef, (entries) => {
 })
 
 const columns = computed(() => {
-  if (width.value < 300) return 1
-  if (width.value < 450) return 2
-  if (width.value < 600) return 3
-  if (width.value < 750) return 4
-  if (width.value < 900) return 5
-  if (width.value < 1050) return 6
-  if (width.value < 1200) return 7
-  if (width.value < 1350) return 8
-  if (width.value < 1500) return 9
-  return 10
+  if (width.value < 300) return 2
+  if (width.value < 450) return 4
+  if (width.value < 600) return 6
+  if (width.value < 750) return 8
+  if (width.value < 900) return 10
+  if (width.value < 1050) return 12
+  if (width.value < 1200) return 14
+  if (width.value < 1350) return 16
+  if (width.value < 1500) return 18
+  return 20
 })
 
 const gridColsStyle = computed(() => `repeat(${columns.value}, 1fr)`)
@@ -51,9 +51,11 @@ onUnmounted(() => {})
 @use '@/assets/styles/variables.scss';
 
 .form-area {
-  display: grid;
-  grid-template-columns: v-bind(gridColsStyle);
-  row-gap: variables.$space-l;
-  column-gap: variables.$space-l;
+  &__fields {
+    display: grid;
+    grid-template-columns: v-bind(gridColsStyle);
+    row-gap: variables.$space-l;
+    column-gap: variables.$space-m;
+  }
 }
 </style>

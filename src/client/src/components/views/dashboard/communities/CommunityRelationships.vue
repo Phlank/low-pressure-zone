@@ -14,27 +14,27 @@
     </IftaLabel>
     <Divider />
     <CommunityRelationshipsGrid
-      :relationships="relationships"
-      :usernames="availableUsernames" />
+      :available-users="availableUsers"
+      :relationships="relationships" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { Divider, IftaLabel, Select, useToast } from 'primevue'
 import type { CommunityResponse } from '@/api/resources/communitiesApi.ts'
-import { computed, ref, type Ref, watch } from 'vue'
+import { computed, type ComputedRef, ref, type Ref, watch } from 'vue'
 import communityRelationshipsApi, {
   type CommunityRelationshipResponse
 } from '@/api/resources/communityRelationshipsApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import CommunityRelationshipsGrid from '@/components/views/dashboard/communities/CommunityRelationshipsGrid.vue'
-import type { UsernameResponse } from '@/api/resources/usersApi.ts'
+import type { UserResponse } from '@/api/resources/usersApi.ts'
 
 const toast = useToast()
 
 const props = defineProps<{
   communities: CommunityResponse[]
-  usernameResponses: UsernameResponse[]
+  users: UserResponse[]
 }>()
 
 const availableCommunities = computed(() =>
@@ -43,14 +43,14 @@ const availableCommunities = computed(() =>
 const selectedCommunity: Ref<CommunityResponse> = ref(availableCommunities.value[0])
 const relationships: Ref<CommunityRelationshipResponse[]> = ref([])
 
-const availableUsernames: ComputedRef<UsernameResponse[]> = computed(() => {
-  if (props.usernameResponses.length === 0) return []
+const availableUsers: ComputedRef<UserResponse[]> = computed(() => {
+  if (props.users.length === 0) return []
   const userIdsInUse = relationships.value.map((relationship) => relationship.userId)
-  return props.usernameResponses.filter((response) => userIdsInUse.indexOf(response.id) === -1)
+  console.log(JSON.stringify(props.users))
+  console.log(JSON.stringify(userIdsInUse))
+  return props.users.filter((user) => userIdsInUse.indexOf(user.id) === -1)
 })
-const selectedUsername: Ref<UsernameResponse | undefined> = ref(undefined)
-
-const handleAddUserClick = async () => {}
+const selectedUsername: Ref<UserResponse | undefined> = ref(undefined)
 
 watch(
   selectedCommunity,
@@ -63,7 +63,7 @@ watch(
 )
 
 watch(
-  availableUsernames,
+  availableUsers,
   (newValue) => {
     if (newValue.length === 0) selectedUsername.value = undefined
     else selectedUsername.value = newValue[0]

@@ -17,17 +17,13 @@ public class PostTimeslot(DataContext dataContext, PerformerRules performerRules
     public override async Task HandleAsync(TimeslotRequest request, CancellationToken ct)
     {
         var scheduleId = Route<Guid>("scheduleId");
-        var schedule = await dataContext.Schedules.Include(s => s.Timeslots)
-                                        .Where(s => s.Id == scheduleId)
+        var schedule = await dataContext.Schedules
+                                        .Include(schedule => schedule.Timeslots)
+                                        .Include(schedule => schedule.Community)
+                                        .Where(schedule => schedule.Id == scheduleId)
                                         .FirstAsync(ct);
 
         var performer = await dataContext.Performers.FirstAsync(p => p.Id == request.PerformerId, ct);
-
-        if (schedule == null)
-        {
-            await SendNotFoundAsync(ct);
-            return;
-        }
 
         if (!scheduleRules.IsAddingTimeslotsAuthorized(schedule)
             || !performerRules.IsTimeslotLinkAuthorized(performer))
@@ -39,6 +35,9 @@ public class PostTimeslot(DataContext dataContext, PerformerRules performerRules
         var timeslot = Map.ToEntity(request);
         dataContext.Timeslots.Add(timeslot);
         await dataContext.SaveChangesAsync(ct);
-        await SendCreatedAtAsync<GetScheduleById>(new { id = scheduleId }, Response, cancellation: ct);
+        await SendCreatedAtAsync<GetScheduleById>(new
+        {
+            id = scheduleId
+        }, Response, cancellation: ct);
     }
 }

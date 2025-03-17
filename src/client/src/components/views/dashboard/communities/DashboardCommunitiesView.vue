@@ -46,7 +46,7 @@
         <TabPanel value="relationships">
           <CommunityRelationships
             :communities="communities"
-            :username-responses="usernames" />
+            :users="users" />
         </TabPanel>
         <TabPanel value="create">
           <CreateCommunity @created-community="loadCommunities()" />
@@ -68,12 +68,12 @@ import { useAuthStore } from '@/stores/authStore'
 import { Role } from '@/constants/roles'
 import communitiesApi, { type CommunityResponse } from '@/api/resources/communitiesApi.ts'
 import CommunityRelationships from '@/components/views/dashboard/communities/CommunityRelationships.vue'
-import usersApi, { type UsernameResponse } from '@/api/resources/usersApi.ts'
+import usersApi, { type UserResponse } from '@/api/resources/usersApi.ts'
 
 const authStore = useAuthStore()
 const isLoaded = ref(false)
 const communities: Ref<CommunityResponse[]> = ref([])
-const usernames: Ref<UsernameResponse[]> = ref([])
+const users: Ref<UserResponse[]> = ref([])
 const linkedCommunities = computed(() => communities.value.filter((a) => a.isOrganizable))
 const tabValue: Ref<string | number> = ref('0')
 
@@ -84,7 +84,6 @@ onMounted(async () => {
 })
 
 const loadCommunities = async () => {
-  console.log('loading communities')
   const response = await communitiesApi.get()
   isLoaded.value = true
   if (!response.isSuccess()) {
@@ -94,8 +93,8 @@ const loadCommunities = async () => {
 }
 
 const loadUsernames = async () => {
-  const response = await usersApi.getUsernames()
+  const response = await usersApi.get()
   if (!response.isSuccess()) return
-  usernames.value = response.data!
+  users.value = response.data!
 }
 </script>

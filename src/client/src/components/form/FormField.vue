@@ -1,63 +1,43 @@
 <template>
   <div :class="computedClass">
-    <div>
-      <label
-        :class="`${baseClass}__label`"
-        :for="inputId">
-        {{ label }} {{ optional ? '(Optional)' : '' }}
-      </label>
-      <span :class="`${baseClass}__message`">{{ message ? message : ' ' }}</span>
-      <div
-        ref="inputDiv"
-        :class="`${baseClass}__input`">
-        <slot></slot>
-      </div>
+    <label
+      v-if="label"
+      :class="`${baseClass}__label`"
+      :for="inputId">
+      {{ label }} {{ optional ? '(Optional)' : '' }}
+    </label>
+    <div :class="`${baseClass}__input`">
+      <slot></slot>
     </div>
+    <span
+      v-if="message !== undefined"
+      :class="`${baseClass}__message`"
+      >{{ message ? message : ' ' }}</span
+    >
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref, useTemplateRef } from 'vue'
+import { computed } from 'vue'
+import type { FieldSize } from '@/components/form/forms.ts'
 
 const props = withDefaults(
   defineProps<{
-    size: 'xs' | 's' | 'm' | 'l' | 'xl'
-    label: string
-    message: string
-    optional: boolean
-    useIftaLabel: boolean
+    inputId: string
+    size?: FieldSize
+    label?: string
+    message?: string
+    optional?: boolean
   }>(),
   {
     size: 's',
-    message: '',
-    optional: false,
-    useIftaLabel: false
+    optional: false
   }
 )
 
 const baseClass = 'form-field'
 const widthClass = computed(() => `${baseClass}--${props.size}`)
-const computedClass = computed(() => `${baseClass} ${widthClass.value}}`)
-
-const inputId = ref('')
-const inputDiv = useTemplateRef('inputDiv')
-
-onMounted(() => {
-  setInputId()
-})
-
-const setInputId = () => {
-  if (!inputDiv.value) {
-    inputId.value = ''
-    return
-  }
-  const inputElements = inputDiv.value.getElementsByTagName('input')
-  if (inputElements.length === 1) {
-    inputId.value = inputElements[0].id
-  } else {
-    inputId.value = ''
-  }
-}
+const computedClass = computed(() => `${baseClass} ${widthClass.value}`)
 </script>
 
 <style lang="scss">
@@ -66,46 +46,57 @@ const setInputId = () => {
 .form-field {
   display: flex;
   flex-direction: column;
-  gap: variables.$space-xs;
+  gap: variables.$space-s;
   height: min-content;
 
+  .p-inputwrapper {
+    width: 100%;
+  }
+
   &--xs {
-    width: min(100%, 1fr);
+    grid-column: span 2;
   }
 
   &--s {
-    width: min(100%, 2fr);
+    grid-column: span 3;
   }
 
   &--m {
-    width: min(100%, 3fr);
+    grid-column: span 4;
   }
 
   &--l {
-    width: min(100%, 4fr);
+    grid-column: span 6;
   }
 
   &--xl {
-    width: min(100%, 5fr);
+    grid-column: span 8;
   }
 
   &__label {
     font-size: 1rem;
     font-weight: bold;
+    margin-bottom: variables.$space-s;
   }
 
   &__message {
     width: 100%;
     text-wrap: wrap pretty;
+    height: 0.8rem;
     font-size: 0.8rem;
-    color: var(--p-message-error-simple-color);
+    color: var(--p-red-500);
   }
 
   &__input {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: variables.$space-m;
 
-    input {
-      width: 100%;
+    div {
+      display: flex;
+      gap: variables.$space-m;
     }
   }
 }

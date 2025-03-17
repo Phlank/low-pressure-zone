@@ -27,12 +27,12 @@ public class GetCommunityRelationshipById(DataContext dataContext, IdentityConte
             await SendNotFoundAsync(ct);
             return;
         }
-        var username = await identityContext.Users
-                                            .AsNoTracking()
-                                            .Where(username => username.Id == userId)
-                                            .Select(user => user.UserName)
-                                            .FirstOrDefaultAsync(ct);
-        username.ShouldNotBeNull();
-        await SendOkAsync(Map.FromEntity(relationship, username), ct);
+        var displayName = await identityContext.Users
+                                               .AsNoTracking()
+                                               .Where(user => user.Id == userId)
+                                               .Select(user => user.DisplayName)
+                                               .FirstOrDefaultAsync(ct);
+        displayName.ShouldNotBeNull();
+        await SendOkAsync(Map.FromEntity(relationship, displayName), ct);
     }
 }

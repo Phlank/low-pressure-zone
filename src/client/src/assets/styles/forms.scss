@@ -14,18 +14,21 @@
       width: 100%;
     }
   }
+
   &--medium.p-iftalabel {
     width: variables.$input-width-m;
     @include variables.mobile {
       width: 100%;
     }
   }
+
   &--large.p-iftalabel {
     width: variables.$input-width-l;
     @include variables.mobile {
       width: 100%;
     }
   }
+
   &--xl.p-iftalabel {
     width: variables.$input-width-xl;
     @include variables.mobile {
@@ -50,13 +53,30 @@
 tbody.p-datatable-tbody tr > td.grid-action-col {
   text-align: center;
   height: 40px;
+
   &--1 {
     width: variables.$grid-action-width;
   }
+
   &--2 {
     width: calc(#{variables.$grid-action-width} * 2);
   }
+
   &--3 {
     width: calc(#{variables.$grid-action-width} * 3);
+  }
+}
+
+.checkbox-area {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: variables.$space-l;
+  
+  &__item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: variables.$space-m;
   }
 }

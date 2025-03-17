@@ -1,34 +1,54 @@
 <template>
   <div class="community-relationship-form">
-    <IftaLabel>
-      <Select
-        v-if="!props.initialState"
-        id="userInput"
-        v-model:model-value="formState.user"
-        :options="availableUsers"
-        optionLabel="username" />
-      <label for="userInput">User</label>
-    </IftaLabel>
-    <div class="community-relationship-form__checkbox">
-      <Checkbox
-        id="isPerformerInput"
-        v-model="formState.isPerformer" />
-      <label for="isPerformerInput">Performer</label>
-    </div>
-    <div class="community-relationship-form__checkbox">
-      <Checkbox
-        id="isPerformerInput"
-        v-model="formState.isOrganizer" />
-      <label for="isPerformerInput">Organizer</label>
-    </div>
+    <FormArea>
+      <IftaFormField
+        :message="validation.message('userId')"
+        input-id="userInput"
+        label="User"
+        size="m">
+        <Select
+          id="userInput"
+          v-model="formState.userId"
+          :disabled="props.initialState !== undefined"
+          :invalid="!validation.isValid('userId')"
+          :option-label="(user: UserResponse) => user.displayName"
+          :option-value="(user: UserResponse) => user.id"
+          :options="availableUsers" />
+      </IftaFormField>
+      <FormField
+        input-id="rolesInput"
+        label="Roles"
+        size="m">
+        <div>
+          <Checkbox
+            id="isPerformerInput"
+            v-model="formState.isPerformer"
+            binary />
+          <label for="isPerformerInput">Performer</label>
+        </div>
+        <div>
+          <Checkbox
+            id="isOrganizerInput"
+            v-model="formState.isOrganizer"
+            binary />
+          <label for="isOrganizerInput">Organizer</label>
+        </div>
+      </FormField>
+    </FormArea>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Checkbox, IftaLabel, Select } from 'primevue'
+import { Checkbox, Select } from 'primevue'
 import { type UserResponse } from '@/api/resources/usersApi.ts'
 import { onMounted, reactive } from 'vue'
 import type { CommunityRelationshipResponse } from '@/api/resources/communityRelationshipsApi.ts'
+import FormArea from '@/components/form/FormArea.vue'
+import FormField from '@/components/form/FormField.vue'
+import { createFormValidation } from '@/validation/types/formValidation.ts'
+import { required } from '@/validation/rules/stringRules.ts'
+import { alwaysValid } from '@/validation/rules/untypedRules.ts'
+import IftaFormField from '@/components/form/IftaFormField.vue'
 
 const props = defineProps<{
   initialState?: CommunityRelationshipResponse
@@ -36,14 +56,28 @@ const props = defineProps<{
 }>()
 
 const formState = reactive({
-  user: '',
+  userId: '',
   isPerformer: false,
   isOrganizer: false
+})
+const validation = createFormValidation(formState, {
+  userId: required(),
+  isPerformer: alwaysValid(),
+  isOrganizer: alwaysValid()
 })
 
 onMounted(async () => {
   if (props.initialState) {
-    formState.user = props.initialState.userId
+    formState.userId = props.initialState.userId
+    formState.isPerformer = props.initialState.isPerformer
+    formState.isOrganizer = props.initialState.isOrganizer
+  } else {
+    formState.userId = props.availableUsers[0].id
   }
+})
+
+defineExpose({
+  formState,
+  validation
 })
 </script>

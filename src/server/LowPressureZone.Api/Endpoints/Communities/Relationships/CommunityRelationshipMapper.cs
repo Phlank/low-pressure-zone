@@ -33,7 +33,7 @@ public class CommunityRelationshipMapper(IHttpContextAccessor contextAccessor)
         return relationship;
     }
 
-    public CommunityRelationshipResponse FromEntity(CommunityRelationship relationship, string username)
+    public CommunityRelationshipResponse FromEntity(CommunityRelationship relationship, string displayName)
     {
         var communityId = contextAccessor.GetGuidRouteParameterOrDefault("communityId");
         var userId = contextAccessor.GetGuidRouteParameterOrDefault("userId");
@@ -41,7 +41,7 @@ public class CommunityRelationshipMapper(IHttpContextAccessor contextAccessor)
         {
             CommunityId = communityId,
             UserId = userId,
-            Username = username,
+            DisplayName = displayName,
             IsOrganizer = relationship.IsOrganizer,
             IsPerformer = relationship.IsPerformer
         };
