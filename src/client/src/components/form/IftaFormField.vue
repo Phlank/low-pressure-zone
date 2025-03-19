@@ -1,6 +1,7 @@
 <template>
   <FormField
     :input-id="inputId"
+    :size="size"
     class="ifta-form-field">
     <IftaLabel
       id="iftaLabel"
@@ -40,6 +41,10 @@ withDefaults(
 .ifta-form-field {
   &__ifta-label {
     width: 100%;
+
+    input {
+      width: 100%;
+    }
   }
 }
 </style>

@@ -1,83 +1,72 @@
 <template>
   <div class="invite-user">
-    <IftaLabel class="input input--large">
-      <InputText
-        id="inviteEmailInput"
-        v-model="formState.email"
-        :invalid="!validation.isValid('email')"
-        class="input__field"
-        @change="validation.validateIfDirty('email')" />
-      <ValidationLabel
+    <FormArea>
+      <IftaFormField
         :message="validation.message('email')"
-        for="inviteEmailInput"
-        text="Email" />
-    </IftaLabel>
-    <IftaLabel class="input input--small">
-      <Select
-        id="roleInput"
-        v-model:model-value="formState.role"
-        :default-value="Role.Performer"
-        :options="roleItems"
-        class="input__field"
-        data-key="name"
-        option-label="name"
-        option-value="name" />
-      <label for="roleInput">Role</label>
-    </IftaLabel>
-    <Button
-      :disabled="isSubmitting"
-      :loading="isSubmitting"
-      class="input"
-      label="Send Invite"
-      @click="handleSubmit" />
+        input-id="emailInput"
+        label="Email"
+        size="m">
+        <InputText
+          id="emailInput"
+          v-model="formState.email"
+          :invalid="!validation.isValid('email')" />
+      </IftaFormField>
+      <IftaFormField
+        :message="validation.message('communityId')"
+        input-id="communityInput"
+        label="Community"
+        size="m">
+        <Select
+          :option-label="(data: CommunityResponse) => data.name"
+          :option-value="(data: CommunityResponse) => data.id"
+          :options="communities"
+          model-value="formState.communityId" />
+      </IftaFormField>
+      <template #actions>
+        <Button
+          :disabled="isSubmitting"
+          :loading="isSubmitting"
+          class="input"
+          label="Send Invite"
+          @click="handleSubmit" />
+      </template>
+    </FormArea>
   </div>
 </template>
 
 <script lang="ts" setup>
-import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { KeyName } from '@/constants/keys'
-import { Role } from '@/constants/roles'
 import { inviteRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { onKeyDown } from '@vueuse/core'
-import { Button, IftaLabel, InputText, Select, useToast } from 'primevue'
-import { reactive, ref, watch } from 'vue'
+import { Button, InputText, Select, useToast } from 'primevue'
+import { onMounted, reactive, type Ref, ref, watch } from 'vue'
 import invitesApi from '@/api/resources/invitesApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import FormArea from '@/components/form/FormArea.vue'
+import IftaFormField from '@/components/form/IftaFormField.vue'
+import communitiesApi, { type CommunityResponse } from '@/api/resources/communitiesApi.ts'
 
 const toast = useToast()
 
 onKeyDown(KeyName.Enter, () => handleSubmit())
 
-interface RoleItem {
-  name: Role
-  availableTo: Role[]
-}
-
-const roleItems: RoleItem[] = [
-  {
-    name: Role.Performer,
-    availableTo: [Role.Admin, Role.Organizer]
-  },
-  {
-    name: Role.Organizer,
-    availableTo: [Role.Admin, Role.Organizer]
-  },
-  {
-    name: Role.Admin,
-    availableTo: [Role.Admin]
-  }
-]
-
 const formState = reactive({
   email: '',
-  role: Role.Performer
+  communityId: ''
 })
 const validation = createFormValidation(formState, inviteRequestRules)
 
 const props = defineProps<{
   visible?: boolean
 }>()
+
+const communities: Ref<CommunityResponse[]> = ref([])
+
+onMounted(async () => {
+  communities.value =
+    (await communitiesApi.get()).data?.filter((community) => community.isOrganizable) ?? []
+})
 
 const emit = defineEmits<{ close: [] }>()
 
@@ -106,7 +95,7 @@ watch(
 
 const reset = () => {
   formState.email = ''
-  formState.role = Role.Performer
+  formState.communityId = ''
   validation.reset()
 }
 </script>

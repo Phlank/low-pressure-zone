@@ -1,11 +1,12 @@
-﻿using FluentEmail.Core;
+﻿using System.Text.Json;
+using FluentEmail.Core;
 using FluentEmail.Core.Interfaces;
 using LowPressureZone.Identity;
 using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Api.Services;
 
-public class EmailService(IOptions<EmailServiceOptions> options, UriService uriService, ISender sender)
+public class EmailService(IOptions<EmailServiceOptions> options, UriService uriService, ISender sender, ILogger<EmailService> logger)
 {
     private async Task Send(string toAddress, string subject, string body)
     {
@@ -13,17 +14,18 @@ public class EmailService(IOptions<EmailServiceOptions> options, UriService uriS
                          .To(toAddress)
                          .Subject(subject)
                          .Body(body);
-        await sender.SendAsync(email);
+        var sendResponse = await sender.SendAsync(email);
+        if (!sendResponse.Successful) logger.LogError("Failed to send email: {Response}", JsonSerializer.Serialize(sendResponse));
     }
 
-    public async Task SendTwoFactorEmail(string toAddress, string username, string code)
+    public async Task SendTwoFactorEmailAsync(string toAddress, string username, string code)
     {
         var subject = $"2FA | Low Pressure Zone";
         var message = $"Hey {username}, there was a login request made at Low Pressure Zone using your username and password.\n\nYour two factor authentication code is {code}.\n\nIf you weren't the one making the request, take the time to go to the site and change your password. Hope your day is going alright.";
         await Send(toAddress, subject, message);
     }
 
-    public async Task SendInviteEmail(string toAddress, TokenContext context)
+    public async Task SendInviteEmailAsync(string toAddress, TokenContext context)
     {
         var uri = uriService.GetInviteUrl(context);
         var subject = "Welcome | Low Pressure Zone";
@@ -31,7 +33,7 @@ public class EmailService(IOptions<EmailServiceOptions> options, UriService uriS
         await Send(toAddress, subject, message);
     }
 
-    public async Task SendResetPasswordEmail(string toAddress, string username, TokenContext context)
+    public async Task SendResetPasswordEmailAsync(string toAddress, string username, TokenContext context)
     {
         var uri = uriService.GetResetPasswordUrl(context);
         var subject = "Reset Password | Low Pressure Zone";

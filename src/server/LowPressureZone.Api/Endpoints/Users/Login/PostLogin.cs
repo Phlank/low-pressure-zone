@@ -34,7 +34,7 @@ public class PostLogin(SignInManager<AppUser> signInManager, UserManager<AppUser
         if (signInResult.RequiresTwoFactor)
         {
             var token = await userManager.GenerateTwoFactorTokenAsync(user, TokenProviders.Email);
-            await emailService.SendTwoFactorEmail(user.Email, req.Username, token);
+            await emailService.SendTwoFactorEmailAsync(user.Email, req.Username, token);
             await SendOkAsync(new LoginResponse
             {
                 RequiresTwoFactor = true

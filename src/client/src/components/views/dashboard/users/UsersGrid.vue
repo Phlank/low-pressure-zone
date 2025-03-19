@@ -5,11 +5,8 @@
         :value="users"
         data-key="id">
         <Column
-          field="username"
-          header="Username" />
-        <Column
-          field="email"
-          header="Email" />
+          field="displayName"
+          header="Name" />
         <Column header="Registration Date">
           <template #body="{ data }: { data: UserResponse }">
             <div v-if="data.registrationDate">
@@ -26,9 +23,11 @@
         <ListItem style="width: 100%">
           <template #left>
             <div style="display: flex; flex-direction: column; overflow-x: hidden">
-              <span class="ellipsis">{{ user.username }}</span>
-              <span class="text-s ellipsis">
-                {{ user.email }}
+              <span class="ellipsis">{{ user.displayName }}</span>
+              <span
+                v-if="user.registrationDate"
+                class="text-s ellipsis">
+                {{ parseDate(user.registrationDate).toLocaleDateString() }}
               </span>
             </div>
           </template>

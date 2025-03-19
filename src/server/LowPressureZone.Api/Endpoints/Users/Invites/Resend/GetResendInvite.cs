@@ -44,7 +44,7 @@ public class GetResendInvite(UserManager<AppUser> userManager, IdentityContext i
             Email = user.Email!,
             Token = inviteToken
         };
-        await emailService.SendInviteEmail(user.Email, tokenContext);
+        await emailService.SendInviteEmailAsync(user.Email, tokenContext);
         invite.LastSentDate = DateTime.UtcNow;
         await identityContext.SaveChangesAsync(ct);
         await this.SendDelayedNoContentAsync(_start, ct);

@@ -25,7 +25,9 @@ public class UpdateCommunityRelationship(DataContext dataContext, IdentityContex
             await SendNotFoundAsync(ct);
             return;
         }
-        var existing = await dataContext.CommunityRelationships.FirstOrDefaultAsync(relationship => relationship.CommunityId == communityId && relationship.UserId == userId, ct);
+        var existing = await dataContext.CommunityRelationships
+                                        .Where(relationship => relationship.CommunityId == communityId && relationship.UserId == userId)
+                                        .FirstOrDefaultAsync(ct);
         if (existing != null)
         {
             await Map.UpdateEntityAsync(request, existing, ct);

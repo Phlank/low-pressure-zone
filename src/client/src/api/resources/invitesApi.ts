@@ -1,5 +1,4 @@
 import { sendGet, sendPost } from '@/api/fetchFunctions.ts'
-import type { Role } from '@/constants/roles.ts'
 
 const route = '/users/invites'
 
@@ -11,12 +10,13 @@ export default {
 
 export interface InviteRequest {
   email: string
-  role: Role
+  communityId: string
 }
 
 export interface InviteResponse {
   id: string
   email: string
+  displayName: string
   invitedAt: string
   lastSentAt: string
 }

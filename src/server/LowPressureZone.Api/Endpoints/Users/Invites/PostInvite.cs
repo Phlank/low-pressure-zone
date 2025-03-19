@@ -16,18 +16,17 @@ public class PostInvite(UserManager<AppUser> userManager, IdentityContext identi
         Post("/users/invites");
     }
 
-    public override async Task HandleAsync(InviteRequest req, CancellationToken ct)
+    public override async Task HandleAsync(InviteRequest request, CancellationToken ct)
     {
-        ThrowIfAnyErrors();
-        var invitation = await Map.ToEntityAsync(req, ct);
+        var invitation = Map.ToEntity(request);
 
-        var normalizedEmail = req.Email.ToUpperInvariant();
+        var normalizedEmail = request.Email.ToUpperInvariant().Normalize();
         var username = Guid.NewGuid().ToString();
-        var normalizedUsername = username.ToUpperInvariant();
+        var normalizedUsername = username.ToUpperInvariant().Normalize();
         var user = new AppUser
         {
             Id = invitation.UserId,
-            Email = req.Email,
+            Email = request.Email,
             NormalizedEmail = normalizedEmail,
             DisplayName = username,
             UserName = username,
@@ -37,17 +36,13 @@ public class PostInvite(UserManager<AppUser> userManager, IdentityContext identi
         createResult.Errors.ForEach(e => AddError(e.Code + " " + e.Description));
         ThrowIfAnyErrors();
 
-        var addToRoleResult = await userManager.AddToRoleAsync(user, req.Role);
-        addToRoleResult.Errors.Select(e => e.Description).ForEach(e => AddError(e));
-        ThrowIfAnyErrors();
-
         var inviteToken = await userManager.GenerateUserTokenAsync(user, TokenProviders.Default, TokenPurposes.Invite);
         var tokenContext = new TokenContext
         {
-            Email = req.Email,
+            Email = request.Email,
             Token = inviteToken
         };
-        await emailService.SendInviteEmail(req.Email, tokenContext);
+        await emailService.SendInviteEmailAsync(request.Email, tokenContext);
         await identityContext.Invitations.AddAsync(invitation, ct);
         await identityContext.SaveChangesAsync(ct);
         await SendNoContentAsync(ct);

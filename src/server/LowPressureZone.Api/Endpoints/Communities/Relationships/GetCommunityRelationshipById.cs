@@ -21,6 +21,7 @@ public class GetCommunityRelationshipById(DataContext dataContext, IdentityConte
         var relationship = await dataContext.CommunityRelationships
                                             .AsNoTracking()
                                             .Where(relationship => relationship.CommunityId == communityId && relationship.UserId == userId)
+                                            .Where(relationship => relationship.IsOrganizer || relationship.IsPerformer)
                                             .FirstOrDefaultAsync(ct);
         if (relationship == null)
         {

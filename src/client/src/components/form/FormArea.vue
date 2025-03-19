@@ -2,6 +2,11 @@
   <div
     ref="formAreaRef"
     class="form-area">
+    <div class="form-area__header">
+      <slot name="header">
+        <h4>{{ header }}</h4>
+      </slot>
+    </div>
     <div class="form-area__fields">
       <slot></slot>
     </div>
@@ -13,10 +18,14 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
-import { useResizeObserver } from '@vueuse/core'
+import { clamp, useResizeObserver } from '@vueuse/core'
 
 const formAreaRef = useTemplateRef('formAreaRef')
 const width = ref(0)
+
+defineProps<{
+  header?: string
+}>()
 
 onMounted(() => {
   if (formAreaRef.value) {
@@ -28,19 +37,10 @@ useResizeObserver(formAreaRef, (entries) => {
   const entry = entries[0]
   width.value = entry.contentRect.width
 })
-
-const columns = computed(() => {
-  if (width.value < 300) return 2
-  if (width.value < 450) return 4
-  if (width.value < 600) return 6
-  if (width.value < 750) return 8
-  if (width.value < 900) return 10
-  if (width.value < 1050) return 12
-  if (width.value < 1200) return 14
-  if (width.value < 1350) return 16
-  if (width.value < 1500) return 18
-  return 20
-})
+// xs: 2, s: 3, m: 4, l: 6, xl: 8
+// Thinking about this, 1fr should be ~75px-150px.
+// Column gap is 20px, so each column should be considered 55px.
+const columns = computed(() => clamp(Math.floor(width.value / 80), 1, 99))
 
 const gridColsStyle = computed(() => `repeat(${columns.value}, 1fr)`)
 
@@ -54,8 +54,7 @@ onUnmounted(() => {})
   &__fields {
     display: grid;
     grid-template-columns: v-bind(gridColsStyle);
-    row-gap: variables.$space-l;
-    column-gap: variables.$space-m;
+    column-gap: variables.$space-l;
   }
 }
 </style>

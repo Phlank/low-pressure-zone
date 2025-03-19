@@ -48,6 +48,7 @@ const computedClass = computed(() => `${baseClass} ${widthClass.value}`)
   flex-direction: column;
   gap: variables.$space-s;
   height: min-content;
+  margin-bottom: variables.$space-l;
 
   .p-inputwrapper {
     width: 100%;

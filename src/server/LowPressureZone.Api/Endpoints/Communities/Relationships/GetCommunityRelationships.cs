@@ -16,16 +16,17 @@ public class GetCommunityRelationships(DataContext dataContext, IdentityContext 
     {
         var communityId = Route<Guid>("communityId");
 
-        var relationships = await dataContext.CommunityRelationships
-                                             .AsNoTracking()
-                                             .Where(relationship => relationship.CommunityId == communityId)
-                                             .ToListAsync(ct);
-        var userIds = relationships.Select(relationship => relationship.UserId);
-        var usernameDictionary = await identityContext.Users
-                                                      .AsNoTracking()
-                                                      .Where(user => userIds.Contains(user.Id))
-                                                      .ToDictionaryAsync(user => user.Id, user => user.UserName!, ct);
+        var relationshipJoin = await dataContext.CommunityRelationships
+                                                .AsNoTracking()
+                                                .Where(relationship => relationship.CommunityId == communityId)
+                                                .Where(relationship => relationship.IsOrganizer || relationship.IsPerformer)
+                                                .Join(identityContext.Users, relationship => relationship.UserId, user => user.Id, (relationship, user) => new
+                                                {
+                                                    Relationship = relationship,
+                                                    user.DisplayName
+                                                })
+                                                .ToListAsync(ct);
 
-        await SendOkAsync(relationships.Select(relationship => Map.FromEntity(relationship, usernameDictionary[relationship.UserId])), ct);
+        await SendOkAsync(relationshipJoin.Select(relationship => Map.FromEntity(relationship.Relationship, relationship.DisplayName)), ct);
     }
 }

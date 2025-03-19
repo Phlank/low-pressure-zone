@@ -28,11 +28,11 @@
         </template>
       </Column>
       <Column class="grid-action-col grid-action-col--1">
-        <!--        <template #body="{ data }">-->
-        <!--          <GridActions-->
-        <!--            show-edit-->
-        <!--            @edit="handleEditActionClick(data)" />-->
-        <!--        </template>-->
+        <template #body="{ data }: { data: CommunityRelationshipResponse }">
+          <GridActions
+            show-edit
+            @edit="handleEditActionClick(data)" />
+        </template>
       </Column>
     </DataTable>
     <FormDialog
@@ -61,6 +61,7 @@ import CommunityRelationshipForm from '@/components/form/requestForms/CommunityR
 import { type CommunityResponse } from '@/api/resources/communitiesApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import { showCreateSuccessToast, showEditSuccessToast } from '@/utils/toastUtils.ts'
+import GridActions from '@/components/data/grid-actions/GridActions.vue'
 
 const toast = useToast()
 const updateForm = useTemplateRef('updateForm')
@@ -79,8 +80,11 @@ const isSubmitting: Ref<boolean> = ref(false)
 const showUpdateDialog: Ref<boolean> = ref(false)
 const updatingRelationship: Ref<CommunityRelationshipResponse | undefined> = ref(undefined)
 const handleAddUserClick = async () => {
-  console.log('Grid:' + JSON.stringify(props.availableUsers))
   updatingRelationship.value = undefined
+  showUpdateDialog.value = true
+}
+const handleEditActionClick = (relationship: CommunityRelationshipResponse) => {
+  updatingRelationship.value = relationship
   showUpdateDialog.value = true
 }
 const handleUpdateDialogSave = async () => {

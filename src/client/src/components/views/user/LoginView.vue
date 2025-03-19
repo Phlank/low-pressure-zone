@@ -56,9 +56,12 @@ import { useAuthStore } from '@/stores/authStore'
 import { loginRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { onKeyDown } from '@vueuse/core'
-import { Button, IftaLabel, InputText, Message, Panel, Password } from 'primevue'
+import { Button, IftaLabel, InputText, Message, Panel, Password, useToast } from 'primevue'
 import { reactive, ref } from 'vue'
 import authApi, { type LoginRequest } from '@/api/resources/authApi.ts'
+import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+
+const toast = useToast()
 
 const formState: LoginRequest = reactive({
   username: '',
@@ -86,10 +89,13 @@ const handleLogin = async () => {
 
   isSubmitting.value = true
   const response = await authApi.postLogin(formState)
+  isSubmitting.value = false
   if (!response.isSuccess()) {
-    errorMessage.value = 'Invalid credentials'
-    isSubmitting.value = false
-    return
+    if (response.status === 403) {
+      errorMessage.value = 'Invalid credentials'
+      return
+    }
+    tryHandleUnsuccessfulResponse(response, toast)
   }
 
   if (response.data?.requiresTwoFactor) {
