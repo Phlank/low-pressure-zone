@@ -11,6 +11,8 @@ export default {
 export interface InviteRequest {
   email: string
   communityId: string
+  isPerformer: boolean
+  isOrganizer: boolean
 }
 
 export interface InviteResponse {

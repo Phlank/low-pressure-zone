@@ -65,7 +65,7 @@
 
 .single-panel-center {
   margin: 20dvh auto auto;
-  width: fit-content;
+  width: min(340px, calc(100vw - 2 * #{variables.$space-l}));
 
   &__message {
     width: variables.$input-width-m;

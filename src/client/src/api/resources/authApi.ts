@@ -33,6 +33,7 @@ export interface LoginResponse {
 export interface RegisterRequest {
   context: string
   username: string
+  displayName: string
   password: string
   confirmPassword: string
 }

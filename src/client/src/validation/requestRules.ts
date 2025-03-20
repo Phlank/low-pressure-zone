@@ -67,7 +67,9 @@ export const loginRequestRules: PropertyRules<LoginRequest> = {
 
 export const inviteRequestRules: PropertyRules<InviteRequest> = {
   email: combineRules(required(), emailAddress()),
-  communityId: required()
+  communityId: required(),
+  isPerformer: alwaysValid(),
+  isOrganizer: alwaysValid()
 }
 
 export const registerRequestRules = (

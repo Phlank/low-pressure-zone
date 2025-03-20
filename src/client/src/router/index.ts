@@ -1,4 +1,4 @@
-import { allRoles, Role } from '@/constants/roles'
+import { Role } from '@/constants/roles'
 import { useAuthStore } from '@/stores/authStore'
 import { createRouter, createWebHistory } from 'vue-router'
 import { Routes } from './routes'
@@ -60,32 +60,32 @@ const router = createRouter({
         }
       ],
       meta: {
-        auth: true,
-        roles: allRoles
+        auth: true
       }
     }
   ]
 })
 
 router.beforeEach(async (to, from, next) => {
-  if (to.meta.auth) {
-    const authStore = useAuthStore()
-    await authStore.loadIfNotInitialized()
-    if (!authStore.isLoggedIn()) {
-      next(Routes.Login)
-      return
-    }
-
-    const allowedRoles = (to.meta.roles ?? []) as string[]
-    if (authStore.isInAnySpecifiedRole(...allowedRoles)) {
-      next()
-      return
-    }
-
-    next(Routes.Login)
-  } else {
+  if (!to.meta.auth) {
     next()
+    return
   }
+
+  const authStore = useAuthStore()
+  await authStore.loadIfNotInitialized()
+  if (!authStore.isLoggedIn()) {
+    next(Routes.Login)
+    return
+  }
+
+  const allowedRoles = (to.meta.roles ?? []) as string[]
+  if (authStore.isInAnySpecifiedRole(...allowedRoles)) {
+    next()
+    return
+  }
+
+  next(Routes.Login)
 })
 
 export default router

@@ -9,19 +9,48 @@
         <InputText
           id="emailInput"
           v-model="formState.email"
-          :invalid="!validation.isValid('email')" />
+          :invalid="!validation.isValid('email')"
+          @update:model-value="validation.validateIfDirty('email')" />
       </IftaFormField>
+      <GridRowFill />
       <IftaFormField
         :message="validation.message('communityId')"
         input-id="communityInput"
         label="Community"
         size="m">
         <Select
-          :option-label="(data: CommunityResponse) => data.name"
-          :option-value="(data: CommunityResponse) => data.id"
+          v-model="formState.communityId"
+          :invalid="!validation.isValid('communityId')"
           :options="communities"
-          model-value="formState.communityId" />
+          option-label="name"
+          option-value="id"
+          @update:model-value="validation.validateIfDirty('communityId')" />
       </IftaFormField>
+      <GridRowFill />
+      <FormField
+        input-id="rolesInput"
+        label="Roles"
+        size="xs">
+        <div class="checkbox-area">
+          <div class="checkbox-area__item">
+            <Checkbox
+              id="isPerformerInput"
+              v-model="formState.isPerformer"
+              binary
+              name="isPerformer" />
+            <label for="isPerformerInput">Performer</label>
+          </div>
+          <div class="checkbox-area__item">
+            <Checkbox
+              id="isOrganizerInput"
+              v-model="formState.isOrganizer"
+              binary
+              name="isOrganizer" />
+            <label for="isOrganizerInput">Organizer</label>
+          </div>
+        </div>
+      </FormField>
+      <GridRowFill />
       <template #actions>
         <Button
           :disabled="isSubmitting"
@@ -39,13 +68,15 @@ import { KeyName } from '@/constants/keys'
 import { inviteRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { onKeyDown } from '@vueuse/core'
-import { Button, InputText, Select, useToast } from 'primevue'
+import { Button, Checkbox, InputText, Select, useToast } from 'primevue'
 import { onMounted, reactive, type Ref, ref, watch } from 'vue'
 import invitesApi from '@/api/resources/invitesApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import FormArea from '@/components/form/FormArea.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import communitiesApi, { type CommunityResponse } from '@/api/resources/communitiesApi.ts'
+import FormField from '@/components/form/FormField.vue'
+import GridRowFill from '@/components/layout/GridRowFill.vue'
 
 const toast = useToast()
 
@@ -53,7 +84,9 @@ onKeyDown(KeyName.Enter, () => handleSubmit())
 
 const formState = reactive({
   email: '',
-  communityId: ''
+  communityId: '',
+  isPerformer: false,
+  isOrganizer: false
 })
 const validation = createFormValidation(formState, inviteRequestRules)
 
@@ -96,6 +129,8 @@ watch(
 const reset = () => {
   formState.email = ''
   formState.communityId = ''
+  formState.isPerformer = false
+  formState.isOrganizer = false
   validation.reset()
 }
 </script>

@@ -17,9 +17,10 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
+import { computed, inject, onMounted, onUnmounted, type Ref, ref, useTemplateRef } from 'vue'
 import { clamp, useResizeObserver } from '@vueuse/core'
 
+const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const formAreaRef = useTemplateRef('formAreaRef')
 const width = ref(0)
 
@@ -37,11 +38,20 @@ useResizeObserver(formAreaRef, (entries) => {
   const entry = entries[0]
   width.value = entry.contentRect.width
 })
-// xs: 2, s: 3, m: 4, l: 6, xl: 8
-// Thinking about this, 1fr should be ~75px-150px.
-// Column gap is 20px, so each column should be considered 55px.
-const columns = computed(() => clamp(Math.floor(width.value / 80), 1, 99))
 
+const columnWidth = 80
+const columns = computed(() => {
+  if (isMobile?.value) {
+    return clamp(Math.floor(width.value / columnWidth), 1, 4)
+  }
+  return clamp(Math.floor(width.value / columnWidth), 1, 99)
+})
+const widthPx = computed(() => {
+  if (isMobile?.value) {
+    return width.value + 'px'
+  }
+  return width.value - (width.value % columnWidth) + 'px'
+})
 const gridColsStyle = computed(() => `repeat(${columns.value}, 1fr)`)
 
 onUnmounted(() => {})
@@ -52,6 +62,7 @@ onUnmounted(() => {})
 
 .form-area {
   &__fields {
+    width: min(v-bind(widthPx), 100%);
     display: grid;
     grid-template-columns: v-bind(gridColsStyle);
     column-gap: variables.$space-l;
