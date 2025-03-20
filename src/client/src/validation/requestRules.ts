@@ -9,10 +9,9 @@ import {
   required,
   url
 } from './rules/stringRules'
-import { alwaysValid, inArray } from './rules/untypedRules'
+import { alwaysValid } from './rules/untypedRules'
 import type { PropertyRules } from './types/propertyRules'
 import { combineRules } from './types/validationRule'
-import { allRoles } from '@/constants/roles'
 import type { CommunityRequest } from '@/api/resources/communitiesApi.ts'
 import type { PerformerRequest } from '@/api/resources/performersApi.ts'
 import type { ScheduleRequest } from '@/api/resources/schedulesApi.ts'
@@ -68,7 +67,7 @@ export const loginRequestRules: PropertyRules<LoginRequest> = {
 
 export const inviteRequestRules: PropertyRules<InviteRequest> = {
   email: combineRules(required(), emailAddress()),
-  role: inArray(allRoles, 'Invalid role')
+  communityId: required()
 }
 
 export const registerRequestRules = (

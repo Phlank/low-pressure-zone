@@ -130,7 +130,7 @@ const handleEditScheduleActionClick = (schedule: ScheduleResponse) => {
   showEditScheduleDialog.value = true
 }
 const handleEditScheduleSave = async () => {
-  if (scheduleEditForm.value === undefined) return
+  if (!scheduleEditForm.value) return
   const isValid = scheduleEditForm.value.validation.validate()
   if (!isValid) return
 
