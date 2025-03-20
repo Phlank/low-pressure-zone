@@ -80,7 +80,7 @@ const tabValue: Ref<string | number> = ref('0')
 onMounted(async () => {
   if (authStore.isInAnySpecifiedRole(Role.Admin)) tabValue.value = 'all'
   await loadCommunities()
-  await loadUsernames()
+  await loadUsers()
 })
 
 const loadCommunities = async () => {
@@ -92,7 +92,7 @@ const loadCommunities = async () => {
   communities.value = response.data!
 }
 
-const loadUsernames = async () => {
+const loadUsers = async () => {
   const response = await usersApi.get()
   if (!response.isSuccess()) return
   users.value = response.data!

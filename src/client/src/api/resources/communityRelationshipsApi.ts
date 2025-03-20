@@ -26,7 +26,7 @@ const mapRequest = <TRequest extends CommunityRelationshipRequest>(request: TReq
 export interface CommunityRelationshipResponse {
   communityId: string
   userId: string
-  username: string
+  displayName: string
   isPerformer: boolean
   isOrganizer: boolean
 }

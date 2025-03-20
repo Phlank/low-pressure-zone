@@ -52,7 +52,7 @@ const availableUsers: ComputedRef<UserResponse[]> = computed(() => {
   console.log(JSON.stringify(userIdsInUse))
   return props.users.filter((user) => userIdsInUse.indexOf(user.id) === -1)
 })
-const selectedUsername: Ref<UserResponse | undefined> = ref(undefined)
+const selectedUser: Ref<UserResponse | undefined> = ref(undefined)
 
 onMounted(async () => {
   relationships.value = (await communityRelationshipsApi.get(selectedCommunity.value.id)).data!
@@ -75,8 +75,8 @@ watch(
 watch(
   availableUsers,
   (newValue) => {
-    if (newValue.length === 0) selectedUsername.value = undefined
-    else selectedUsername.value = newValue[0]
+    if (newValue.length === 0) selectedUser.value = undefined
+    else selectedUser.value = newValue[0]
   },
   { immediate: true }
 )

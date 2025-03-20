@@ -14,7 +14,7 @@
           class="input__field" />
         <ValidationLabel
           :disabled="isSubmitting"
-          for="usernameInput"
+          for="codeInput"
           message=""
           text="Code" />
       </IftaLabel>
