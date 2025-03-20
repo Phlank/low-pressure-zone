@@ -21,7 +21,8 @@ public sealed class GetCommunities(DataContext dataContext)
         IQueryable<Community> communitiesQuery = dataContext.Communities
                                                             .AsNoTracking()
                                                             .Include(community => community.Relationships.Where(relationship => relationship.UserId == User.GetIdOrDefault()));
-        if (!User.IsInRole(RoleNames.Admin)) communitiesQuery = communitiesQuery.Where(community => community.IsDeleted);
+        if (!User.IsInRole(RoleNames.Admin))
+            communitiesQuery = communitiesQuery.Where(community => community.IsDeleted);
 
         var communities = await communitiesQuery.ToListAsync(ct);
 

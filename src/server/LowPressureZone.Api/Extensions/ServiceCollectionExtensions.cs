@@ -7,6 +7,7 @@ using LowPressureZone.Api.Endpoints.Communities.Relationships;
 using LowPressureZone.Api.Endpoints.Performers;
 using LowPressureZone.Api.Endpoints.Schedules;
 using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
+using LowPressureZone.Api.Endpoints.Users.Invites;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Domain;
@@ -88,6 +89,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ScheduleMapper>();
         services.AddSingleton<PerformerMapper>();
         services.AddSingleton<TimeslotMapper>();
+        services.AddSingleton<InviteMapper>();
 
         services.AddSingleton<CommunityRules>();
         services.AddSingleton<ScheduleRules>();

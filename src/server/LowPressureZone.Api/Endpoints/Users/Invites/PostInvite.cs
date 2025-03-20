@@ -1,15 +1,20 @@
 ﻿using FastEndpoints;
 using FluentEmail.Core;
 using LowPressureZone.Api.Constants;
-using LowPressureZone.Api.Endpoints.Users.Invites;
 using LowPressureZone.Api.Services;
+using LowPressureZone.Domain;
+using LowPressureZone.Domain.Entities;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 
-namespace LowPressureZone.Api.Endpoints.Users.Invite;
+namespace LowPressureZone.Api.Endpoints.Users.Invites;
 
-public class PostInvite(UserManager<AppUser> userManager, IdentityContext identityContext, EmailService emailService) : EndpointWithMapper<InviteRequest, InviteMapper>
+public class PostInvite(UserManager<AppUser> userManager,
+                        IdentityContext identityContext,
+                        DataContext dataContext,
+                        EmailService emailService)
+    : EndpointWithMapper<InviteRequest, InviteMapper>
 {
     public override void Configure()
     {
@@ -43,8 +48,17 @@ public class PostInvite(UserManager<AppUser> userManager, IdentityContext identi
             Token = inviteToken
         };
         await emailService.SendInviteEmailAsync(request.Email, tokenContext);
-        await identityContext.Invitations.AddAsync(invitation, ct);
+
+        identityContext.Add(invitation);
         await identityContext.SaveChangesAsync(ct);
+        dataContext.Add(new CommunityRelationship
+        {
+            UserId = user.Id,
+            CommunityId = request.CommunityId,
+            IsOrganizer = request.IsOrganizer,
+            IsPerformer = request.IsPerformer
+        });
+        await dataContext.SaveChangesAsync(ct);
         await SendNoContentAsync(ct);
     }
 }

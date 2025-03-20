@@ -2,12 +2,10 @@
 using FluentValidation;
 using LowPressureZone.Api.Constants;
 using LowPressureZone.Domain;
-using LowPressureZone.Domain.Entities;
-using LowPressureZone.Domain.Extensions;
 using LowPressureZone.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace LowPressureZone.Api.Endpoints.Users.Invite;
+namespace LowPressureZone.Api.Endpoints.Users.Invites;
 
 public class InviteRequestValidator : Validator<InviteRequest>
 {
@@ -27,8 +25,11 @@ public class InviteRequestValidator : Validator<InviteRequest>
                                                     .AnyAsync(ct);
             if (isEmailInUse)
                 ctx.AddFailure(nameof(req.Email), Errors.Unique);
-
-            if (!await dataContext.HasAsync<Community>(req.CommunityId, ct))
+            
+            if (!await dataContext.Communities
+                                  .AsNoTracking()
+                                  .Where(community => community.Id == req.CommunityId && !community.IsDeleted)
+                                  .AnyAsync(ct))
                 ctx.AddFailure(nameof(req.CommunityId), Errors.DoesNotExist);
         });
     }

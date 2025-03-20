@@ -1,5 +1,4 @@
 ﻿using FastEndpoints;
-using LowPressureZone.Api.Endpoints.Users.Invite;
 using LowPressureZone.Identity.Entities;
 using Shouldly;
 
