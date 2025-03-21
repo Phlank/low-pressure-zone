@@ -1,16 +1,16 @@
 <template>
   <Drawer
-    class="grid-actions-drawer"
-    position="bottom"
     v-model:visible="visible"
-    :show-close-icon="false">
+    :show-close-icon="false"
+    class="grid-actions-drawer"
+    position="bottom">
     <div class="buttons">
       <Button
-        v-for="(action, index) in visibleActions"
+        v-for="action in visibleActions"
         :key="action.name"
         class="button"
-        severity="secondary"
         outlined
+        severity="secondary"
         @click="emit('actionClicked', action)">
         <div class="button-content">
           <i :class="action.icon"></i>
@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Button, Divider, Drawer } from 'primevue'
+import { Button, Drawer } from 'primevue'
 import type { Ref } from 'vue'
 import type { GridAction } from './gridAction'
 
@@ -39,7 +39,7 @@ const emit = defineEmits<{
 </script>
 
 <style lang="scss">
-@use '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables';
 
 div.p-drawer.grid-actions-drawer {
   min-height: fit-content;

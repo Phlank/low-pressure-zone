@@ -122,7 +122,7 @@ onMounted(async () => {
 </script>
 
 <style lang="scss">
-@use '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables';
 
 .upcoming-schedules {
   &__content {

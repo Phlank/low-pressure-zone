@@ -8,8 +8,7 @@ export default {
 
 export interface UserResponse {
   id: string
-  username: string
-  email: string
+  displayName: string
   registrationDate: string
-  roles: string[]
+  isAdmin: boolean
 }

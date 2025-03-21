@@ -1,5 +1,7 @@
 <template>
-  <div class="app">
+  <div
+    ref="appRef"
+    class="app">
     <Toast class="app__toast" />
     <SiteLayout />
   </div>
@@ -7,31 +9,20 @@
 
 <script lang="ts" setup>
 import { Toast } from 'primevue'
-import { computed, type ComputedRef, onMounted, onUnmounted, provide, ref, type Ref } from 'vue'
+import { provide, ref, type Ref } from 'vue'
 import SiteLayout from './components/layout/site/SiteLayout.vue'
-
-const screenWidth: Ref<number> = ref(1000)
-
-onMounted(() => {
-  updateScreenWidth()
-  window.addEventListener('resize', updateScreenWidth)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', updateScreenWidth)
-})
-
-const updateScreenWidth = () => {
-  screenWidth.value = window.screen.width
-}
+import { useResizeObserver } from '@vueuse/core'
 
 const mobileWidth = 760
-const isMobile: ComputedRef<boolean> = computed(() => screenWidth.value <= mobileWidth)
+const isMobile: Ref<boolean> = ref(false)
+useResizeObserver(document.body, () => {
+  isMobile.value = document.body.offsetWidth <= mobileWidth
+})
 provide('isMobile', isMobile)
 </script>
 
 <style lang="scss">
-@use '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables';
 
 .app {
   min-width: 100vw;

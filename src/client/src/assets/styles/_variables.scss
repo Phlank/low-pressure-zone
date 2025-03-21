@@ -1,0 +1,48 @@
+@use 'sass:color';
+
+// Font
+$font-size-title: 1.3rem;
+
+// Spacing
+$space-xs: 2px;
+$space-s: 5px;
+$space-m: 10px;
+$space-l: 20px;
+
+$header-height: 64px;
+$footer-height: 96px;
+
+$mobile-transition-width: 760px;
+$mobile-element-width: calc(100vw - 2 * $space-m);
+
+$grid-action-width: 50px;
+
+// Font and styling
+$font-family-body: 'Helvetica Neue', sans-serif;
+$font-family-header: 'Nunito Sans', 'Helvetica Neue', sans-serif;
+
+// Mixins
+@mixin mobile {
+  @media (max-width: 760px) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: 761px) {
+    @content;
+  }
+}
+
+@mixin tiny {
+  @media (max-width: 370px) {
+    @content;
+  }
+}
+
+// Inputs
+
+$input-width-s: 200px;
+$input-width-m: calc(1.5 * $input-width-s + $space-m * 0.5);
+$input-width-l: calc(2 * $input-width-s + $space-m);
+$input-width-xl: calc(3 * $input-width-s + $space-m * 2);

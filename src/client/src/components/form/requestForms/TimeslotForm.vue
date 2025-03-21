@@ -80,7 +80,7 @@ const props = defineProps<{
 }>()
 
 const defaultStartPerformerId = computed(() => {
-  if (props.performers.length == 1) return props.performers[0].id
+  if (props.performers.length === 1) return props.performers[0].id
   return undefined
 })
 

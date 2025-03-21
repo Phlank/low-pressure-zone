@@ -14,7 +14,7 @@ import PlayButton from '../../controls/PlayButton.vue'
 </script>
 
 <style lang="scss">
-@use '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables';
 
 .site-footer {
   position: sticky;

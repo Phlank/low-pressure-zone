@@ -1,13 +1,26 @@
 {
-  "extends": ["stylelint-config-standard"],
+  "extends": [
+    "stylelint-config-recommended"
+  ],
   "overrides": [
     {
-      "files": ["*.scss", "**/*.scss"],
-      "extends": ["stylelint-config-standard-scss"]
+      "files": [
+        "*.scss",
+        "**/*.scss"
+      ],
+      "extends": [
+        "stylelint-config-recommended-scss"
+      ]
     },
     {
-      "files": ["*.vue", "**/*.vue"],
-      "extends": ["stylelint-config-standard-scss", "stylelint-config-standard-vue/scss"]
+      "files": [
+        "*.vue",
+        "**/*.vue"
+      ],
+      "extends": [
+        "stylelint-config-recommended-scss",
+        "stylelint-config-recommended-vue/scss"
+      ]
     }
   ]
 }

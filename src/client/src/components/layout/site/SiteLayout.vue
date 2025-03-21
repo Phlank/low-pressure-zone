@@ -17,7 +17,7 @@ import SiteHeader from './SiteHeader.vue'
 </script>
 
 <style lang="scss">
-@use '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables';
 
 .site-layout {
   display: flex;

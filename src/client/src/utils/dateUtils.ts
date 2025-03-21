@@ -2,12 +2,6 @@ import { formatDate } from '@vueuse/core'
 
 export const parseDate = (dateString: string) => new Date(Date.parse(dateString))
 
-export const getHour = (date: Date) => {
-  const newDate = new Date(date.getTime())
-  setToHour(newDate)
-  return newDate
-}
-
 export const setToHour = (date: Date) => {
   date.setMinutes(0)
   date.setSeconds(0)
@@ -37,7 +31,7 @@ export const setToPreviousHour = (date: Date) => {
 }
 
 export const isHour = (date: Date) =>
-  date.getMinutes() == 0 && date.getSeconds() == 0 && date.getMilliseconds() == 0
+  date.getMinutes() === 0 && date.getSeconds() === 0 && date.getMilliseconds() === 0
 
 export const hoursBetween = (start: Date, end: Date) => {
   const out: Date[] = []

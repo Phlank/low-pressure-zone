@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
-public class PostTimeslot(DataContext dataContext, PerformerRules performerRules, ScheduleRules scheduleRules) 
+public class PostTimeslot(DataContext dataContext, PerformerRules performerRules, ScheduleRules scheduleRules)
     : EndpointWithMapper<TimeslotRequest, TimeslotMapper>
 {
     public override void Configure()
@@ -14,20 +14,16 @@ public class PostTimeslot(DataContext dataContext, PerformerRules performerRules
         Description(b => b.Produces(201));
     }
 
-    public override async Task HandleAsync(TimeslotRequest req, CancellationToken ct)
+    public override async Task HandleAsync(TimeslotRequest request, CancellationToken ct)
     {
         var scheduleId = Route<Guid>("scheduleId");
-        var schedule = await dataContext.Schedules.Include(s => s.Timeslots)
-                                                  .Where(s => s.Id == scheduleId)
-                                                  .FirstAsync(ct);
+        var schedule = await dataContext.Schedules
+                                        .Include(schedule => schedule.Timeslots)
+                                        .Include(schedule => schedule.Community)
+                                        .Where(schedule => schedule.Id == scheduleId)
+                                        .FirstAsync(ct);
 
-        var performer = await dataContext.Performers.FirstAsync(p => p.Id == req.PerformerId, ct);
-
-        if (schedule == null)
-        {
-            await SendNotFoundAsync(ct);
-            return;
-        }
+        var performer = await dataContext.Performers.FirstAsync(p => p.Id == request.PerformerId, ct);
 
         if (!scheduleRules.IsAddingTimeslotsAuthorized(schedule)
             || !performerRules.IsTimeslotLinkAuthorized(performer))
@@ -36,9 +32,12 @@ public class PostTimeslot(DataContext dataContext, PerformerRules performerRules
             return;
         }
 
-        var timeslot = await Map.ToEntityAsync(req, ct);
+        var timeslot = Map.ToEntity(request);
         dataContext.Timeslots.Add(timeslot);
         await dataContext.SaveChangesAsync(ct);
-        await SendCreatedAtAsync<GetScheduleById>(new { id = scheduleId }, Response, cancellation: ct);
+        await SendCreatedAtAsync<GetScheduleById>(new
+        {
+            id = scheduleId
+        }, Response, cancellation: ct);
     }
 }

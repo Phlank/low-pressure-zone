@@ -1,6 +1,6 @@
 import { sendDelete, sendGet, sendPost, sendPut } from '../fetchFunctions'
 
-const route = (id?: string) => `/communities${id ? '/' + id : ''}`
+const route = (id?: string) => `/communities/${id ?? ''}`
 
 export default {
   get: () => sendGet<CommunityResponse[]>(route()),
@@ -19,9 +19,8 @@ export interface CommunityResponse {
   id: string
   name: string
   url: string
-  isRelated: boolean
+  isPerformable: boolean
   isEditable: boolean
   isDeletable: boolean
-  isLinkableToSchedule: boolean
+  isOrganizable: boolean
 }
-

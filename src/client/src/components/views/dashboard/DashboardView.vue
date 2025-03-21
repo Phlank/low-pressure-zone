@@ -53,8 +53,10 @@ import { Menu, Panel } from 'primevue'
 import type { MenuItem } from 'primevue/menuitem'
 import { inject, onMounted, type Ref } from 'vue'
 import router from '@/router'
+import { useCommunityStore } from '@/stores/communityStore.ts'
 
 const authStore = useAuthStore()
+const communityStore = useCommunityStore()
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const menuItems: MenuItem[] = [
@@ -86,11 +88,12 @@ const menuItems: MenuItem[] = [
 
 onMounted(async () => {
   await authStore.loadIfNotInitialized()
+  await communityStore.loadCommunitiesAsync()
 })
 </script>
 
 <style lang="scss">
-@use '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables';
 
 .dashboard-view {
   &__content {

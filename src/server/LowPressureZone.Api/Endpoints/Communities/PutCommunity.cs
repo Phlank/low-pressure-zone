@@ -1,6 +1,4 @@
 ﻿using FastEndpoints;
-using FluentValidation.Results;
-using LowPressureZone.Api.Constants;
 using LowPressureZone.Domain;
 using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
@@ -13,21 +11,21 @@ public sealed class PutCommunity(DataContext dataContext) : EndpointWithMapper<C
     {
         Put("/communities/{id}");
         Description(b => b.Produces(204)
-            .Produces(404));
+                          .Produces(404));
         AllowAnonymous();
     }
 
-    public override async Task HandleAsync(CommunityRequest req, CancellationToken ct)
+    public override async Task HandleAsync(CommunityRequest request, CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        var community = await dataContext.Communities.FirstOrDefaultAsync(a => a.Id == id, ct);
-        if (community == null || (community.IsDeleted && !User.IsInRole(RoleNames.Admin)))
+        var community = await dataContext.Communities.FirstOrDefaultAsync(community => community.Id == id, ct);
+        if (community == null || community.IsDeleted && !User.IsInRole(RoleNames.Admin))
         {
             await SendNotFoundAsync(ct);
             return;
         }
 
-        await Map.UpdateEntityAsync(req, community, ct);
+        await Map.UpdateEntityAsync(request, community, ct);
         await SendNoContentAsync(ct);
     }
 }

@@ -9,11 +9,11 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Endpoints.Performers;
 
-public sealed class PerformerMapper(IHttpContextAccessor contextAccessor, PerformerRules rules) : Mapper<PerformerRequest, PerformerResponse, Performer>, IRequestMapper, IResponseMapper
+public sealed class PerformerMapper(IHttpContextAccessor contextAccessor, PerformerRules rules) : IRequestMapper, IResponseMapper
 {
     private ClaimsPrincipal? User => contextAccessor.GetAuthenticatedUserOrDefault();
 
-    public override Performer ToEntity(PerformerRequest req)
+    public Performer ToEntity(PerformerRequest req)
     {
         User.ShouldNotBeNull();
 
@@ -28,35 +28,24 @@ public sealed class PerformerMapper(IHttpContextAccessor contextAccessor, Perfor
         };
     }
 
-    public override Task<Performer> ToEntityAsync(PerformerRequest req, CancellationToken ct = default)
-        => Task.FromResult(ToEntity(req));
-
-    public override async Task<Performer> UpdateEntityAsync(PerformerRequest req, Performer performer, CancellationToken ct = default)
+    public async Task UpdateEntityAsync(PerformerRequest req, Performer performer, CancellationToken ct = default)
     {
-        var dataContext = Resolve<DataContext>();
+        var dataContext = contextAccessor.Resolve<DataContext>();
         performer.Name = req.Name;
         performer.Url = req.Url;
-        if (dataContext.ChangeTracker.HasChanges())
-        {
-            performer.LastModifiedDate = DateTime.UtcNow;
-            await dataContext.SaveChangesAsync(ct);
-        }
-        return performer;
+        if (!dataContext.ChangeTracker.HasChanges()) return;
+        performer.LastModifiedDate = DateTime.UtcNow;
+        await dataContext.SaveChangesAsync(ct);
     }
 
-    public override PerformerResponse FromEntity(Performer performer)
-    {
-        return new PerformerResponse
+    public PerformerResponse FromEntity(Performer performer)
+        => new PerformerResponse
         {
             Id = performer.Id,
             Name = performer.Name,
             Url = performer.Url,
             IsDeletable = rules.IsDeleteAuthorized(performer) && !performer.IsDeleted,
             IsEditable = rules.IsEditAuthorized(performer),
-            IsLinkableToTimeslot = rules.IsTimeslotLinkAuthorized(performer),
+            IsLinkableToTimeslot = rules.IsTimeslotLinkAuthorized(performer)
         };
-    }
-
-    public override Task<PerformerResponse> FromEntityAsync(Performer performer, CancellationToken ct = default)
-        => Task.FromResult(FromEntity(performer));
 }

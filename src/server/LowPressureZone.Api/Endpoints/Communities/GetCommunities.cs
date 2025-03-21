@@ -1,6 +1,8 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Domain;
+using LowPressureZone.Domain.Entities;
 using LowPressureZone.Identity.Constants;
+using LowPressureZone.Identity.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Communities;
@@ -8,16 +10,15 @@ namespace LowPressureZone.Api.Endpoints.Communities;
 public sealed class GetCommunities(DataContext dataContext)
     : EndpointWithoutRequest<IEnumerable<CommunityResponse>, CommunityMapper>
 {
-    public override void Configure()
-    {
-        Get("/communities");
-        Description(b => b.Produces<List<CommunityResponse>>());
-    }
+    public override void Configure() => Get("/communities");
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var communitiesQuery = dataContext.Communities.Include(community => community.Relationships).AsNoTracking();
-        if (!User.IsInRole(RoleNames.Admin)) communitiesQuery = communitiesQuery.Where(community => community.IsDeleted);
+        IQueryable<Community> communitiesQuery = dataContext.Communities
+                                                            .AsNoTracking()
+                                                            .Include(community => community.Relationships.Where(relationship => relationship.UserId == User.GetIdOrDefault()));
+        if (!User.IsInRole(RoleNames.Admin))
+            communitiesQuery = communitiesQuery.Where(community => !community.IsDeleted);
 
         var communities = await communitiesQuery.ToListAsync(ct);
 

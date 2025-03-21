@@ -5,7 +5,6 @@
     <iframe
       allowtransparency="true"
       class="discord-iframe flex-variable-space-between__right"
-      frameborder="0"
       height="500"
       sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
       src="https://discord.com/widget?id=722643085137412096&theme=dark"
@@ -18,9 +17,10 @@ import UpcomingSchedules from './UpcomingSchedules.vue'
 </script>
 
 <style lang="scss">
-@use '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables';
 
 .discord-iframe {
+  border: none;
   border-radius: variables.$space-m;
 }
 </style>

@@ -3,28 +3,35 @@
     <Tabs v-model:value="tabValue">
       <TabList>
         <Tab
-          v-if="!useAuthStore().isInAnySpecifiedRole(Role.Admin)"
+          v-if="!useAuthStore().isInRole(Role.Admin)"
           value="mine">
           Mine
         </Tab>
-        <Tab value="all"> All</Tab>
+        <Tab value="all">All</Tab>
         <Tab
-          v-if="authStore.isInAnySpecifiedRole(Role.Admin)"
+          v-if="organizingCommunities.length > 0"
+          value="relationships">
+          Relationships
+        </Tab>
+        <Tab
+          v-if="authStore.isInRole(Role.Admin)"
           value="create">
           Create
         </Tab>
       </TabList>
       <TabPanels v-if="isLoaded">
-        <TabPanel
-          v-if="!useAuthStore().isInAnySpecifiedRole(Role.Admin)"
-          value="mine">
+        <TabPanel value="mine">
           <div class="communities-dashboard__linked">
             <h4>Your Communities</h4>
             <CommunitiesGrid
               v-if="linkedCommunities.length > 0"
-              :communities="communities.filter((a) => a.isRelated)"
-              @deleted="loadCommunities()"
-              @edited="loadCommunities()" />
+              :communities="
+                communityStore
+                  .getCommunities()
+                  .filter((community) => community.isPerformable || community.isOrganizable)
+              "
+              @deleted="communityStore.loadCommunitiesAsync()"
+              @edited="communityStore.loadCommunitiesAsync()" />
             <div v-else>You do not currently have any linked communities.</div>
           </div>
         </TabPanel>
@@ -32,13 +39,20 @@
           <div class="communities-dashboard__all">
             <h4>All Communities</h4>
             <CommunitiesGrid
-              :communities="communities"
-              @deleted="loadCommunities()"
-              @edited="loadCommunities()" />
+              :communities="communityStore.getCommunities()"
+              @deleted="communityStore.loadCommunitiesAsync()"
+              @edited="communityStore.loadCommunitiesAsync()" />
+          </div>
+        </TabPanel>
+        <TabPanel value="relationships">
+          <div
+            v-if="organizingCommunities.length > 0"
+            class="communities-dashboard__relationships">
+            <CommunityRelationships :available-communities="organizingCommunities" />
           </div>
         </TabPanel>
         <TabPanel value="create">
-          <CreateCommunity @created-community="loadCommunities()" />
+          <CreateCommunity @created-community="communityStore.loadCommunitiesAsync()" />
         </TabPanel>
       </TabPanels>
     </Tabs>
@@ -55,26 +69,36 @@ import CommunitiesGrid from './CommunitiesGrid.vue'
 import CreateCommunity from './CreateCommunity.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { Role } from '@/constants/roles'
-import communitiesApi, { type CommunityResponse } from '@/api/resources/communitiesApi.ts'
+import CommunityRelationships from '@/components/views/dashboard/communities/CommunityRelationships.vue'
+import { useCommunityStore } from '@/stores/communityStore.ts'
+import { useUserStore } from '@/stores/userStore.ts'
 
 const authStore = useAuthStore()
+const communityStore = useCommunityStore()
+const userStore = useUserStore()
 const isLoaded = ref(false)
-const communities: Ref<CommunityResponse[]> = ref([])
-const linkedCommunities = computed(() => communities.value.filter((a) => a.isLinkableToSchedule))
 const tabValue: Ref<string | number> = ref('0')
+
+const linkedCommunities = computed(() =>
+  communityStore
+    .getCommunities()
+    .filter((community) => community.isPerformable || community.isOrganizable)
+)
+
+const organizingCommunities = computed(() =>
+  communityStore.getCommunities().filter((community) => community.isOrganizable)
+)
 
 onMounted(async () => {
   if (authStore.isInAnySpecifiedRole(Role.Admin)) tabValue.value = 'all'
-  await loadCommunities()
-})
-
-const loadCommunities = async () => {
-  console.log('loading communities')
-  const response = await communitiesApi.get()
-  isLoaded.value = true
-  if (!response.isSuccess()) {
-    return
+  const promises: Promise<void>[] = []
+  if (communityStore.getCommunities().length === 0) {
+    promises.push(communityStore.loadCommunitiesAsync())
   }
-  communities.value = response.data!
-}
+  if (userStore.users.length === 0) {
+    promises.push(userStore.loadUsersAsync())
+  }
+  await Promise.all(promises)
+  isLoaded.value = true
+})
 </script>

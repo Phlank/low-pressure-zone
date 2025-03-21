@@ -2,57 +2,68 @@
   <Panel
     class="register single-panel-center"
     header="Register User">
-    <div class="single-panel-center__form">
-      <IftaLabel class="input input--medium">
+    <FormArea>
+      <IftaFormField
+        :message="validation.message('username')"
+        input-id="usernameInput"
+        label="Username"
+        size="m">
         <InputText
           id="usernameInput"
-          v-model:model-value="formState.username"
+          v-model="formState.username"
           :invalid="!validation.isValid('username')"
-          class="input__field"
-          @change="validation.validateIfDirty('username')" />
-        <ValidationLabel
-          :message="validation.message('username')"
-          for="usernameInput"
-          text="Username" />
-      </IftaLabel>
-      <IftaLabel class="input input--medium">
+          @update:model-value="validation.validateIfDirty('username')" />
+      </IftaFormField>
+      <IftaFormField
+        :message="validation.message('displayName')"
+        input-id="displayNameInput"
+        label="Display Name"
+        size="m">
+        <InputText
+          id="displayNameInput"
+          v-model="formState.displayName"
+          :invalid="!validation.isValid('displayName')"
+          @update:model-value="validation.validateIfDirty('displayName')" />
+      </IftaFormField>
+      <IftaFormField
+        :message="validation.message('password')"
+        input-id="passwordInput"
+        label="Password"
+        size="m">
         <Password
           id="passwordInput"
-          v-model:model-value="formState.password"
+          v-model="formState.password"
           :feedback="false"
           :invalid="!validation.isValid('password')"
-          class="input__field"
-          @change="validation.validateIfDirty('password')" />
-        <ValidationLabel
-          :message="validation.message('password')"
-          for="passwordInput"
-          text="Password" />
-      </IftaLabel>
-      <IftaLabel class="input input--medium">
+          type="password"
+          @update:model-value="validation.validateIfDirty('password')" />
+      </IftaFormField>
+      <IftaFormField
+        :message="validation.message('confirmPassword')"
+        input-id="confirmPasswordInput"
+        label="Confirm Password"
+        size="m">
         <Password
           id="confirmPasswordInput"
-          v-model:model-value="formState.confirmPassword"
+          v-model="formState.confirmPassword"
           :feedback="false"
           :invalid="!validation.isValid('confirmPassword')"
-          class="input__field"
-          @change="validation.validateIfDirty('confirmPassword')" />
-        <ValidationLabel
-          :message="validation.message('confirmPassword')"
-          for="confirmPasswordInput"
-          text="Confirm Password" />
-      </IftaLabel>
-      <Button
-        :disabled="isSubmitting"
-        :loading="isSubmitting"
-        class="input"
-        label="Register"
-        @click="handleRegister" />
-    </div>
+          type="password"
+          @update:model-value="validation.validateIfDirty('confirmPassword')" />
+      </IftaFormField>
+      <template #actions>
+        <Button
+          :disabled="isSubmitting"
+          :loading="isSubmitting"
+          class="input"
+          label="Register"
+          @click="handleRegister" />
+      </template>
+    </FormArea>
   </Panel>
 </template>
 
 <script lang="ts" setup>
-import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { KeyName } from '@/constants/keys'
 import { TokenProvider, TokenPurpose } from '@/constants/tokens'
 import router from '@/router'
@@ -61,10 +72,12 @@ import { useAuthStore } from '@/stores/authStore'
 import { registerRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { onKeyDown } from '@vueuse/core'
-import { Button, IftaLabel, InputText, Panel, Password, useToast } from 'primevue'
+import { Button, InputText, Panel, Password, useToast } from 'primevue'
 import { onMounted, reactive, ref } from 'vue'
 import authApi, { type RegisterRequest } from '@/api/resources/authApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import FormArea from '@/components/form/FormArea.vue'
+import IftaFormField from '@/components/form/IftaFormField.vue'
 
 onKeyDown(KeyName.Enter, () => handleRegister())
 
@@ -75,6 +88,7 @@ const props = defineProps<{
 const formState: RegisterRequest = reactive({
   context: '',
   username: '',
+  displayName: '',
   password: '',
   confirmPassword: ''
 })

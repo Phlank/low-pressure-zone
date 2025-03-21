@@ -1,21 +1,24 @@
 <template>
   <Dialog
-    modal
-    class="form-dialog"
-    :visible="visible"
-    :header="header"
-    @update:visible="isSubmitting ? undefined : emit('close')"
-    @hide="emit('close')"
     :draggable="false"
-    @show="emit('show')">
-    <slot></slot>
+    :header="header"
+    :visible="visible"
+    class="form-dialog"
+    modal
+    @hide="emit('close')"
+    @show="emit('show')"
+    @update:visible="isSubmitting ? undefined : emit('close')">
+    <div v-if="visible">
+      <slot></slot>
+    </div>
     <template #footer>
       <div class="form-dialog__footer">
         <Button
+          :disabled="isSubmitting"
+          :loading="isSubmitting"
           class="input"
           label="Save"
-          @click="emit('save')"
-          :disabled="isSubmitting" />
+          @click="emit('save')" />
       </div>
     </template>
   </Dialog>
@@ -36,3 +39,12 @@ const emit = defineEmits<{
   show: []
 }>()
 </script>
+
+<style lang="scss">
+@use '@/assets/styles/variables';
+
+.form-dialog {
+  min-width: min-content;
+  width: min(600px, calc(100vw - 2 * #{variables.$space-l}));
+}
+</style>

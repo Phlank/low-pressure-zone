@@ -5,14 +5,14 @@ import { combineRules, type ValidationRule } from '@/validation/types/validation
 export const required =
   (msg?: string): ValidationRule<string> =>
   (arg) => {
-    if (arg.trim().length == 0) return invalid(msg ?? 'Required field')
+    if (arg.trim().length === 0) return invalid(msg ?? 'Required field')
     return valid
   }
 
 export const url =
   (msg?: string): ValidationRule<string> =>
   (arg) => {
-    if (arg.trim().length == 0) return valid
+    if (arg.trim().length === 0) return valid
     if (URL.parse(arg)) return valid
     return invalid(msg ?? 'Invalid URL')
   }
@@ -23,7 +23,7 @@ const emailRegex =
 export const emailAddress =
   (msg?: string): ValidationRule<string> =>
   (arg) => {
-    if (arg.trim().length == 0) return valid
+    if (arg.trim().length === 0) return valid
     if (emailRegex.test(arg)) return valid
     return invalid(msg ?? 'Invalid email')
   }

@@ -16,7 +16,7 @@
           @change="validation.validateIfDirty('email')" />
         <ValidationLabel
           :message="validation.message('email')"
-          for="usernameInput"
+          for="emailInput"
           text="Email" />
       </IftaLabel>
       <Button

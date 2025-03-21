@@ -46,9 +46,12 @@ export const useAuthStore = defineStore('authStore', () => {
 
   const getRoles = () => userInfo.value.roles
 
+  const isInRole = (roleToCheck: string): boolean => {
+    return getRoles().includes(roleToCheck)
+  }
+
   const isInAnySpecifiedRole = (...rolesToCheck: string[]): boolean => {
     if (rolesToCheck.length === 0) return true
-    if (getRoles().length === 0) return false
 
     return hasIntersection(rolesToCheck, getRoles())
   }
@@ -69,6 +72,7 @@ export const useAuthStore = defineStore('authStore', () => {
     getEmail,
     getUsername,
     getRoles,
+    isInRole,
     /**
      * @returns `true` if the user is in one of the specified roles or no roles were specified.
      */

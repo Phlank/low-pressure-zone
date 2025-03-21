@@ -1,11 +1,11 @@
 <template>
   <Button
-    class="play-button"
     :icon="controlIcon"
-    @click="handleControlClick"
     :label="controlLabel"
+    class="play-button"
+    rounded
     size="large"
-    rounded />
+    @click="handleControlClick" />
 </template>
 
 <script lang="ts" setup>
@@ -34,7 +34,7 @@ const toggle = (ref: Ref<PlayState>) => {
 }
 
 const controlIcon = computed(() => {
-  if (playState.value == PlayState.Paused) {
+  if (playState.value === PlayState.Paused) {
     return 'pi pi-play'
   }
   return 'pi pi-pause'

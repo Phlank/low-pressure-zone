@@ -44,5 +44,5 @@ import type { InviteResponse } from '@/api/resources/invitesApi.ts'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 
-const props = defineProps<{ invites: InviteResponse[] }>()
+defineProps<{ invites: InviteResponse[] }>()
 </script>

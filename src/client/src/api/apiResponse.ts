@@ -2,15 +2,18 @@ export class ApiResponse<TRequest extends object, TResponse> {
   readonly data?: TResponse
   readonly status: number
   readonly validationProblem?: ValidationProblemDetails<TRequest>
+  readonly error: unknown
 
   constructor(
     status: number,
     data: TResponse | undefined = undefined,
-    validationProblem: ValidationProblemDetails<TRequest> | undefined = undefined
+    validationProblem: ValidationProblemDetails<TRequest> | undefined = undefined,
+    error: unknown = undefined
   ) {
     this.status = status
     this.data = data
     this.validationProblem = validationProblem
+    this.error = error
   }
 
   /**
@@ -18,14 +21,14 @@ export class ApiResponse<TRequest extends object, TResponse> {
    */
   readonly isSuccess = () => {
     const hasSuccessStatus = this.status >= 200 && this.status < 300
-    const hasDataIf200 = this.status !== 200 || this.data !== undefined
-    return hasSuccessStatus && hasDataIf200
+    const hasRequiredData = this.status !== 200 || this.data !== undefined
+    return hasSuccessStatus && hasRequiredData
   }
 
   /**
    * @returns `true` if a validation problem details was returned in the response body.
    */
-  readonly isInvalid = () => this.validationProblem != undefined
+  readonly isInvalid = () => this.validationProblem !== undefined
 
   /**
    * @returns Request fields each mapped to an array of error messages.

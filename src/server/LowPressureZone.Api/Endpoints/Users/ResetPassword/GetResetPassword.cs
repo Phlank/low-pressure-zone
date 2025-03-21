@@ -39,6 +39,6 @@ public class GetPasswordReset(UserManager<AppUser> userManager, EmailService ema
             Email = user.Email!,
             Token = resetToken
         };
-        await emailService.SendResetPasswordEmail(user.Email!, user.UserName!, context);
+        await emailService.SendResetPasswordEmailAsync(user.Email!, user.UserName!, context);
     }
 }

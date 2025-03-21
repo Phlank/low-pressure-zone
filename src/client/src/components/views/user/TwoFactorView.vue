@@ -14,7 +14,7 @@
           class="input__field" />
         <ValidationLabel
           :disabled="isSubmitting"
-          for="usernameInput"
+          for="codeInput"
           message=""
           text="Code" />
       </IftaLabel>
@@ -76,7 +76,6 @@ const handleVerify = async () => {
   }
 
   await useAuthStore().load()
-  isSubmitting.value = false
-  router.push(props.redirect)
+  await router.push(props.redirect)
 }
 </script>

@@ -25,23 +25,23 @@
             <GridActions
               :show-create="
                 schedule.isTimeslotCreationAllowed &&
-                data.timeslot == undefined &&
+                data.timeslot === undefined &&
                 data.start.getTime() > new Date().getTime()
               "
-              :show-edit="data.timeslot?.isEditable"
               :show-delete="data.timeslot?.isDeletable"
+              :show-edit="data.timeslot?.isEditable"
               @create="handleEditClicked(data)"
-              @edit="handleEditClicked(data)"
-              @delete="handleDeleteClicked(data)" />
+              @delete="handleDeleteClicked(data)"
+              @edit="handleEditClicked(data)" />
           </template>
         </Column>
       </DataTable>
     </div>
     <div v-else>
       <ListItem
-        class="timeslots-grid__item"
         v-for="row in rows"
-        :key="row.start.getTime()">
+        :key="row.start.getTime()"
+        class="timeslots-grid__item">
         <template #left>
           <div>{{ formatTimeslot(row.start) }}</div>
           <div>{{ row.timeslot?.performer.name ?? '' }}</div>
@@ -50,14 +50,14 @@
           <GridActions
             :show-create="
               schedule.isTimeslotCreationAllowed &&
-              row.timeslot == undefined &&
+              row.timeslot === undefined &&
               row.start.getTime() > new Date().getTime()
             "
-            :show-edit="row.timeslot?.isEditable"
             :show-delete="row.timeslot?.isDeletable"
+            :show-edit="row.timeslot?.isEditable"
             @create="handleEditClicked(row)"
-            @edit="handleEditClicked(row)"
-            @delete="handleDeleteClicked(row)" />
+            @delete="handleDeleteClicked(row)"
+            @edit="handleEditClicked(row)" />
         </template>
       </ListItem>
     </div>
@@ -69,16 +69,16 @@
       @save="handleSave">
       <TimeslotForm
         ref="timeslotForm"
+        :disabled="isSubmitting"
         :initial-state="formInitialValue"
-        :performers="performers.filter((p) => p.isLinkableToTimeslot)"
-        :disabled="isSubmitting" />
+        :performers="performers.filter((p) => p.isLinkableToTimeslot)" />
     </FormDialog>
     <DeleteDialog
+      :entity-name="deletingName"
+      :is-submitting="false"
+      :visible="showDeleteDialog"
       entity-type="timeslot"
       header="Delete Timeslot"
-      :entity-name="deletingName"
-      :visible="showDeleteDialog"
-      :is-submitting="false"
       @close="showDeleteDialog = false"
       @delete="handleDelete" />
   </div>
@@ -98,10 +98,14 @@ import {
   showEditSuccessToast
 } from '@/utils/toastUtils'
 import { Column, DataTable, useToast } from 'primevue'
-import { inject, onMounted, ref, useTemplateRef, watch, type Ref } from 'vue'
+import { inject, onMounted, ref, type Ref, useTemplateRef } from 'vue'
 import type { ScheduleResponse } from '@/api/resources/schedulesApi.ts'
 import type { PerformerResponse } from '@/api/resources/performersApi.ts'
-import timeslotsApi, { PerformanceType, type TimeslotRequest, type TimeslotResponse } from '@/api/resources/timeslotsApi.ts'
+import timeslotsApi, {
+  PerformanceType,
+  type TimeslotRequest,
+  type TimeslotResponse
+} from '@/api/resources/timeslotsApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 
 const toast = useToast()
@@ -115,8 +119,6 @@ const timeslots: Ref<TimeslotResponse[]> = ref(props.schedule.timeslots)
 const startDate = ref(parseDate(props.schedule.startsAt))
 const endDate = ref(parseDate(props.schedule.endsAt))
 const isSubmitting = ref(false)
-
-const allowedPerformers = ref(props.performers.filter((p) => p.isLinkableToTimeslot))
 
 interface TimeslotRow {
   start: Date
@@ -171,7 +173,7 @@ const handleSave = async () => {
 
   isSubmitting.value = true
   const request = timeslotForm.value.formState
-  let response: ApiResponse<TimeslotRequest, never> | undefined = undefined
+  let response: ApiResponse<TimeslotRequest, never> | undefined
   if (editingId) {
     response = await timeslotsApi.put(props.schedule.id, editingId, request)
   } else {
@@ -236,7 +238,7 @@ const emit = defineEmits<{ update: [] }>()
 </script>
 
 <style lang="scss">
-@use '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables';
 
 .timeslots-grid {
   &__item {

@@ -29,13 +29,13 @@ const sendRequest = async <TRequest extends object, TResponse = never>(
       )
     }
     return new ApiResponse<TRequest, TResponse>(response.status)
-  } catch (error: any) {
-    return new ApiResponse<TRequest, TResponse>(0)
+  } catch (error: unknown) {
+    return new ApiResponse<TRequest, TResponse>(0, undefined, undefined, error)
   }
 }
 
 export const sendGet = async <TResponse = never>(route: string, params?: QueryParameters) => {
-  if (params) route = route + toQueryString(params)
+  if (params) route += toQueryString(params)
   return await sendRequest<never, TResponse>('GET', route)
 }
 

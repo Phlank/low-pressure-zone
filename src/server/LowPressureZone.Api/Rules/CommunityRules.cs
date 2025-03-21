@@ -3,7 +3,6 @@ using LowPressureZone.Domain.Entities;
 using LowPressureZone.Domain.Extensions;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
-using Shouldly;
 
 namespace LowPressureZone.Api.Rules;
 
@@ -11,9 +10,16 @@ public class CommunityRules(IHttpContextAccessor contextAccessor)
 {
     private ClaimsPrincipal? User => contextAccessor.GetAuthenticatedUserOrDefault();
 
-    public bool IsScheduleLinkAuthorized(Community community)
+    public bool IsPerformanceAuthorized(Community community)
     {
-        community.Relationships.ShouldNotBeNull();
+        if (community.IsDeleted) return false;
+        if (User == null) return false;
+        if (User.IsInRole(RoleNames.Admin)) return true;
+        return community.Relationships.Any(relationship => relationship.UserId == User.GetIdOrDefault() && relationship.IsPerformer);
+    }
+
+    public bool IsOrganizingAuthorized(Community community)
+    {
         if (community.IsDeleted) return false;
         if (User == null) return false;
         if (User.IsInRole(RoleNames.Admin)) return true;
@@ -40,11 +46,10 @@ public class CommunityRules(IHttpContextAccessor contextAccessor)
         return !User.IsInRole(RoleNames.Admin) && entity.IsDeleted;
     }
 
-    public bool IsRelated(Community community)
+    public bool IsOrganizable(Community community)
     {
-        community.Relationships.ShouldNotBeNull();
-        if (community.IsDeleted) return false;
         if (User == null) return false;
-        return community.Relationships.Any(relationship => relationship.UserId == User.GetIdOrDefault() && (relationship.IsPerformer || relationship.IsOrganizer));
+        if (User.IsInRole(RoleNames.Admin)) return true;
+        return community.Relationships.Any(relationship => relationship.UserId == User.GetIdOrDefault() && relationship.IsOrganizer);
     }
 }

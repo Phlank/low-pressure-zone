@@ -1,54 +1,64 @@
 ﻿using FastEndpoints;
 using FluentEmail.Core;
 using LowPressureZone.Api.Constants;
-using LowPressureZone.Api.Endpoints.Users.Invites;
 using LowPressureZone.Api.Services;
+using LowPressureZone.Domain;
+using LowPressureZone.Domain.Entities;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 
-namespace LowPressureZone.Api.Endpoints.Users.Invite;
+namespace LowPressureZone.Api.Endpoints.Users.Invites;
 
-public class PostInvite(UserManager<AppUser> userManager, IdentityContext identityContext, EmailService emailService) : EndpointWithMapper<InviteRequest, InviteMapper>
+public class PostInvite(UserManager<AppUser> userManager,
+                        IdentityContext identityContext,
+                        DataContext dataContext,
+                        EmailService emailService)
+    : EndpointWithMapper<InviteRequest, InviteMapper>
 {
     public override void Configure()
     {
         Post("/users/invites");
     }
 
-    public override async Task HandleAsync(InviteRequest req, CancellationToken ct)
+    public override async Task HandleAsync(InviteRequest request, CancellationToken ct)
     {
-        ThrowIfAnyErrors();
-        var invitation = await Map.ToEntityAsync(req, ct);
+        var invitation = Map.ToEntity(request);
 
-        var normalizedEmail = req.Email.ToUpperInvariant();
+        var normalizedEmail = request.Email.ToUpperInvariant().Normalize();
         var username = Guid.NewGuid().ToString();
-        var normalizedUsername = username.ToUpperInvariant();
-        var user = new AppUser()
+        var normalizedUsername = username.ToUpperInvariant().Normalize();
+        var user = new AppUser
         {
             Id = invitation.UserId,
-            Email = req.Email,
+            Email = request.Email,
             NormalizedEmail = normalizedEmail,
+            DisplayName = username,
             UserName = username,
-            NormalizedUserName = username.ToUpperInvariant()
+            NormalizedUserName = normalizedUsername
         };
         var createResult = await userManager.CreateAsync(user);
         createResult.Errors.ForEach(e => AddError(e.Code + " " + e.Description));
         ThrowIfAnyErrors();
 
-        var addToRoleResult = await userManager.AddToRoleAsync(user, req.Role);
-        addToRoleResult.Errors.Select(e => e.Description).ForEach(e => AddError(e));
-        ThrowIfAnyErrors();
-
         var inviteToken = await userManager.GenerateUserTokenAsync(user, TokenProviders.Default, TokenPurposes.Invite);
         var tokenContext = new TokenContext
         {
-            Email = req.Email,
-            Token = inviteToken,
+            Email = request.Email,
+            Token = inviteToken
         };
-        await emailService.SendInviteEmail(req.Email, tokenContext);
-        await identityContext.Invitations.AddAsync(invitation, ct);
+        await emailService.SendInviteEmailAsync(request.Email, tokenContext);
+
+        identityContext.Add(invitation);
         await identityContext.SaveChangesAsync(ct);
+        dataContext.Add(new CommunityRelationship
+        {
+            UserId = user.Id,
+            CommunityId = request.CommunityId,
+            IsOrganizer = request.IsOrganizer,
+            IsPerformer = request.IsPerformer
+        });
+        await dataContext.SaveChangesAsync(ct);
         await SendNoContentAsync(ct);
     }
 }

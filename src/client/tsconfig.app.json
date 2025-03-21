@@ -9,14 +9,11 @@
     "src/**/__tests__/*"
   ],
   "compilerOptions": {
-    "composite": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "paths": {
       "@/*": [
         "./src/*"
       ]
-    },
-    "module": "ESNext"
-    // "types": ["node"]
+    }
   }
 }

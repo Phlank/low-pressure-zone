@@ -64,7 +64,7 @@ const handleResetPasswordClick = async () => {
 </script>
 
 <style lang="scss">
-@use '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables';
 
 .request-password-reset {
   .buttons {

@@ -19,8 +19,7 @@ export const withinRangeOf =
 export const hourOnly = (msg?: string) => (arg: string) => {
   const time = parseDate(arg)
   if (!time) return valid // Don't unintentionally enforce required() validation
-  if (time.getMinutes() != 0 || time.getSeconds() != 0 || time.getMilliseconds() != 0) {
-    return invalid(msg ?? 'Hour intervals only')
-  }
-  return valid
+  if (time.getMinutes() === 0 || time.getSeconds() === 0 || time.getMilliseconds() === 0)
+    return valid
+  return invalid(msg ?? 'Hour intervals only')
 }
