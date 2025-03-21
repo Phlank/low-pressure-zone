@@ -9,8 +9,8 @@ using Shouldly;
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
 public class TimeslotMapper(IHttpContextAccessor contextAccessor,
-    TimeslotRules rules,
-    PerformerMapper performerMapper)
+                            TimeslotRules rules,
+                            PerformerMapper performerMapper)
     : IRequestMapper, IResponseMapper
 {
     public Timeslot ToEntity(TimeslotRequest req)

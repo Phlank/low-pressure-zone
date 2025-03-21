@@ -11,7 +11,6 @@ public sealed class GetCommunityById(DataContext dataContext)
     {
         Get("/communities/{id}");
         Description(builder => builder.Produces(404));
-        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

@@ -24,7 +24,8 @@ public class ScheduleRequestValidator : Validator<ScheduleRequest>
 
             var community = await dataContext.Communities.FirstOrDefaultAsync(a => a.Id == req.CommunityId, ct);
 
-            var schedule = await dataContext.Schedules.AsSplitQuery()
+            var schedule = await dataContext.Schedules
+                                            .AsSplitQuery()
                                             .Include(s => s.Timeslots)
                                             .Where(s => s.Id == id)
                                             .FirstOrDefaultAsync(ct);

@@ -11,24 +11,24 @@ public class GetTimeslots(DataContext dataContext) : EndpointWithoutRequest<IEnu
     public override void Configure()
     {
         Get("/schedules/{scheduleId}/timeslots");
-        Description(builder => builder.Produces<IEnumerable<TimeslotResponse>>(200)
-                                      .Produces(404));
+        Description(builder => builder.Produces(404));
     }
 
     public override async Task HandleAsync(CancellationToken ct)
     {
         var scheduleId = Route<Guid>("scheduleId");
-        if (!dataContext.Has<Schedule>(scheduleId))
+        if (!await dataContext.HasAsync<Schedule>(scheduleId, ct))
         {
             await SendNotFoundAsync(ct);
             return;
         }
 
-        var timeslots = await dataContext.Timeslots.AsNoTracking()
-                                                   .Include(t => t.Performer)
-                                                   .Where(t => t.ScheduleId == scheduleId)
-                                                   .OrderBy(t => t.StartsAt)
-                                                   .ToListAsync(ct);
+        var timeslots = await dataContext.Timeslots
+                                         .AsNoTracking()
+                                         .Include(timeslot => timeslot.Performer)
+                                         .Where(timeslot => timeslot.ScheduleId == scheduleId)
+                                         .OrderBy(timeslot => timeslot.StartsAt)
+                                         .ToListAsync(ct);
         await SendOkAsync(timeslots.Select(Map.FromEntity), ct);
     }
 }

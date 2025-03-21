@@ -11,8 +11,7 @@ public class GetTimeslotById : EndpointWithoutRequest<TimeslotResponse, Timeslot
     public override void Configure()
     {
         Get("/schedules/{scheduleId}/timeslots/{timeslotId}");
-        Description(builder => builder.Produces<TimeslotResponse>(200)
-                                      .Produces(404));
+        Description(builder => builder.Produces(404));
     }
 
     public override async Task HandleAsync(CancellationToken ct)
