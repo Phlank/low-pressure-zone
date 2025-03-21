@@ -36,11 +36,10 @@ public class CommunityRelationshipMapper(IHttpContextAccessor contextAccessor)
     public CommunityRelationshipResponse FromEntity(CommunityRelationship relationship, string displayName)
     {
         var communityId = contextAccessor.GetGuidRouteParameterOrDefault("communityId");
-        var userId = contextAccessor.GetGuidRouteParameterOrDefault("userId");
         return new CommunityRelationshipResponse
         {
             CommunityId = communityId,
-            UserId = userId,
+            UserId = relationship.UserId,
             DisplayName = displayName,
             IsOrganizer = relationship.IsOrganizer,
             IsPerformer = relationship.IsPerformer

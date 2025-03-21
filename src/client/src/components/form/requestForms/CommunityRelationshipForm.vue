@@ -2,6 +2,7 @@
   <div class="community-relationship-form">
     <FormArea>
       <IftaFormField
+        v-if="!initialState"
         :message="validation.message('userId')"
         input-id="userInput"
         label="User"

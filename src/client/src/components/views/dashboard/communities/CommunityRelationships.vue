@@ -14,70 +14,35 @@
     </IftaLabel>
     <Divider />
     <CommunityRelationshipsGrid
-      :available-users="availableUsers"
       :community="selectedCommunity"
       :relationships="relationships"
-      @update="handleGridUpdate" />
+      @update="handleRelationshipUpdate" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Divider, IftaLabel, Select, useToast } from 'primevue'
+import { Divider, IftaLabel, Select } from 'primevue'
 import type { CommunityResponse } from '@/api/resources/communitiesApi.ts'
-import { computed, type ComputedRef, onMounted, ref, type Ref, watch } from 'vue'
-import communityRelationshipsApi, {
-  type CommunityRelationshipResponse
-} from '@/api/resources/communityRelationshipsApi.ts'
-import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import { computed, onMounted, ref, type Ref } from 'vue'
 import CommunityRelationshipsGrid from '@/components/views/dashboard/communities/CommunityRelationshipsGrid.vue'
-import type { UserResponse } from '@/api/resources/usersApi.ts'
+import { useCommunityStore } from '@/stores/communityStore.ts'
 
-const toast = useToast()
+const communityStore = useCommunityStore()
 
 const props = defineProps<{
-  communities: CommunityResponse[]
-  users: UserResponse[]
+  availableCommunities: CommunityResponse[]
 }>()
 
-const availableCommunities = computed(() =>
-  props.communities.filter((community) => community.isOrganizable)
-)
-const selectedCommunity: Ref<CommunityResponse> = ref(availableCommunities.value[0])
-const relationships: Ref<CommunityRelationshipResponse[]> = ref([])
-
-const availableUsers: ComputedRef<UserResponse[]> = computed(() => {
-  if (props.users.length === 0) return []
-  const userIdsInUse = relationships.value.map((relationship) => relationship.userId)
-  console.log(JSON.stringify(props.users))
-  console.log(JSON.stringify(userIdsInUse))
-  return props.users.filter((user) => userIdsInUse.indexOf(user.id) === -1)
-})
-const selectedUser: Ref<UserResponse | undefined> = ref(undefined)
+const selectedCommunity: Ref<CommunityResponse> = ref(props.availableCommunities[0])
+const relationships = computed(() => communityStore.getRelationships(selectedCommunity.value.id))
 
 onMounted(async () => {
-  relationships.value = (await communityRelationshipsApi.get(selectedCommunity.value.id)).data!
+  if (relationships.value.length === 0) {
+    await communityStore.loadRelationshipsAsync(selectedCommunity.value.id)
+  }
 })
 
-const handleGridUpdate = async () => {
-  relationships.value = (await communityRelationshipsApi.get(selectedCommunity.value.id)).data!
+const handleRelationshipUpdate = async () => {
+  await communityStore.loadRelationshipsAsync(selectedCommunity.value.id)
 }
-
-watch(
-  selectedCommunity,
-  async (newCommunity) => {
-    const relationshipsResponse = await communityRelationshipsApi.get(newCommunity.id)
-    if (tryHandleUnsuccessfulResponse(relationshipsResponse, toast)) return
-    relationships.value = relationshipsResponse.data!
-  },
-  { immediate: true }
-)
-
-watch(
-  availableUsers,
-  (newValue) => {
-    if (newValue.length === 0) selectedUser.value = undefined
-    else selectedUser.value = newValue[0]
-  },
-  { immediate: true }
-)
 </script>
