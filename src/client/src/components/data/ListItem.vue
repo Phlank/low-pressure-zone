@@ -35,8 +35,12 @@ const emit = defineEmits<{
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
 
   &__right {

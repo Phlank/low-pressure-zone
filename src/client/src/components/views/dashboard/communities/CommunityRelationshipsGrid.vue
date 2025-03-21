@@ -8,7 +8,7 @@
         paginator>
         <template #paginatorstart>
           <Button
-            :disabled="availableUsers.length === 0"
+            v-if="availableUsers.length !== 0"
             label="Add User"
             @click="handleAddUserClick" />
         </template>
@@ -69,7 +69,7 @@
         </template>
         <template #footer>
           <Button
-            :disabled="availableUsers.length === 0"
+            v-if="availableUsers.length !== 0"
             label="Add User"
             style="width: 100%"
             @click="handleAddUserClick" />
