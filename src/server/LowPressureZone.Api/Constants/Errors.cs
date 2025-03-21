@@ -37,6 +37,9 @@ internal static class Errors
 
     // User errors
     public static string InvalidRole => $"Allowed roles are {string.Join(" | ", RoleNames.All)}";
+
+    // Other errors
+    public static string NotEqual(string fieldName) => $"Cannot equal ${fieldName}";
     public static string MinLength(int value) => $"Minimum {value} characters";
     public static string MaxLength(int value) => $"Maximum {value} characters";
 
