@@ -92,6 +92,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<InviteMapper>();
 
         services.AddSingleton<CommunityRules>();
+        services.AddSingleton<CommunityRelationshipRules>();
         services.AddSingleton<ScheduleRules>();
         services.AddSingleton<PerformerRules>();
         services.AddSingleton<TimeslotRules>();

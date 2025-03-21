@@ -22,6 +22,8 @@ public class GetCommunityRelationshipById(DataContext dataContext, IdentityConte
                                             .AsNoTracking()
                                             .Where(relationship => relationship.CommunityId == communityId && relationship.UserId == userId)
                                             .Where(relationship => relationship.IsOrganizer || relationship.IsPerformer)
+                                            .Include(relationship => relationship.Community)
+                                            .ThenInclude(community => community.Relationships.Where(relationship => relationship.UserId == userId))
                                             .FirstOrDefaultAsync(ct);
         if (relationship == null)
         {

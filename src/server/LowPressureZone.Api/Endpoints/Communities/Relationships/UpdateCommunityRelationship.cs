@@ -2,11 +2,16 @@
 using LowPressureZone.Domain;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Constants;
+using LowPressureZone.Identity.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Communities.Relationships;
 
-public class UpdateCommunityRelationship(DataContext dataContext, IdentityContext identityContext) : EndpointWithMapper<CommunityRelationshipRequest, CommunityRelationshipMapper>
+public class UpdateCommunityRelationship(DataContext dataContext,
+                                         IdentityContext identityContext,
+                                         UserManager<AppUser> userManager)
+    : EndpointWithMapper<CommunityRelationshipRequest, CommunityRelationshipMapper>
 {
     public override void Configure()
     {
@@ -19,12 +24,28 @@ public class UpdateCommunityRelationship(DataContext dataContext, IdentityContex
     {
         var communityId = Route<Guid>("communityId");
         var userId = Route<Guid>("userId");
+
         if (!await dataContext.Communities.AnyAsync(community => community.Id == communityId, ct)
             || !await identityContext.Users.AnyAsync(user => user.Id == userId, ct))
         {
             await SendNotFoundAsync(ct);
             return;
         }
+
+        var user = await userManager.FindByIdAsync(userId.ToString());
+        if (user == null)
+        {
+            await SendNotFoundAsync(ct);
+            return;
+        }
+
+        var roles = await userManager.GetRolesAsync(user);
+        if (roles.Contains(RoleNames.Admin))
+        {
+            await SendForbiddenAsync(ct);
+            return;
+        }
+
         var existing = await dataContext.CommunityRelationships
                                         .Where(relationship => relationship.CommunityId == communityId && relationship.UserId == userId)
                                         .FirstOrDefaultAsync(ct);

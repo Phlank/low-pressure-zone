@@ -29,4 +29,5 @@ export interface CommunityRelationshipResponse {
   displayName: string
   isPerformer: boolean
   isOrganizer: boolean
+  isEditable: boolean
 }

@@ -1,11 +1,12 @@
 ﻿using FastEndpoints;
+using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Entities;
 using LowPressureZone.Domain.Extensions;
 
 namespace LowPressureZone.Api.Endpoints.Communities.Relationships;
 
-public class CommunityRelationshipMapper(IHttpContextAccessor contextAccessor)
+public class CommunityRelationshipMapper(IHttpContextAccessor contextAccessor, CommunityRelationshipRules rules)
     : IRequestMapper, IResponseMapper
 {
     public CommunityRelationship ToEntity(CommunityRelationshipRequest request)
@@ -21,16 +22,14 @@ public class CommunityRelationshipMapper(IHttpContextAccessor contextAccessor)
         };
     }
 
-    public async Task<CommunityRelationship> UpdateEntityAsync(CommunityRelationshipRequest request, CommunityRelationship relationship, CancellationToken ct = default)
+    public async Task UpdateEntityAsync(CommunityRelationshipRequest request, CommunityRelationship relationship, CancellationToken ct = default)
     {
         var dataContext = contextAccessor.Resolve<DataContext>();
         relationship.IsPerformer = request.IsPerformer;
         relationship.IsOrganizer = request.IsOrganizer;
-        if (!dataContext.ChangeTracker.HasChanges())
-            return relationship;
+        if (!dataContext.ChangeTracker.HasChanges()) return;
         relationship.LastModifiedDate = DateTime.UtcNow;
         await dataContext.SaveChangesAsync(ct);
-        return relationship;
     }
 
     public CommunityRelationshipResponse FromEntity(CommunityRelationship relationship, string displayName)
@@ -42,7 +41,8 @@ public class CommunityRelationshipMapper(IHttpContextAccessor contextAccessor)
             UserId = relationship.UserId,
             DisplayName = displayName,
             IsOrganizer = relationship.IsOrganizer,
-            IsPerformer = relationship.IsPerformer
+            IsPerformer = relationship.IsPerformer,
+            IsEditable = rules.IsEditable(relationship)
         };
     }
 }

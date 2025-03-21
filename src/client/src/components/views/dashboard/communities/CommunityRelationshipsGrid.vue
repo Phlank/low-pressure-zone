@@ -33,7 +33,7 @@
         <Column class="grid-action-col grid-action-col--1">
           <template #body="{ data }: { data: CommunityRelationshipResponse }">
             <GridActions
-              show-edit
+              :show-edit="data.isEditable"
               @edit="handleEditActionClick(data)" />
           </template>
         </Column>
@@ -50,19 +50,22 @@
           </ListItem>
         </template>
         <template #list="{ items }: { items: CommunityRelationshipResponse[] }">
-          <ListItem
-            v-for="relationship in items"
+          <div
+            v-for="(relationship, index) in items"
             :key="relationship.userId">
-            <template #left>
-              <span>{{ relationship.displayName }}</span>
-              <span class="text-s">{{ getMobileRelationshipText(relationship) }}</span>
-            </template>
-            <template #right>
-              <GridActions
-                show-edit
-                @edit="handleEditActionClick(relationship)" />
-            </template>
-          </ListItem>
+            <ListItem>
+              <template #left>
+                <span>{{ relationship.displayName }}</span>
+                <span class="text-s">{{ getMobileRelationshipText(relationship) }}</span>
+              </template>
+              <template #right>
+                <GridActions
+                  :show-edit="relationship.isEditable"
+                  @edit="handleEditActionClick(relationship)" />
+              </template>
+            </ListItem>
+            <Divider v-if="index < items.length - 1" />
+          </div>
         </template>
         <template #footer>
           <Button

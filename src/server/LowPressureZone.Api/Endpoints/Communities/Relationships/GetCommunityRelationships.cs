@@ -1,6 +1,7 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Domain;
 using LowPressureZone.Identity;
+using LowPressureZone.Identity.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Communities.Relationships;
@@ -15,8 +16,11 @@ public class GetCommunityRelationships(DataContext dataContext, IdentityContext 
 
         var relationships = await dataContext.CommunityRelationships
                                              .AsNoTracking()
+                                             .AsSplitQuery()
                                              .Where(relationship => relationship.CommunityId == communityId)
                                              .Where(relationship => relationship.IsOrganizer || relationship.IsPerformer)
+                                             .Include(relationship => relationship.Community)
+                                             .ThenInclude(community => community.Relationships.Where(relationship => relationship.UserId == User.GetIdOrDefault()))
                                              .ToListAsync(ct);
         var relationshipUserIds = relationships.Select(relationship => relationship.UserId).Distinct();
         var displayNames = await identityContext.Users
