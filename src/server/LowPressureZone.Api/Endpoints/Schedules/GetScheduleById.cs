@@ -1,7 +1,6 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain;
-using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
@@ -11,9 +10,7 @@ public class GetScheduleById(DataContext dataContext, ScheduleRules rules) : End
     public override void Configure()
     {
         Get("/schedules/{id}");
-        Description(b => b.Produces<ScheduleResponse>(200)
-                          .Produces(404));
-        Roles(RoleNames.All);
+        Description(builder => builder.Produces(404));
     }
 
     public override async Task HandleAsync(CancellationToken ct)

@@ -3,6 +3,7 @@ using LowPressureZone.Domain.Entities;
 using LowPressureZone.Domain.Extensions;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
+using Shouldly;
 
 namespace LowPressureZone.Api.Rules;
 
@@ -12,6 +13,7 @@ public class CommunityRules(IHttpContextAccessor contextAccessor)
 
     public bool IsPerformanceAuthorized(Community community)
     {
+        community.Relationships.ShouldNotBeNull();
         if (community.IsDeleted) return false;
         if (User == null) return false;
         if (User.IsInRole(RoleNames.Admin)) return true;
@@ -20,6 +22,7 @@ public class CommunityRules(IHttpContextAccessor contextAccessor)
 
     public bool IsOrganizingAuthorized(Community community)
     {
+        community.Relationships.ShouldNotBeNull();
         if (community.IsDeleted) return false;
         if (User == null) return false;
         if (User.IsInRole(RoleNames.Admin)) return true;
@@ -44,12 +47,5 @@ public class CommunityRules(IHttpContextAccessor contextAccessor)
     {
         if (User == null) return true;
         return !User.IsInRole(RoleNames.Admin) && entity.IsDeleted;
-    }
-
-    public bool IsOrganizable(Community community)
-    {
-        if (User == null) return false;
-        if (User.IsInRole(RoleNames.Admin)) return true;
-        return community.Relationships.Any(relationship => relationship.UserId == User.GetIdOrDefault() && relationship.IsOrganizer);
     }
 }

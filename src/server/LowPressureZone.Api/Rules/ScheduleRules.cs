@@ -28,7 +28,7 @@ public class ScheduleRules(IHttpContextAccessor contextAccessor)
         if (User == null) return false;
         if (schedule.EndsAt < DateTime.UtcNow) return false;
         if (User.IsInRole(RoleNames.Admin)) return true;
-        return schedule.Community.Relationships.Any(relationship => relationship.UserId == User.GetIdOrDefault());
+        return schedule.Community.Relationships.Any(relationship => relationship.UserId == User.GetIdOrDefault() && relationship.IsOrganizer);
     }
 
     public bool IsDeleteAuthorized(Schedule schedule)
@@ -38,7 +38,7 @@ public class ScheduleRules(IHttpContextAccessor contextAccessor)
         if (User == null) return false;
         if (schedule.EndsAt < DateTime.UtcNow) return false;
         if (User.IsInRole(RoleNames.Admin)) return true;
-        return schedule.Community.Relationships.Any(relationship => relationship.UserId == User.GetIdOrDefault());
+        return schedule.Community.Relationships.Any(relationship => relationship.UserId == User.GetIdOrDefault() && relationship.IsOrganizer);
     }
 
     public bool IsHiddenFromApi(Schedule schedule)

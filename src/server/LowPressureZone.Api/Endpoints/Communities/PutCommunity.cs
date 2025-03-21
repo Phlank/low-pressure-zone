@@ -10,9 +10,8 @@ public sealed class PutCommunity(DataContext dataContext) : EndpointWithMapper<C
     public override void Configure()
     {
         Put("/communities/{id}");
-        Description(b => b.Produces(204)
-                          .Produces(404));
-        AllowAnonymous();
+        Description(builder => builder.Produces(404));
+        Roles(RoleNames.Admin);
     }
 
     public override async Task HandleAsync(CommunityRequest request, CancellationToken ct)

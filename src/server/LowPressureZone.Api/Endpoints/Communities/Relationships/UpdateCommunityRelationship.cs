@@ -54,7 +54,7 @@ public class UpdateCommunityRelationship(DataContext dataContext,
                                          .Include(community => community.Relationships.Where(relationship => relationship.UserId == User.GetIdOrDefault()))
                                          .FirstAsync(ct);
 
-        if (!communityRules.IsOrganizable(community))
+        if (!communityRules.IsOrganizingAuthorized(community))
         {
             await SendUnauthorizedAsync(ct);
             return;

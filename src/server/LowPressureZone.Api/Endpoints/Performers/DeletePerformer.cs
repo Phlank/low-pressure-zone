@@ -1,7 +1,6 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain;
-using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Performers;
@@ -11,17 +10,16 @@ public class DeletePerformer(DataContext dataContext, PerformerRules rules) : En
     public override void Configure()
     {
         Delete("/performers/{id}");
-        Description(builder => builder.Produces(204)
-                                      .Produces(404));
-        Roles(RoleNames.All.ToArray());
+        Description(builder => builder.Produces(404));
     }
 
     public override async Task HandleAsync(CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        var performer = await dataContext.Performers.AsNoTracking()
-                                                     .Where(p => p.Id == id)
-                                                     .FirstOrDefaultAsync(ct);
+        var performer = await dataContext.Performers
+                                         .AsNoTracking()
+                                         .Where(p => p.Id == id)
+                                         .FirstOrDefaultAsync(ct);
 
         if (performer == null || performer.IsDeleted)
         {

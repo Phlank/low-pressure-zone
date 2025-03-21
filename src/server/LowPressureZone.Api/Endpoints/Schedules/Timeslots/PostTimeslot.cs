@@ -11,7 +11,7 @@ public class PostTimeslot(DataContext dataContext, PerformerRules performerRules
     public override void Configure()
     {
         Post("/schedules/{scheduleId}/timeslots");
-        Description(b => b.Produces(201));
+        Description(builder => builder.Produces(201));
     }
 
     public override async Task HandleAsync(TimeslotRequest request, CancellationToken ct)

@@ -1,12 +1,11 @@
 ﻿using FastEndpoints;
-using FluentValidation.Results;
+using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain;
-using LowPressureZone.Domain.Extensions;
-using LowPressureZone.Identity.Constants;
+using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
-public class PostSchedule : EndpointWithMapper<ScheduleRequest, ScheduleMapper>
+public class PostSchedule(DataContext dataContext, CommunityRules communityRules) : EndpointWithMapper<ScheduleRequest, ScheduleMapper>
 {
     public required DataContext DataContext { get; set; }
 
@@ -14,27 +13,28 @@ public class PostSchedule : EndpointWithMapper<ScheduleRequest, ScheduleMapper>
     {
         Post("/schedules");
         Description(b => b.Produces(201));
-        Roles(RoleNames.Admin, RoleNames.Organizer);
     }
 
-    public override async Task HandleAsync(ScheduleRequest req, CancellationToken ct)
+    public override async Task HandleAsync(ScheduleRequest request, CancellationToken ct)
     {
-        var schedule = Map.ToEntity(req);
-        var doesOverlapOtherSchedule = DataContext.Schedules.WhereOverlaps(schedule).Any();
-        if (doesOverlapOtherSchedule)
+        var community = await dataContext.Communities
+                                         .Where(community => community.Id == request.CommunityId)
+                                         .Include(community => community.Relationships)
+                                         .FirstAsync(ct);
+
+        if (!communityRules.IsOrganizingAuthorized(community))
         {
-            AddError(new ValidationFailure(nameof(req.StartsAt), "Overlaps other schedule"));
-            AddError(new ValidationFailure(nameof(req.EndsAt), "Overlaps other schedule"));
+            await SendUnauthorizedAsync(ct);
+            return;
         }
-        var doesCommunityExist = DataContext.Communities.Any(a => a.Id == req.CommunityId);
-        if (!doesCommunityExist)
-        {
-            AddError(new ValidationFailure(nameof(req.CommunityId), "Invalid community"));
-        }
-        ThrowIfAnyErrors();
+
+        var schedule = Map.ToEntity(request);
 
         DataContext.Schedules.Add(schedule);
         await DataContext.SaveChangesAsync(ct);
-        await SendCreatedAtAsync<GetScheduleById>(new { schedule.Id }, Response, cancellation: ct);
+        await SendCreatedAtAsync<GetScheduleById>(new
+        {
+            schedule.Id
+        }, Response, cancellation: ct);
     }
 }
