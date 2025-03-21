@@ -84,7 +84,7 @@ const handleDrawerActionClick = (action: GridAction) => {
 </script>
 
 <style lang="scss">
-@use '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables';
 
 .grid-actions {
   &__buttons {

@@ -48,7 +48,7 @@ const props = defineProps<{
 </script>
 
 <style lang="scss">
-@use '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables';
 
 .titled-nav-menu {
   a.p-menubar-button {

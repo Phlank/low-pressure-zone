@@ -22,7 +22,7 @@ provide('isMobile', isMobile)
 </script>
 
 <style lang="scss">
-@use '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables';
 
 .app {
   min-width: 100vw;

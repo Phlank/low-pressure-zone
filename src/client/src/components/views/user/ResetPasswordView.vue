@@ -89,7 +89,7 @@ const handleUpdatePassword = async () => {
 </script>
 
 <style lang="scss">
-@use '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables';
 
 .reset-password {
   .buttons {

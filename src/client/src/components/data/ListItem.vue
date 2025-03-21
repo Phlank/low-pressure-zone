@@ -18,7 +18,7 @@ const emit = defineEmits<{
 </script>
 
 <style lang="scss">
-@use '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables';
 
 .list-item {
   display: flex;

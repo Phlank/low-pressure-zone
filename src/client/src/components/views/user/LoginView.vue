@@ -110,7 +110,7 @@ const handleLogin = async () => {
 </script>
 
 <style lang="scss">
-@use '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables';
 
 .login {
   .buttons {

@@ -41,7 +41,7 @@ const computedClass = computed(() => `${baseClass} ${widthClass.value}`)
 </script>
 
 <style lang="scss">
-@use '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables';
 
 .form-field {
   display: flex;

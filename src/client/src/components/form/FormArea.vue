@@ -58,7 +58,7 @@ onUnmounted(() => {})
 </script>
 
 <style lang="scss">
-@use '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables';
 
 .form-area {
   &__fields {

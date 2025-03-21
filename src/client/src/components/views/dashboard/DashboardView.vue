@@ -93,7 +93,7 @@ onMounted(async () => {
 </script>
 
 <style lang="scss">
-@use '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables';
 
 .dashboard-view {
   &__content {

@@ -39,7 +39,7 @@ const emit = defineEmits<{
 </script>
 
 <style lang="scss">
-@use '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables';
 
 div.p-drawer.grid-actions-drawer {
   min-height: fit-content;

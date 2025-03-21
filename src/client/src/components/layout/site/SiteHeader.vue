@@ -25,7 +25,7 @@ const title = import.meta.env.VITE_SITE_NAME
 </script>
 
 <style lang="scss">
-@use '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables';
 
 .site-header {
   &__dark-mode-toggle {
@@ -33,10 +33,12 @@ const title = import.meta.env.VITE_SITE_NAME
       display: none;
     }
   }
+
   &__end {
     display: flex;
     gap: variables.$space-m;
   }
+
   .p-toolbar-start {
     a {
       text-decoration: none;

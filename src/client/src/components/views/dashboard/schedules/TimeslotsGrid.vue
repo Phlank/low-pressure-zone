@@ -238,7 +238,7 @@ const emit = defineEmits<{ update: [] }>()
 </script>
 
 <style lang="scss">
-@use '@/assets/styles/variables.scss';
+@use '@/assets/styles/variables';
 
 .timeslots-grid {
   &__item {
