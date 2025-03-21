@@ -57,10 +57,7 @@ public class PostRegister(UserManager<AppUser> userManager, IdentityContext iden
 
         var normalizedRequestUsername = req.Username.ToUpperInvariant();
         var isUsernameInUse = await identityContext.Users.AnyAsync(u => u.NormalizedUserName == normalizedRequestUsername, ct);
-        if (isUsernameInUse)
-        {
-            ThrowError(new ValidationFailure(nameof(req.Username), Errors.Unique));
-        }
+        if (isUsernameInUse) ThrowError(new ValidationFailure(nameof(req.Username), Errors.Unique));
 
         var isValidToken = await userManager.VerifyUserTokenAsync(user, TokenProviders.Default, TokenPurposes.Invite, context.Token);
         if (!isValidToken)
@@ -76,7 +73,7 @@ public class PostRegister(UserManager<AppUser> userManager, IdentityContext iden
             AddError(new ValidationFailure(nameof(req.Username), message));
         });
         ThrowIfAnyErrors();
-        
+
         var addPasswordResult = await userManager.AddPasswordAsync(user, req.Password);
         addPasswordResult.Errors.Select(e => e.Description).ForEach((message) =>
         {
@@ -85,6 +82,7 @@ public class PostRegister(UserManager<AppUser> userManager, IdentityContext iden
         ThrowIfAnyErrors();
 
         user.EmailConfirmed = true;
+        user.DisplayName = req.DisplayName;
         await userManager.UpdateAsync(user);
 
         invitation.IsRegistered = true;
