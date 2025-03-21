@@ -21,7 +21,7 @@
         <Select
           v-model="formState.communityId"
           :invalid="!validation.isValid('communityId')"
-          :options="communities"
+          :options="availableCommunities"
           option-label="name"
           option-value="id"
           @update:model-value="validation.validateIfDirty('communityId')" />
@@ -69,16 +69,21 @@ import { inviteRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { onKeyDown } from '@vueuse/core'
 import { Button, Checkbox, InputText, Select, useToast } from 'primevue'
-import { onMounted, reactive, type Ref, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import invitesApi from '@/api/resources/invitesApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import FormArea from '@/components/form/FormArea.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
-import communitiesApi, { type CommunityResponse } from '@/api/resources/communitiesApi.ts'
 import FormField from '@/components/form/FormField.vue'
 import GridRowFill from '@/components/layout/GridRowFill.vue'
+import { useCommunityStore } from '@/stores/communityStore.ts'
 
 const toast = useToast()
+const communityStore = useCommunityStore()
+
+const availableCommunities = computed(() =>
+  communityStore.getCommunities().filter((community) => community.isOrganizable)
+)
 
 onKeyDown(KeyName.Enter, () => handleSubmit())
 
@@ -94,14 +99,13 @@ const props = defineProps<{
   visible?: boolean
 }>()
 
-const communities: Ref<CommunityResponse[]> = ref([])
-
 onMounted(async () => {
-  communities.value =
-    (await communitiesApi.get()).data?.filter((community) => community.isOrganizable) ?? []
+  if (communityStore.getCommunities().length === 0) {
+    await communityStore.loadCommunitiesAsync()
+  }
 })
 
-const emit = defineEmits<{ close: [] }>()
+const emit = defineEmits<{ create: [] }>()
 
 const isSubmitting = ref(false)
 const handleSubmit = async () => {
@@ -115,8 +119,8 @@ const handleSubmit = async () => {
   if (tryHandleUnsuccessfulResponse(response, toast, validation)) return
 
   toast.add({ detail: 'Successfully invited new user: ' + formState.email, severity: 'success' })
-  formState.email = ''
-  emit('close')
+  reset()
+  emit('create')
 }
 
 watch(
