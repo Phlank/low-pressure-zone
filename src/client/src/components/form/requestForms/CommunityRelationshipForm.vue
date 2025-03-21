@@ -27,7 +27,7 @@
             binary />
           <label for="isPerformerInput">Performer</label>
         </div>
-        <div>
+        <div v-if="authStore.isInRole(Role.Admin)">
           <Checkbox
             id="isOrganizerInput"
             v-model="formState.isOrganizer"
@@ -50,6 +50,10 @@ import { createFormValidation } from '@/validation/types/formValidation.ts'
 import { required } from '@/validation/rules/stringRules.ts'
 import { alwaysValid } from '@/validation/rules/untypedRules.ts'
 import IftaFormField from '@/components/form/IftaFormField.vue'
+import { useAuthStore } from '@/stores/authStore.ts'
+import { Role } from '@/constants/roles.ts'
+
+const authStore = useAuthStore()
 
 const props = defineProps<{
   initialState?: CommunityRelationshipResponse

@@ -1,8 +1,10 @@
 ﻿using FastEndpoints;
+using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Entities;
+using LowPressureZone.Identity.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,14 +12,14 @@ namespace LowPressureZone.Api.Endpoints.Communities.Relationships;
 
 public class UpdateCommunityRelationship(DataContext dataContext,
                                          IdentityContext identityContext,
-                                         UserManager<AppUser> userManager)
+                                         UserManager<AppUser> userManager,
+                                         CommunityRules communityRules)
     : EndpointWithMapper<CommunityRelationshipRequest, CommunityRelationshipMapper>
 {
     public override void Configure()
     {
         Verbs(Http.PUT, Http.POST);
         Routes("/communities/{communityId}/relationships/{userId}");
-        Roles(RoleNames.Admin);
     }
 
     public override async Task HandleAsync(CommunityRelationshipRequest request, CancellationToken ct)
@@ -43,6 +45,18 @@ public class UpdateCommunityRelationship(DataContext dataContext,
         if (roles.Contains(RoleNames.Admin))
         {
             await SendForbiddenAsync(ct);
+            return;
+        }
+
+        var community = await dataContext.Communities
+                                         .AsNoTracking()
+                                         .Where(community => community.Id == communityId)
+                                         .Include(community => community.Relationships.Where(relationship => relationship.UserId == User.GetIdOrDefault()))
+                                         .FirstAsync(ct);
+
+        if (!communityRules.IsOrganizable(community))
+        {
+            await SendUnauthorizedAsync(ct);
             return;
         }
 
