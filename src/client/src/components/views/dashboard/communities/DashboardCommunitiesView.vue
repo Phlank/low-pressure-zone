@@ -95,7 +95,7 @@ onMounted(async () => {
   if (communityStore.getCommunities().length === 0) {
     promises.push(communityStore.loadCommunitiesAsync())
   }
-  if (!userStore.isLoaded) {
+  if (userStore.users.length === 0) {
     promises.push(userStore.loadUsersAsync())
   }
   await Promise.all(promises)
