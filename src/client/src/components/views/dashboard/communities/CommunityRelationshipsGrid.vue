@@ -12,6 +12,7 @@
             label="Add User"
             @click="handleAddUserClick" />
         </template>
+        <template #empty>No items to display.</template>
         <Column
           field="displayName"
           header="Name" />
@@ -37,6 +38,43 @@
           </template>
         </Column>
       </DataTable>
+      <DataView
+        v-if="isMobile"
+        :paginator="relationships.length > 5"
+        :rows="5"
+        :value="relationships"
+        data-key="id">
+        <template #empty>
+          <ListItem>
+            <template #left>No items to display.</template>
+          </ListItem>
+        </template>
+        <template #list="{ items }: { items: CommunityRelationshipResponse[] }">
+          <ListItem
+            v-for="relationship in items"
+            :key="relationship.userId">
+            <template #left>
+              <span>{{ relationship.displayName }}</span>
+              <span class="text-s">{{ getMobileRelationshipText(relationship) }}</span>
+            </template>
+            <template #right>
+              <GridActions
+                show-edit
+                @edit="handleEditActionClick(relationship)" />
+            </template>
+          </ListItem>
+        </template>
+        <template #footer>
+          <Button
+            :disabled="availableUsers.length === 0"
+            label="Add User"
+            style="width: 100%"
+            @click="handleAddUserClick" />
+        </template>
+      </DataView>
+      <FormArea>
+        <template #actions></template>
+      </FormArea>
     </div>
     <FormDialog
       :is-submitting="isSubmitting"
@@ -63,7 +101,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Button, Column, DataTable, useToast } from 'primevue'
+import { Button, Column, DataTable, DataView, useToast } from 'primevue'
 import communityRelationshipsApi, {
   type CommunityRelationshipResponse
 } from '@/api/resources/communityRelationshipsApi.ts'
@@ -76,6 +114,8 @@ import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.t
 import { showCreateSuccessToast, showEditSuccessToast } from '@/utils/toastUtils.ts'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import { useUserStore } from '@/stores/userStore.ts'
+import ListItem from '@/components/data/ListItem.vue'
+import FormArea from '@/components/form/FormArea.vue'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const toast = useToast()
@@ -98,6 +138,13 @@ const availableUsers: ComputedRef<UserResponse[]> = computed(() => {
   const userIdsInUse = props.relationships.map((relationship) => relationship.userId)
   return userStore.users.filter((user) => userIdsInUse.indexOf(user.id) === -1)
 })
+
+const getMobileRelationshipText = (relationship: CommunityRelationshipResponse) => {
+  const roles = []
+  if (relationship.isPerformer) roles.push('Performer')
+  if (relationship.isOrganizer) roles.push('Organizer')
+  return roles.join(', ')
+}
 
 const createForm = useTemplateRef('createForm')
 const isSubmitting: Ref<boolean> = ref(false)

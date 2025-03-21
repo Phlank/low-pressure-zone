@@ -2,12 +2,16 @@
   <div
     class="list-item"
     @click="emit('click')">
-    <div class="list-item__left"><slot name="left"></slot></div>
-    <div class="list-item__right"><slot name="right"></slot></div>
+    <div class="list-item__left">
+      <slot name="left"></slot>
+    </div>
+    <div class="list-item__right">
+      <slot name="right"></slot>
+    </div>
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 const emit = defineEmits<{
   click: []
 }>()
@@ -24,6 +28,7 @@ const emit = defineEmits<{
   user-select: none;
   flex-wrap: nowrap;
   width: 100%;
+  min-height: 4rem;
   gap: variables.$space-l;
 
   &__left {

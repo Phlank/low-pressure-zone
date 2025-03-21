@@ -1,18 +1,19 @@
 <template>
   <div class="community-relationships">
-    Viewing relationships for:
-    <IftaLabel class="input input--medium">
-      <Select
-        v-model:model-value="selectedCommunity"
-        :option-label="(data: CommunityResponse) => data.name"
-        :option-value="(data: CommunityResponse) => data"
-        :options="availableCommunities"
-        class="input__field"
-        input-id="selectCommunityInput">
-      </Select>
-      <label for="selectCommunityInput">Community</label>
-    </IftaLabel>
-    <Divider />
+    <FormArea>
+      <IftaFormField
+        :size="isMobile ? 'm' : 's'"
+        input-id="selectCommunityInput"
+        label="Community">
+        <Select
+          v-model:model-value="selectedCommunity"
+          :option-label="(data: CommunityResponse) => data.name"
+          :option-value="(data: CommunityResponse) => data"
+          :options="availableCommunities"
+          input-id="selectCommunityInput" />
+      </IftaFormField>
+    </FormArea>
+    <!--    <Divider v-if="isMobile" />-->
     <CommunityRelationshipsGrid
       :community="selectedCommunity"
       :relationships="relationships"
@@ -21,12 +22,15 @@
 </template>
 
 <script lang="ts" setup>
-import { Divider, IftaLabel, Select } from 'primevue'
+import { Select } from 'primevue'
 import type { CommunityResponse } from '@/api/resources/communitiesApi.ts'
-import { computed, onMounted, ref, type Ref } from 'vue'
+import { computed, inject, onMounted, ref, type Ref } from 'vue'
 import CommunityRelationshipsGrid from '@/components/views/dashboard/communities/CommunityRelationshipsGrid.vue'
 import { useCommunityStore } from '@/stores/communityStore.ts'
+import IftaFormField from '@/components/form/IftaFormField.vue'
+import FormArea from '@/components/form/FormArea.vue'
 
+const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const communityStore = useCommunityStore()
 
 const props = defineProps<{

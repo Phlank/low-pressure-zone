@@ -11,3 +11,8 @@ export const distinct = <T>(array: T[]) => {
     return array.indexOf(value) === index
   })
 }
+
+export const joinIf = (array: { label: string; condition: boolean }[], separator: string) => {
+  const appliedLabels = array.filter((item) => item.condition).map((item) => item.label)
+  return appliedLabels.join(separator)
+}
