@@ -83,6 +83,7 @@ public class PostRegister(UserManager<AppUser> userManager, IdentityContext iden
 
         user.EmailConfirmed = true;
         user.DisplayName = req.DisplayName;
+        user.TwoFactorEnabled = true;
         await userManager.UpdateAsync(user);
 
         invitation.IsRegistered = true;
