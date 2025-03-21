@@ -104,7 +104,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Button, Column, DataTable, DataView, useToast } from 'primevue'
+import { Button, Column, DataTable, DataView, Divider, useToast } from 'primevue'
 import communityRelationshipsApi, {
   type CommunityRelationshipResponse
 } from '@/api/resources/communityRelationshipsApi.ts'

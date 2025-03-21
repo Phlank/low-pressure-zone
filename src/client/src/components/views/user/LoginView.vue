@@ -74,7 +74,7 @@ onKeyDown(KeyName.Enter, () => handleLogin())
 const isSubmitting = ref(false)
 const errorMessage = ref('')
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     redirect?: string
   }>(),
@@ -99,13 +99,13 @@ const handleLogin = async () => {
   }
 
   if (response.data?.requiresTwoFactor) {
-    await router.push('/user/twoFactor')
+    await router.replace(Routes.TwoFactor)
     return
   }
 
   await useAuthStore().load()
   isSubmitting.value = false
-  await router.push(props.redirect)
+  await router.push(Routes.Schedules)
 }
 </script>
 
