@@ -45,7 +45,9 @@
           </div>
         </TabPanel>
         <TabPanel value="relationships">
-          <div class="communities-dashboard__relationships">
+          <div
+            v-if="organizingCommunities.length > 0"
+            class="communities-dashboard__relationships">
             <CommunityRelationships :available-communities="organizingCommunities" />
           </div>
         </TabPanel>

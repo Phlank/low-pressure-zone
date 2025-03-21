@@ -19,7 +19,6 @@ public class GetCommunityRelationshipById(DataContext dataContext, IdentityConte
         var communityId = Route<Guid>("communityId");
         var userId = Route<Guid>("userId");
         var relationship = await dataContext.CommunityRelationships
-                                            .AsNoTracking()
                                             .Where(relationship => relationship.CommunityId == communityId && relationship.UserId == userId)
                                             .Where(relationship => relationship.IsOrganizer || relationship.IsPerformer)
                                             .Include(relationship => relationship.Community)

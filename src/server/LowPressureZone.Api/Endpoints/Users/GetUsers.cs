@@ -28,10 +28,10 @@ public class GetUsers(IdentityContext identityContext) : EndpointWithoutRequest<
                                 IsAdmin = userRoles != null && userRoles.Any(userRole => userRole.RoleId == adminRoleId),
                                 RegistrationDate = user.Invitation != null ? user.Invitation.RegistrationDate : null
                             };
-        if (!User.IsInRole(RoleNames.Admin)) userJoinQuery = userJoinQuery.Where(user => user.IsAdmin == false);
-        var results = await userJoinQuery
-                            .AsNoTracking()
-                            .ToListAsync(ct);
-        await SendOkAsync(results, ct);
+        IEnumerable<UserResponse> responses = await userJoinQuery
+                                                    .AsNoTracking()
+                                                    .ToListAsync(ct);
+        if (!User.IsInRole(RoleNames.Admin)) responses = responses.Where(response => !response.IsAdmin);
+        await SendOkAsync(responses, ct);
     }
 }

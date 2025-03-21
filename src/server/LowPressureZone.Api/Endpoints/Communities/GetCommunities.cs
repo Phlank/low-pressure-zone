@@ -10,11 +10,7 @@ namespace LowPressureZone.Api.Endpoints.Communities;
 public sealed class GetCommunities(DataContext dataContext)
     : EndpointWithoutRequest<IEnumerable<CommunityResponse>, CommunityMapper>
 {
-    public override void Configure()
-    {
-        Get("/communities");
-        Description(builder => builder.Produces<List<CommunityResponse>>());
-    }
+    public override void Configure() => Get("/communities");
 
     public override async Task HandleAsync(CancellationToken ct)
     {
@@ -22,7 +18,7 @@ public sealed class GetCommunities(DataContext dataContext)
                                                             .AsNoTracking()
                                                             .Include(community => community.Relationships.Where(relationship => relationship.UserId == User.GetIdOrDefault()));
         if (!User.IsInRole(RoleNames.Admin))
-            communitiesQuery = communitiesQuery.Where(community => community.IsDeleted);
+            communitiesQuery = communitiesQuery.Where(community => !community.IsDeleted);
 
         var communities = await communitiesQuery.ToListAsync(ct);
 
