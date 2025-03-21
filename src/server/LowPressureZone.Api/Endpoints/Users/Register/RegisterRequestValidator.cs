@@ -14,9 +14,7 @@ public class RegisterRequestValidator : Validator<RegisterRequest>
         RuleFor(request => request.DisplayName).NotEmpty()
                                                .WithMessage(Errors.Required)
                                                .MaximumLength(AppUser.DisplayNameMaxLength)
-                                               .WithMessage(Errors.MaxLength(AppUser.DisplayNameMaxLength))
-                                               .NotEqual(request => request.Username)
-                                               .WithMessage(Errors.NotEqual(nameof(RegisterRequest.Username)));
+                                               .WithMessage(Errors.MaxLength(AppUser.DisplayNameMaxLength));
         RuleFor(r => r.Username).Username();
         RuleFor(r => r.Password).Password();
         RuleFor(r => r.ConfirmPassword).Must((request, confirmPassword) => request.Password == confirmPassword)
