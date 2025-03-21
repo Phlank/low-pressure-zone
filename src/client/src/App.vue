@@ -12,8 +12,8 @@ import { Toast } from 'primevue'
 import { provide, ref, type Ref } from 'vue'
 import SiteLayout from './components/layout/site/SiteLayout.vue'
 import { useResizeObserver } from '@vueuse/core'
+import { mobileWidth } from '@/constants/size.ts'
 
-const mobileWidth = 760
 const isMobile: Ref<boolean> = ref(false)
 useResizeObserver(document.body, () => {
   isMobile.value = document.body.offsetWidth <= mobileWidth

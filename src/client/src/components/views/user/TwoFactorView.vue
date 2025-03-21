@@ -1,52 +1,50 @@
 <template>
   <Panel class="two-factor single-panel-center single-panel-center--no-header">
-    <Message
-      class="single-panel-center__message"
-      severity="info">
-      A two-factor code has been emailed to you.
-    </Message>
-    <div class="single-panel-center__form">
-      <IftaLabel class="input input--medium">
+    <FormArea>
+      <FormField
+        input-id="none"
+        size="m">
+        <Message
+          class="single-panel-center__message"
+          severity="info">
+          A two-factor code has been emailed to you.
+        </Message>
+      </FormField>
+      <IftaFormField
+        :message="errorMessage"
+        input-id="codeInput"
+        label="Code"
+        size="m">
         <InputText
           id="codeInput"
           v-model:model-value="formState.code"
           :autofocus="true"
-          class="input__field" />
-        <ValidationLabel
-          :disabled="isSubmitting"
-          for="codeInput"
-          message=""
-          text="Code" />
-      </IftaLabel>
-      <div v-if="errorMessage">
-        <Message
-          class="input--medium"
-          severity="error">
-          {{ errorMessage }}
-        </Message>
-      </div>
-      <div class="buttons">
+          :invalid="errorMessage !== ''" />
+      </IftaFormField>
+      <template #actions>
         <Button
           :disabled="isSubmitting"
           :loading="isSubmitting"
-          class="input"
           label="Verify"
+          style="width: 100%"
           @click="handleVerify" />
-      </div>
-    </div>
+      </template>
+    </FormArea>
   </Panel>
 </template>
 
 <script lang="ts" setup>
-import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { KeyName } from '@/constants/keys'
 import router from '@/router'
 import { Routes } from '@/router/routes'
 import { useAuthStore } from '@/stores/authStore'
 import { onKeyDown } from '@vueuse/core'
-import { Button, IftaLabel, InputText, Message, Panel } from 'primevue'
+import { Button, InputText, Message, Panel } from 'primevue'
 import { reactive, ref } from 'vue'
 import authApi from '@/api/resources/authApi.ts'
+import FormArea from '@/components/form/FormArea.vue'
+import FormField from '@/components/form/FormField.vue'
+import IftaFormField from '@/components/form/IftaFormField.vue'
 
 const formState = reactive({
   code: ''

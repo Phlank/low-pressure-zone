@@ -2,7 +2,9 @@
   <div
     ref="formAreaRef"
     class="form-area">
-    <div class="form-area__header">
+    <div
+      v-if="header"
+      class="form-area__header">
       <slot name="header">
         <h4>{{ header }}</h4>
       </slot>
@@ -17,10 +19,10 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, onMounted, onUnmounted, type Ref, ref, useTemplateRef } from 'vue'
+import { computed, onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
 import { clamp, useResizeObserver } from '@vueuse/core'
+import { mobileWidth } from '@/constants/size.ts'
 
-const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const formAreaRef = useTemplateRef('formAreaRef')
 const width = ref(0)
 
@@ -41,13 +43,13 @@ useResizeObserver(formAreaRef, (entries) => {
 
 const columnWidth = 80
 const columns = computed(() => {
-  if (isMobile?.value) {
+  if (width.value <= mobileWidth) {
     return clamp(Math.floor(width.value / columnWidth), 1, 4)
   }
   return clamp(Math.floor(width.value / columnWidth), 1, 99)
 })
 const widthPx = computed(() => {
-  if (isMobile?.value) {
+  if (width.value <= mobileWidth) {
     return width.value + 'px'
   }
   return width.value - (width.value % columnWidth) + 'px'
