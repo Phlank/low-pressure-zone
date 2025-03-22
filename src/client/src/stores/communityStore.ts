@@ -78,6 +78,42 @@ export const useCommunityStore = defineStore('communityStore', () => {
   const getRelationships = (communityId: string) =>
     loadedCommunityRelationships.value[communityId] ?? []
 
+  const addRelationship = (communityId: string, relationship: CommunityRelationshipResponse) => {
+    if (loadedCommunityRelationships.value[communityId] === undefined) return
+    var alphabeticalIndex = loadedCommunityRelationships.value[communityId]?.findIndex(
+      (loadedRelationship) =>
+        loadedRelationship.displayName.toLowerCase() > relationship.displayName.toLowerCase()
+    )
+    if (alphabeticalIndex > -1) {
+      loadedCommunityRelationships.value[communityId].splice(alphabeticalIndex, 0, relationship)
+    } else {
+      loadedCommunityRelationships.value[communityId].push(relationship)
+    }
+  }
+
+  const removeRelationship = (communityId: string, userId: string) => {
+    if (loadedCommunityRelationships.value[communityId] === undefined) return
+    const index = loadedCommunityRelationships.value[communityId]?.findIndex(
+      (relationship) => relationship.userId === userId
+    )
+    if (index === -1) return
+    loadedCommunityRelationships.value[communityId].splice(index, 1)
+  }
+
+  const updateRelationshipAsync = async (communityId: string, userId: string) => {
+    if (loadedCommunityRelationships.value[communityId] === undefined) return
+    const response = await communityRelationshipsApi.getById(communityId, userId)
+    if (!response.isSuccess()) return
+    const index = loadedCommunityRelationships.value[communityId]?.findIndex(
+      (relationship) => relationship.userId === userId
+    )
+    if (index === -1) {
+      addRelationship(communityId, response.data!)
+      return
+    }
+    loadedCommunityRelationships.value[communityId].splice(index, 1, response.data!)
+  }
+
   return {
     loadCommunitiesAsync,
     communities,
@@ -85,7 +121,10 @@ export const useCommunityStore = defineStore('communityStore', () => {
     addCommunity,
     updateCommunityAsync,
     loadRelationshipsAsync,
-    getRelationships
+    getRelationships,
+    addRelationship,
+    removeRelationship,
+    updateRelationshipAsync
   }
 })
 

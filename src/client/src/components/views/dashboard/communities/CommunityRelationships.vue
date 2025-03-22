@@ -10,7 +10,8 @@
           :option-label="(data: CommunityResponse) => data.name"
           :option-value="(data: CommunityResponse) => data"
           :options="availableCommunities"
-          input-id="selectCommunityInput" />
+          input-id="selectCommunityInput"
+          @update:model-value="handleCommunityChange" />
       </IftaFormField>
     </FormArea>
     <CommunityRelationshipsGrid
@@ -47,5 +48,11 @@ onMounted(async () => {
 
 const handleRelationshipUpdate = async () => {
   await communityStore.loadRelationshipsAsync(selectedCommunity.value.id)
+}
+
+const handleCommunityChange = async (newCommunity: CommunityResponse) => {
+  if (communityStore.getRelationships(newCommunity.id).length === 0) {
+    await communityStore.loadRelationshipsAsync(newCommunity.id)
+  }
 }
 </script>
