@@ -28,6 +28,15 @@ export const usePerformerStore = defineStore('performerStore', () => {
     loadedPerformers.value.filter((performer) => performer.isLinkableToTimeslot)
   )
 
+  const add = (performer: PerformerResponse) => {
+    const alphabeticalIndex = loadedPerformers.value.findIndex(
+      (loadedPerformer) => loadedPerformer.name.toLowerCase() > performer.name.toLowerCase()
+    )
+    if (alphabeticalIndex > -1) {
+      loadedPerformers.value.splice(alphabeticalIndex, 0, performer)
+    }
+  }
+
   const remove = (id: string) => {
     const index = loadedPerformers.value.findIndex((performer) => performer.id === id)
     if (index > -1) {
@@ -46,6 +55,7 @@ export const usePerformerStore = defineStore('performerStore', () => {
     performers,
     linkablePerformers,
     loadPerformersAsync,
+    add,
     remove,
     updateAsync
   }

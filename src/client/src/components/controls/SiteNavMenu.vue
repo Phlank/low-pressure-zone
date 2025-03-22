@@ -1,12 +1,12 @@
 <template>
   <div style="display: flex">
     <Button
+      aria-controls="navigation-menu"
       icon="pi pi-bars"
-      size="large"
-      @click="toggleMenu"
       outlined
       severity="secondary"
-      aria-controls="navigation-menu" />
+      size="large"
+      @click="toggleMenu" />
     <Menu
       id="navigation-menu"
       ref="navMenuRef"
@@ -43,15 +43,15 @@
 </template>
 
 <script lang="ts" setup>
-import router from '@/router'
 import { Routes } from '@/router/routes'
 import { useAuthStore } from '@/stores/authStore'
 import { Button, Menu } from 'primevue'
 import type { MenuItem } from 'primevue/menuitem'
 import { computed, onMounted, useTemplateRef } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import authApi from '@/api/resources/authApi.ts'
 
+const router = useRouter()
 const navMenuRef = useTemplateRef('navMenuRef')
 const authStore = useAuthStore()
 

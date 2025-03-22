@@ -102,7 +102,6 @@ const editFormInitialState: Ref<PerformerRequest> = ref({ name: '', url: '' })
 const editForm = useTemplateRef('editForm')
 
 const handleEditActionClick = async (performer: PerformerResponse) => {
-  await performerStore.updateAsync(performer.id)
   editingId = performer.id
   editFormInitialState.value.name = performer.name
   editFormInitialState.value.url = performer.url
@@ -139,7 +138,6 @@ let deletingId = ''
 const deletingName = ref('')
 
 const handleDeleteActionClick = async (performer: PerformerResponse) => {
-  await performerStore.updateAsync(performer.id)
   deletingId = performer.id
   deletingName.value = performer.name
   showDeleteDialog.value = true

@@ -39,8 +39,9 @@
 <script lang="ts" setup>
 import { Menubar } from 'primevue'
 import type { MenuItem } from 'primevue/menuitem'
-import { RouterLink } from 'vue-router'
-import router from '../../router'
+import { RouterLink, useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const props = defineProps<{
   items: MenuItem[]

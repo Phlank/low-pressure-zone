@@ -15,22 +15,22 @@ const sendRequest = async <TRequest extends object, TResponse = never>(
       credentials: 'include'
     })
 
-    if (response.status === 200) {
-      return new ApiResponse<TRequest, TResponse>(
-        response.status,
-        (await response.json()) as TResponse
-      )
-    }
-    if (response.status === 400) {
-      return new ApiResponse<TRequest, TResponse>(
-        response.status,
-        undefined,
-        (await response.json()) as ValidationProblemDetails<TRequest>
-      )
-    }
-    return new ApiResponse<TRequest, TResponse>(response.status)
+    return new ApiResponse<TRequest, TResponse>({
+      status: response.status,
+      headers: response.headers,
+      data: response.status === 200 ? ((await response.json()) as TResponse) : undefined,
+      // Only 400 responses will ever have problem details
+      validationProblem:
+        response.status === 400
+          ? ((await response.json()) as ValidationProblemDetails<TRequest>)
+          : undefined,
+      error: undefined
+    })
   } catch (error: unknown) {
-    return new ApiResponse<TRequest, TResponse>(0, undefined, undefined, error)
+    return new ApiResponse<TRequest, TResponse>({
+      status: 0,
+      error: error
+    })
   }
 }
 
