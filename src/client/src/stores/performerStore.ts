@@ -29,11 +29,17 @@ export const usePerformerStore = defineStore('performerStore', () => {
   )
 
   const add = (performer: PerformerResponse) => {
+    // Performers are ordered alphabetically from the API by name
+    // When inserting, need to keep this order
+    // This finds the index of the first item that has higher alphabetic value
+    // If there is none, inserts at the end of the array
     const alphabeticalIndex = loadedPerformers.value.findIndex(
       (loadedPerformer) => loadedPerformer.name.toLowerCase() > performer.name.toLowerCase()
     )
     if (alphabeticalIndex > -1) {
       loadedPerformers.value.splice(alphabeticalIndex, 0, performer)
+    } else {
+      loadedPerformers.value.push(performer)
     }
   }
 
@@ -48,7 +54,11 @@ export const usePerformerStore = defineStore('performerStore', () => {
     const response = await performersApi.getById(id)
     if (!response.isSuccess()) return
     const index = loadedPerformers.value.findIndex((performer) => performer.id === id)
-    loadedPerformers.value.splice(index, 1, response.data!)
+    if (index > -1) {
+      loadedPerformers.value.splice(index, 1, response.data!)
+    } else {
+      add(response.data!)
+    }
   }
 
   return {
