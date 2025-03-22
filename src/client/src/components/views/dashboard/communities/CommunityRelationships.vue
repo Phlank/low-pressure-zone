@@ -13,7 +13,6 @@
           input-id="selectCommunityInput" />
       </IftaFormField>
     </FormArea>
-    <!--    <Divider v-if="isMobile" />-->
     <CommunityRelationshipsGrid
       :community="selectedCommunity"
       :relationships="relationships"

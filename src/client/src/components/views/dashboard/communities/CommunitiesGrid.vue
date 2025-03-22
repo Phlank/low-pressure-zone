@@ -75,18 +75,15 @@ import communitiesApi, {
   type CommunityResponse
 } from '@/api/resources/communitiesApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import { useCommunityStore } from '@/stores/communityStore.ts'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const isSubmitting = ref(false)
 const toast = useToast()
+const communityStore = useCommunityStore()
 
 defineProps<{
   communities: CommunityResponse[]
-}>()
-
-const emit = defineEmits<{
-  edited: [id: string]
-  deleted: [id: string]
 }>()
 
 const showEditDialog = ref(false)
@@ -114,7 +111,7 @@ const handleSave = async () => {
 
   showEditSuccessToast(toast, 'community', editForm.value.formState.name)
   showEditDialog.value = false
-  emit('edited', editingId)
+  await communityStore.updateCommunityAsync(editingId)
 }
 
 const showDeleteDialog = ref(false)
@@ -134,6 +131,6 @@ const handleDelete = async () => {
 
   showDeleteSuccessToast(toast, 'community', deletingName.value)
   showDeleteDialog.value = false
-  emit('deleted', deletingId)
+  communityStore.removeCommunity(deletingId)
 }
 </script>

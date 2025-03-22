@@ -1,6 +1,6 @@
 import communitiesApi, { type CommunityResponse } from '@/api/resources/communitiesApi'
 import { defineStore } from 'pinia'
-import { type Ref, ref } from 'vue'
+import { computed, type Ref, ref } from 'vue'
 import communityRelationshipsApi, {
   type CommunityRelationshipResponse
 } from '@/api/resources/communityRelationshipsApi.ts'
@@ -26,7 +26,8 @@ export const useCommunityStore = defineStore('communityStore', () => {
     await loadCommunitiesPromise
     loadCommunitiesPromise = undefined
   }
-  const getCommunities = () => loadedCommunities.value
+
+  const communities = computed(() => loadedCommunities.value)
 
   const removeCommunity = (id: string) => {
     const index = loadedCommunities.value.findIndex((community) => community.id === id)
@@ -79,7 +80,7 @@ export const useCommunityStore = defineStore('communityStore', () => {
 
   return {
     loadCommunitiesAsync,
-    getCommunities,
+    communities,
     removeCommunity,
     addCommunity,
     updateCommunityAsync,
