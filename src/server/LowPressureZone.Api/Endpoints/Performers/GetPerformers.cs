@@ -15,7 +15,7 @@ public sealed class GetPerformers(DataContext dataContext, PerformerRules rules)
                                           .AsNoTracking()
                                           .OrderBy(performer => performer.Name)
                                           .ToListAsync(ct);
-        performers.RemoveAll(rules.IsHiddenFromApi);
+        performers.RemoveAll(PerformerRules.IsHiddenFromApi);
         var responses = performers.Select(Map.FromEntity);
         await SendOkAsync(responses, ct);
     }

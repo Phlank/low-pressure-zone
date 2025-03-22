@@ -22,8 +22,10 @@ import { showCreateSuccessToast } from '@/utils/toastUtils'
 import { Button, useToast } from 'primevue'
 import { computed, ref, useTemplateRef } from 'vue'
 import performersApi, { type PerformerRequest } from '@/api/resources/performersApi.ts'
+import { usePerformerStore } from '@/stores/performerStore.ts'
 
 const toast = useToast()
+const performerStore = usePerformerStore()
 const createFormInitialState: PerformerRequest = { name: '', url: '' }
 const createForm = useTemplateRef('createForm')
 
@@ -42,11 +44,7 @@ const handleCreatePerformer = async () => {
   if (tryHandleUnsuccessfulResponse(response, toast, createForm.value.validation)) return
 
   showCreateSuccessToast(toast, 'performer', createForm.value.formState.name)
-  emit('createdPerformer')
   createForm.value.reset()
+  await performerStore.loadPerformersAsync()
 }
-
-const emit = defineEmits<{
-  createdPerformer: []
-}>()
 </script>
