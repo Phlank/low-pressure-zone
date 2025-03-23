@@ -1,6 +1,6 @@
 import communitiesApi, { type CommunityResponse } from '@/api/resources/communitiesApi'
 import { defineStore } from 'pinia'
-import { type Ref, ref } from 'vue'
+import { computed, type Ref, ref } from 'vue'
 import communityRelationshipsApi, {
   type CommunityRelationshipResponse
 } from '@/api/resources/communityRelationshipsApi.ts'
@@ -26,7 +26,37 @@ export const useCommunityStore = defineStore('communityStore', () => {
     await loadCommunitiesPromise
     loadCommunitiesPromise = undefined
   }
-  const getCommunities = () => loadedCommunities.value
+
+  const communities = computed(() => loadedCommunities.value)
+
+  const removeCommunity = (id: string) => {
+    const index = loadedCommunities.value.findIndex((community) => community.id === id)
+    if (index > -1) {
+      loadedCommunities.value.splice(index, 1)
+    }
+  }
+
+  const addCommunity = (community: CommunityResponse) => {
+    const alphabeticalIndex = loadedCommunities.value.findIndex(
+      (loadedCommunity) => loadedCommunity.name.toLowerCase() > community.name.toLowerCase()
+    )
+    if (alphabeticalIndex > -1) {
+      loadedCommunities.value.splice(alphabeticalIndex, 0, community)
+    } else {
+      loadedCommunities.value.push(community)
+    }
+  }
+
+  const updateCommunityAsync = async (id: string) => {
+    const response = await communitiesApi.getById(id)
+    if (!response.isSuccess()) return
+    const index = loadedCommunities.value.findIndex((community) => community.id === id)
+    if (index > -1) {
+      loadedCommunities.value.splice(index, 1, response.data!)
+    } else {
+      addCommunity(response.data!)
+    }
+  }
 
   const loadRelationshipsPromises: RelationshipPromiseMap = {}
   const loadRelationships = async (communityId: string) => {
@@ -48,11 +78,53 @@ export const useCommunityStore = defineStore('communityStore', () => {
   const getRelationships = (communityId: string) =>
     loadedCommunityRelationships.value[communityId] ?? []
 
+  const addRelationship = (communityId: string, relationship: CommunityRelationshipResponse) => {
+    if (loadedCommunityRelationships.value[communityId] === undefined) return
+    const alphabeticalIndex = loadedCommunityRelationships.value[communityId].findIndex(
+      (loadedRelationship) =>
+        loadedRelationship.displayName.toLowerCase() > relationship.displayName.toLowerCase()
+    )
+    if (alphabeticalIndex > -1) {
+      loadedCommunityRelationships.value[communityId].splice(alphabeticalIndex, 0, relationship)
+    } else {
+      loadedCommunityRelationships.value[communityId].push(relationship)
+    }
+  }
+
+  const removeRelationship = (communityId: string, userId: string) => {
+    if (loadedCommunityRelationships.value[communityId] === undefined) return
+    const index = loadedCommunityRelationships.value[communityId]?.findIndex(
+      (relationship) => relationship.userId === userId
+    )
+    if (index === -1) return
+    loadedCommunityRelationships.value[communityId].splice(index, 1)
+  }
+
+  const updateRelationshipAsync = async (communityId: string, userId: string) => {
+    if (loadedCommunityRelationships.value[communityId] === undefined) return
+    const response = await communityRelationshipsApi.getById(communityId, userId)
+    if (!response.isSuccess()) return
+    const index = loadedCommunityRelationships.value[communityId]?.findIndex(
+      (relationship) => relationship.userId === userId
+    )
+    if (index === -1) {
+      addRelationship(communityId, response.data!)
+      return
+    }
+    loadedCommunityRelationships.value[communityId].splice(index, 1, response.data!)
+  }
+
   return {
     loadCommunitiesAsync,
-    getCommunities,
+    communities,
+    removeCommunity,
+    addCommunity,
+    updateCommunityAsync,
     loadRelationshipsAsync,
-    getRelationships
+    getRelationships,
+    addRelationship,
+    removeRelationship,
+    updateRelationshipAsync
   }
 })
 

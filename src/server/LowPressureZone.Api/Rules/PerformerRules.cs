@@ -33,9 +33,6 @@ public class PerformerRules(IHttpContextAccessor contextAccessor)
         return performer.LinkedUserIds.Contains(User.GetIdOrDefault());
     }
 
-    public bool IsHiddenFromApi(Performer entity)
-    {
-        if (User == null) return true;
-        return !User.IsInRole(RoleNames.Admin) && entity.IsDeleted;
-    }
+    public static bool IsHiddenFromApi(Performer entity)
+        => entity.IsDeleted;
 }

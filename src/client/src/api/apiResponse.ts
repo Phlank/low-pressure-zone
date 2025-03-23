@@ -1,28 +1,41 @@
-export class ApiResponse<TRequest extends object, TResponse> {
-  readonly data?: TResponse
+interface ApiResponseParameters<TRequest, TResponse> {
   readonly status: number
+  readonly headers?: Headers
+  readonly data?: TResponse
   readonly validationProblem?: ValidationProblemDetails<TRequest>
-  readonly error: unknown
+  readonly error?: unknown
+}
 
-  constructor(
-    status: number,
-    data: TResponse | undefined = undefined,
-    validationProblem: ValidationProblemDetails<TRequest> | undefined = undefined,
-    error: unknown = undefined
-  ) {
-    this.status = status
-    this.data = data
-    this.validationProblem = validationProblem
-    this.error = error
+// noinspection MagicNumberJS
+export class ApiResponse<TRequest, TResponse> {
+  readonly status: number
+  readonly headers?: Headers
+  readonly data?: TResponse
+  readonly validationProblem?: ValidationProblemDetails<TRequest>
+  readonly error?: unknown
+
+  constructor(parameters: ApiResponseParameters<TRequest, TResponse>) {
+    this.status = parameters.status
+    this.headers = parameters.headers
+    this.data = parameters.data
+    this.validationProblem = parameters.validationProblem
+    this.error = parameters.error
   }
 
   /**
    * @returns `true` if the status is successful. If the status is 200, then `data` must be defined.
    */
   readonly isSuccess = () => {
-    const hasSuccessStatus = this.status >= 200 && this.status < 300
-    const hasRequiredData = this.status !== 200 || this.data !== undefined
-    return hasSuccessStatus && hasRequiredData
+    if (this.status < 200 || this.status > 299) {
+      return false
+    }
+    if (this.status === 200) {
+      return this.data !== undefined
+    }
+    if (this.status === 201) {
+      return this.headers?.get('location') !== undefined
+    }
+    return true
   }
 
   /**
@@ -40,9 +53,14 @@ export class ApiResponse<TRequest extends object, TResponse> {
    * @returns `true` if no contact with the API occurred.
    */
   readonly isFailure = () => this.status === 0
+
+  /**
+   * @returns the resource id from the location header after a successful POST
+   */
+  readonly getCreatedId = () => this.headers?.get('location')?.split('/').pop()
 }
 
-export interface ValidationProblemDetails<TRequest extends object> {
+export interface ValidationProblemDetails<TRequest> {
   type: string
   title: string
   status: number
@@ -51,6 +69,6 @@ export interface ValidationProblemDetails<TRequest extends object> {
   errors: ErrorMessageDictionary<TRequest>
 }
 
-export type ErrorMessageDictionary<TRequest extends object> = {
+export type ErrorMessageDictionary<TRequest> = {
   [key in keyof TRequest | 'generalErrors']?: string[]
 }

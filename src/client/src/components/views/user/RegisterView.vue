@@ -66,7 +66,6 @@
 <script lang="ts" setup>
 import { KeyName } from '@/constants/keys'
 import { TokenProvider, TokenPurpose } from '@/constants/tokens'
-import router from '@/router'
 import { Routes } from '@/router/routes'
 import { useAuthStore } from '@/stores/authStore'
 import { registerRequestRules } from '@/validation/requestRules'
@@ -78,6 +77,9 @@ import authApi, { type RegisterRequest } from '@/api/resources/authApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import FormArea from '@/components/form/FormArea.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 onKeyDown(KeyName.Enter, () => handleRegister())
 

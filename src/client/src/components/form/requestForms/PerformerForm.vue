@@ -3,30 +3,31 @@
     <IftaLabel class="input input--small">
       <InputText
         id="name"
-        class="input__field"
         v-model:model-value="formState.name"
-        @update:model-value="validation.validateIfDirty('name')"
         :disabled="disabled"
-        :invalid="!validation.isValid('name')" />
+        :invalid="!validation.isValid('name')"
+        autofocus
+        class="input__field"
+        @update:model-value="validation.validateIfDirty('name')" />
       <ValidationLabel
-        for="name"
         :message="validation.message('name')"
-        >Name</ValidationLabel
-      >
+        for="name"
+        >Name
+      </ValidationLabel>
     </IftaLabel>
     <IftaLabel class="input input--large">
       <InputText
         id="url"
-        class="input__field"
         v-model:model-value="formState.url"
-        @update:model-value="validation.validateIfDirty('url')"
         :disabled="disabled"
-        :invalid="!validation.isValid('url')" />
+        :invalid="!validation.isValid('url')"
+        class="input__field"
+        @update:model-value="validation.validateIfDirty('url')" />
       <ValidationLabel
-        for="url"
         :message="validation.message('url')"
-        >URL</ValidationLabel
-      >
+        for="url"
+        >URL
+      </ValidationLabel>
     </IftaLabel>
   </div>
 </template>
@@ -43,18 +44,17 @@ const formState: PerformerRequest = reactive({ name: '', url: '' })
 const validation = createFormValidation(formState, performerRequestRules)
 
 const props = defineProps<{
-  initialState: PerformerRequest
+  initialState?: PerformerRequest
   disabled: boolean
 }>()
 
 onMounted(() => {
-  formState.name = props.initialState.name
-  formState.url = props.initialState.url
+  reset()
 })
 
 const reset = () => {
-  formState.name = props.initialState.name
-  formState.url = props.initialState.url
+  formState.name = props.initialState?.name ?? ''
+  formState.url = props.initialState?.url ?? ''
   validation.reset()
 }
 

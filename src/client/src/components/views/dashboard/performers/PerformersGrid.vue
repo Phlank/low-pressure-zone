@@ -81,10 +81,13 @@ import performersApi, {
   type PerformerResponse
 } from '@/api/resources/performersApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import { usePerformerStore } from '@/stores/performerStore.ts'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 
 const toast = useToast()
+const performerStore = usePerformerStore()
+
 defineProps<{
   performers: PerformerResponse[]
 }>()
@@ -98,7 +101,7 @@ let editingId = ''
 const editFormInitialState: Ref<PerformerRequest> = ref({ name: '', url: '' })
 const editForm = useTemplateRef('editForm')
 
-const handleEditActionClick = (performer: PerformerResponse) => {
+const handleEditActionClick = async (performer: PerformerResponse) => {
   editingId = performer.id
   editFormInitialState.value.name = performer.name
   editFormInitialState.value.url = performer.url
@@ -126,15 +129,15 @@ const handleSave = async () => {
 
   showEditSuccessToast(toast, 'performer', editFormInitialState.value.name)
   showEditDialog.value = false
+  await performerStore.updateAsync(editingId)
 }
 
 // DELETING PERFORMERS
-
 const showDeleteDialog = ref(false)
 let deletingId = ''
 const deletingName = ref('')
 
-const handleDeleteActionClick = (performer: PerformerResponse) => {
+const handleDeleteActionClick = async (performer: PerformerResponse) => {
   deletingId = performer.id
   deletingName.value = performer.name
   showDeleteDialog.value = true
@@ -149,5 +152,6 @@ const handleDelete = async () => {
 
   showDeleteSuccessToast(toast, 'performer', deletingName.value)
   showDeleteDialog.value = false
+  performerStore.remove(deletingId)
 }
 </script>

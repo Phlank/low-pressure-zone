@@ -35,7 +35,6 @@
 
 <script lang="ts" setup>
 import { KeyName } from '@/constants/keys'
-import router from '@/router'
 import { Routes } from '@/router/routes'
 import { useAuthStore } from '@/stores/authStore'
 import { onKeyDown } from '@vueuse/core'
@@ -45,6 +44,9 @@ import authApi from '@/api/resources/authApi.ts'
 import FormArea from '@/components/form/FormArea.vue'
 import FormField from '@/components/form/FormField.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const formState = reactive({
   code: ''

@@ -50,7 +50,6 @@
 <script lang="ts" setup>
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { KeyName } from '@/constants/keys'
-import router from '@/router'
 import { Routes } from '@/router/routes'
 import { useAuthStore } from '@/stores/authStore'
 import { loginRequestRules } from '@/validation/requestRules'
@@ -60,8 +59,10 @@ import { Button, IftaLabel, InputText, Message, Panel, Password, useToast } from
 import { reactive, ref } from 'vue'
 import authApi, { type LoginRequest } from '@/api/resources/authApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import { useRouter } from 'vue-router'
 
 const toast = useToast()
+const router = useRouter()
 
 const formState: LoginRequest = reactive({
   username: '',

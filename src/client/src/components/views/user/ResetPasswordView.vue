@@ -39,7 +39,6 @@
 <script lang="ts" setup>
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { KeyName } from '@/constants/keys'
-import router from '@/router'
 import { Routes } from '@/router/routes'
 import { equals, password, required } from '@/validation/rules/stringRules'
 import { createFormValidation } from '@/validation/types/formValidation'
@@ -48,9 +47,12 @@ import { Button, IftaLabel, Panel, Password, useToast } from 'primevue'
 import { reactive, ref } from 'vue'
 import authApi from '@/api/resources/authApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import { useRouter } from 'vue-router'
+
+const toast = useToast()
+const router = useRouter()
 
 const isSubmitting = ref(false)
-const toast = useToast()
 onKeyDown(KeyName.Enter, () => handleUpdatePassword())
 const props = defineProps<{
   context: string

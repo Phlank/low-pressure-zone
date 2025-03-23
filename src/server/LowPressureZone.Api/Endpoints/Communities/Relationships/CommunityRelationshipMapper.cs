@@ -32,7 +32,7 @@ public class CommunityRelationshipMapper(IHttpContextAccessor contextAccessor, C
         await dataContext.SaveChangesAsync(ct);
     }
 
-    public CommunityRelationshipResponse FromEntity(CommunityRelationship relationship, string displayName)
+    public CommunityRelationshipResponse FromEntity(CommunityRelationship relationship, string displayName, CommunityRelationship? userRelationship)
     {
         var communityId = contextAccessor.GetGuidRouteParameterOrDefault("communityId");
         return new CommunityRelationshipResponse
@@ -42,7 +42,7 @@ public class CommunityRelationshipMapper(IHttpContextAccessor contextAccessor, C
             DisplayName = displayName,
             IsOrganizer = relationship.IsOrganizer,
             IsPerformer = relationship.IsPerformer,
-            IsEditable = rules.IsEditable(relationship)
+            IsEditable = rules.IsEditable(relationship, userRelationship)
         };
     }
 }

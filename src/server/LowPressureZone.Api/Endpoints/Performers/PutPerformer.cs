@@ -25,7 +25,7 @@ public sealed class PutPerformer(DataContext dataContext, PerformerRules rules)
                                           .Where(p => p.Id == id)
                                           .FirstOrDefaultAsync(ct);
 
-        if (performer == null || _rules.IsHiddenFromApi(performer))
+        if (performer == null || PerformerRules.IsHiddenFromApi(performer))
         {
             await SendNotFoundAsync(ct);
             return;

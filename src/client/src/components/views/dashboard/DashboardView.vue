@@ -52,11 +52,12 @@ import { useAuthStore } from '@/stores/authStore'
 import { Menu, Panel } from 'primevue'
 import type { MenuItem } from 'primevue/menuitem'
 import { inject, onMounted, type Ref } from 'vue'
-import router from '@/router'
 import { useCommunityStore } from '@/stores/communityStore.ts'
+import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
 const communityStore = useCommunityStore()
+const router = useRouter()
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const menuItems: MenuItem[] = [

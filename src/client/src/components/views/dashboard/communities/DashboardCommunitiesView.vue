@@ -26,22 +26,17 @@
             <CommunitiesGrid
               v-if="linkedCommunities.length > 0"
               :communities="
-                communityStore
-                  .getCommunities()
-                  .filter((community) => community.isPerformable || community.isOrganizable)
-              "
-              @deleted="communityStore.loadCommunitiesAsync()"
-              @edited="communityStore.loadCommunitiesAsync()" />
+                communityStore.communities.filter(
+                  (community) => community.isPerformable || community.isOrganizable
+                )
+              " />
             <div v-else>You do not currently have any linked communities.</div>
           </div>
         </TabPanel>
         <TabPanel value="all">
           <div class="communities-dashboard__all">
             <h4>All Communities</h4>
-            <CommunitiesGrid
-              :communities="communityStore.getCommunities()"
-              @deleted="communityStore.loadCommunitiesAsync()"
-              @edited="communityStore.loadCommunitiesAsync()" />
+            <CommunitiesGrid :communities="communityStore.communities" />
           </div>
         </TabPanel>
         <TabPanel value="relationships">
@@ -52,7 +47,7 @@
           </div>
         </TabPanel>
         <TabPanel value="create">
-          <CreateCommunity @created-community="communityStore.loadCommunitiesAsync()" />
+          <CreateCommunity />
         </TabPanel>
       </TabPanels>
     </Tabs>
@@ -80,19 +75,19 @@ const isLoaded = ref(false)
 const tabValue: Ref<string | number> = ref('0')
 
 const linkedCommunities = computed(() =>
-  communityStore
-    .getCommunities()
-    .filter((community) => community.isPerformable || community.isOrganizable)
+  communityStore.communities.filter(
+    (community) => community.isPerformable || community.isOrganizable
+  )
 )
 
 const organizingCommunities = computed(() =>
-  communityStore.getCommunities().filter((community) => community.isOrganizable)
+  communityStore.communities.filter((community) => community.isOrganizable)
 )
 
 onMounted(async () => {
   if (authStore.isInAnySpecifiedRole(Role.Admin)) tabValue.value = 'all'
   const promises: Promise<void>[] = []
-  if (communityStore.getCommunities().length === 0) {
+  if (communityStore.communities.length === 0) {
     promises.push(communityStore.loadCommunitiesAsync())
   }
   if (userStore.users.length === 0) {

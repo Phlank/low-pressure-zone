@@ -43,9 +43,5 @@ public class CommunityRules(IHttpContextAccessor contextAccessor)
         return User.IsInRole(RoleNames.Admin);
     }
 
-    public bool IsHiddenFromApi(Community entity)
-    {
-        if (User == null) return true;
-        return !User.IsInRole(RoleNames.Admin) && entity.IsDeleted;
-    }
+    public bool IsHiddenFromApi(Community community) => community.IsDeleted;
 }
