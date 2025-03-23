@@ -1,6 +1,6 @@
 import { sendDelete, sendGet, sendPost, sendPut } from '../fetchFunctions'
 
-const route = (performerId?: string) => `/performers${performerId ? '/' + performerId : ''}`
+const route = (performerId?: string) => `/performers/${performerId ?? ''}`
 
 export default {
   get: () => sendGet<PerformerResponse[]>(route()),

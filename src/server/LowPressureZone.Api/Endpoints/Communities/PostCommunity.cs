@@ -18,6 +18,7 @@ public sealed class PostCommunity(DataContext dataContext) : EndpointWithMapper<
         var community = Map.ToEntity(req);
         dataContext.Communities.Add(community);
         await dataContext.SaveChangesAsync(ct);
+        HttpContext.Response.Headers.Append("Access-Control-Expose-Headers", "location");
         await SendCreatedAtAsync<GetCommunities>(new
         {
             community.Id

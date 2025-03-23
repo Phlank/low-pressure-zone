@@ -32,6 +32,7 @@ public class PostSchedule(DataContext dataContext, CommunityRules communityRules
 
         DataContext.Schedules.Add(schedule);
         await DataContext.SaveChangesAsync(ct);
+        HttpContext.Response.Headers.Append("Access-Control-Expose-Headers", "location");
         await SendCreatedAtAsync<GetScheduleById>(new
         {
             schedule.Id

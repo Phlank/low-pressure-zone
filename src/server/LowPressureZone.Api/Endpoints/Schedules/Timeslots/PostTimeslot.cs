@@ -35,6 +35,7 @@ public class PostTimeslot(DataContext dataContext, PerformerRules performerRules
         var timeslot = Map.ToEntity(request);
         dataContext.Timeslots.Add(timeslot);
         await dataContext.SaveChangesAsync(ct);
+        HttpContext.Response.Headers.Append("Access-Control-Expose-Headers", "location");
         await SendCreatedAtAsync<GetScheduleById>(new
         {
             id = scheduleId

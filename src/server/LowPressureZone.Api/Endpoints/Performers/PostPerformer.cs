@@ -16,6 +16,7 @@ public sealed class PostPerformer(DataContext dataContext) : EndpointWithMapper<
         var performer = Map.ToEntity(request);
         dataContext.Performers.Add(performer);
         await dataContext.SaveChangesAsync(ct);
+        HttpContext.Response.Headers.Append("Access-Control-Expose-Headers", "location");
         await SendCreatedAtAsync<GetPerformerById>(new
         {
             performer.Id

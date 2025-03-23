@@ -72,6 +72,7 @@ public class UpdateCommunityRelationship(DataContext dataContext,
 
         await dataContext.AddAsync(Map.ToEntity(request), ct);
         await dataContext.SaveChangesAsync(ct);
+        HttpContext.Response.Headers.Append("Access-Control-Expose-Headers", "location");
         await SendCreatedAtAsync<GetCommunityRelationshipById>(new
         {
             communityId,

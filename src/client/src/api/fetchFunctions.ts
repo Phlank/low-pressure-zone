@@ -9,21 +9,23 @@ const sendRequest = async <TRequest extends object, TResponse = never>(
 ) => {
   try {
     const response = await fetch(`${API_URL}${route}`, {
-      body: request ? JSON.stringify(request) : null,
+      body: request ? JSON.stringify(request) : undefined,
       method: method,
       headers: request ? { 'Content-Type': 'application/json' } : undefined,
       credentials: 'include'
     })
 
+    const data = response.status === 200 ? ((await response.json()) as TResponse) : undefined
+    const validationProblem =
+      response.status === 400
+        ? ((await response.json()) as ValidationProblemDetails<TRequest>)
+        : undefined
     return new ApiResponse<TRequest, TResponse>({
       status: response.status,
       headers: response.headers,
-      data: response.status === 200 ? ((await response.json()) as TResponse) : undefined,
+      data: data,
       // Only 400 responses will ever have problem details
-      validationProblem:
-        response.status === 400
-          ? ((await response.json()) as ValidationProblemDetails<TRequest>)
-          : undefined,
+      validationProblem: validationProblem,
       error: undefined
     })
   } catch (error: unknown) {
