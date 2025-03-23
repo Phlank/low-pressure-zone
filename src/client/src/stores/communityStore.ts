@@ -80,7 +80,7 @@ export const useCommunityStore = defineStore('communityStore', () => {
 
   const addRelationship = (communityId: string, relationship: CommunityRelationshipResponse) => {
     if (loadedCommunityRelationships.value[communityId] === undefined) return
-    var alphabeticalIndex = loadedCommunityRelationships.value[communityId]?.findIndex(
+    const alphabeticalIndex = loadedCommunityRelationships.value[communityId].findIndex(
       (loadedRelationship) =>
         loadedRelationship.displayName.toLowerCase() > relationship.displayName.toLowerCase()
     )

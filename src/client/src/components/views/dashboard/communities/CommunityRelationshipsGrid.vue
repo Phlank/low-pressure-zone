@@ -4,7 +4,7 @@
       <DataTable
         v-if="!isMobile"
         :rows="10"
-        :value="relationships"
+        :value="communityStore.getRelationships(props.community.id)"
         paginator>
         <template #paginatorstart>
           <Button
@@ -40,9 +40,9 @@
       </DataTable>
       <DataView
         v-if="isMobile"
-        :paginator="relationships.length > 5"
+        :paginator="communityStore.getRelationships(props.community.id).length > 5"
         :rows="5"
-        :value="relationships"
+        :value="communityStore.getRelationships(props.community.id)"
         data-key="id">
         <template #empty>
           <ListItem>
@@ -119,18 +119,15 @@ import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import { useUserStore } from '@/stores/userStore.ts'
 import ListItem from '@/components/data/ListItem.vue'
 import FormArea from '@/components/form/FormArea.vue'
+import { useCommunityStore } from '@/stores/communityStore.ts'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const toast = useToast()
 const userStore = useUserStore()
+const communityStore = useCommunityStore()
 
 const props = defineProps<{
   community: CommunityResponse
-  relationships: CommunityRelationshipResponse[]
-}>()
-
-const emit = defineEmits<{
-  update: []
 }>()
 
 onMounted(async () => {
@@ -138,7 +135,9 @@ onMounted(async () => {
 })
 
 const availableUsers: ComputedRef<UserResponse[]> = computed(() => {
-  const userIdsInUse = props.relationships.map((relationship) => relationship.userId)
+  const userIdsInUse = communityStore
+    .getRelationships(props.community.id)
+    .map((relationship) => relationship.userId)
   return userStore.users.filter((user) => userIdsInUse.indexOf(user.id) === -1)
 })
 
@@ -152,13 +151,18 @@ const getMobileRelationshipText = (relationship: CommunityRelationshipResponse) 
 const createForm = useTemplateRef('createForm')
 const isSubmitting: Ref<boolean> = ref(false)
 const showCreateDialog: Ref<boolean> = ref(false)
+
 const handleAddUserClick = async () => {
   updatingRelationship.value = undefined
   showCreateDialog.value = true
 }
+
 const handleCreateDialogSave = async () => {
   if (!createForm.value) return
-  const isValid = createForm.value.validation.validate()
+  const formState = createForm.value.formState
+  const validation = createForm.value.validation
+
+  const isValid = validation.validate()
   if (!isValid) return
 
   isSubmitting.value = true
@@ -171,11 +175,17 @@ const handleCreateDialogSave = async () => {
 
   if (tryHandleUnsuccessfulResponse(response, toast)) return
 
-  const displayName = userStore.getUser(createForm.value.formState.userId).displayName
-  if (updatingRelationship.value) showEditSuccessToast(toast, 'relationship', displayName)
-  else showCreateSuccessToast(toast, 'relationship', displayName)
+  const displayName = userStore.getUser(formState.userId).displayName
+  showCreateSuccessToast(toast, 'relationship', displayName)
   showCreateDialog.value = false
-  emit('update')
+  communityStore.addRelationship(props.community.id, {
+    userId: formState.userId,
+    communityId: props.community.id,
+    displayName: userStore.getUser(formState.userId).displayName,
+    isOrganizer: formState.isOrganizer,
+    isPerformer: formState.isPerformer,
+    isEditable: true
+  })
 }
 
 const updateForm = useTemplateRef('updateForm')
@@ -207,6 +217,11 @@ const handleEditDialogSave = async () => {
   const displayName = userStore.getUser(updatingUserId.value).displayName
   showEditSuccessToast(toast, 'relationship', displayName)
   showUpdateDialog.value = false
-  emit('update')
+  await communityStore.updateRelationshipAsync(
+    updatingRelationship.value!.communityId,
+    updatingRelationship.value!.userId
+  )
+  updatingRelationship.value = undefined
+  updatingUserId.value = ''
 }
 </script>

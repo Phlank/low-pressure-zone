@@ -16,12 +16,10 @@ public class GetCommunityRelationships(DataContext dataContext, IdentityContext 
 
         var relationships = await dataContext.CommunityRelationships
                                              .AsNoTracking()
-                                             .AsSplitQuery()
                                              .Where(relationship => relationship.CommunityId == communityId)
-                                             .Include(relationship => relationship.Community)
                                              .ToListAsync(ct);
         var userRelationship = relationships.FirstOrDefault(relationship => relationship.UserId == User.GetIdOrDefault());
-        var relationshipUserIds = relationships.Select(relationship => relationship.UserId).Distinct();
+        var relationshipUserIds = relationships.Select(relationship => relationship.UserId);
         var displayNames = await identityContext.Users
                                                 .AsNoTracking()
                                                 .Where(user => relationshipUserIds.Contains(user.Id))

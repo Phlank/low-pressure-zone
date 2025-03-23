@@ -19,18 +19,18 @@ public class GetCommunityRelationshipById(DataContext dataContext, IdentityConte
     {
         var communityId = Route<Guid>("communityId");
         var userId = Route<Guid>("userId");
-        var requestedRelationship = await dataContext.CommunityRelationships
-                                                     .AsNoTracking()
-                                                     .Where(relationship => relationship.CommunityId == communityId && relationship.UserId == userId)
-                                                     .Include(relationship => relationship.Community)
-                                                     .FirstOrDefaultAsync(ct);
+
+        var requestRelationship = await dataContext.CommunityRelationships
+                                                   .AsNoTracking()
+                                                   .Where(relationship => relationship.CommunityId == communityId && relationship.UserId == userId)
+                                                   .FirstOrDefaultAsync(ct);
 
         var userRelationship = await dataContext.CommunityRelationships
                                                 .AsNoTracking()
                                                 .Where(relationship => relationship.CommunityId == communityId && relationship.UserId == User.GetIdOrDefault())
                                                 .FirstOrDefaultAsync(ct);
 
-        if (requestedRelationship == null)
+        if (requestRelationship == null)
         {
             await SendNotFoundAsync(ct);
             return;
@@ -41,6 +41,6 @@ public class GetCommunityRelationshipById(DataContext dataContext, IdentityConte
                                                .Select(user => user.DisplayName)
                                                .FirstOrDefaultAsync(ct);
         displayName.ShouldNotBeNull();
-        await SendOkAsync(Map.FromEntity(requestedRelationship, displayName, userRelationship), ct);
+        await SendOkAsync(Map.FromEntity(requestRelationship, displayName, userRelationship), ct);
     }
 }
