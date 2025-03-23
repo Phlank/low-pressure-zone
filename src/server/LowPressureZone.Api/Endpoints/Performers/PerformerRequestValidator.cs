@@ -12,22 +12,25 @@ public sealed class PerformerRequestValidator : Validator<PerformerRequest>
 {
     public PerformerRequestValidator(IHttpContextAccessor accessor)
     {
-        RuleFor(p => p.Name).NotEmpty()
-                            .WithMessage(Errors.Required);
-        RuleFor(p => p.Url).NotEmpty()
-                           .WithMessage(Errors.Required)
-                           .AbsoluteHttpUri();
+        RuleFor(request => request.Name).NotEmpty()
+                                        .WithMessage(Errors.Required);
 
-        RuleFor(p => p).CustomAsync(async (req, ctx, ct) =>
+        When(request => !string.IsNullOrEmpty(request.Url), () =>
+        {
+            RuleFor(request => request.Url!).AbsoluteHttpUri();
+        });
+
+        RuleFor(request => request).CustomAsync(async (request, context, ct) =>
         {
             var performerId = accessor.GetGuidRouteParameterOrDefault("id");
             var dataContext = Resolve<DataContext>();
 
-            var isNameInUse = await dataContext.Performers.Where(p => p.Name == req.Name && p.Id != performerId)
-                                                          .AnyAsync(ct);
+            var isNameInUse = await dataContext.Performers
+                                               .Where(performer => performer.Name == request.Name && performer.Id != performerId)
+                                               .AnyAsync(ct);
 
             if (isNameInUse)
-                ctx.AddFailure(nameof(req.Name), Errors.Unique);
+                context.AddFailure(nameof(request.Name), Errors.Unique);
         });
     }
 }

@@ -13,26 +13,26 @@ public sealed class PerformerMapper(IHttpContextAccessor contextAccessor, Perfor
 {
     private ClaimsPrincipal? User => contextAccessor.GetAuthenticatedUserOrDefault();
 
-    public Performer ToEntity(PerformerRequest req)
+    public Performer ToEntity(PerformerRequest request)
     {
         User.ShouldNotBeNull();
 
         return new Performer
         {
             Id = Guid.NewGuid(),
-            Name = req.Name.Trim(),
-            Url = req.Url.Trim(),
+            Name = request.Name.Trim(),
+            Url = request.Url?.Trim(),
             CreatedDate = DateTime.UtcNow,
             LastModifiedDate = DateTime.UtcNow,
             LinkedUserIds = [User.GetIdOrDefault()]
         };
     }
 
-    public async Task UpdateEntityAsync(PerformerRequest req, Performer performer, CancellationToken ct = default)
+    public async Task UpdateEntityAsync(PerformerRequest request, Performer performer, CancellationToken ct = default)
     {
         var dataContext = contextAccessor.Resolve<DataContext>();
-        performer.Name = req.Name;
-        performer.Url = req.Url;
+        performer.Name = request.Name;
+        performer.Url = request.Url;
         if (!dataContext.ChangeTracker.HasChanges()) return;
         performer.LastModifiedDate = DateTime.UtcNow;
         await dataContext.SaveChangesAsync(ct);

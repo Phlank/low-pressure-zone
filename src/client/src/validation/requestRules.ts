@@ -26,7 +26,7 @@ export const communityRequestRules: PropertyRules<CommunityRequest> = {
 
 export const performerRequestRules: PropertyRules<PerformerRequest> = {
   name: required(),
-  url: combineRules(required(), url())
+  url: url()
 }
 
 export const scheduleRequestRules = (
