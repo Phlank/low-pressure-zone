@@ -1,11 +1,11 @@
 <template>
   <Dialog
-    modal
+    :draggable="false"
     :header="header"
     :visible="visible"
-    @update:visible="isSubmitting ? undefined : emit('close')"
+    modal
     @hide="emit('close')"
-    :draggable="false">
+    @update:visible="isSubmitting ? undefined : emit('close')">
     <template #default>
       {{ `Delete ${entityType}${entityName == undefined ? '?' : ' ' + entityName + '?'}` }}
     </template>
@@ -13,8 +13,8 @@
       <div class="form-dialog__footer">
         <Button
           class="input"
-          severity="danger"
           label="Delete"
+          severity="danger"
           @click="emit('delete')" />
       </div>
     </template>
