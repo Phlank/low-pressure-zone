@@ -82,7 +82,7 @@ const toast = useToast()
 const communityStore = useCommunityStore()
 
 const availableCommunities = computed(() =>
-  communityStore.getCommunities().filter((community) => community.isOrganizable)
+  communityStore.communities.filter((community) => community.isOrganizable)
 )
 
 onKeyDown(KeyName.Enter, () => handleSubmit())
