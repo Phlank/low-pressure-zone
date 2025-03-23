@@ -13,7 +13,7 @@ export const url =
   (msg?: string): ValidationRule<string> =>
   (arg) => {
     if (arg.trim().length === 0) return valid
-    if (URL.parse(arg)) return valid
+    if (URL.parse(arg) && /^http(s)?:\/\//.test(arg)) return valid
     return invalid(msg ?? 'Invalid URL')
   }
 
