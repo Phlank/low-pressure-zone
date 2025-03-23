@@ -28,11 +28,13 @@ public static class ServiceCollectionExtensions
 
         builder.Services.AddDbContext<IdentityContext>(options =>
         {
-            options.UseNpgsql(identityConnectionString).EnableSensitiveDataLogging();
+            options.UseNpgsql(identityConnectionString);
+            if (builder.Environment.IsDevelopment()) options.EnableSensitiveDataLogging();
         });
         builder.Services.AddDbContext<DataContext>(options =>
         {
-            options.UseNpgsql(dataConnectionString).EnableSensitiveDataLogging();
+            options.UseNpgsql(dataConnectionString);
+            if (builder.Environment.IsDevelopment()) options.EnableSensitiveDataLogging();
         });
     }
 

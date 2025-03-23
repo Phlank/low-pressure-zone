@@ -15,9 +15,9 @@ public sealed class PerformerRequestValidator : Validator<PerformerRequest>
         RuleFor(request => request.Name).NotEmpty()
                                         .WithMessage(Errors.Required);
 
-        When(request => string.IsNullOrEmpty(request.Url), () =>
+        When(request => !string.IsNullOrEmpty(request.Url), () =>
         {
-            RuleFor(request => request.Url).AbsoluteHttpUri();
+            RuleFor(request => request.Url!).AbsoluteHttpUri();
         });
 
         RuleFor(request => request).CustomAsync(async (request, context, ct) =>
