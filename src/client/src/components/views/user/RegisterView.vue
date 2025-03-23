@@ -38,6 +38,22 @@
           type="password"
           @update:model-value="validation.validateIfDirty('password')" />
       </IftaFormField>
+      <FormField
+        input-id="passwordHelpTextMessage"
+        size="m">
+        <Message>
+          <div style="display: flex; flex-direction: column; justify-content: start">
+            <div>Password must meet the following requirements:</div>
+            <ul>
+              <li>At least 8 characters in length</li>
+              <li>At least one symbol</li>
+              <li>At least one uppercase letter</li>
+              <li>At least one lowercase letter</li>
+              <li>At least one digit</li>
+            </ul>
+          </div>
+        </Message>
+      </FormField>
       <IftaFormField
         :message="validation.message('confirmPassword')"
         input-id="confirmPasswordInput"
@@ -71,13 +87,14 @@ import { useAuthStore } from '@/stores/authStore'
 import { registerRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { onKeyDown } from '@vueuse/core'
-import { Button, InputText, Panel, Password, useToast } from 'primevue'
+import { Button, InputText, Message, Panel, Password, useToast } from 'primevue'
 import { onMounted, reactive, ref } from 'vue'
 import authApi, { type RegisterRequest } from '@/api/resources/authApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import FormArea from '@/components/form/FormArea.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import { useRouter } from 'vue-router'
+import FormField from '@/components/form/FormField.vue'
 
 const router = useRouter()
 
