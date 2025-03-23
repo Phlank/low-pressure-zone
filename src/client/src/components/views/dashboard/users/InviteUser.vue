@@ -100,7 +100,7 @@ const props = defineProps<{
 }>()
 
 onMounted(async () => {
-  if (communityStore.getCommunities().length === 0) {
+  if (communityStore.communities.length === 0) {
     await communityStore.loadCommunitiesAsync()
   }
 })
