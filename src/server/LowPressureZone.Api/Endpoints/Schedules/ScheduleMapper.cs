@@ -27,7 +27,7 @@ public class ScheduleMapper(
         };
 
     public async Task UpdateEntityAsync(ScheduleRequest req, Schedule schedule,
-        CancellationToken ct = default)
+                                        CancellationToken ct = default)
     {
         var dataContext = accessor.Resolve<DataContext>();
         schedule.StartsAt = req.StartsAt;

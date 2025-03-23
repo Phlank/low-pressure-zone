@@ -12,8 +12,7 @@ public class IdentityContext(DbContextOptions<IdentityContext> options) : Identi
     public DbSet<Invitation<Guid, AppUser>> Invitations { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseSeeding((context, _) =>
+        => optionsBuilder.UseSeeding((context, _) =>
         {
             Console.WriteLine($"{nameof(IdentityContext)}: Seeding db.");
             var roles = context.Set<AppRole>();
@@ -70,7 +69,6 @@ public class IdentityContext(DbContextOptions<IdentityContext> options) : Identi
             }
             context.SaveChanges();
         });
-    }
 
     private static IdentitySeedData GetSeedData()
     {

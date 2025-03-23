@@ -24,10 +24,7 @@ public static class HttpContextAccessorExtensions
     {
         var param = accessor.HttpContext?.Request.RouteValues.GetValueOrDefault(paramName, null);
         if (param == null) return default;
-        if (Guid.TryParse(param.ToString(), out Guid result))
-        {
-            return result;
-        }
+        if (Guid.TryParse(param.ToString(), out var result)) return result;
         return default;
     }
 }

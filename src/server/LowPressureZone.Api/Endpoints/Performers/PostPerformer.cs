@@ -16,6 +16,9 @@ public sealed class PostPerformer(DataContext dataContext) : EndpointWithMapper<
         var performer = Map.ToEntity(request);
         dataContext.Performers.Add(performer);
         await dataContext.SaveChangesAsync(ct);
-        await SendCreatedAtAsync<GetPerformerById>(new { performer.Id }, Response, cancellation: ct);
+        await SendCreatedAtAsync<GetPerformerById>(new
+        {
+            performer.Id
+        }, Response, cancellation: ct);
     }
 }

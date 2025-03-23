@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace LowPressureZone.Domain.Entities;
+﻿namespace LowPressureZone.Domain.Entities;
 
 public sealed class Community : BaseEntity
 {

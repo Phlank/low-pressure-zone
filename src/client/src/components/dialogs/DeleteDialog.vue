@@ -1,20 +1,21 @@
 <template>
   <Dialog
-    modal
+    :draggable="false"
     :header="header"
     :visible="visible"
-    @update:visible="isSubmitting ? undefined : emit('close')"
+    modal
     @hide="emit('close')"
-    :draggable="false">
+    @update:visible="isSubmitting ? undefined : emit('close')">
     <template #default>
-      {{ `Delete ${entityType}${entityName == undefined ? '?' : ' ' + entityName + '?'}` }}
+      <span v-if="entityName"> Delete {{ entityType }} {{ entityName }}? </span>
+      <span v-else> Delete {{ entityType }}? </span>
     </template>
     <template #footer>
       <div class="form-dialog__footer">
         <Button
           class="input"
-          severity="danger"
           label="Delete"
+          severity="danger"
           @click="emit('delete')" />
       </div>
     </template>

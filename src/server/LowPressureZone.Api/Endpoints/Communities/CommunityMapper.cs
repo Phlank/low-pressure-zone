@@ -39,6 +39,6 @@ public sealed class CommunityMapper(IHttpContextAccessor contextAccessor, Commun
             IsPerformable = rules.IsPerformanceAuthorized(community),
             IsOrganizable = rules.IsOrganizingAuthorized(community),
             IsEditable = rules.IsEditAuthorized(community),
-            IsDeletable = rules.IsDeleteAuthorized(community) && !community.IsDeleted,
+            IsDeletable = rules.IsDeleteAuthorized(community) && !community.IsDeleted
         };
 }

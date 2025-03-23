@@ -22,10 +22,10 @@ public class TimeslotRequestValidator : Validator<TimeslotRequest>
             var timeslotId = contextAccessor.GetGuidRouteParameterOrDefault("timeslotId");
             var dataContext = Resolve<DataContext>();
             var schedule = await dataContext.Schedules.Include(s => s.Timeslots)
-                                                      .Where(s => s.Id == scheduleId)
-                                                      .FirstOrDefaultAsync(ct);
+                                            .Where(s => s.Id == scheduleId)
+                                            .FirstOrDefaultAsync(ct);
             var performer = await dataContext.Performers.Where(p => p.Id == req.PerformerId)
-                                                        .FirstOrDefaultAsync(ct);
+                                             .FirstOrDefaultAsync(ct);
 
             if (performer is null)
                 ctx.AddFailure(nameof(req.PerformerId), Errors.DoesNotExist);
