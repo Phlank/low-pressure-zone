@@ -12,7 +12,7 @@
     <span
       v-if="message !== undefined"
       :class="`${baseClass}__message`">
-      {{ message ? message : ' ' }}
+      {{ message }}
     </span>
   </div>
 </template>

@@ -7,7 +7,8 @@
     @hide="emit('close')"
     @update:visible="isSubmitting ? undefined : emit('close')">
     <template #default>
-      {{ `Delete ${entityType}${entityName == undefined ? '?' : ' ' + entityName + '?'}` }}
+      <span v-if="entityName"> Delete {{ entityType }} {{ entityName }}? </span>
+      <span v-else> Delete {{ entityType }}? </span>
     </template>
     <template #footer>
       <div class="form-dialog__footer">
