@@ -11,9 +11,9 @@
     </div>
     <span
       v-if="message !== undefined"
-      :class="`${baseClass}__message`"
-      >{{ message ? message : ' ' }}</span
-    >
+      :class="`${baseClass}__message`">
+      {{ message ? message : ' ' }}
+    </span>
   </div>
 </template>
 
