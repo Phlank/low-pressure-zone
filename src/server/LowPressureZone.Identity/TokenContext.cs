@@ -1,5 +1,5 @@
-﻿using System.Text.Json.Serialization;
-using System.Text.Json;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.IdentityModel.Tokens;
 
 namespace LowPressureZone.Identity;
@@ -10,7 +10,7 @@ public class TokenContext
     public required string Token { get; set; }
 
     [JsonIgnore]
-    public string Encoded => Base64UrlEncoder.Encode(JsonSerializer.Serialize(this, options: JsonSerializerOptions.Web));
+    public string Encoded => Base64UrlEncoder.Encode(JsonSerializer.Serialize(this, JsonSerializerOptions.Web));
 
     public static TokenContext? Decode(string encodedContext)
     {

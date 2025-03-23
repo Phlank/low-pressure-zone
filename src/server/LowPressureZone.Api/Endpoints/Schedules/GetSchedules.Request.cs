@@ -1,6 +1,4 @@
-﻿using FastEndpoints;
-
-namespace LowPressureZone.Api.Endpoints.Schedules;
+﻿namespace LowPressureZone.Api.Endpoints.Schedules;
 
 public sealed class GetSchedulesRequest
 {

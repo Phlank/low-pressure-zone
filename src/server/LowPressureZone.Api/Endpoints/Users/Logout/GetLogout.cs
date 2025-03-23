@@ -7,9 +7,7 @@ namespace LowPressureZone.Api.Endpoints.Users.Logout;
 public class GetLogout(SignInManager<AppUser> signInManager) : EndpointWithoutRequest<EmptyResponse>
 {
     public override void Configure()
-    {
-        Get("/users/logout");
-    }
+        => Get("/users/logout");
 
     public override async Task HandleAsync(CancellationToken ct)
     {

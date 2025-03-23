@@ -16,10 +16,10 @@ public class GetInvites(IdentityContext identityContext) : EndpointWithoutReques
     public override async Task HandleAsync(CancellationToken ct)
     {
         var invites = await identityContext.Invitations.AsNoTracking()
-                                                       .Include(i => i.User)
-                                                       .Where(i => !i.IsCancelled && !i.IsRegistered)
-                                                       .OrderBy(i => i.InvitationDate)
-                                                       .ToListAsync(ct);
+                                           .Include(i => i.User)
+                                           .Where(i => !i.IsCancelled && !i.IsRegistered)
+                                           .OrderBy(i => i.InvitationDate)
+                                           .ToListAsync(ct);
         var responses = invites.Select(Map.FromEntity);
         await SendOkAsync(responses, ct);
     }

@@ -6,9 +6,7 @@ namespace LowPressureZone.Api.Endpoints.Users.Info;
 public class GetUserInfo : EndpointWithoutRequest<UserInfoResponse>
 {
     public override void Configure()
-    {
-        Get("/users/info");
-    }
+        => Get("/users/info");
 
     public override async Task HandleAsync(CancellationToken ct)
     {

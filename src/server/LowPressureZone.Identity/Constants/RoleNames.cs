@@ -1,6 +1,4 @@
-﻿using System.Collections.Immutable;
-
-namespace LowPressureZone.Identity.Constants;
+﻿namespace LowPressureZone.Identity.Constants;
 
 public class RoleNames
 {

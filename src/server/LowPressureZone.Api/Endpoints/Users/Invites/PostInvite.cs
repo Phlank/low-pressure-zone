@@ -17,9 +17,7 @@ public class PostInvite(UserManager<AppUser> userManager,
     : EndpointWithMapper<InviteRequest, InviteMapper>
 {
     public override void Configure()
-    {
-        Post("/users/invites");
-    }
+        => Post("/users/invites");
 
     public override async Task HandleAsync(InviteRequest request, CancellationToken ct)
     {
