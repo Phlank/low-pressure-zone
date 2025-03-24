@@ -138,7 +138,8 @@ const availableUsers: ComputedRef<UserResponse[]> = computed(() => {
   const userIdsInUse = communityStore
     .getRelationships(props.community.id)
     .map((relationship) => relationship.userId)
-  return userStore.users.filter((user) => userIdsInUse.indexOf(user.id) === -1)
+  const usersNotInUse = userStore.users.filter((user) => userIdsInUse.indexOf(user.id) === -1)
+  return usersNotInUse.filter((user) => !user.isAdmin)
 })
 
 const getMobileRelationshipText = (relationship: CommunityRelationshipResponse) => {
