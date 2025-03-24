@@ -13,11 +13,15 @@ public sealed class PerformerRequestValidator : Validator<PerformerRequest>
     public PerformerRequestValidator(IHttpContextAccessor accessor)
     {
         RuleFor(request => request.Name).NotEmpty()
-                                        .WithMessage(Errors.Required);
+                                        .WithMessage(Errors.Required)
+                                        .MaximumLength(64)
+                                        .WithMessage(Errors.MaxLength(64));
 
         When(request => !string.IsNullOrEmpty(request.Url), () =>
         {
-            RuleFor(request => request.Url!).AbsoluteHttpUri();
+            RuleFor(request => request.Url!).MaximumLength(64)
+                                            .WithMessage(Errors.MaxLength(256))
+                                            .AbsoluteHttpUri();
         });
 
         RuleFor(request => request).CustomAsync(async (request, context, ct) =>

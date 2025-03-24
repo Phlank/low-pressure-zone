@@ -13,8 +13,12 @@ public sealed class CommunityRequestValidator : Validator<CommunityRequest>
     public CommunityRequestValidator(IHttpContextAccessor accessor)
     {
         RuleFor(request => request.Name).NotEmpty()
-                                        .WithMessage(Errors.Required);
+                                        .WithMessage(Errors.Required)
+                                        .MaximumLength(64)
+                                        .WithMessage(Errors.MaxLength(64));
         RuleFor(request => request.Url).NotEmpty()
+                                       .MaximumLength(64)
+                                       .WithMessage(Errors.MaxLength(256))
                                        .AbsoluteHttpUri();
 
         RuleFor(request => request).CustomAsync(async (request, validationContext, ct) =>
