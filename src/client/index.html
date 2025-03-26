@@ -14,4 +14,21 @@
 <div id="app"></div>
 <script src="/src/main.ts" type="module"></script>
 </body>
+<style lang="scss">
+  body {
+    margin: 0;
+    overflow: hidden;
+    background-image: url(./src/assets/bg-invert.jpg);
+    font-family: 'Nunito Sans', 'Helvetica Neue', sans-serif;
+    text-rendering: optimizeLegibility;
+    overflow-y: scroll;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body.dark-mode-toggle {
+    background-color: #222;
+    background-image: url(./src/assets/bg.jpg);
+  }
+</style>
 </html>

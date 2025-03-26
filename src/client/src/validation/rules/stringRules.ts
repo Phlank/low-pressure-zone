@@ -66,6 +66,11 @@ export const minimumLength = (length: number, msg?: string) => (arg: string) => 
   return valid
 }
 
+export const maximumLength = (length: number, msg?: string) => (arg: string | null) => {
+  if (!arg || arg.length <= length) return valid
+  return invalid(msg ?? `Maximum ${length} characters`)
+}
+
 export const password = combineRules(
   minimumLength(8),
   requireAnyCharacter('A-Z', 'Requires uppercase'),

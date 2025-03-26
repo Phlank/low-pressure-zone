@@ -3,6 +3,7 @@ import {
   allowedCharacters,
   emailAddress,
   equals,
+  maximumLength,
   minimumLength,
   requireAnyCharacter,
   requireAnyOtherCharacter,
@@ -20,13 +21,13 @@ import type { LoginRequest, RegisterRequest } from '@/api/resources/authApi.ts'
 import type { InviteRequest } from '@/api/resources/invitesApi.ts'
 
 export const communityRequestRules: PropertyRules<CommunityRequest> = {
-  name: required(),
-  url: combineRules(required(), url())
+  name: combineRules(required(), maximumLength(64)),
+  url: combineRules(required(), url(), maximumLength(256))
 }
 
 export const performerRequestRules: PropertyRules<PerformerRequest> = {
-  name: required(),
-  url: url()
+  name: combineRules(required(), maximumLength(64)),
+  url: combineRules(url(), maximumLength(256))
 }
 
 export const scheduleRequestRules = (
@@ -50,7 +51,7 @@ export const timeslotRequestRules = (
   return {
     performerId: required(),
     performanceType: required(),
-    name: alwaysValid(),
+    name: maximumLength(64),
     startsAt: combineRules(required(), hourOnly()),
     endsAt: combineRules(
       required(),
@@ -77,7 +78,7 @@ export const registerRequestRules = (
 ): PropertyRules<RegisterRequest> => {
   return {
     context: alwaysValid(),
-    displayName: required(),
+    displayName: combineRules(required(), maximumLength(64)),
     username: combineRules(required(), allowedCharacters('A-Za-z0-9-._@+')),
     password: combineRules(
       minimumLength(8),
