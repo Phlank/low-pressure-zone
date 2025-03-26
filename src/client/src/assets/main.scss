@@ -13,25 +13,10 @@
   src: url('fonts/Nunito_Sans.woff2') format('woff2');
 }
 
-body {
-  margin: 0;
-  overflow: hidden;
-  background-image: url(./bg-invert.jpg);
-  font-family: 'Nunito Sans', 'Helvetica Neue', sans-serif;
-  text-rendering: optimizeLegibility;
-  overflow-y: scroll;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
 h1,
 h2,
 h3 {
   font-family: 'Helvetica Neue', sans-serif;
-}
-
-body.dark-mode-toggle {
-  background-image: url(./bg.jpg);
 }
 
 .header {

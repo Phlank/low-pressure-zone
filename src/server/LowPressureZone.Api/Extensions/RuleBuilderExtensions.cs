@@ -15,15 +15,19 @@ public static class RuleBuilderExtensions
     public static IRuleBuilder<T, string> AbsoluteHttpUri<T>(this IRuleBuilder<T, string> ruleBuilder)
         => ruleBuilder.Must(e => Uri.IsWellFormedUriString(e, UriKind.Absolute)).WithMessage(Errors.InvalidUrl).Must(e => e.StartsWith("https://", StringComparison.InvariantCulture) || e.StartsWith("http://", StringComparison.InvariantCulture)).WithMessage(Errors.InvalidUrl);
     public static IRuleBuilder<T, string> Username<T>(this IRuleBuilder<T, string> ruleBuilder)
-        => ruleBuilder.NotEmpty().WithMessage(Errors.Required).Custom((username, context) =>
-        {
-            var invalidCharacterMatches = InvalidUsernameCharactersRegex.Matches(username);
-            if (invalidCharacterMatches.Count > 0)
-            {
-                var invalidCharacters = invalidCharacterMatches.Select(match => match.Value).Distinct();
-                context.AddFailure(nameof(username), Errors.UsernameInvalidCharacters(invalidCharacters));
-            }
-        });
+        => ruleBuilder.NotEmpty()
+                      .WithMessage(Errors.Required)
+                      .MaximumLength(256)
+                      .WithMessage(Errors.MaxLength(256))
+                      .Custom((username, context) =>
+                      {
+                          var invalidCharacterMatches = InvalidUsernameCharactersRegex.Matches(username);
+                          if (invalidCharacterMatches.Count > 0)
+                          {
+                              var invalidCharacters = invalidCharacterMatches.Select(match => match.Value).Distinct();
+                              context.AddFailure(nameof(username), Errors.UsernameInvalidCharacters(invalidCharacters));
+                          }
+                      });
     public static IRuleBuilder<T, string> Password<T>(this IRuleBuilder<T, string> ruleBuilder)
         => ruleBuilder.MinimumLength(8).WithMessage(Errors.MinLength(8)).Custom(static (password, context) =>
         {

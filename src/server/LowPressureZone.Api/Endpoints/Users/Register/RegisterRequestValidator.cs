@@ -10,14 +10,14 @@ public class RegisterRequestValidator : Validator<RegisterRequest>
 {
     public RegisterRequestValidator()
     {
-        RuleFor(r => r.Context).NotEmpty();
+        RuleFor(request => request.Context).NotEmpty();
         RuleFor(request => request.DisplayName).NotEmpty()
                                                .WithMessage(Errors.Required)
                                                .MaximumLength(AppUser.DisplayNameMaxLength)
                                                .WithMessage(Errors.MaxLength(AppUser.DisplayNameMaxLength));
-        RuleFor(r => r.Username).Username();
-        RuleFor(r => r.Password).Password();
-        RuleFor(r => r.ConfirmPassword).Must((request, confirmPassword) => request.Password == confirmPassword)
-                                       .WithMessage("Does not match");
+        RuleFor(request => request.Username).Username();
+        RuleFor(request => request.Password).Password();
+        RuleFor(request => request.ConfirmPassword).Must((request, confirmPassword) => request.Password == confirmPassword)
+                                                   .WithMessage("Does not match");
     }
 }

@@ -11,18 +11,18 @@ public class ScheduleRequestValidator : Validator<ScheduleRequest>
 {
     public ScheduleRequestValidator(IHttpContextAccessor contextAccessor)
     {
-        RuleFor(req => req.EndsAt).GreaterThanOrEqualTo(s => s.StartsAt.AddHours(1))
+        RuleFor(request => request.EndsAt).GreaterThanOrEqualTo(request => request.StartsAt.AddHours(1))
                                   .WithMessage(Errors.MinDuration(1))
-                                  .LessThanOrEqualTo(s => s.StartsAt.AddHours(24))
+                                  .LessThanOrEqualTo(request => request.StartsAt.AddHours(24))
                                   .WithMessage(Errors.MaxDuration(24));
-        RuleFor(req => req).CustomAsync(async (req, ctx, ct) =>
+        RuleFor(request => request).CustomAsync(async (request, context, ct) =>
         {
             var id = contextAccessor.GetGuidRouteParameterOrDefault("id");
             var dataContext = Resolve<DataContext>();
 
-            if (id == default && req.StartsAt <= DateTime.UtcNow) ctx.AddFailure(nameof(req.StartsAt), Errors.TimeInPast);
+            if (id == default && request.StartsAt <= DateTime.UtcNow) context.AddFailure(nameof(request.StartsAt), Errors.TimeInPast);
 
-            var community = await dataContext.Communities.FirstOrDefaultAsync(a => a.Id == req.CommunityId, ct);
+            var community = await dataContext.Communities.FirstOrDefaultAsync(a => a.Id == request.CommunityId, ct);
 
             var schedule = await dataContext.Schedules
                                             .AsSplitQuery()
@@ -30,22 +30,22 @@ public class ScheduleRequestValidator : Validator<ScheduleRequest>
                                             .Where(s => s.Id == id)
                                             .FirstOrDefaultAsync(ct);
 
-            if (community == null) ctx.AddFailure(nameof(req.CommunityId), Errors.DoesNotExist);
+            if (community == null) context.AddFailure(nameof(request.CommunityId), Errors.DoesNotExist);
 
-            var isRequestOverlappingOtherSchedule = await dataContext.Schedules.WhereOverlaps(req)
+            var isRequestOverlappingOtherSchedule = await dataContext.Schedules.WhereOverlaps(request)
                                                                      .Where(s => s.Id != id)
                                                                      .AnyAsync(ct);
             if (isRequestOverlappingOtherSchedule)
             {
-                ctx.AddFailure(nameof(req.StartsAt), Errors.OverlapsOtherSchedule);
-                ctx.AddFailure(nameof(req.EndsAt), Errors.OverlapsOtherSchedule);
+                context.AddFailure(nameof(request.StartsAt), Errors.OverlapsOtherSchedule);
+                context.AddFailure(nameof(request.EndsAt), Errors.OverlapsOtherSchedule);
             }
 
             if (schedule != null)
             {
-                if (schedule.Timeslots.Any(t => req.StartsAt > t.StartsAt)) ctx.AddFailure(nameof(req.StartsAt), Errors.ExcludesTimeslots);
+                if (schedule.Timeslots.Any(t => request.StartsAt > t.StartsAt)) context.AddFailure(nameof(request.StartsAt), Errors.ExcludesTimeslots);
 
-                if (schedule.Timeslots.Any(t => req.EndsAt < t.EndsAt)) ctx.AddFailure(nameof(req.EndsAt), Errors.ExcludesTimeslots);
+                if (schedule.Timeslots.Any(t => request.EndsAt < t.EndsAt)) context.AddFailure(nameof(request.EndsAt), Errors.ExcludesTimeslots);
             }
         });
     }

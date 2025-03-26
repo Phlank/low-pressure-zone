@@ -11,38 +11,43 @@ public class TimeslotRequestValidator : Validator<TimeslotRequest>
 {
     public TimeslotRequestValidator(IHttpContextAccessor contextAccessor)
     {
-        RuleFor(t => t.PerformanceType).Must(t => PerformanceTypes.All.Contains(t))
-                                       .WithMessage("Invalid type");
-        RuleFor(t => t.StartsAt).GreaterThan(DateTime.UtcNow).WithMessage(Errors.TimeInPast);
-        RuleFor(t => t.EndsAt).GreaterThan(t => t.StartsAt);
+        RuleFor(request => request.PerformanceType).Must(type => PerformanceTypes.All.Contains(type))
+                                                   .WithMessage("Invalid type");
+        RuleFor(request => request.StartsAt).GreaterThan(DateTime.UtcNow).WithMessage(Errors.TimeInPast);
+        RuleFor(request => request.EndsAt).GreaterThan(request => request.StartsAt);
 
-        RuleFor(t => t).CustomAsync(async (req, ctx, ct) =>
+        RuleFor(request => request.Name).MaximumLength(64)
+                                        .WithMessage(Errors.MaxLength(64));
+
+        RuleFor(t => t).CustomAsync(async (request, context, ct) =>
         {
             var scheduleId = contextAccessor.GetGuidRouteParameterOrDefault("scheduleId");
             var timeslotId = contextAccessor.GetGuidRouteParameterOrDefault("timeslotId");
             var dataContext = Resolve<DataContext>();
-            var schedule = await dataContext.Schedules.Include(s => s.Timeslots)
-                                            .Where(s => s.Id == scheduleId)
+            var schedule = await dataContext.Schedules
+                                            .Include(schedule => schedule.Timeslots)
+                                            .Where(schedule => schedule.Id == scheduleId)
                                             .FirstOrDefaultAsync(ct);
-            var performer = await dataContext.Performers.Where(p => p.Id == req.PerformerId)
+            var performer = await dataContext.Performers
+                                             .Where(performer => performer.Id == request.PerformerId)
                                              .FirstOrDefaultAsync(ct);
 
             if (performer is null)
-                ctx.AddFailure(nameof(req.PerformerId), Errors.DoesNotExist);
+                context.AddFailure(nameof(request.PerformerId), Errors.DoesNotExist);
             if (schedule is null)
             {
-                ctx.AddFailure("Schedule does not exist");
+                context.AddFailure("Schedule does not exist");
                 return;
             }
 
-            if (req.StartsAt < schedule.StartsAt || req.EndsAt > schedule.EndsAt)
-                ctx.AddFailure(nameof(req.StartsAt), Errors.OutOfScheduleRange);
-            if (req.EndsAt < schedule.StartsAt || req.EndsAt > schedule.EndsAt)
-                ctx.AddFailure(nameof(req.EndsAt), Errors.OutOfScheduleRange);
-            if (schedule.Timeslots.WhereOverlaps(req).Any(t => t.Id != timeslotId))
+            if (request.StartsAt < schedule.StartsAt || request.EndsAt > schedule.EndsAt)
+                context.AddFailure(nameof(request.StartsAt), Errors.OutOfScheduleRange);
+            if (request.EndsAt < schedule.StartsAt || request.EndsAt > schedule.EndsAt)
+                context.AddFailure(nameof(request.EndsAt), Errors.OutOfScheduleRange);
+            if (schedule.Timeslots.WhereOverlaps(request).Any(timeslot => timeslot.Id != timeslotId))
             {
-                ctx.AddFailure(nameof(req.StartsAt), Errors.OverlapsOtherTimeslot);
-                ctx.AddFailure(nameof(req.EndsAt), Errors.OverlapsOtherTimeslot);
+                context.AddFailure(nameof(request.StartsAt), Errors.OverlapsOtherTimeslot);
+                context.AddFailure(nameof(request.EndsAt), Errors.OverlapsOtherTimeslot);
             }
         });
     }
