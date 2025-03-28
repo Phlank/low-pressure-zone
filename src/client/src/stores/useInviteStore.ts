@@ -3,7 +3,7 @@ import invitesApi from '@/api/resources/invitesApi.ts'
 import { computed, ref, type Ref } from 'vue'
 import { defineStore } from 'pinia'
 
-export const inviteStore = defineStore('inviteStore', () => {
+export const useInviteStore = defineStore('inviteStore', () => {
   const loadedInvites: Ref<InviteResponse[]> = ref([])
 
   let loadInvitesPromise: Promise<void> | undefined = undefined

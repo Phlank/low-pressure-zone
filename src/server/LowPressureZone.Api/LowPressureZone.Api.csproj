@@ -28,4 +28,8 @@
         <ProjectReference Include="..\LowPressureZone.Identity\LowPressureZone.Identity.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Folder Include="Authentication\"/>
+    </ItemGroup>
+
 </Project>

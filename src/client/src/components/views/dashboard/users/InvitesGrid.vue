@@ -3,7 +3,7 @@
     <DataTable
       v-if="!isMobile"
       key="id"
-      :value="invites">
+      :value="inviteStore.invites">
       <Column
         field="email"
         header="Email" />
@@ -19,25 +19,31 @@
       </Column>
     </DataTable>
     <DataView
-      v-if="isMobile"
-      :paginator="communityStore.getRelationships(props.community.id).length > 5"
-      :rows="5"
-      :value="communityStore.getRelationships(props.community.id)"
-      data-key="id"></DataView>
-    <div
-      v-for="(invite, index) in invites"
       v-else
-      :key="invite.id">
-      <ListItem>
-        <template #left>
-          <div style="display: flex; flex-direction: column">
-            <span>{{ parseDate(invite.invitedAt).toLocaleDateString() }}</span>
-            <span class="ellipsis text-s">{{ invite.email }}</span>
-          </div>
-        </template>
-      </ListItem>
-      <Divider v-if="index !== invites.length - 1" />
-    </div>
+      :paginator="inviteStore.invites.length > 5"
+      :rows="5"
+      :value="inviteStore.invites"
+      data-key="id">
+      <template #empty>
+        <ListItem>
+          <template #left>No items to display.</template>
+        </ListItem>
+      </template>
+      <template #list="{ items }: { items: InviteResponse[] }">
+        <div
+          v-for="(invite, index) in items"
+          :key="invite.id">
+          <ListItem>
+            <template #left>
+              <span>{{ parseDate(invite.invitedAt).toLocaleDateString() }}</span>
+              <span class="ellipsis text-s">{{ invite.email }}</span>
+            </template>
+            <template #right> </template>
+          </ListItem>
+          <Divider v-if="index < items.length - 1" />
+        </div>
+      </template>
+    </DataView>
   </div>
 </template>
 
@@ -45,10 +51,19 @@
 import ListItem from '@/components/data/ListItem.vue'
 import { parseDate } from '@/utils/dateUtils'
 import { Column, DataTable, DataView, Divider } from 'primevue'
-import { inject, type Ref } from 'vue'
+import { inject, onMounted, type Ref } from 'vue'
 import type { InviteResponse } from '@/api/resources/invitesApi.ts'
+import { useInviteStore } from '@/stores/useInviteStore.ts'
+import { useCommunityStore } from '@/stores/communityStore.ts'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
+const inviteStore = useInviteStore()
+const communityStore = useCommunityStore()
 
-defineProps<{ invites: InviteResponse[] }>()
+onMounted(async () => {
+  const promises: Promise<void>[] = []
+  if (inviteStore.invites.length === 0) promises.push(inviteStore.loadInvitesAsync())
+  if (communityStore.communities.length === 0) promises.push(communityStore.loadCommunitiesAsync())
+  await Promise.all(promises)
+})
 </script>

@@ -17,6 +17,7 @@ export interface InviteRequest {
 
 export interface InviteResponse {
   id: string
+  communityId: string
   email: string
   displayName: string
   invitedAt: string
