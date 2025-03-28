@@ -16,14 +16,14 @@ export const useUserStore = defineStore('userStore', () => {
     }
     loadedUsers.value = response.data!
     const userMap: UserMap = {}
-    response.data!.forEach((user) => {
+    loadedUsers.value.forEach((user) => {
       userMap[user.id] = user
     })
     loadedUserMap.value = userMap
   }
 
   const loadUsersAsync = async () => {
-    if (!loadUsersPromise) {
+    if (loadUsersPromise === undefined) {
       loadUsersPromise = loadUsers()
     }
     await loadUsersPromise

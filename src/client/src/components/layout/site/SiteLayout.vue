@@ -40,7 +40,6 @@ import SiteHeader from './SiteHeader.vue'
   &__footer {
     position: sticky;
     margin-top: auto;
-    // bottom: variables.$space-m;
     text-align: center;
     width: 100%;
   }
