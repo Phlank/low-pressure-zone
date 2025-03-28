@@ -8,6 +8,8 @@ namespace LowPressureZone.Api.Services;
 
 public class EmailService(IOptions<EmailServiceOptions> options, UriService uriService, ISender sender, ILogger<EmailService> logger)
 {
+    private static readonly Action<ILogger, string, Exception?> LogEmailFailure = LoggerMessage.Define<string>(LogLevel.Error, new EventId(0, nameof(LogEmailFailure)), "Failed to send email: {Response}");
+
     private async Task Send(string toAddress, string subject, string body)
     {
         var email = Email.From(options.Value.FromAddress)
@@ -15,7 +17,7 @@ public class EmailService(IOptions<EmailServiceOptions> options, UriService uriS
                          .Subject(subject)
                          .Body(body);
         var sendResponse = await sender.SendAsync(email);
-        if (!sendResponse.Successful) logger.LogError("Failed to send email: {Response}", JsonSerializer.Serialize(sendResponse));
+        if (!sendResponse.Successful) LogEmailFailure(logger, JsonSerializer.Serialize(sendResponse), null);
     }
 
     public async Task SendTwoFactorEmailAsync(string toAddress, string username, string code)
