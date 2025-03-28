@@ -56,8 +56,8 @@ class FormValidationImplementation<TForm extends object> implements FormValidati
 
   public isValid = (...keys: (keyof TForm)[]) => {
     if (keys.length === 0) keys = this.getKeys()
-    for (let i = 0; i < keys.length; i++) {
-      const isKeyValid = this.propertyState[keys[i]].isValid.value
+    for (const key in keys) {
+      const isKeyValid = this.propertyState[key as keyof TForm].isValid.value
       if (isKeyValid === false) return false
     }
     return true

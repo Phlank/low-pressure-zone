@@ -20,7 +20,7 @@ export const useCommunityStore = defineStore('communityStore', () => {
   }
 
   const loadCommunitiesAsync = async () => {
-    if (!loadCommunitiesPromise) {
+    if (loadCommunitiesPromise === undefined) {
       loadCommunitiesPromise = loadCommunities()
     }
     await loadCommunitiesPromise
@@ -69,7 +69,7 @@ export const useCommunityStore = defineStore('communityStore', () => {
   }
 
   const loadRelationshipsAsync = async (communityId: string) => {
-    if (!loadRelationshipsPromises[communityId]) {
+    if (loadRelationshipsPromises[communityId] === undefined) {
       loadRelationshipsPromises[communityId] = loadRelationships(communityId)
     }
     await loadRelationshipsPromises[communityId]

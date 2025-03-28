@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
 
 namespace LowPressureZone.Domain.Extensions;
 
@@ -23,8 +22,8 @@ public static class HttpContextAccessorExtensions
     public static Guid GetGuidRouteParameterOrDefault(this IHttpContextAccessor accessor, string paramName)
     {
         var param = accessor.HttpContext?.Request.RouteValues.GetValueOrDefault(paramName, null);
-        if (param == null) return default;
+        if (param == null) return Guid.Empty;
         if (Guid.TryParse(param.ToString(), out var result)) return result;
-        return default;
+        return Guid.Empty;
     }
 }

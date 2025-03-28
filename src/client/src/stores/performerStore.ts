@@ -17,7 +17,7 @@ export const usePerformerStore = defineStore('performerStore', () => {
   }
 
   const loadPerformersAsync = async () => {
-    if (!loadPerformersPromise) {
+    if (loadPerformersPromise === undefined) {
       loadPerformersPromise = loadPerformers()
     }
     await loadPerformersPromise

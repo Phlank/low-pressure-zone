@@ -26,14 +26,14 @@ const toggleDarkModeStored = () => {
 const isDarkMode = computed(() => isTrueString(isDarkModeStored.value))
 
 onMounted(() => {
-  if (
-    isDarkMode.value &&
-    !document.documentElement.classList.contains('dark-mode-toggle') &&
-    !document.body.classList.contains('dark-mode-toggle')
-  ) {
-    document.documentElement.classList.toggle('dark-mode-toggle')
-    document.body.classList.toggle('dark-mode-toggle')
-  } else if (!isDarkMode.value && document.documentElement.classList.contains('dark-mode-toggle')) {
+  const isDarkModeRef = isDarkMode.value
+  const isDocumentDarkMode = document.documentElement.classList.contains('dark-mode-toggle')
+  const isBodyDarkMode = document.body.classList.contains('dark-mode-toggle')
+
+  const isDarkModeOnFlipped = isDarkModeRef && !isDocumentDarkMode && !isBodyDarkMode
+  const isDarkModeOffFlipped = !isDarkModeRef && isDocumentDarkMode && isBodyDarkMode
+  
+  if (isDarkModeOffFlipped || isDarkModeOnFlipped) {
     document.documentElement.classList.toggle('dark-mode-toggle')
     document.body.classList.toggle('dark-mode-toggle')
   }
