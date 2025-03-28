@@ -47,7 +47,7 @@
 
 <script lang="ts" setup>
 import TitledNavMenu from '@/components/controls/TitledNavMenu.vue'
-import { Role } from '@/constants/roles'
+import { Role } from '@/constants/role.ts'
 import { useAuthStore } from '@/stores/authStore'
 import { Menu, Panel } from 'primevue'
 import type { MenuItem } from 'primevue/menuitem'
@@ -88,8 +88,10 @@ const menuItems: MenuItem[] = [
 ]
 
 onMounted(async () => {
-  await authStore.loadIfNotInitialized()
-  await communityStore.loadCommunitiesAsync()
+  const promises: Promise<void>[] = []
+  promises.push(authStore.loadIfNotInitialized())
+  promises.push(communityStore.loadCommunitiesAsync())
+  await Promise.all(promises)
 })
 </script>
 

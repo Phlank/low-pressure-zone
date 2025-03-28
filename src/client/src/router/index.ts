@@ -1,4 +1,4 @@
-import { Role } from '@/constants/roles'
+import { Role } from '@/constants/role.ts'
 import { useAuthStore } from '@/stores/authStore'
 import { createRouter, createWebHistory } from 'vue-router'
 import { Routes } from './routes'
@@ -66,7 +66,7 @@ const router = createRouter({
   ]
 })
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, _, next) => {
   if (!to.meta.auth) {
     next()
     return
@@ -79,8 +79,8 @@ router.beforeEach(async (to, from, next) => {
     return
   }
 
-  const allowedRoles = (to.meta.roles ?? []) as string[]
-  if (authStore.isInAnySpecifiedRole(...allowedRoles)) {
+  const allowedRoles = (to.meta.roles ?? []) as Role[]
+  if (allowedRoles.length === 0 || authStore.isInAnySpecifiedRole(...allowedRoles)) {
     next()
     return
   }

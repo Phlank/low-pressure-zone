@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-schedules-view">
     <div
-      v-show="authStore.isInAnySpecifiedRole(Role.Admin, Role.Organizer)"
+      v-show="authStore.isInAnySpecifiedRole(Role.Admin) || communitySto"
       class="dashboard-schedules-view__new-schedules-form">
       <h4>Create New Schedule</h4>
       <ScheduleForm
@@ -29,18 +29,28 @@ import { Button, useToast } from 'primevue'
 import { onMounted, ref, type Ref, useTemplateRef } from 'vue'
 import SchedulesGrid from './SchedulesGrid.vue'
 import { useAuthStore } from '@/stores/authStore'
-import { Role } from '@/constants/roles'
+import { Role } from '@/constants/role.ts'
 import schedulesApi, { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
 import communitiesApi, { type CommunityResponse } from '@/api/resources/communitiesApi.ts'
 import performersApi, { type PerformerResponse } from '@/api/resources/performersApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import { useCommunityStore } from '@/stores/communityStore.ts'
 
 const authStore = useAuthStore()
+const communityStore = useCommunityStore()
 const toast = useToast()
 const isSubmitting = ref(false)
 
 onMounted(async () => {
-  await Promise.all([loadSchedules(), loadCommunities(), loadPerformers()])
+  const promises = [loadSchedules(), loadCommunities(), loadPerformers()]
+  if (communityStore.communities.length === 0) {
+  }
+  await Promise.all([
+    loadSchedules(),
+    loadCommunities(),
+    loadPerformers(),
+    communityStore.loadCommunitiesAsync()
+  ])
 })
 
 const schedules: Ref<ScheduleResponse[]> = ref([])

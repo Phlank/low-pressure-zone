@@ -51,7 +51,7 @@ import { required } from '@/validation/rules/stringRules.ts'
 import { alwaysValid } from '@/validation/rules/untypedRules.ts'
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import { useAuthStore } from '@/stores/authStore.ts'
-import { Role } from '@/constants/roles.ts'
+import { Role } from '@/constants/role.ts'
 
 const authStore = useAuthStore()
 

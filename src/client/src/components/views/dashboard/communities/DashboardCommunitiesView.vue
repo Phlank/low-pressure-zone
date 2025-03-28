@@ -63,7 +63,7 @@ import { computed, onMounted, ref, type Ref } from 'vue'
 import CommunitiesGrid from './CommunitiesGrid.vue'
 import CreateCommunity from './CreateCommunity.vue'
 import { useAuthStore } from '@/stores/authStore'
-import { Role } from '@/constants/roles'
+import { Role } from '@/constants/role.ts'
 import CommunityRelationships from '@/components/views/dashboard/communities/CommunityRelationships.vue'
 import { useCommunityStore } from '@/stores/communityStore.ts'
 import { useUserStore } from '@/stores/userStore.ts'
@@ -72,7 +72,7 @@ const authStore = useAuthStore()
 const communityStore = useCommunityStore()
 const userStore = useUserStore()
 const isLoaded = ref(false)
-const tabValue: Ref<string | number> = ref('0')
+const tabValue: Ref<string | number> = ref('mine')
 
 const linkedCommunities = computed(() =>
   communityStore.communities.filter(
@@ -85,7 +85,7 @@ const organizingCommunities = computed(() =>
 )
 
 onMounted(async () => {
-  if (authStore.isInAnySpecifiedRole(Role.Admin)) tabValue.value = 'all'
+  if (authStore.isInRole(Role.Admin)) tabValue.value = 'all'
   const promises: Promise<void>[] = []
   if (communityStore.communities.length === 0) {
     promises.push(communityStore.loadCommunitiesAsync())
