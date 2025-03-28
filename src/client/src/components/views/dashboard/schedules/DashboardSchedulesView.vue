@@ -1,7 +1,10 @@
 <template>
   <div class="dashboard-schedules-view">
     <div
-      v-show="authStore.isInAnySpecifiedRole(Role.Admin) || communitySto"
+      v-show="
+        authStore.isInAnySpecifiedRole(Role.Admin) ||
+        communityStore.communities.some((community) => community.isOrganizable)
+      "
       class="dashboard-schedules-view__new-schedules-form">
       <h4>Create New Schedule</h4>
       <ScheduleForm
@@ -42,15 +45,11 @@ const toast = useToast()
 const isSubmitting = ref(false)
 
 onMounted(async () => {
-  const promises = [loadSchedules(), loadCommunities(), loadPerformers()]
+  const promises: Promise<unknown>[] = [loadSchedules(), loadCommunities(), loadPerformers()]
   if (communityStore.communities.length === 0) {
+    promises.push(communityStore.loadCommunitiesAsync())
   }
-  await Promise.all([
-    loadSchedules(),
-    loadCommunities(),
-    loadPerformers(),
-    communityStore.loadCommunitiesAsync()
-  ])
+  await Promise.all(promises)
 })
 
 const schedules: Ref<ScheduleResponse[]> = ref([])
