@@ -18,6 +18,12 @@
         </template>
       </Column>
     </DataTable>
+    <DataView
+      v-if="isMobile"
+      :paginator="communityStore.getRelationships(props.community.id).length > 5"
+      :rows="5"
+      :value="communityStore.getRelationships(props.community.id)"
+      data-key="id"></DataView>
     <div
       v-for="(invite, index) in invites"
       v-else
@@ -38,7 +44,7 @@
 <script lang="ts" setup>
 import ListItem from '@/components/data/ListItem.vue'
 import { parseDate } from '@/utils/dateUtils'
-import { Column, DataTable, Divider } from 'primevue'
+import { Column, DataTable, DataView, Divider } from 'primevue'
 import { inject, type Ref } from 'vue'
 import type { InviteResponse } from '@/api/resources/invitesApi.ts'
 
