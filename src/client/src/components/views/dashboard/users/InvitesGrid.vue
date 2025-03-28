@@ -38,7 +38,11 @@
               <span>{{ parseDate(invite.invitedAt).toLocaleDateString() }}</span>
               <span class="ellipsis text-s">{{ invite.email }}</span>
             </template>
-            <template #right> </template>
+            <template #right>
+              <GridActions
+                show-resend
+                @resend="handleResendInvite(invite)" />
+            </template>
           </ListItem>
           <Divider v-if="index < items.length - 1" />
         </div>
@@ -55,6 +59,7 @@ import { inject, onMounted, type Ref } from 'vue'
 import type { InviteResponse } from '@/api/resources/invitesApi.ts'
 import { useInviteStore } from '@/stores/useInviteStore.ts'
 import { useCommunityStore } from '@/stores/communityStore.ts'
+import GridActions from '@/components/data/grid-actions/GridActions.vue'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const inviteStore = useInviteStore()
@@ -66,4 +71,6 @@ onMounted(async () => {
   if (communityStore.communities.length === 0) promises.push(communityStore.loadCommunitiesAsync())
   await Promise.all(promises)
 })
+
+const handleResendInvite = async (invite: InviteResponse) => {}
 </script>
