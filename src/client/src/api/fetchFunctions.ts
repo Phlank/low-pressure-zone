@@ -47,7 +47,7 @@ export const sendPut = async <TRequest extends object>(route: string, request: T
 
 export const sendPost = async <TRequest extends object, TResponse = never>(
   route: string,
-  request: TRequest
+  request?: TRequest
 ) => {
   return await sendRequest<TRequest, TResponse>('POST', route, request)
 }

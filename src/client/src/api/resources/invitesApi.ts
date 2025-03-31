@@ -5,7 +5,8 @@ const route = '/users/invites'
 export default {
   get: () => sendGet<InviteResponse[]>(route),
   post: (request: InviteRequest) => sendPost(route, request),
-  getResend: (email: string) => sendGet<never>(`${route}/resend`, { email: email })
+  getResend: (email: string) => sendGet<never>(`${route}/resend`, { email: email }),
+  postResend: (id: string) => sendPost<never>(`${route}/resend/${id}`)
 }
 
 export interface InviteRequest {

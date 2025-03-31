@@ -1,6 +1,5 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Constants;
-using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Constants;
@@ -11,8 +10,6 @@ namespace LowPressureZone.Api.Endpoints.Users.Invites.Resend;
 
 public class PostResendInvite(IdentityContext identityContext, UserManager<AppUser> userManager, EmailService emailService) : EndpointWithoutRequest
 {
-    private readonly DateTime _start = DateTime.UtcNow;
-
     public override void Configure()
     {
         Post("/users/invites/resend/{id}");
@@ -45,6 +42,6 @@ public class PostResendInvite(IdentityContext identityContext, UserManager<AppUs
         await emailService.SendInviteEmailAsync(user.Email!, tokenContext);
         invite.LastSentDate = DateTime.UtcNow;
         await identityContext.SaveChangesAsync(ct);
-        await this.SendDelayedNoContentAsync(_start, ct);
+        await SendNoContentAsync(ct);
     }
 }

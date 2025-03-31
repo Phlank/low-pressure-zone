@@ -41,7 +41,7 @@ export const gridActions = {
   resend: {
     name: 'Resend',
     icon: 'pi pi-envelope',
-    severity: 'info',
+    severity: 'secondary',
     emit: 'resend'
   } as GridAction
 }

@@ -19,6 +19,22 @@ h3 {
   font-family: 'Helvetica Neue', sans-serif;
 }
 
+body {
+  margin: 0;
+  overflow: hidden;
+  background-image: url(./bg-invert.jpg);
+  font-family: 'Nunito Sans', 'Helvetica Neue', sans-serif;
+  text-rendering: optimizeLegibility;
+  overflow-y: scroll;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body.dark-mode-toggle {
+  background-color: #222;
+  background-image: url(./bg.jpg);
+}
+
 .header {
   font-family: variables.$font-family-header;
 }

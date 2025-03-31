@@ -17,6 +17,13 @@
           {{ parseDate(data.lastSentAt).toLocaleString() }}
         </template>
       </Column>
+      <Column class="grid-actions-col grid-action-col--1">
+        <template #body="{ data }: { data: InviteResponse }">
+          <GridActions
+            show-resend
+            @resend="handleResendActionClick(data)" />
+        </template>
+      </Column>
     </DataTable>
     <DataView
       v-else
@@ -41,29 +48,46 @@
             <template #right>
               <GridActions
                 show-resend
-                @resend="handleResendInvite(invite)" />
+                @resend="handleResendActionClick(invite)" />
             </template>
           </ListItem>
           <Divider v-if="index < items.length - 1" />
         </div>
       </template>
     </DataView>
+    <Dialog
+      :visible="showResendDialog"
+      closable
+      header="Resend Invite"
+      modal
+      @hide="handleHideShowResendDialog">
+      <template #default> Resend invitation to {{ resendEmail }}?</template>
+      <template #footer>
+        <Button
+          :disabled="isSending"
+          :loading="isSending"
+          label="Resend"
+          @click="handleResendInvite" />
+      </template>
+    </Dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
 import ListItem from '@/components/data/ListItem.vue'
-import { parseDate } from '@/utils/dateUtils'
-import { Column, DataTable, DataView, Divider } from 'primevue'
-import { inject, onMounted, type Ref } from 'vue'
-import type { InviteResponse } from '@/api/resources/invitesApi.ts'
+import { Button, Column, DataTable, DataView, Dialog, Divider, useToast } from 'primevue'
+import { inject, onMounted, ref, type Ref } from 'vue'
+import invitesApi, { type InviteResponse } from '@/api/resources/invitesApi.ts'
 import { useInviteStore } from '@/stores/useInviteStore.ts'
 import { useCommunityStore } from '@/stores/communityStore.ts'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
+import { showApiStatusToast } from '@/utils/toastUtils.ts'
+import { parseDate } from '@/utils/dateUtils.ts'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const inviteStore = useInviteStore()
 const communityStore = useCommunityStore()
+const toast = useToast()
 
 onMounted(async () => {
   const promises: Promise<void>[] = []
@@ -72,5 +96,29 @@ onMounted(async () => {
   await Promise.all(promises)
 })
 
-const handleResendInvite = async (invite: InviteResponse) => {}
+const showResendDialog = ref(false)
+const resendEmail = ref('')
+const resendId = ref('')
+const isSending = ref(false)
+
+const handleResendActionClick = async (invite: InviteResponse) => {
+  showResendDialog.value = true
+  resendEmail.value = invite.email
+  resendId.value = invite.id
+}
+
+const handleResendInvite = async () => {
+  isSending.value = true
+  const response = await invitesApi.postResend(resendId.value)
+  if (!response.isSuccess()) {
+    showApiStatusToast(toast, response.status)
+  }
+  showResendDialog.value = false
+  isSending.value = false
+}
+
+const handleHideShowResendDialog = () => {
+  console.log('hide')
+  showResendDialog.value = false
+}
 </script>
