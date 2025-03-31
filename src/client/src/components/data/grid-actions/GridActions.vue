@@ -46,6 +46,7 @@ const props = withDefaults(
     showEdit?: boolean
     showDelete?: boolean
     showInfo?: boolean
+    showResend?: boolean
     disabled?: boolean
   }>(),
   {
@@ -53,6 +54,7 @@ const props = withDefaults(
     showEdit: false,
     showDelete: false,
     showInfo: false,
+    showResend: false,
     disabled: false
   }
 )
@@ -65,6 +67,7 @@ const visibleActions = computed(() => {
   if (props.showEdit) actions.push(gridActions.edit)
   if (props.showDelete) actions.push(gridActions.delete)
   if (props.showInfo) actions.push(gridActions.info)
+  if (props.showResend) actions.push(gridActions.resend)
   return actions
 })
 

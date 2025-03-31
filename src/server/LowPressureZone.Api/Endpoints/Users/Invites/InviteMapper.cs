@@ -14,7 +14,7 @@ public class InviteMapper : IRequestMapper, IResponseMapper
             LastSentDate = DateTime.UtcNow
         };
 
-    public InviteResponse FromEntity(Invitation<Guid, AppUser> invitation)
+    public InviteResponse FromEntity(Invitation<Guid, AppUser> invitation, Guid communityId)
     {
         invitation.User.ShouldNotBeNull();
         invitation.User.Email.ShouldNotBeNull();
@@ -22,6 +22,7 @@ public class InviteMapper : IRequestMapper, IResponseMapper
         return new InviteResponse
         {
             Id = invitation.Id,
+            CommunityId = communityId,
             InvitedAt = invitation.InvitationDate,
             LastSentAt = invitation.LastSentDate,
             Email = invitation.User.Email,

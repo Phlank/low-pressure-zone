@@ -3,6 +3,7 @@ export interface GridActionEmits {
   edit: []
   delete: []
   info: []
+  resend: []
 }
 
 export interface GridAction {
@@ -36,5 +37,11 @@ export const gridActions = {
     icon: 'pi pi-info',
     severity: 'info',
     emit: 'info'
+  } as GridAction,
+  resend: {
+    name: 'Resend',
+    icon: 'pi pi-envelope',
+    severity: 'secondary',
+    emit: 'resend'
   } as GridAction
 }

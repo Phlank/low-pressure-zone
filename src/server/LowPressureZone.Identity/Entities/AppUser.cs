@@ -6,7 +6,6 @@ namespace LowPressureZone.Identity.Entities;
 public class AppUser : IdentityUser<Guid>
 {
     public const int DisplayNameMaxLength = 50;
-    public AppUser() : base() { }
 
     [MaxLength(DisplayNameMaxLength)]
     public required string DisplayName { get; set; }
