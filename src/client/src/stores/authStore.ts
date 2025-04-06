@@ -2,7 +2,7 @@ import { hasIntersection } from '@/utils/arrayUtils'
 import { defineStore } from 'pinia'
 import { ref, type Ref } from 'vue'
 import authApi, { type UserInfoResponse } from '@/api/resources/authApi.ts'
-import type { Role } from '@/constants/role.ts'
+import type { Role } from '@/constants/roles.ts'
 
 export const useAuthStore = defineStore('authStore', () => {
   const isLoggedInRef: Ref<boolean | undefined> = ref(undefined)

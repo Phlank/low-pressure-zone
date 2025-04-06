@@ -29,6 +29,18 @@ export const useCommunityStore = defineStore('communityStore', () => {
 
   const communities = computed(() => loadedCommunities.value)
 
+  const relatedCommunities = computed(() =>
+    communities.value.filter((community) => community.isPerformable || community.isOrganizable)
+  )
+
+  const organizableCommunities = computed(() =>
+    communities.value.filter((community) => community.isOrganizable)
+  )
+
+  const performableCommunities = computed(() =>
+    communities.value.filter((community) => community.isPerformable)
+  )
+
   const removeCommunity = (id: string) => {
     const index = loadedCommunities.value.findIndex((community) => community.id === id)
     if (index > -1) {
@@ -117,6 +129,9 @@ export const useCommunityStore = defineStore('communityStore', () => {
   return {
     loadCommunitiesAsync,
     communities,
+    relatedCommunities,
+    organizableCommunities,
+    performableCommunities,
     removeCommunity,
     addCommunity,
     updateCommunityAsync,

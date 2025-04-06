@@ -8,6 +8,7 @@
         class="schedules-grid__table"
         data-key="id"
         sort-field="start">
+        <template #empty> No items to display. </template>
         <template>
           <Column
             expander
@@ -54,7 +55,6 @@
         <template #expansion="rowProps">
           <TimeslotsGrid
             :disabled="false"
-            :performers="performers"
             :schedule="rowProps.data"
             @update="emit('update', rowProps.data.id)" />
         </template>
@@ -68,7 +68,7 @@
       @save="handleEditScheduleSave">
       <ScheduleForm
         ref="scheduleEditForm"
-        :communities="communities"
+        :communities="communityStore.communities"
         :initial-state="editScheduleFormInitialState" />
     </FormDialog>
     <DeleteDialog
@@ -92,10 +92,14 @@ import { Column, DataTable, useToast } from 'primevue'
 import { inject, reactive, ref, type Ref, useTemplateRef } from 'vue'
 import TimeslotsGrid from './TimeslotsGrid.vue'
 import schedulesApi, { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
-import type { PerformerResponse } from '@/api/resources/performersApi.ts'
-import type { CommunityResponse } from '@/api/resources/communitiesApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import { useScheduleStore } from '@/stores/scheduleStore.ts'
+import { usePerformerStore } from '@/stores/performerStore.ts'
+import { useCommunityStore } from '@/stores/communityStore.ts'
 
+const scheduleStore = useScheduleStore()
+const performerStore = usePerformerStore()
+const communityStore = useCommunityStore()
 const expandedRows = ref({})
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const isSubmitting = ref(false)
@@ -103,8 +107,6 @@ const toast = useToast()
 
 defineProps<{
   schedules: ScheduleResponse[]
-  performers: PerformerResponse[]
-  communities: CommunityResponse[]
 }>()
 
 const scheduleEditForm = useTemplateRef('scheduleEditForm')

@@ -5,6 +5,7 @@ import { computed, type Ref, ref } from 'vue'
 
 export const usePerformerStore = defineStore('performerStore', () => {
   const loadedPerformers: Ref<PerformerResponse[]> = ref([])
+  const loadedPerformersMap: Ref<PerformerMap> = ref({})
 
   let loadPerformersPromise: Promise<void> | undefined
   const loadPerformers = async () => {
@@ -14,6 +15,7 @@ export const usePerformerStore = defineStore('performerStore', () => {
       return
     }
     loadedPerformers.value = response.data!
+    loadedPerformersMap.value = createMap(response.data!)
   }
 
   const loadPerformersAsync = async () => {
@@ -27,6 +29,8 @@ export const usePerformerStore = defineStore('performerStore', () => {
   const linkablePerformers = computed(() =>
     loadedPerformers.value.filter((performer) => performer.isLinkableToTimeslot)
   )
+
+  const get = (id: string) => loadedPerformersMap.value[id]
 
   const add = (performer: PerformerResponse) => {
     // Performers are ordered alphabetically from the API by name
@@ -65,8 +69,18 @@ export const usePerformerStore = defineStore('performerStore', () => {
     performers,
     linkablePerformers,
     loadPerformersAsync,
+    get,
     add,
     remove,
     updateAsync
   }
 })
+
+type PerformerMap = { [key: string]: PerformerResponse }
+const createMap = (performers: PerformerResponse[]): PerformerMap => {
+  const map: PerformerMap = {}
+  for (const performer of performers) {
+    map[performer.id] = performer
+  }
+  return map
+}

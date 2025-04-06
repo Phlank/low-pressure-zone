@@ -71,7 +71,7 @@
         ref="timeslotForm"
         :disabled="isSubmitting"
         :initial-state="formInitialValue"
-        :performers="performers.filter((p) => p.isLinkableToTimeslot)" />
+        :performers="performerStore.linkablePerformers" />
     </FormDialog>
     <DeleteDialog
       :entity-name="deletingName"
@@ -100,20 +100,20 @@ import {
 import { Column, DataTable, useToast } from 'primevue'
 import { inject, onMounted, ref, type Ref, useTemplateRef } from 'vue'
 import type { ScheduleResponse } from '@/api/resources/schedulesApi.ts'
-import type { PerformerResponse } from '@/api/resources/performersApi.ts'
 import timeslotsApi, {
   PerformanceType,
   type TimeslotRequest,
   type TimeslotResponse
 } from '@/api/resources/timeslotsApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import { usePerformerStore } from '@/stores/performerStore.ts'
 
 const toast = useToast()
 const props = defineProps<{
   schedule: ScheduleResponse
-  performers: PerformerResponse[]
 }>()
 
+const performerStore = usePerformerStore()
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const timeslots: Ref<TimeslotResponse[]> = ref(props.schedule.timeslots)
 const startDate = ref(parseDate(props.schedule.startsAt))
@@ -184,7 +184,7 @@ const handleSave = async () => {
 
   showFormDialog.value = false
 
-  const requestPerformer = props.performers.find((p) => p.id === request.performerId)
+  const requestPerformer = performerStore.get(request.performerId)
   if (editingId) {
     showEditSuccessToast(
       toast,
