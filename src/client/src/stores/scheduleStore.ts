@@ -35,22 +35,17 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
     loadedSchedules.value.filter((schedule) => getTime(schedule.endsAt) > Date.now())
   )
 
-  const pastSchedules = computed(() =>
-    loadedSchedules.value.filter((schedule) => getTime(schedule.endsAt) <= Date.now())
-  )
+  const pastSchedules = computed(() => {
+    const schedules = loadedSchedules.value.filter(
+      (schedule) => getTime(schedule.endsAt) <= Date.now()
+    )
+    return [...schedules].reverse()
+  })
 
   const nextSchedule = computed(() => {
     loadedSchedules.value.sort((a, b) => compareAsc(a.endsAt, b.endsAt))
     return loadedSchedules.value.find((schedule) => getTime(schedule.endsAt) > Date.now())
   })
-
-  const reloadTimeslotsAsync = async (scheduleId: string): Promise<void> => {
-    if (loadedSchedulesMap.value[scheduleId] === undefined) return
-    const response = await timeslotsApi.get(scheduleId)
-    if (!response.isSuccess()) return
-
-    loadedSchedulesMap.value[scheduleId].timeslots = response.data!
-  }
 
   const addSchedule = (schedule: ScheduleResponse) => {
     loadedSchedulesMap.value[schedule.id] = schedule
@@ -60,6 +55,33 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
     loadedSchedules.value.splice(index, 0, schedule)
   }
 
+  const removeSchedule = (id: string) => {
+    const index = loadedSchedules.value.findIndex((schedule) => schedule.id === id)
+    if (index > -1) {
+      loadedSchedules.value.splice(index, 1)
+      loadedSchedulesMap.value[id] = undefined
+    }
+  }
+
+  const updateScheduleAsync = async (id: string) => {
+    const response = await schedulesApi.getById(id)
+    if (!response.isSuccess()) return
+    const index = loadedSchedules.value.findIndex((schedule) => schedule.id === id)
+    if (index > -1) {
+      loadedSchedules.value.splice(index, 1, response.data!)
+      loadedSchedulesMap.value[id] = response.data!
+    } else {
+      addSchedule(response.data!)
+    }
+  }
+
+  const reloadTimeslotsAsync = async (scheduleId: string): Promise<void> => {
+    if (loadedSchedulesMap.value[scheduleId] === undefined) return
+    const response = await timeslotsApi.get(scheduleId)
+    if (!response.isSuccess()) return
+    loadedSchedulesMap.value[scheduleId].timeslots = response.data!
+  }
+
   return {
     nextSchedule,
     schedules,
@@ -67,11 +89,13 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
     pastSchedules,
     loadDefaultSchedulesAsync,
     reloadTimeslotsAsync,
-    addSchedule
+    addSchedule,
+    removeSchedule,
+    updateScheduleAsync
   }
 })
 
-type ScheduleMap = { [id: string]: ScheduleResponse }
+type ScheduleMap = { [id: string]: ScheduleResponse | undefined }
 const mapSchedules = (schedules: ScheduleResponse[]) => {
   const map: ScheduleMap = {}
   schedules.forEach((schedule) => {

@@ -30,7 +30,7 @@ public class DeleteTimeslot(DataContext dataContext, TimeslotRules rules) : Endp
             return;
         }
 
-        if (rules.IsDeleteAuthorized(timeslot))
+        if (!rules.IsDeleteAuthorized(timeslot))
         {
             await SendUnauthorizedAsync(ct);
             return;

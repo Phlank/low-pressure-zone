@@ -48,6 +48,8 @@ export const useCommunityStore = defineStore('communityStore', () => {
     }
   }
 
+  const getCommunity = (id: string) => communities.value.find((community) => community.id === id)
+
   const addCommunity = (community: CommunityResponse) => {
     const alphabeticalIndex = loadedCommunities.value.findIndex(
       (loadedCommunity) => loadedCommunity.name.toLowerCase() > community.name.toLowerCase()
@@ -132,6 +134,7 @@ export const useCommunityStore = defineStore('communityStore', () => {
     relatedCommunities,
     organizableCommunities,
     performableCommunities,
+    getCommunity,
     removeCommunity,
     addCommunity,
     updateCommunityAsync,

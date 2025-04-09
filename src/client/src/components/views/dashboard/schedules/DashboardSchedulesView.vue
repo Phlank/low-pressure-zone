@@ -12,10 +12,10 @@
       </TabList>
       <TabPanels v-if="isLoaded">
         <TabPanel value="upcoming">
-          <SchedulesGrid :schedules="upcomingSchedules" />
+          <SchedulesGrid :schedules="scheduleStore.upcomingSchedules" />
         </TabPanel>
         <TabPanel value="past">
-          <SchedulesGrid :schedules="pastSchedules" />
+          <SchedulesGrid :schedules="scheduleStore.pastSchedules" />
         </TabPanel>
         <TabPanel
           v-if="communityStore.organizableCommunities.length > 0"
@@ -42,13 +42,12 @@
 import { Button, Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs, useToast } from 'primevue'
 import ScheduleForm from '@/components/form/requestForms/ScheduleForm.vue'
 import { showCreateSuccessToast } from '@/utils/toastUtils'
-import { computed, onMounted, ref, type Ref, useTemplateRef } from 'vue'
+import { onMounted, ref, type Ref, useTemplateRef } from 'vue'
 import SchedulesGrid from './SchedulesGrid.vue'
 import schedulesApi from '@/api/resources/schedulesApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import { useCommunityStore } from '@/stores/communityStore.ts'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
-import { compareDateStrings, parseTime } from '@/utils/dateUtils.ts'
 import { usePerformerStore } from '@/stores/performerStore.ts'
 
 const scheduleStore = useScheduleStore()
@@ -75,15 +74,6 @@ const load = async () => {
   await Promise.all(loadingPromises)
 }
 
-const upcomingSchedules = computed(() =>
-  scheduleStore.schedules.filter((schedule) => parseTime(schedule.endsAt) > new Date().getTime())
-)
-const pastSchedules = computed(() =>
-  scheduleStore.schedules
-    .filter((schedule) => parseTime(schedule.endsAt) <= new Date().getTime())
-    .sort((a, b) => compareDateStrings(b.startsAt, a.startsAt))
-)
-
 const createForm = useTemplateRef('createForm')
 const handleCreateClick = async () => {
   if (!createForm.value) return
@@ -96,7 +86,18 @@ const handleCreateClick = async () => {
 
   if (tryHandleUnsuccessfulResponse(response, toast, createForm.value.validation)) return
   showCreateSuccessToast(toast, 'schedule')
-
+  const community = communityStore.getCommunity(createForm.value.formState.communityId)!
+  scheduleStore.addSchedule({
+    id: response.getCreatedId() ?? '',
+    startsAt: createForm.value.formState.startsAt,
+    endsAt: createForm.value.formState.endsAt,
+    timeslots: [],
+    community: community,
+    description: createForm.value.formState.description,
+    isDeletable: true,
+    isEditable: true,
+    isTimeslotCreationAllowed: community.isPerformable
+  })
   createForm.value.reset()
 }
 </script>
