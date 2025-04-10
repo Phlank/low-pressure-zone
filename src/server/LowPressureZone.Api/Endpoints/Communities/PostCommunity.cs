@@ -1,4 +1,5 @@
 ﻿using FastEndpoints;
+using LowPressureZone.Api.Extensions;
 using LowPressureZone.Domain;
 using LowPressureZone.Identity.Constants;
 
@@ -18,7 +19,7 @@ public sealed class PostCommunity(DataContext dataContext) : EndpointWithMapper<
         var community = Map.ToEntity(req);
         dataContext.Communities.Add(community);
         await dataContext.SaveChangesAsync(ct);
-        HttpContext.Response.Headers.Append("Access-Control-Expose-Headers", "location");
+        HttpContext.ExposeLocation();
         await SendCreatedAtAsync<GetCommunities>(new
         {
             community.Id

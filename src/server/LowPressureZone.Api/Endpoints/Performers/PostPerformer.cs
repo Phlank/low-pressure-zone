@@ -1,4 +1,5 @@
 ﻿using FastEndpoints;
+using LowPressureZone.Api.Extensions;
 using LowPressureZone.Domain;
 
 namespace LowPressureZone.Api.Endpoints.Performers;
@@ -16,7 +17,7 @@ public sealed class PostPerformer(DataContext dataContext) : EndpointWithMapper<
         var performer = Map.ToEntity(request);
         dataContext.Performers.Add(performer);
         await dataContext.SaveChangesAsync(ct);
-        HttpContext.Response.Headers.Append("Access-Control-Expose-Headers", "location");
+        HttpContext.ExposeLocation();
         await SendCreatedAtAsync<GetPerformerById>(new
         {
             performer.Id

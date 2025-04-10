@@ -1,4 +1,5 @@
 ﻿using FastEndpoints;
+using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -32,7 +33,7 @@ public class PostSchedule(DataContext dataContext, CommunityRules communityRules
 
         DataContext.Schedules.Add(schedule);
         await DataContext.SaveChangesAsync(ct);
-        HttpContext.Response.Headers.Append("Access-Control-Expose-Headers", "location");
+        HttpContext.ExposeLocation();
         await SendCreatedAtAsync<GetScheduleById>(new
         {
             schedule.Id
