@@ -49,8 +49,8 @@ onMounted(async () => {
     tryHandleUnsuccessfulResponse(inviteResponse, toast)
   )
     return
-  users.value = userresponse.data()
-  invites.value = inviteresponse.data()
+  users.value = userResponse.data()
+  invites.value = inviteResponse.data()
   isLoaded.value = true
 })
 </script>
