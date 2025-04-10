@@ -18,14 +18,12 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
     }
     const response = await schedulesApi.get(parameters)
     if (!response.isSuccess()) return
-    loadedSchedules.value = response.data()!.sort((a, b) => compareAsc(a.endsAt, b.endsAt))
-    loadedSchedulesMap.value = mapSchedules(response.data()!)
+    loadedSchedules.value = response.data().sort((a, b) => compareAsc(a.endsAt, b.endsAt))
+    loadedSchedulesMap.value = mapSchedules(response.data())
   }
 
   const loadDefaultSchedulesAsync = async (): Promise<void> => {
-    if (loadDefaultSchedulesPromise === undefined) {
-      loadDefaultSchedulesPromise = loadDefaultSchedules()
-    }
+    loadDefaultSchedulesPromise ??= loadDefaultSchedules()
     return await loadDefaultSchedulesPromise
   }
 
@@ -68,10 +66,10 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
     if (!response.isSuccess()) return
     const index = loadedSchedules.value.findIndex((schedule) => schedule.id === id)
     if (index > -1) {
-      loadedSchedules.value.splice(index, 1, response.data()!)
-      loadedSchedulesMap.value[id] = response.data()!
+      loadedSchedules.value.splice(index, 1, response.data())
+      loadedSchedulesMap.value[id] = response.data()
     } else {
-      addSchedule(response.data()!)
+      addSchedule(response.data())
     }
   }
 

@@ -23,12 +23,11 @@ export const useUserStore = defineStore('userStore', () => {
   }
 
   const loadUsersAsync = async () => {
-    if (loadUsersPromise === undefined) {
-      loadUsersPromise = loadUsers()
-    }
+    loadUsersPromise ??= loadUsers()
     await loadUsersPromise
     loadUsersPromise = undefined
   }
+  
   const getUser = (id: string) => {
     return loadedUserMap.value[id]
   }

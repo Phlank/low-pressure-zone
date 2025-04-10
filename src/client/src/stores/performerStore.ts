@@ -19,10 +19,9 @@ export const usePerformerStore = defineStore('performerStore', () => {
   }
 
   const loadPerformersAsync = async () => {
-    if (loadPerformersPromise === undefined) {
-      loadPerformersPromise = loadPerformers()
-    }
+    loadPerformersPromise ??= loadPerformers()
     await loadPerformersPromise
+    loadPerformersPromise = undefined
   }
 
   const performers = computed(() => loadedPerformers.value)

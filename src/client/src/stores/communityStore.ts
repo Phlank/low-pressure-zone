@@ -20,9 +20,7 @@ export const useCommunityStore = defineStore('communityStore', () => {
   }
 
   const loadCommunitiesAsync = async () => {
-    if (loadCommunitiesPromise === undefined) {
-      loadCommunitiesPromise = loadCommunities()
-    }
+    loadCommunitiesPromise ??= loadCommunities()
     await loadCommunitiesPromise
     loadCommunitiesPromise = undefined
   }
@@ -30,7 +28,7 @@ export const useCommunityStore = defineStore('communityStore', () => {
   const communities = computed(() => loadedCommunities.value)
 
   const relatedCommunities = computed(() =>
-    communities.value.filter((community) => community.isPerformable || community.isOrganizable)
+    communities.value.filter((community) => community.isPerformable ?? community.isOrganizable)
   )
 
   const organizableCommunities = computed(() =>
@@ -83,12 +81,11 @@ export const useCommunityStore = defineStore('communityStore', () => {
   }
 
   const loadRelationshipsAsync = async (communityId: string) => {
-    if (loadRelationshipsPromises[communityId] === undefined) {
-      loadRelationshipsPromises[communityId] = loadRelationships(communityId)
-    }
+    loadRelationshipsPromises[communityId] ??= loadRelationships(communityId)
     await loadRelationshipsPromises[communityId]
     loadRelationshipsPromises[communityId] = undefined
   }
+  
   const getRelationships = (communityId: string) =>
     loadedCommunityRelationships.value[communityId] ?? []
 

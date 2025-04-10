@@ -14,10 +14,9 @@ export const useInviteStore = defineStore('inviteStore', () => {
   }
 
   const loadInvitesAsync = async () => {
-    if (loadInvitesPromise === undefined) {
-      loadInvitesPromise = loadInvites()
-    }
+    loadInvitesPromise ??= loadInvites()
     await loadInvitesPromise
+    loadInvitesPromise = undefined
   }
 
   const invites = computed(() => loadedInvites.value)
