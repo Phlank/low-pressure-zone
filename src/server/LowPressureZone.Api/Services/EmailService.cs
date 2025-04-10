@@ -19,6 +19,8 @@ public class EmailService(IOptions<EmailServiceOptions> options, UriService uriS
         var sendResponse = await sender.SendAsync(email);
         if (!sendResponse.Successful) LogEmailFailure(logger, JsonSerializer.Serialize(sendResponse), null);
     }
+    
+    
 
     public async Task SendTwoFactorEmailAsync(string toAddress, string username, string code)
     {

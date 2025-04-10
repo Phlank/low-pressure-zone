@@ -71,7 +71,7 @@
         ref="timeslotForm"
         :disabled="isSubmitting"
         :initial-state="formInitialValue"
-        :performers="performers.filter((p) => p.isLinkableToTimeslot)" />
+        :performers="performerStore.linkablePerformers" />
     </FormDialog>
     <DeleteDialog
       :entity-name="deletingName"
@@ -98,26 +98,28 @@ import {
   showEditSuccessToast
 } from '@/utils/toastUtils'
 import { Column, DataTable, useToast } from 'primevue'
-import { inject, onMounted, ref, type Ref, useTemplateRef } from 'vue'
+import { computed, inject, onMounted, ref, type Ref, useTemplateRef } from 'vue'
 import type { ScheduleResponse } from '@/api/resources/schedulesApi.ts'
-import type { PerformerResponse } from '@/api/resources/performersApi.ts'
 import timeslotsApi, {
   PerformanceType,
   type TimeslotRequest,
   type TimeslotResponse
 } from '@/api/resources/timeslotsApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import { usePerformerStore } from '@/stores/performerStore.ts'
+import { useScheduleStore } from '@/stores/scheduleStore.ts'
 
 const toast = useToast()
 const props = defineProps<{
   schedule: ScheduleResponse
-  performers: PerformerResponse[]
 }>()
 
+const scheduleStore = useScheduleStore()
+const performerStore = usePerformerStore()
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
-const timeslots: Ref<TimeslotResponse[]> = ref(props.schedule.timeslots)
-const startDate = ref(parseDate(props.schedule.startsAt))
-const endDate = ref(parseDate(props.schedule.endsAt))
+const timeslots = computed(() => props.schedule.timeslots)
+const startDate = computed(() => parseDate(props.schedule.startsAt))
+const endDate = computed(() => parseDate(props.schedule.endsAt))
 const isSubmitting = ref(false)
 
 interface TimeslotRow {
@@ -183,29 +185,24 @@ const handleSave = async () => {
   if (tryHandleUnsuccessfulResponse(response, toast, timeslotForm.value.validation)) return
 
   showFormDialog.value = false
+  editingId = ''
 
-  const requestPerformer = props.performers.find((p) => p.id === request.performerId)
+  const performer = performerStore.get(request.performerId)
   if (editingId) {
     showEditSuccessToast(
       toast,
       'timeslot',
-      `${formatTimeslot(parseDate(request.startsAt))} | ${requestPerformer!.name}`
+      `${formatTimeslot(parseDate(request.startsAt))} | ${performer!.name}`
     )
   } else {
     showCreateSuccessToast(
       toast,
       'timeslot',
-      `${formatTimeslot(parseDate(request.startsAt))} | ${requestPerformer!.name}`
+      `${formatTimeslot(parseDate(request.startsAt))} | ${performer!.name}`
     )
   }
-
-  const timeslotResponse = await timeslotsApi.get(props.schedule.id)
-  if (timeslotResponse.isSuccess()) {
-    timeslots.value = timeslotResponse.data!
-  }
-
-  emit('update')
-  editingId = ''
+  await scheduleStore.reloadTimeslotsAsync(props.schedule.id)
+  setupRows()
 }
 
 const showDeleteDialog = ref(false)
@@ -224,17 +221,13 @@ const handleDelete = async () => {
 
   if (tryHandleUnsuccessfulResponse(response, toast)) return
 
+  await scheduleStore.reloadTimeslotsAsync(props.schedule.id)
+  setupRows()
   showDeleteSuccessToast(toast, 'timeslot')
   showDeleteDialog.value = false
-  const index = timeslots.value.findIndex((t) => t.id === deletingId)
-  timeslots.value.splice(index, 1)
-
   deletingId = ''
   deletingName.value = ''
-  emit('update')
 }
-
-const emit = defineEmits<{ update: [] }>()
 </script>
 
 <style lang="scss">

@@ -34,6 +34,6 @@ public static class RuleBuilderExtensions
             if (!PasswordNumberRegex.IsMatch(password)) context.AddFailure(nameof(password), Errors.PasswordNumber);
             if (!PasswordSpecialCharacterRegex.IsMatch(password)) context.AddFailure(nameof(password), Errors.PasswordSymbol);
             if (!PasswordLowercaseRegex.IsMatch(password)) context.AddFailure(nameof(password), Errors.PasswordLowercase);
-            if (!PasswordUppercaseRegex.IsMatch(password)) context.AddFailure(nameof(password), Errors.PasswordUppeercase);
+            if (!PasswordUppercaseRegex.IsMatch(password)) context.AddFailure(nameof(password), Errors.PasswordUppercase);
         });
 }

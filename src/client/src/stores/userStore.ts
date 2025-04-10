@@ -14,7 +14,7 @@ export const useUserStore = defineStore('userStore', () => {
       console.log(JSON.stringify(response))
       return
     }
-    loadedUsers.value = response.data!
+    loadedUsers.value = response.data()
     const userMap: UserMap = {}
     loadedUsers.value.forEach((user) => {
       userMap[user.id] = user
@@ -23,12 +23,11 @@ export const useUserStore = defineStore('userStore', () => {
   }
 
   const loadUsersAsync = async () => {
-    if (loadUsersPromise === undefined) {
-      loadUsersPromise = loadUsers()
-    }
+    loadUsersPromise ??= loadUsers()
     await loadUsersPromise
     loadUsersPromise = undefined
   }
+  
   const getUser = (id: string) => {
     return loadedUserMap.value[id]
   }

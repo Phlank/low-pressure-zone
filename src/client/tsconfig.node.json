@@ -15,6 +15,12 @@
     "moduleResolution": "Bundler",
     "types": [
       "node"
-    ]
+    ],
+    "strictNullChecks": true,
+    "allowJs": false,
+    "alwaysStrict": true,
+    "noImplicitThis": true,
+    "noImplicitAny": true,
+    "noPropertyAccessFromIndexSignature": true
   }
 }

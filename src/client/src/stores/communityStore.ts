@@ -16,18 +16,28 @@ export const useCommunityStore = defineStore('communityStore', () => {
       console.log(JSON.stringify(response.error))
       return
     }
-    loadedCommunities.value = response.data!
+    loadedCommunities.value = response.data()
   }
 
   const loadCommunitiesAsync = async () => {
-    if (loadCommunitiesPromise === undefined) {
-      loadCommunitiesPromise = loadCommunities()
-    }
+    loadCommunitiesPromise ??= loadCommunities()
     await loadCommunitiesPromise
     loadCommunitiesPromise = undefined
   }
 
   const communities = computed(() => loadedCommunities.value)
+
+  const relatedCommunities = computed(() =>
+    communities.value.filter((community) => community.isPerformable ?? community.isOrganizable)
+  )
+
+  const organizableCommunities = computed(() =>
+    communities.value.filter((community) => community.isOrganizable)
+  )
+
+  const performableCommunities = computed(() =>
+    communities.value.filter((community) => community.isPerformable)
+  )
 
   const removeCommunity = (id: string) => {
     const index = loadedCommunities.value.findIndex((community) => community.id === id)
@@ -35,6 +45,8 @@ export const useCommunityStore = defineStore('communityStore', () => {
       loadedCommunities.value.splice(index, 1)
     }
   }
+
+  const getCommunity = (id: string) => communities.value.find((community) => community.id === id)
 
   const addCommunity = (community: CommunityResponse) => {
     const alphabeticalIndex = loadedCommunities.value.findIndex(
@@ -52,9 +64,9 @@ export const useCommunityStore = defineStore('communityStore', () => {
     if (!response.isSuccess()) return
     const index = loadedCommunities.value.findIndex((community) => community.id === id)
     if (index > -1) {
-      loadedCommunities.value.splice(index, 1, response.data!)
+      loadedCommunities.value.splice(index, 1, response.data())
     } else {
-      addCommunity(response.data!)
+      addCommunity(response.data())
     }
   }
 
@@ -65,16 +77,15 @@ export const useCommunityStore = defineStore('communityStore', () => {
       console.log(JSON.stringify(response.error))
       return
     }
-    loadedCommunityRelationships.value[communityId] = response.data!
+    loadedCommunityRelationships.value[communityId] = response.data()
   }
 
   const loadRelationshipsAsync = async (communityId: string) => {
-    if (loadRelationshipsPromises[communityId] === undefined) {
-      loadRelationshipsPromises[communityId] = loadRelationships(communityId)
-    }
+    loadRelationshipsPromises[communityId] ??= loadRelationships(communityId)
     await loadRelationshipsPromises[communityId]
     loadRelationshipsPromises[communityId] = undefined
   }
+  
   const getRelationships = (communityId: string) =>
     loadedCommunityRelationships.value[communityId] ?? []
 
@@ -108,15 +119,19 @@ export const useCommunityStore = defineStore('communityStore', () => {
       (relationship) => relationship.userId === userId
     )
     if (index === -1) {
-      addRelationship(communityId, response.data!)
+      addRelationship(communityId, response.data())
       return
     }
-    loadedCommunityRelationships.value[communityId].splice(index, 1, response.data!)
+    loadedCommunityRelationships.value[communityId].splice(index, 1, response.data())
   }
 
   return {
     loadCommunitiesAsync,
     communities,
+    relatedCommunities,
+    organizableCommunities,
+    performableCommunities,
+    getCommunity,
     removeCommunity,
     addCommunity,
     updateCommunityAsync,

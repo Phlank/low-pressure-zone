@@ -3,11 +3,10 @@
     <div>
       <DataTable
         :expanded-rows="expandedRows"
-        :sort-order="1"
         :value="schedules"
         class="schedules-grid__table"
-        data-key="id"
-        sort-field="start">
+        data-key="id">
+        <template #empty> No items to display.</template>
         <template>
           <Column
             expander
@@ -18,7 +17,6 @@
             header="Community" />
           <Column
             v-if="!isMobile"
-            :sortable="true"
             field="start"
             header="Date">
             <template #body="{ data }: { data: ScheduleResponse }">
@@ -40,7 +38,9 @@
               <div class="text-s ellipsis">{{ data.community.name }}</div>
             </template>
           </Column>
+          <!-- Only show the action col for grids with schedules in the future -->
           <Column
+            v-if="showActionColumn"
             :class="'grid-action-col' + isMobile ? 'grid-action-col--1' : 'grid-action-col--2'">
             <template #body="{ data }: { data: ScheduleResponse }">
               <GridActions
@@ -54,9 +54,7 @@
         <template #expansion="rowProps">
           <TimeslotsGrid
             :disabled="false"
-            :performers="performers"
-            :schedule="rowProps.data"
-            @update="emit('update', rowProps.data.id)" />
+            :schedule="rowProps.data" />
         </template>
       </DataTable>
     </div>
@@ -68,7 +66,7 @@
       @save="handleEditScheduleSave">
       <ScheduleForm
         ref="scheduleEditForm"
-        :communities="communities"
+        :communities="communityStore.communities"
         :initial-state="editScheduleFormInitialState" />
     </FormDialog>
     <DeleteDialog
@@ -86,26 +84,33 @@ import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
 import FormDialog from '@/components/dialogs/FormDialog.vue'
 import ScheduleForm from '@/components/form/requestForms/ScheduleForm.vue'
-import { formatTimeslot, parseDate } from '@/utils/dateUtils'
+import { formatTimeslot, parseDate, parseTime } from '@/utils/dateUtils'
 import { showEditSuccessToast } from '@/utils/toastUtils'
 import { Column, DataTable, useToast } from 'primevue'
-import { inject, reactive, ref, type Ref, useTemplateRef } from 'vue'
+import { computed, inject, reactive, ref, type Ref, useTemplateRef } from 'vue'
 import TimeslotsGrid from './TimeslotsGrid.vue'
 import schedulesApi, { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
-import type { PerformerResponse } from '@/api/resources/performersApi.ts'
-import type { CommunityResponse } from '@/api/resources/communitiesApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import { useCommunityStore } from '@/stores/communityStore.ts'
+import { useScheduleStore } from '@/stores/scheduleStore.ts'
 
+const communityStore = useCommunityStore()
+const scheduleStore = useScheduleStore()
 const expandedRows = ref({})
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const isSubmitting = ref(false)
 const toast = useToast()
 
-defineProps<{
+const props = defineProps<{
   schedules: ScheduleResponse[]
-  performers: PerformerResponse[]
-  communities: CommunityResponse[]
 }>()
+
+const showActionColumn = computed(() =>
+  props.schedules.some(
+    (schedule) =>
+      parseTime(schedule.endsAt) > Date.now() && (schedule.isDeletable || schedule.isEditable)
+  )
+)
 
 const scheduleEditForm = useTemplateRef('scheduleEditForm')
 const showEditScheduleDialog = ref(false)
@@ -144,8 +149,6 @@ const handleEditScheduleSave = async () => {
 
   const newScheduleResponse = await schedulesApi.getById(editingId)
   if (tryHandleUnsuccessfulResponse(newScheduleResponse, toast)) return
-
-  emit('update', editingId)
 }
 
 let deletingId = ''
@@ -158,11 +161,8 @@ const handleDelete = async () => {
   showDeleteScheduleDialog.value = false
   const response = await schedulesApi.delete(deletingId)
   tryHandleUnsuccessfulResponse(response, toast)
-
-  emit('update')
+  scheduleStore.removeSchedule(deletingId)
 }
-
-const emit = defineEmits<{ update: [scheduleId?: string] }>()
 </script>
 
 <style lang="scss">

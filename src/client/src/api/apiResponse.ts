@@ -1,3 +1,5 @@
+import httpStatus from '@/constants/httpStatus.ts'
+
 interface ApiResponseParameters<TRequest, TResponse> {
   readonly status: number
   readonly headers?: Headers
@@ -6,18 +8,17 @@ interface ApiResponseParameters<TRequest, TResponse> {
   readonly error?: unknown
 }
 
-// noinspection MagicNumberJS
 export class ApiResponse<TRequest, TResponse> {
   readonly status: number
   readonly headers?: Headers
-  readonly data?: TResponse
+  readonly body?: TResponse
   readonly validationProblem?: ValidationProblemDetails<TRequest>
   readonly error?: unknown
 
   constructor(parameters: ApiResponseParameters<TRequest, TResponse>) {
     this.status = parameters.status
     this.headers = parameters.headers
-    this.data = parameters.data
+    this.body = parameters.data
     this.validationProblem = parameters.validationProblem
     this.error = parameters.error
   }
@@ -26,16 +27,27 @@ export class ApiResponse<TRequest, TResponse> {
    * @returns `true` if the status is successful. If the status is 200, then `data` must be defined.
    */
   readonly isSuccess = () => {
-    if (this.status < 200 || this.status > 299) {
+    if (this.status < httpStatus.ok || this.status >= httpStatus.multipleChoices) {
       return false
     }
-    if (this.status === 200) {
-      return this.data !== undefined
+    if (this.status === httpStatus.ok) {
+      return this.body !== undefined
     }
-    if (this.status === 201) {
+    if (this.status === httpStatus.created) {
       return this.headers?.get('location') !== undefined
     }
     return true
+  }
+
+  /**
+   * Get the data associated with the request after calling `isSuccess()`
+   *
+   * @returns `body` if it is not undefined
+   * @throws Error if `body is undefined
+   */
+  readonly data = (): TResponse => {
+    if (this.body === undefined) throw new Error('No data in response')
+    return this.body
   }
 
   /**

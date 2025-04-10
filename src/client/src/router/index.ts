@@ -1,7 +1,7 @@
-import { Role } from '@/constants/role.ts'
 import { useAuthStore } from '@/stores/authStore'
 import { createRouter, createWebHistory } from 'vue-router'
 import { Routes } from './routes'
+import roles, { type Role } from '@/constants/roles.ts'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -56,7 +56,7 @@ const router = createRouter({
           path: 'users',
           name: 'Users',
           component: () => import('@/components/views/dashboard/users/DashboardUsersView.vue'),
-          meta: { auth: true, roles: [Role.Admin] }
+          meta: { auth: true, roles: [roles.admin] }
         }
       ],
       meta: {

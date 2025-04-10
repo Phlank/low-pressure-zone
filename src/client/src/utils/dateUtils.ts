@@ -2,6 +2,10 @@ import { formatDate } from '@vueuse/core'
 
 export const parseDate = (dateString: string) => new Date(Date.parse(dateString))
 
+export const parseTime = (dateString: string) => parseDate(dateString).getTime()
+
+export const compareDateStrings = (a: string, b: string) => parseTime(b) - parseTime(a)
+
 export const setToHour = (date: Date) => {
   date.setMinutes(0)
   date.setSeconds(0)

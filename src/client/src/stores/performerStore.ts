@@ -5,6 +5,7 @@ import { computed, type Ref, ref } from 'vue'
 
 export const usePerformerStore = defineStore('performerStore', () => {
   const loadedPerformers: Ref<PerformerResponse[]> = ref([])
+  const loadedPerformersMap: Ref<PerformerMap> = ref({})
 
   let loadPerformersPromise: Promise<void> | undefined
   const loadPerformers = async () => {
@@ -13,20 +14,22 @@ export const usePerformerStore = defineStore('performerStore', () => {
       console.log(JSON.stringify(response))
       return
     }
-    loadedPerformers.value = response.data!
+    loadedPerformers.value = response.data()
+    loadedPerformersMap.value = createMap(response.data())
   }
 
   const loadPerformersAsync = async () => {
-    if (loadPerformersPromise === undefined) {
-      loadPerformersPromise = loadPerformers()
-    }
+    loadPerformersPromise ??= loadPerformers()
     await loadPerformersPromise
+    loadPerformersPromise = undefined
   }
 
   const performers = computed(() => loadedPerformers.value)
   const linkablePerformers = computed(() =>
     loadedPerformers.value.filter((performer) => performer.isLinkableToTimeslot)
   )
+
+  const get = (id: string) => loadedPerformersMap.value[id]
 
   const add = (performer: PerformerResponse) => {
     // Performers are ordered alphabetically from the API by name
@@ -55,9 +58,9 @@ export const usePerformerStore = defineStore('performerStore', () => {
     if (!response.isSuccess()) return
     const index = loadedPerformers.value.findIndex((performer) => performer.id === id)
     if (index > -1) {
-      loadedPerformers.value.splice(index, 1, response.data!)
+      loadedPerformers.value.splice(index, 1, response.data())
     } else {
-      add(response.data!)
+      add(response.data())
     }
   }
 
@@ -65,8 +68,18 @@ export const usePerformerStore = defineStore('performerStore', () => {
     performers,
     linkablePerformers,
     loadPerformersAsync,
+    get,
     add,
     remove,
     updateAsync
   }
 })
+
+type PerformerMap = { [key: string]: PerformerResponse }
+const createMap = (performers: PerformerResponse[]): PerformerMap => {
+  const map: PerformerMap = {}
+  for (const performer of performers) {
+    map[performer.id] = performer
+  }
+  return map
+}

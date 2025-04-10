@@ -1,64 +1,78 @@
 <template>
   <div class="dashboard-schedules-view">
-    <div
-      v-show="
-        authStore.isInAnySpecifiedRole(Role.Admin) ||
-        communityStore.communities.some((community) => community.isOrganizable)
-      "
-      class="dashboard-schedules-view__new-schedules-form">
-      <h4>Create New Schedule</h4>
-      <ScheduleForm
-        ref="createForm"
-        :communities="communities.filter((a) => a.isOrganizable)" />
-      <Button
-        :disabled="isSubmitting"
-        class="input"
-        label="Create"
-        @click="handleCreateClick" />
-    </div>
-    <h4>Upcoming Schedules</h4>
-    <SchedulesGrid
-      :communities="communities"
-      :performers="performers"
-      :schedules="schedules"
-      @update="handleSchedulesUpdate" />
+    <Tabs v-model:value="tabValue">
+      <TabList style="width: 100%; overflow-x: scroll">
+        <Tab value="upcoming">Upcoming</Tab>
+        <Tab value="past">Past</Tab>
+        <Tab
+          v-if="communityStore.organizableCommunities.length > 0"
+          value="create">
+          Create
+        </Tab>
+      </TabList>
+      <TabPanels v-if="isLoaded">
+        <TabPanel value="upcoming">
+          <SchedulesGrid :schedules="scheduleStore.upcomingSchedules" />
+        </TabPanel>
+        <TabPanel value="past">
+          <SchedulesGrid :schedules="scheduleStore.pastSchedules" />
+        </TabPanel>
+        <TabPanel
+          v-if="communityStore.organizableCommunities.length > 0"
+          value="create">
+          <h4>Create New Schedule</h4>
+          <ScheduleForm
+            ref="createForm"
+            :communities="communityStore.organizableCommunities" />
+          <Button
+            :disabled="isSubmitting"
+            class="input"
+            label="Create"
+            @click="handleCreateClick" />
+        </TabPanel>
+      </TabPanels>
+      <Skeleton
+        v-else
+        style="height: 300px" />
+    </Tabs>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { Button, Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs, useToast } from 'primevue'
 import ScheduleForm from '@/components/form/requestForms/ScheduleForm.vue'
 import { showCreateSuccessToast } from '@/utils/toastUtils'
-import { Button, useToast } from 'primevue'
 import { onMounted, ref, type Ref, useTemplateRef } from 'vue'
 import SchedulesGrid from './SchedulesGrid.vue'
-import { useAuthStore } from '@/stores/authStore'
-import { Role } from '@/constants/role.ts'
-import schedulesApi, { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
-import communitiesApi, { type CommunityResponse } from '@/api/resources/communitiesApi.ts'
-import performersApi, { type PerformerResponse } from '@/api/resources/performersApi.ts'
+import schedulesApi from '@/api/resources/schedulesApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import { useCommunityStore } from '@/stores/communityStore.ts'
+import { useScheduleStore } from '@/stores/scheduleStore.ts'
+import { usePerformerStore } from '@/stores/performerStore.ts'
 
-const authStore = useAuthStore()
+const scheduleStore = useScheduleStore()
 const communityStore = useCommunityStore()
+const performerStore = usePerformerStore()
 const toast = useToast()
 const isSubmitting = ref(false)
+const isLoaded = ref(false)
+const tabValue: Ref<string | number> = ref('upcoming')
 
 onMounted(async () => {
-  const promises: Promise<unknown>[] = [loadSchedules(), loadCommunities(), loadPerformers()]
-  if (communityStore.communities.length === 0) {
-    promises.push(communityStore.loadCommunitiesAsync())
-  }
-  await Promise.all(promises)
+  await load()
+  isLoaded.value = true
 })
 
-const schedules: Ref<ScheduleResponse[]> = ref([])
-const communities: Ref<CommunityResponse[]> = ref([])
-const performers: Ref<PerformerResponse[]> = ref([])
-const loadSchedules = async () =>
-  (schedules.value = (await schedulesApi.get({ after: new Date().toISOString() })).data ?? [])
-const loadCommunities = async () => (communities.value = (await communitiesApi.get()).data ?? [])
-const loadPerformers = async () => (performers.value = (await performersApi.get()).data ?? [])
+const load = async () => {
+  const loadingPromises: Promise<unknown>[] = []
+  if (communityStore.communities.length === 0)
+    loadingPromises.push(communityStore.loadCommunitiesAsync())
+  if (scheduleStore.schedules.length === 0)
+    loadingPromises.push(scheduleStore.loadDefaultSchedulesAsync())
+  if (performerStore.performers.length === 0)
+    loadingPromises.push(performerStore.loadPerformersAsync())
+  await Promise.all(loadingPromises)
+}
 
 const createForm = useTemplateRef('createForm')
 const handleCreateClick = async () => {
@@ -72,22 +86,18 @@ const handleCreateClick = async () => {
 
   if (tryHandleUnsuccessfulResponse(response, toast, createForm.value.validation)) return
   showCreateSuccessToast(toast, 'schedule')
-  await loadSchedules()
+  const community = communityStore.getCommunity(createForm.value.formState.communityId)!
+  scheduleStore.addSchedule({
+    id: response.getCreatedId() ?? '',
+    startsAt: createForm.value.formState.startsAt,
+    endsAt: createForm.value.formState.endsAt,
+    timeslots: [],
+    community: community,
+    description: createForm.value.formState.description,
+    isDeletable: true,
+    isEditable: true,
+    isTimeslotCreationAllowed: community.isPerformable
+  })
   createForm.value.reset()
-}
-
-const handleSchedulesUpdate = async (scheduleId?: string) => {
-  if (scheduleId) {
-    const response = await schedulesApi.getById(scheduleId)
-    if (response.isSuccess()) {
-      const index = schedules.value.findIndex((s) => s.id === scheduleId)
-      schedules.value.splice(index, 1, response.data!)
-    }
-  } else {
-    const response = await schedulesApi.get({ after: new Date().toISOString() })
-    if (response.isSuccess()) {
-      schedules.value = response.data!
-    }
-  }
 }
 </script>
