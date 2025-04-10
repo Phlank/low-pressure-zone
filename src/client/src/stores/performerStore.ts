@@ -14,8 +14,8 @@ export const usePerformerStore = defineStore('performerStore', () => {
       console.log(JSON.stringify(response))
       return
     }
-    loadedPerformers.value = response.data!
-    loadedPerformersMap.value = createMap(response.data!)
+    loadedPerformers.value = response.data()
+    loadedPerformersMap.value = createMap(response.data())
   }
 
   const loadPerformersAsync = async () => {
@@ -59,9 +59,9 @@ export const usePerformerStore = defineStore('performerStore', () => {
     if (!response.isSuccess()) return
     const index = loadedPerformers.value.findIndex((performer) => performer.id === id)
     if (index > -1) {
-      loadedPerformers.value.splice(index, 1, response.data!)
+      loadedPerformers.value.splice(index, 1, response.data())
     } else {
-      add(response.data!)
+      add(response.data())
     }
   }
 

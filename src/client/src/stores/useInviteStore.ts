@@ -10,7 +10,7 @@ export const useInviteStore = defineStore('inviteStore', () => {
   const loadInvites = async () => {
     const response = await invitesApi.get()
     if (!response.isSuccess()) return
-    loadedInvites.value = response.data!
+    loadedInvites.value = response.data()
   }
 
   const loadInvitesAsync = async () => {

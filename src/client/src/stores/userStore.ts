@@ -14,7 +14,7 @@ export const useUserStore = defineStore('userStore', () => {
       console.log(JSON.stringify(response))
       return
     }
-    loadedUsers.value = response.data!
+    loadedUsers.value = response.data()
     const userMap: UserMap = {}
     loadedUsers.value.forEach((user) => {
       userMap[user.id] = user

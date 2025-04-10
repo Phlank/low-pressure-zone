@@ -114,8 +114,8 @@ const mapTimeslotDisplayData = (schedule: ScheduleResponse) => {
 onMounted(async () => {
   const response = await schedulesApi.get({ after: new Date().toISOString() })
   if (tryHandleUnsuccessfulResponse(response, toast)) return
-  if (response.isSuccess() && response.data) {
-    schedules.value = response.data.sort((a, b) => Date.parse(a.endsAt) - Date.parse(b.endsAt))
+  if (response.isSuccess()) {
+    schedules.value = response.data().sort((a, b) => Date.parse(a.endsAt) - Date.parse(b.endsAt))
     isLoaded.value = true
   }
 })

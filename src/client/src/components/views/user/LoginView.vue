@@ -99,7 +99,7 @@ const handleLogin = async () => {
     tryHandleUnsuccessfulResponse(response, toast)
   }
 
-  if (response.data?.requiresTwoFactor) {
+  if (response.data().requiresTwoFactor) {
     await router.replace(Routes.TwoFactor)
     return
   }

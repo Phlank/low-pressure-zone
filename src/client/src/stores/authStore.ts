@@ -29,7 +29,7 @@ export const useAuthStore = defineStore('authStore', () => {
     if (response.status === 0) return
     isLoggedInRef.value = response.isSuccess()
     if (response.isSuccess()) {
-      userInfo.value = response.data!
+      userInfo.value = response.data()
     }
   }
 

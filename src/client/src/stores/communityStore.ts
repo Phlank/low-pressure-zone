@@ -16,7 +16,7 @@ export const useCommunityStore = defineStore('communityStore', () => {
       console.log(JSON.stringify(response.error))
       return
     }
-    loadedCommunities.value = response.data!
+    loadedCommunities.value = response.data()
   }
 
   const loadCommunitiesAsync = async () => {
@@ -66,9 +66,9 @@ export const useCommunityStore = defineStore('communityStore', () => {
     if (!response.isSuccess()) return
     const index = loadedCommunities.value.findIndex((community) => community.id === id)
     if (index > -1) {
-      loadedCommunities.value.splice(index, 1, response.data!)
+      loadedCommunities.value.splice(index, 1, response.data())
     } else {
-      addCommunity(response.data!)
+      addCommunity(response.data())
     }
   }
 
@@ -79,7 +79,7 @@ export const useCommunityStore = defineStore('communityStore', () => {
       console.log(JSON.stringify(response.error))
       return
     }
-    loadedCommunityRelationships.value[communityId] = response.data!
+    loadedCommunityRelationships.value[communityId] = response.data()
   }
 
   const loadRelationshipsAsync = async (communityId: string) => {
@@ -122,10 +122,10 @@ export const useCommunityStore = defineStore('communityStore', () => {
       (relationship) => relationship.userId === userId
     )
     if (index === -1) {
-      addRelationship(communityId, response.data!)
+      addRelationship(communityId, response.data())
       return
     }
-    loadedCommunityRelationships.value[communityId].splice(index, 1, response.data!)
+    loadedCommunityRelationships.value[communityId].splice(index, 1, response.data())
   }
 
   return {
