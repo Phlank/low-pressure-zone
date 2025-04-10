@@ -1,4 +1,5 @@
 ﻿using FastEndpoints;
+using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain;
 using LowPressureZone.Identity;
@@ -72,7 +73,7 @@ public class UpdateCommunityRelationship(DataContext dataContext,
 
         await dataContext.AddAsync(Map.ToEntity(request), ct);
         await dataContext.SaveChangesAsync(ct);
-        HttpContext.Response.Headers.Append("Access-Control-Expose-Headers", "location");
+        HttpContext.ExposeLocation();
         await SendCreatedAtAsync<GetCommunityRelationshipById>(new
         {
             communityId,

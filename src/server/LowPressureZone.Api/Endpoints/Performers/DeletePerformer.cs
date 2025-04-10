@@ -17,8 +17,7 @@ public class DeletePerformer(DataContext dataContext, PerformerRules rules) : En
     {
         var id = Route<Guid>("id");
         var performer = await dataContext.Performers
-                                         .AsNoTracking()
-                                         .Where(p => p.Id == id)
+                                         .Where(performer => performer.Id == id)
                                          .FirstOrDefaultAsync(ct);
 
         if (performer == null || performer.IsDeleted)
@@ -36,7 +35,7 @@ public class DeletePerformer(DataContext dataContext, PerformerRules rules) : En
         performer.IsDeleted = true;
         performer.LastModifiedDate = DateTime.UtcNow;
         await dataContext.SaveChangesAsync(ct);
-        await dataContext.Timeslots.Where(t => t.PerformerId == performer.Id && t.StartsAt > DateTime.UtcNow).ExecuteDeleteAsync(ct);
+        await dataContext.Timeslots.Where(timeslot => timeslot.PerformerId == performer.Id && timeslot.StartsAt > DateTime.UtcNow).ExecuteDeleteAsync(ct);
         await SendNoContentAsync(ct);
     }
 }

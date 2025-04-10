@@ -57,6 +57,14 @@ public static class ServiceCollectionExtensions
             options.Cookie.HttpOnly = true;
             options.ExpireTimeSpan = TimeSpan.FromDays(1);
             options.Cookie.SameSite = SameSiteMode.Lax;
+            options.LoginPath = "/api/users/login";
+            options.ReturnUrlParameter = "/";
+
+            options.Events.OnRedirectToLogin = context =>
+            {
+                context.Response.StatusCode = 401;
+                return Task.CompletedTask;
+            };
         });
     }
 
