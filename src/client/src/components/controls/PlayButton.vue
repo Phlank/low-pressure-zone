@@ -30,8 +30,8 @@ enum PlayState {
   Paused
 }
 
-const djName: Ref<string> = ref('strgrll')
-const streamType: Ref<string> = ref('Live DJ Set')
+const djName: Ref<string> = ref('Nobody')
+const streamType: Ref<string> = ref('Nothing')
 const playState: Ref<PlayState> = ref(PlayState.Paused)
 const isLoading: Ref<boolean> = ref(false)
 let audio: HTMLAudioElement | undefined = undefined
@@ -50,8 +50,11 @@ const toggle = (ref: Ref<PlayState>) => {
 }
 
 watch(playState, (newPlayState) => {
-  if (newPlayState === PlayState.Paused) {
-    audio?.pause()
+  if (newPlayState === PlayState.Paused && audio !== undefined) {
+    audio.pause()
+    // This should disable loading when paused (which frees up a listener on the icecast server)
+    // noinspection SillyAssignmentJS
+    audio.src = audio.src
     return
   }
 
@@ -98,6 +101,7 @@ const handleWaiting = () => {
 }
 
 const handleError = () => {
+  if (audio?.src === '') return
   toast.add({
     summary: 'Playback error',
     detail: 'Unable to load audio stream',

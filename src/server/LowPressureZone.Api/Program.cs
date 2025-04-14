@@ -33,11 +33,9 @@ app.UseFastEndpoints(config =>
     config.Endpoints.RoutePrefix = "api";
     config.Errors.ResponseBuilder = (failures, ctx, statusCode) =>
     {
-        return new ValidationProblemDetails(
-                                            failures.GroupBy(f => (f.PropertyName ?? "none").ToCamelCase())
-                                                    .ToDictionary(
-                                                                  e => e.Key,
-                                                                  e => e.Select(m => m.ErrorMessage).ToArray()))
+        return new ValidationProblemDetails(failures.GroupBy(failure => (failure.PropertyName ?? "none").ToCamelCase())
+                                                    .ToDictionary(failureGrouping => failureGrouping.Key,
+                                                                  failureGrouping => failureGrouping.Select(failure => failure.ErrorMessage).ToArray()))
         {
             Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
             Title = "One or more validation errors occurred.",
