@@ -30,7 +30,6 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
-app.UseCors(app.Environment.IsDevelopment() ? "Development" : "Production");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseFastEndpoints(config =>
@@ -56,5 +55,4 @@ app.UseFastEndpoints(config =>
     };
     config.Errors.ProducesMetadataType = typeof(ValidationProblemDetails);
 }).UseSwaggerGen();
-app.UseHsts();
 app.Run();
