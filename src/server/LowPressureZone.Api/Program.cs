@@ -3,6 +3,7 @@ using FastEndpoints;
 using FastEndpoints.Swagger;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Services;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Minerals.StringCases;
 
@@ -25,6 +26,10 @@ builder.Services.ConfigureWebApi();
 builder.Services.AddApiServices();
 
 var app = builder.Build();
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 app.UseCors(app.Environment.IsDevelopment() ? "Development" : "Production");
 app.UseAuthentication();
 app.UseAuthorization();

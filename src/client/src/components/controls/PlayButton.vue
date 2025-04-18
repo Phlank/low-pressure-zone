@@ -1,5 +1,6 @@
 <template>
   <Button
+    :disabled="!isPlayable"
     :icon="controlIcon"
     :label="controlLabel"
     class="play-button"
@@ -22,6 +23,8 @@
 import { Button, ProgressSpinner, useToast } from 'primevue'
 import { computed, onMounted, type Ref, ref, watch } from 'vue'
 import delay from '@/utils/delay.ts'
+import { noStatsToast } from '@/constants/toasts.ts'
+import { getLiveSource, type IcecastStats } from '@/types/icecastStats.ts'
 
 const toast = useToast()
 
@@ -34,8 +37,14 @@ const djName: Ref<string> = ref('Nobody')
 const streamType: Ref<string> = ref('Nothing')
 const playState: Ref<PlayState> = ref(PlayState.Paused)
 const isLoading: Ref<boolean> = ref(false)
+const isPlayable: Ref<boolean> = ref(false)
 let audio: HTMLAudioElement | undefined = undefined
 let audioAbortController = new AbortController()
+
+window.addEventListener('beforeunload', () => {
+  audioAbortController.abort()
+  audio = undefined
+})
 
 const handleControlClick = () => {
   toggle(playState)
@@ -52,28 +61,28 @@ const toggle = (ref: Ref<PlayState>) => {
 watch(playState, (newPlayState) => {
   if (newPlayState === PlayState.Paused && audio !== undefined) {
     audio.pause()
-    // This should disable loading when paused (which frees up a listener on the icecast server)
-    // noinspection SillyAssignmentJS
-    audio.src = audio.src
     return
   }
 
-  // Create the HTMLAudioElement and begin loading data; start playing when enough is available
-  audioAbortController = new AbortController()
+  let isNewAudio = false
   if (audio === undefined) {
+    isNewAudio = true
+    audioAbortController = new AbortController()
     audio = new Audio(import.meta.env.VITE_LISTEN_URL)
     audio.preload = 'metadata'
     addAudioEventListeners()
-    isLoading.value = true
-  } else {
-    if (audio) audio.currentTime = audio.duration - 1
-    audio.play()
   }
+  isLoading.value = true
+  if (!isNaN(audio.duration) && !isNewAudio) {
+    audio.fastSeek(audio.duration)
+  }
+  audio.play()
 })
 
 const addAudioEventListeners = () => {
   const listenerOptions = { signal: audioAbortController.signal }
   audio?.addEventListener('canplay', handleCanPlay, listenerOptions)
+  audio?.addEventListener('play', handlePlay, listenerOptions)
   audio?.addEventListener('ended', handleEnded, listenerOptions)
   audio?.addEventListener('waiting', handleWaiting, listenerOptions)
   audio?.addEventListener('error', handleError, listenerOptions)
@@ -81,9 +90,12 @@ const addAudioEventListeners = () => {
 
 const handleCanPlay = () => {
   if (playState.value === PlayState.Playing) {
-    audio?.play()
     isLoading.value = false
   }
+}
+
+const handlePlay = () => {
+  isLoading.value = false
 }
 
 const handleEnded = () => {
@@ -117,15 +129,27 @@ onMounted(() => {
 const pollStreamMetadata = async () => {
   while (true) {
     const result = await fetch(import.meta.env.VITE_STREAM_STATUS_URL)
-    const json = await result.json()
-    console.log(JSON.stringify(json))
-    if (json.icestats?.source?.server_name !== undefined) {
-      djName.value = json.icestats.source.server_name
-      streamType.value = 'Live DJ Set'
-    } else {
-      djName.value = 'Nobody'
-      streamType.value = 'Nothing'
+    if (!result.ok) {
+      toast.add(noStatsToast)
+      isPlayable.value = false
+      return
     }
+    const json = await result.json()
+    if (json.icestats === undefined) {
+      toast.add(noStatsToast)
+      isPlayable.value = false
+      return
+    }
+    const stats = json.icestats as IcecastStats
+    const liveSource = getLiveSource(stats)
+    if (liveSource === undefined) {
+      isPlayable.value = false
+      djName.value = 'Nobody'
+      return
+    }
+    djName.value = liveSource.artist ?? liveSource.title ?? liveSource.server_name ?? 'Unknown'
+    streamType.value = 'Live DJ Set'
+    isPlayable.value = true
     await delay(10000)
   }
 }
@@ -137,7 +161,7 @@ const controlIcon = computed(() => {
   return 'pi pi-pause'
 })
 
-const controlLabel = computed(() => `${djName.value} | ${streamType.value}`)
+const controlLabel = computed(() => `${djName.value}`)
 </script>
 
 <style lang="scss">
