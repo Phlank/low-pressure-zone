@@ -13,7 +13,6 @@ public class PutTimeslot(DataContext dataContext, TimeslotRules rules) : Endpoin
         Put("/schedules/{scheduleId}/timeslots/{timeslotId}");
         Description(builder => builder.Produces(204)
                                       .Produces(404));
-        Roles(RoleNames.All);
     }
 
     public override async Task HandleAsync(TimeslotRequest req, CancellationToken ct)

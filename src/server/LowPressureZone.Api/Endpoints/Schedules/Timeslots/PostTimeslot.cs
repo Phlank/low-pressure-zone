@@ -2,6 +2,7 @@
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain;
+using LowPressureZone.Identity.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
@@ -21,6 +22,7 @@ public class PostTimeslot(DataContext dataContext, PerformerRules performerRules
         var schedule = await dataContext.Schedules
                                         .Include(schedule => schedule.Timeslots)
                                         .Include(schedule => schedule.Community)
+                                        .ThenInclude(community => community.Relationships.Where(relationship => relationship.UserId == User.GetIdOrDefault()))
                                         .Where(schedule => schedule.Id == scheduleId)
                                         .FirstAsync(ct);
 

@@ -8,9 +8,6 @@ namespace LowPressureZone.Api.Endpoints.Performers;
 public sealed class PutPerformer(DataContext dataContext, PerformerRules rules)
     : EndpointWithMapper<PerformerRequest, PerformerMapper>
 {
-    private readonly DataContext _dataContext = dataContext;
-    private readonly PerformerRules _rules = rules;
-
     public override void Configure()
     {
         Put("/performers/{id}");
@@ -21,9 +18,9 @@ public sealed class PutPerformer(DataContext dataContext, PerformerRules rules)
     public override async Task HandleAsync(PerformerRequest req, CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        var performer = await _dataContext.Performers
-                                          .Where(p => p.Id == id)
-                                          .FirstOrDefaultAsync(ct);
+        var performer = await dataContext.Performers
+                                         .Where(p => p.Id == id)
+                                         .FirstOrDefaultAsync(ct);
 
         if (performer == null || PerformerRules.IsHiddenFromApi(performer))
         {
@@ -31,7 +28,7 @@ public sealed class PutPerformer(DataContext dataContext, PerformerRules rules)
             return;
         }
 
-        if (!_rules.IsEditAuthorized(performer))
+        if (!rules.IsEditAuthorized(performer))
         {
             await SendUnauthorizedAsync(ct);
             return;
