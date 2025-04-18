@@ -9,7 +9,6 @@ using Minerals.StringCases;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Configuration.AddJsonFile("appsettings.json");
 if (builder.Environment.IsDevelopment()) builder.Configuration.AddJsonFile("appsettings.Development.json", true);
 if (builder.Environment.IsProduction()) builder.Configuration.AddJsonFile("appsettings.Production.json", true);
@@ -30,6 +29,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
+if (app.Environment.IsDevelopment()) app.UseCors("Development");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseFastEndpoints(config =>
