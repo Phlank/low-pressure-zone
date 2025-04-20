@@ -28,7 +28,20 @@
           </Column>
           <Column
             field="performer"
-            header="Performer" />
+            header="Performer">
+            <template #body="{ data }: { data: TimeslotData }">
+              <ListItem>
+                <template #left>{{ data.performer }}</template>
+                <template #right>
+                  <a
+                    v-if="data.performerUrl !== ''"
+                    :href="data.performerUrl">
+                    <i class="pi pi-external-link"></i>
+                  </a>
+                </template>
+              </ListItem>
+            </template>
+          </Column>
           <Column
             v-if="!isMobile"
             field="type"
@@ -45,6 +58,7 @@ import { Column, DataTable, Panel, Skeleton, useToast } from 'primevue'
 import { computed, type ComputedRef, inject, onMounted, ref, type Ref } from 'vue'
 import schedulesApi, { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import ListItem from '@/components/data/ListItem.vue'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const schedules: Ref<ScheduleResponse[]> = ref([])
@@ -63,6 +77,7 @@ interface ScheduleData {
 interface TimeslotData {
   start: Date
   performer: string
+  performerUrl: string
   type: string
 }
 
@@ -105,6 +120,7 @@ const mapTimeslotDisplayData = (schedule: ScheduleResponse) => {
     timeslotData.push({
       start: hour,
       performer: slot?.performer.name ?? '',
+      performerUrl: slot?.performer.url ?? '',
       type: slot?.performanceType ?? ''
     })
   })

@@ -10,8 +10,7 @@ namespace LowPressureZone.Api.Endpoints.Users.Login;
 
 public class PostLogin(SignInManager<AppUser> signInManager,
                        UserManager<AppUser> userManager,
-                       EmailService emailService,
-                       DataContext dataContext) : Endpoint<LoginRequest, LoginResponse>
+                       EmailService emailService) : Endpoint<LoginRequest, LoginResponse>
 {
     private readonly DateTime _requestStart = DateTime.UtcNow;
 
