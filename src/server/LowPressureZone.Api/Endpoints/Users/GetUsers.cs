@@ -1,4 +1,5 @@
-﻿using FastEndpoints;
+﻿using System.Diagnostics.CodeAnalysis;
+using FastEndpoints;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,8 @@ public class GetUsers(IdentityContext identityContext) : EndpointWithoutRequest<
 {
     public override void Configure() => Get("/users");
 
+    // This warning shows up for the LINQ expression; null-propagating operators are not allowed in expression trees, hence disabling it
+    [SuppressMessage("Style", "IDE0031:Use null propagation")]
     public override async Task HandleAsync(CancellationToken ct)
     {
         var adminRoleId = await identityContext.Roles
@@ -24,12 +27,12 @@ public class GetUsers(IdentityContext identityContext) : EndpointWithoutRequest<
                                 Id = user.Id,
                                 DisplayName = user.DisplayName,
                                 IsAdmin = userRoles != null && userRoles.Any(userRole => userRole.RoleId == adminRoleId),
-                                RegistrationDate = user.Invitation?.RegistrationDate
+                                RegistrationDate = user.Invitation != null ? user.Invitation.RegistrationDate : null
                             };
         IEnumerable<UserResponse> responses = await userJoinQuery
                                                     .AsNoTracking()
                                                     .ToListAsync(ct);
-        
+
         if (!User.IsInRole(RoleNames.Admin)) responses = responses.Where(response => !response.IsAdmin);
         await SendOkAsync(responses, ct);
     }
