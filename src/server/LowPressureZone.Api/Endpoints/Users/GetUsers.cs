@@ -10,6 +10,7 @@ public class GetUsers(IdentityContext identityContext) : EndpointWithoutRequest<
 {
     public override void Configure() => Get("/users");
 
+    // This warning shows up for the LINQ expression; null-propagating operators are not allowed in expression trees, hence disabling it
     [SuppressMessage("Style", "IDE0031:Use null propagation")]
     public override async Task HandleAsync(CancellationToken ct)
     {
@@ -31,6 +32,7 @@ public class GetUsers(IdentityContext identityContext) : EndpointWithoutRequest<
         IEnumerable<UserResponse> responses = await userJoinQuery
                                                     .AsNoTracking()
                                                     .ToListAsync(ct);
+
         if (!User.IsInRole(RoleNames.Admin)) responses = responses.Where(response => !response.IsAdmin);
         await SendOkAsync(responses, ct);
     }

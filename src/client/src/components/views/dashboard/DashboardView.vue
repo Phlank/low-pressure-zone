@@ -6,7 +6,7 @@
       class="flex-variable-space-between__left flex-variable-space-between__left--variable-height"
       z-index="99">
       <template #item="{ item, props }">
-        <div v-if="authStore.isInAnySpecifiedRole(...item.roles)">
+        <div v-if="item.isAccessible()">
           <RouterLink
             v-if="item.route"
             v-slot="{ href, navigate }"
@@ -65,25 +65,26 @@ const menuItems: MenuItem[] = [
     label: 'Schedules',
     icon: 'pi pi-calendar',
     route: '/dashboard',
-    roles: []
+    isAccessible: () => true
   },
   {
     label: 'Communities',
     icon: 'pi pi-globe',
     route: '/dashboard/communities',
-    roles: []
+    isAccessible: () => true
   },
   {
     label: 'Performers',
     icon: 'pi pi-microphone',
     route: '/dashboard/performers',
-    roles: []
+    isAccessible: () => true
   },
   {
     label: 'Users',
     icon: 'pi pi-user',
     route: '/dashboard/users',
-    roles: [roles.admin]
+    isAccessible: () =>
+      authStore.isInRole(roles.admin) || communityStore.organizableCommunities.length > 0
   }
 ]
 

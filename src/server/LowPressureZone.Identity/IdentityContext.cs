@@ -16,7 +16,7 @@ public class IdentityContext(DbContextOptions<IdentityContext> options) : Identi
         {
             Console.WriteLine($"{nameof(IdentityContext)}: Seeding db.");
             var roles = context.Set<AppRole>();
-            foreach (var roleName in RoleNames.All)
+            foreach (var roleName in RoleNames.DatabaseRoles)
             {
                 Console.WriteLine($"{nameof(IdentityContext)}: Checking for {roleName} role.");
                 if (roles.Any(r => r.Name == roleName)) continue;

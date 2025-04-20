@@ -2,6 +2,7 @@
 using FastEndpoints.Swagger;
 using FluentEmail.Core.Interfaces;
 using FluentEmail.Mailgun;
+using LowPressureZone.Api.Authentication;
 using LowPressureZone.Api.Endpoints.Communities;
 using LowPressureZone.Api.Endpoints.Communities.Relationships;
 using LowPressureZone.Api.Endpoints.Performers;
@@ -13,6 +14,7 @@ using LowPressureZone.Api.Services;
 using LowPressureZone.Domain;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -66,6 +68,7 @@ public static class ServiceCollectionExtensions
                 return Task.CompletedTask;
             };
         });
+        services.AddTransient<IClaimsTransformation, AppUserClaimsTransformation>();
     }
 
     public static void ConfigureWebApi(this IServiceCollection services)

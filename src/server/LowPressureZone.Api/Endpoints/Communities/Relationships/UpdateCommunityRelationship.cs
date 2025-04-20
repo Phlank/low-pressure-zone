@@ -20,6 +20,7 @@ public class UpdateCommunityRelationship(DataContext dataContext,
     public override void Configure()
     {
         Verbs(Http.PUT, Http.POST);
+        Roles(RoleNames.Admin, RoleNames.Organizer);
         Routes("/communities/{communityId}/relationships/{userId}");
     }
 
