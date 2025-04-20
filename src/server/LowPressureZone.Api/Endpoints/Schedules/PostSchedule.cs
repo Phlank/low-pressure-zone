@@ -2,6 +2,7 @@
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain;
+using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
@@ -13,6 +14,7 @@ public class PostSchedule(DataContext dataContext, CommunityRules communityRules
     public override void Configure()
     {
         Post("/schedules");
+        Roles(RoleNames.Admin, RoleNames.Organizer);
         Description(b => b.Produces(201));
     }
 

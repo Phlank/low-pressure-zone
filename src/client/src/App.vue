@@ -9,10 +9,17 @@
 
 <script lang="ts" setup>
 import { Toast } from 'primevue'
-import { provide, ref, type Ref } from 'vue'
+import { onMounted, provide, ref, type Ref } from 'vue'
 import SiteLayout from './components/layout/site/SiteLayout.vue'
 import { useResizeObserver } from '@vueuse/core'
 import { mobileWidth } from '@/constants/size.ts'
+import { useAuthStore } from '@/stores/authStore.ts'
+
+const authStore = useAuthStore()
+
+onMounted(async () => {
+  await authStore.loadIfNotInitialized()
+})
 
 const isMobile: Ref<boolean> = ref(false)
 useResizeObserver(document.body, () => {

@@ -13,7 +13,7 @@ public class PostResendInvite(IdentityContext identityContext, UserManager<AppUs
     public override void Configure()
     {
         Post("/users/invites/resend/{id}");
-        Roles(RoleNames.Admin);
+        Roles(RoleNames.Admin, RoleNames.Organizer);
     }
 
     public override async Task HandleAsync(CancellationToken ct)

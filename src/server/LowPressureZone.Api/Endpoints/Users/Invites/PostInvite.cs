@@ -5,6 +5,7 @@ using LowPressureZone.Api.Services;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Entities;
 using LowPressureZone.Identity;
+using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 
@@ -17,7 +18,10 @@ public class PostInvite(UserManager<AppUser> userManager,
     : EndpointWithMapper<InviteRequest, InviteMapper>
 {
     public override void Configure()
-        => Post("/users/invites");
+    {
+        Post("/users/invites");
+        Roles(RoleNames.Admin, RoleNames.Organizer);
+    }
 
     public override async Task HandleAsync(InviteRequest request, CancellationToken ct)
     {

@@ -1,5 +1,6 @@
 export default {
-  admin: 'Admin'
+  admin: 'Admin',
+  organizer: 'Organizer'
 }
 
 export type Role = 'Admin'

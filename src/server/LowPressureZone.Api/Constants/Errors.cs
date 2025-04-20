@@ -36,7 +36,7 @@ internal static class Errors
     public const string ExpiredToken = "Your user registration link has expired. Please request a new one.";
 
     // User errors
-    public static string InvalidRole => $"Allowed roles are {string.Join(" | ", RoleNames.All)}";
+    public static string InvalidRole => $"Allowed roles are {string.Join(" | ", RoleNames.AllRoles)}";
 
     // Other errors
     public static string NotEqual(string fieldName) => $"Cannot equal ${fieldName}";

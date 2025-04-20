@@ -11,7 +11,7 @@ public class GetInvites(IdentityContext identityContext, DataContext dataContext
     public override void Configure()
     {
         Get("/users/invites");
-        Roles(RoleNames.Admin);
+        Roles(RoleNames.Admin, RoleNames.Organizer);
     }
 
     public override async Task HandleAsync(CancellationToken ct)

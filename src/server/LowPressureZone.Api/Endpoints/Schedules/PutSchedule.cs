@@ -1,6 +1,7 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain;
+using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
@@ -10,6 +11,7 @@ public class PutSchedule(DataContext dataContext, ScheduleRules rules) : Endpoin
     public override void Configure()
     {
         Put("/schedules/{id}");
+        Roles(RoleNames.Admin, RoleNames.Organizer);
         Description(b => b.Produces(204)
                           .Produces(404));
     }
