@@ -14,7 +14,7 @@
       :popup="true">
       <!-- https://primevue.org/menu/#router -->
       <template #item="{ item, props }">
-        <div v-if="item.visible === undefined ? true : item.visible()">
+        <div>
           <RouterLink
             v-if="item.route"
             v-slot="{ href, navigate }"
@@ -72,7 +72,7 @@ const loggedInNavMenuItems: MenuItem[] = [
     labelString: 'Dashboard',
     icon: 'pi pi-cog',
     route: '/dashboard',
-    visible: () => true
+    visible: true
   },
   {
     label: 'Logout',
@@ -86,7 +86,7 @@ const loggedInNavMenuItems: MenuItem[] = [
       await authStore.load()
       await router.push(Routes.Home)
     },
-    visible: () => true
+    visible: true
   },
   {
     label: 'Chat',
@@ -104,7 +104,8 @@ const loggedOutNavMenuItems: MenuItem[] = [
     label: 'Login',
     labelString: 'Login',
     icon: 'pi pi-sign-in',
-    route: '/user/login'
+    route: '/user/login',
+    visible: true
   },
   {
     label: 'Chat',
