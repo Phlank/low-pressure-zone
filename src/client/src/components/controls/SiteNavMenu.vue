@@ -14,28 +14,30 @@
       :popup="true">
       <!-- https://primevue.org/menu/#router -->
       <template #item="{ item, props }">
-        <RouterLink
-          v-if="item.route"
-          v-slot="{ href, navigate }"
-          :to="item.route"
-          custom>
-          <a
-            v-ripple
-            :href="href"
-            v-bind="props.action"
-            @click="navigate">
-            <span :class="item.icon" />
-            <span class="ml-2">{{ item.label }}</span>
-          </a>
-        </RouterLink>
-        <div v-else>
-          <a
-            v-ripple
-            class="p-menu-item-link"
-            @click="item.callback">
-            <span :class="item.icon" />
-            <span class="ml-2">{{ item.label }}</span>
-          </a>
+        <div v-if="item.visible === undefined ? true : item.visible()">
+          <RouterLink
+            v-if="item.route"
+            v-slot="{ href, navigate }"
+            :to="item.route"
+            custom>
+            <a
+              v-ripple
+              :href="href"
+              v-bind="props.action"
+              @click="navigate">
+              <span :class="item.icon" />
+              <span class="ml-2">{{ item.label }}</span>
+            </a>
+          </RouterLink>
+          <div v-else>
+            <a
+              v-ripple
+              class="p-menu-item-link"
+              @click="item.callback">
+              <span :class="item.icon" />
+              <span class="ml-2">{{ item.label }}</span>
+            </a>
+          </div>
         </div>
       </template>
     </Menu>
@@ -54,6 +56,7 @@ import authApi from '@/api/resources/authApi.ts'
 const router = useRouter()
 const navMenuRef = useTemplateRef('navMenuRef')
 const authStore = useAuthStore()
+const discordInvite = import.meta.env.VITE_DISCORD_INVITE_LINK
 
 const navMenuItems = computed(() => {
   if (authStore.isLoggedIn()) {
@@ -68,7 +71,8 @@ const loggedInNavMenuItems: MenuItem[] = [
     label: 'Dashboard',
     labelString: 'Dashboard',
     icon: 'pi pi-cog',
-    route: '/dashboard'
+    route: '/dashboard',
+    visible: () => true
   },
   {
     label: 'Logout',
@@ -81,7 +85,17 @@ const loggedInNavMenuItems: MenuItem[] = [
       }
       await authStore.load()
       await router.push(Routes.Home)
-    }
+    },
+    visible: () => true
+  },
+  {
+    label: 'Chat',
+    labelString: 'Chat',
+    icon: 'pi pi-discord',
+    callback: () => {
+      window.location.href = discordInvite
+    },
+    visible: () => window.innerWidth < 324
   }
 ]
 
@@ -91,6 +105,15 @@ const loggedOutNavMenuItems: MenuItem[] = [
     labelString: 'Login',
     icon: 'pi pi-sign-in',
     route: '/user/login'
+  },
+  {
+    label: 'Chat',
+    labelString: 'Chat',
+    icon: 'pi pi-discord',
+    callback: () => {
+      window.location.href = discordInvite
+    },
+    visible: () => window.innerWidth < 324
   }
 ]
 
