@@ -14,7 +14,7 @@ The tech stack of C9 was messy, built on Wordpress, Google Sheets, some cronjobs
 
 Low Pressure Zone is a web application deployed on the web through Digital Ocean. The server is a VPS which, alongside a managed database, serve all consumers of the application. As software updates occur, scripts are executed on the VPS manually to deploy changes in the software to the consumers. Especially in the early stages of the app, there is zero need to containerize everything. It would just make configuration updates more difficult with no perceived benefit.
 
-The app client is a Typescript/VueJS built and deployed statically. The web API is a .NET application managing identity and data. Nginx serves the static content and reverse-proxies API requests to the .NET app's Kestrel server. The site audio is served using an [Icecast 2 server](https://icecast.org/). SSL certificates are managed through Certbot.
+The app client is a Typescript/VueJS frontend built and deployed statically. The web API is a .NET application managing identity and data. Nginx serves the static content and reverse-proxies API requests to the .NET app's Kestrel server. The site audio is served using an [Icecast 2 server](https://icecast.org/). SSL certificates are managed through Certbot.
 
 All portions of the site are built using open-source software libraries and possible.
 
