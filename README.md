@@ -16,7 +16,7 @@ Low Pressure Zone is a web application deployed on the web through Digital Ocean
 
 The app client is a Typescript/VueJS built and deployed statically. The web API is a .NET application managing identity and data. Nginx serves the static content and reverse-proxies API requests to the .NET app's Kestrel server. The site audio is served using an [Icecast 2 server](https://icecast.org/). SSL certificates are managed through Certbot.
 
-All portions of the site are built using open-source software libraries and whenever possible.
+All portions of the site are built using open-source software libraries and possible.
 
 ## Contributing
 
