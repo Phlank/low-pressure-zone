@@ -10,6 +10,7 @@
     <template #end>
       <div class="site-header__end">
         <DarkModeToggle class="site-header__dark-mode-toggle" />
+        <ChatButton class="site-header__chat-button" />
         <SiteNavMenu />
       </div>
     </template>
@@ -20,6 +21,7 @@
 import { Toolbar } from 'primevue'
 import DarkModeToggle from '../../controls/DarkModeToggle.vue'
 import SiteNavMenu from '../../controls/SiteNavMenu.vue'
+import ChatButton from '@/components/controls/ChatButton.vue'
 
 const title = import.meta.env.VITE_SITE_NAME
 </script>
@@ -28,13 +30,20 @@ const title = import.meta.env.VITE_SITE_NAME
 @use '@/assets/styles/variables';
 
 .site-header {
+  &__title {
+    @media (width < 350px) {
+      font-size: 1rem;
+    }
+  }
+
   &__dark-mode-toggle {
-    @include variables.tiny {
+    @media (width < 472px) {
       display: none;
     }
   }
 
   &__end {
+    align-items: center;
     display: flex;
     gap: variables.$space-m;
   }
@@ -44,6 +53,12 @@ const title = import.meta.env.VITE_SITE_NAME
       text-decoration: none;
       color: inherit;
     }
+  }
+}
+
+button.site-header__chat-button {
+  @media (width < 324px) {
+    display: none;
   }
 }
 </style>

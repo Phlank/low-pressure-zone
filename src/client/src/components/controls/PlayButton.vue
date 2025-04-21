@@ -140,6 +140,7 @@ const pollStreamMetadata = async () => {
       isPlayable.value = false
       return
     }
+    console.log(JSON.stringify(json))
     const stats = json.icestats as IcecastStats
     const liveSource = getLiveSource(stats)
     if (liveSource === undefined) {

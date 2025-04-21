@@ -6,7 +6,7 @@
       class="flex-variable-space-between__left flex-variable-space-between__left--variable-height"
       z-index="99">
       <template #item="{ item, props }">
-        <div v-if="item.isAccessible()">
+        <div>
           <RouterLink
             v-if="item.route"
             v-slot="{ href, navigate }"
@@ -51,12 +51,10 @@ import { useAuthStore } from '@/stores/authStore'
 import { Menu, Panel } from 'primevue'
 import type { MenuItem } from 'primevue/menuitem'
 import { inject, onMounted, type Ref } from 'vue'
-import { useCommunityStore } from '@/stores/communityStore.ts'
 import { useRouter } from 'vue-router'
 import roles from '@/constants/roles.ts'
 
 const authStore = useAuthStore()
-const communityStore = useCommunityStore()
 const router = useRouter()
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
@@ -65,34 +63,33 @@ const menuItems: MenuItem[] = [
     label: 'Schedules',
     icon: 'pi pi-calendar',
     route: '/dashboard',
-    isAccessible: () => true
+    visible: true
   },
   {
     label: 'Communities',
     icon: 'pi pi-globe',
     route: '/dashboard/communities',
-    isAccessible: () => true
+    visible: true
   },
   {
     label: 'Performers',
     icon: 'pi pi-microphone',
     route: '/dashboard/performers',
-    isAccessible: () => true
+    visible: true
   },
   {
     label: 'Users',
     icon: 'pi pi-user',
     route: '/dashboard/users',
-    isAccessible: () =>
-      authStore.isInRole(roles.admin) || communityStore.organizableCommunities.length > 0
+    visible: authStore.isInRole(roles.admin) || authStore.isInRole(roles.organizer)
   }
 ]
 
 onMounted(async () => {
-  const promises: Promise<void>[] = []
-  promises.push(authStore.loadIfNotInitialized())
-  promises.push(communityStore.loadCommunitiesAsync())
-  await Promise.all(promises)
+  await authStore.loadIfNotInitialized()
+  if (!authStore.isLoggedIn()) {
+    await router.push('/')
+  }
 })
 </script>
 
