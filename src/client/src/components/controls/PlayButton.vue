@@ -140,17 +140,16 @@ const pollStreamMetadata = async () => {
       isPlayable.value = false
       return
     }
-    console.log(JSON.stringify(json))
     const stats = json.icestats as IcecastStats
     const liveSource = getLiveSource(stats)
     if (liveSource === undefined) {
       isPlayable.value = false
       djName.value = 'Nobody'
-      return
+    } else {
+      djName.value = liveSource.server_name ?? 'Unknown'
+      streamType.value = 'Live DJ Set'
+      isPlayable.value = true
     }
-    djName.value = liveSource.artist ?? liveSource.title ?? liveSource.server_name ?? 'Unknown'
-    streamType.value = 'Live DJ Set'
-    isPlayable.value = true
     await delay(10000)
   }
 }
