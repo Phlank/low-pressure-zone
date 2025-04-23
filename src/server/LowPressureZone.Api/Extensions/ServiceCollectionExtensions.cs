@@ -9,6 +9,7 @@ using LowPressureZone.Api.Endpoints.Performers;
 using LowPressureZone.Api.Endpoints.Schedules;
 using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 using LowPressureZone.Api.Endpoints.Users.Invites;
+using LowPressureZone.Api.Models.Options;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Domain;
@@ -117,5 +118,10 @@ public static class ServiceCollectionExtensions
         });
         services.AddSingleton<EmailService>();
         services.AddSingleton<UriService>();
+        services.AddHttpClient("Icecast", (serviceProvider, httpClient) =>
+        {
+            httpClient.BaseAddress = serviceProvider.GetRequiredService<IOptions<UrlOptions>>().Value.IcecastUrl;
+            httpClient.Timeout = TimeSpan.FromSeconds(10);
+        });
     }
 }

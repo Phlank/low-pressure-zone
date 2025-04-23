@@ -1,9 +1,10 @@
-﻿namespace LowPressureZone.Api.Services;
+﻿namespace LowPressureZone.Api.Models.Options;
 
-public class UriServiceOptions
+public class UrlOptions
 {
     public const string Name = "Urls";
 
     public required Uri RegisterUrl { get; set; }
     public required Uri ResetPasswordUrl { get; set; }
+    public required Uri IcecastUrl { get; set; }
 }

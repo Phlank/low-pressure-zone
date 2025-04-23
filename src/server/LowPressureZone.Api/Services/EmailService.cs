@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using FluentEmail.Core;
 using FluentEmail.Core.Interfaces;
+using LowPressureZone.Api.Models.Options;
 using LowPressureZone.Identity;
 using Microsoft.Extensions.Options;
 
@@ -19,8 +20,7 @@ public class EmailService(IOptions<EmailServiceOptions> options, UriService uriS
         var sendResponse = await sender.SendAsync(email);
         if (!sendResponse.Successful) LogEmailFailure(logger, JsonSerializer.Serialize(sendResponse), null);
     }
-    
-    
+
 
     public async Task SendTwoFactorEmailAsync(string toAddress, string username, string code)
     {
