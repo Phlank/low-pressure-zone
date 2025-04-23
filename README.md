@@ -10,13 +10,21 @@ I was given SSH access to the server (something I can't believe even to this day
 
 The tech stack of C9 was messy, built on Wordpress, Google Sheets, some cronjobs, a few python scripts, and some really bad javascript. I built Low Pressure Zone as a successor to C9, another third space for myself and (hopefully) many others to bring more life into their communities.
 
-## Tech stack
+## Tecnical information
 
-Low Pressure Zone is a web application deployed on the web through Digital Ocean. The server is a VPS which, alongside a managed database, serve all consumers of the application. As software updates occur, scripts are executed on the VPS manually to deploy changes in the software to the consumers. Especially in the early stages of the app, there is zero need to containerize everything. It would just make configuration updates more difficult with no perceived benefit.
+Low Pressure Zone is a web application deployed through Digital Ocean. The server is a VPS which, alongside a managed database, serves all consumers of the application. 
 
-The app client is a Typescript/VueJS frontend built and deployed statically. The web API is a .NET application managing identity and data. Nginx serves the static content and reverse-proxies API requests to the .NET app's Kestrel server. The site audio is served using an [Icecast 2 server](https://icecast.org/). SSL certificates are managed through Certbot.
+### Tech stack
 
-All portions of the site are built using open-source software libraries whenever possible.
+The browser client is a Typescript/VueJS frontend built and deployed statically. Yarn is used for package management, and Vite is used as the development server.
+
+The web API is a C#/AspNetCore application managing identity and data.
+
+Nginx serves the static content and reverse-proxies API requests to the .NET app's Kestrel server. The site audio is served using an [Icecast 2 server](https://icecast.org/). SSL certificates are managed through Certbot.
+
+### Deployment
+
+Scripts are executed on the VPS manually to deploy changes in the software to the consumers. Especially now in the early stages of the app, I don't see a need to containerize the whole setup. However, when I eventually do, I will be setting up a CI/CD pipeline for it.
 
 ## Contributing
 
