@@ -4,7 +4,7 @@
 
 ## Why I built this
 
-When I was in college for Computer Science, the /r/realdubstep subreddit started the online radio site ClouwdNine so that subreddit members could DJ and chat with one another. Over time, the site grew significantly and larger events were held. In the early days of C9, I stumbled across it and started performing there before I had ever DJ'd a live show. The site maintainer was busy with work and family life and couldn't make contributions to the site as often as they wished, and allowed me to improve the site.
+When I was in college for Computer Science, the /r/realdubstep subreddit started the online radio site ClouwdNine so that subreddit members could DJ and chat with one another. Over time, the site grew significantly and larger events were held. In the early days of C9, I stumbled across it and started performing there before I had ever DJ'd a live show. The site maintainer couldn't make contributions to the site as often as they wished, and allowed me to improve the site.
 
 I was given SSH access to the server (something I can't believe even to this day) and I started a git repository for the site's code. Over time, I made many contributions. The site was a home for me, a third space that shaped many experiences of my life since I found it. However, I had to leave C9 behind to go and live some of my own life's stories in 2016. The last shows on C9 took place in 2017 after a script for automating google sheets scheduling stopped working.
 
