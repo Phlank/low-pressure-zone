@@ -1,6 +1,6 @@
-﻿namespace LowPressureZone.Api.Endpoints.Status.Stream;
+﻿namespace LowPressureZone.Api.Endpoints.Icecast.Status;
 
-public class StreamStatusResponse
+public class IcecastStatusResponse
 {
     public required bool IsOnline { get; set; }
     public string? Name { get; set; }

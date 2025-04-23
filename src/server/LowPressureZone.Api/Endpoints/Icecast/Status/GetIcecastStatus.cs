@@ -1,13 +1,13 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Services;
 
-namespace LowPressureZone.Api.Endpoints.Status.Stream;
+namespace LowPressureZone.Api.Endpoints.Icecast.Status;
 
-public class GetStreamStatus(IcecastStatusService icecastStatusService) : EndpointWithoutRequest<StreamStatusResponse, StreamStatusMapper>
+public class GetIcecastStatus(IcecastStatusService icecastStatusService) : EndpointWithoutRequest<IcecastStatusResponse, IcecastStatusMapper>
 {
     public override void Configure()
     {
-        Get("/status/stream");
+        Get("/icecast/status");
         Throttle(24, 60);
         AllowAnonymous();
     }
