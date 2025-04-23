@@ -123,5 +123,6 @@ public static class ServiceCollectionExtensions
             httpClient.BaseAddress = serviceProvider.GetRequiredService<IOptions<UrlOptions>>().Value.IcecastUrl;
             httpClient.Timeout = TimeSpan.FromSeconds(10);
         });
+        services.AddSingleton<IcecastStatusService>();
     }
 }
