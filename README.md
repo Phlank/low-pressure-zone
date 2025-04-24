@@ -10,7 +10,7 @@ I was given SSH access to the server (something I can't believe even to this day
 
 The tech stack of C9 was messy, built on Wordpress, Google Sheets, some cronjobs, a few python scripts, and some really bad javascript. I built Low Pressure Zone as a successor to C9, another third space for myself and (hopefully) many others to bring more life into their communities.
 
-## Tecnical information
+## Technical information
 
 Low Pressure Zone is a web application deployed through Digital Ocean. The server is a VPS which, alongside a managed database, serves all consumers of the application. 
 
