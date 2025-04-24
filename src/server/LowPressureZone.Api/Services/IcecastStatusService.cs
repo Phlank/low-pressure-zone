@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using LowPressureZone.Api.Models.Icecast;
+using Shouldly;
 using IHttpClientFactory = System.Net.Http.IHttpClientFactory;
 
 namespace LowPressureZone.Api.Services;
@@ -19,13 +20,6 @@ public class IcecastStatusService(IHttpClientFactory clientFactory, ILogger<Icec
             lock (_statusLock)
             {
                 return _icecastStatus;
-            }
-        }
-        private set
-        {
-            lock (_statusLock)
-            {
-                _icecastStatus = value;
             }
         }
     }
@@ -49,6 +43,9 @@ public class IcecastStatusService(IHttpClientFactory clientFactory, ILogger<Icec
         return Task.CompletedTask;
     }
 
+    // Sets the status.
+    // If the icecast server is offline, then this service will retain the last held data.
+    // An IcecastStatusRaw instance becomes stale 30 seconds after it is created.
     private async Task RefreshStatusAsync(CancellationToken cancellationToken)
     {
         try
@@ -56,21 +53,28 @@ public class IcecastStatusService(IHttpClientFactory clientFactory, ILogger<Icec
             var result = await _client.GetAsync(StatusEndpoint, cancellationToken);
             if (!result.IsSuccessStatusCode)
             {
-                Status = null;
                 logger.LogWarning($"{nameof(IcecastStatusService)}: Unable to retrieve status from Icecast service | {{Status}} | {{Reason}}", result.StatusCode, result.ReasonPhrase);
                 return;
             }
             await using var contentStream = await result.Content.ReadAsStreamAsync(cancellationToken);
-            var content = await JsonSerializer.DeserializeAsync<IcecastStatusRaw>(contentStream, JsonSerializerOptions.Web, cancellationToken);
-            Status = content;
+            var content = await JsonSerializer.DeserializeAsync<IcecastStatusRootRaw>(contentStream, JsonSerializerOptions.Web, cancellationToken);
+            content.ShouldNotBeNull();
+            lock (_statusLock)
+            {
+                _icecastStatus = content.Stats;
+            }
         }
         catch (HttpRequestException httpRequestException)
         {
-            logger.LogError(httpRequestException, "Unable to retrieve status from Icecast server");
+            logger.LogError(httpRequestException, "Unable to retrieve status from Icecast server: The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation or timeout.");
+        }
+        catch (TaskCanceledException taskCanceledException)
+        {
+            logger.LogError(taskCanceledException, "Unable to retrieve status from Icecast server: The request failed due to timeout.");
         }
         catch (JsonException jsonException)
         {
-            logger.LogError(jsonException, "Unable to retrieve status from Icecast server");
+            logger.LogError(jsonException, "Unable to retrieve status from Icecast server: The JSON is invalid. -or- TValue is not compatible with the JSON. -or- There is remaining data in the stream.");
         }
     }
 

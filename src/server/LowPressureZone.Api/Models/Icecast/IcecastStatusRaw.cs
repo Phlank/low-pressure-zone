@@ -5,20 +5,30 @@ namespace LowPressureZone.Api.Models.Icecast;
 
 public class IcecastStatusRaw
 {
-    public required string Admin { get; set; }
-    public required string Host { get; set; }
-    public required string Location { get; set; }
+    private const int SecondsUntilStale = 30;
+    private readonly DateTime _retrievedAt = DateTime.UtcNow;
+    public bool IsStale => DateTime.UtcNow - _retrievedAt > TimeSpan.FromSeconds(SecondsUntilStale);
+
+    [JsonPropertyName("admin")]
+    public required string Admin { get; init; }
+
+    [JsonPropertyName("host")]
+    public required string Host { get; init; }
+
+    [JsonPropertyName("location")]
+    public required string Location { get; init; }
 
     [JsonPropertyName("server_id")]
-    public required string ServerId { get; set; }
+    public required string ServerId { get; init; }
 
     [JsonPropertyName("server_start")]
-    public required string ServerStart { get; set; }
+    public required string ServerStart { get; init; }
 
     [JsonPropertyName("server_start_iso8601")]
-    public DateTime ServerStartIso8601 { get; set; }
+    [JsonConverter(typeof(Iso86012004DateTimeConverter))]
+    public DateTime ServerStartIso8601 { get; init; }
 
     [JsonPropertyName("source")]
-    [JsonConverter(typeof(ToArrayJsonConverter<IcecastSourceRaw>))]
-    public IEnumerable<IcecastSourceRaw> Sources { get; set; } = [];
+    [JsonConverter(typeof(ToEnumerableJsonConverter<IcecastSourceRaw>))]
+    public IEnumerable<IcecastSourceRaw> Sources { get; init; } = [];
 }

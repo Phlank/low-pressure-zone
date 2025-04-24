@@ -3,12 +3,12 @@ using System.Text.Json.Serialization;
 
 namespace LowPressureZone.Api.JsonConverters;
 
-public class ToArrayJsonConverter<T> : JsonConverter<T[]>
+public class ToEnumerableJsonConverter<T> : JsonConverter<IEnumerable<T>>
 {
-    public override T[] Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override IEnumerable<T> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType == JsonTokenType.StartArray)
-            return JsonSerializer.Deserialize<T[]>(ref reader, options)!;
+            return JsonSerializer.Deserialize<IEnumerable<T>>(ref reader, options)!;
         if (reader.TokenType == JsonTokenType.Null)
             return [];
 
@@ -16,6 +16,6 @@ public class ToArrayJsonConverter<T> : JsonConverter<T[]>
         return [singleItem];
     }
 
-    public override void Write(Utf8JsonWriter writer, T[] value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, IEnumerable<T> value, JsonSerializerOptions options)
         => JsonSerializer.Serialize(writer, value, options);
 }

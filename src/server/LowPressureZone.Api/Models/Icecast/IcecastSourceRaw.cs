@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using LowPressureZone.Api.JsonConverters;
 
 namespace LowPressureZone.Api.Models.Icecast;
 
@@ -28,7 +29,9 @@ public class IcecastSourceRaw
     [JsonPropertyName("listener_peak")]
     public required int ListenerPeak { get; set; }
 
-    [JsonPropertyName("listen_url")]
+    public required int Listeners { get; set; }
+
+    [JsonPropertyName("listenurl")]
     public required string ListenUrl { get; set; }
 
     [JsonPropertyName("server_description")]
@@ -44,5 +47,6 @@ public class IcecastSourceRaw
     public required string StreamStart { get; set; }
 
     [JsonPropertyName("stream_start_iso8601")]
+    [JsonConverter(typeof(Iso86012004DateTimeConverter))]
     public DateTime StreamStartIso8601 { get; set; }
 }

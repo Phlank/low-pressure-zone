@@ -5,6 +5,7 @@ using FluentEmail.Mailgun;
 using LowPressureZone.Api.Authentication;
 using LowPressureZone.Api.Endpoints.Communities;
 using LowPressureZone.Api.Endpoints.Communities.Relationships;
+using LowPressureZone.Api.Endpoints.Icecast.Status;
 using LowPressureZone.Api.Endpoints.Performers;
 using LowPressureZone.Api.Endpoints.Schedules;
 using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
@@ -104,6 +105,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<PerformerMapper>();
         services.AddSingleton<TimeslotMapper>();
         services.AddSingleton<InviteMapper>();
+        services.AddSingleton<IcecastStatusMapper>();
 
         services.AddSingleton<CommunityRules>();
         services.AddSingleton<CommunityRelationshipRules>();
