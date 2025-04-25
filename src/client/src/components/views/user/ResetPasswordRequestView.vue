@@ -1,25 +1,27 @@
 <template>
-  <Panel class="request-password-reset single-panel-center single-panel-center--no-header">
-    <div class="single-panel-center__form">
-      <IftaLabel class="input input--medium">
-        <InputText
-          id="emailInput"
-          v-model:model-value="formState.email"
-          class="input__field" />
-        <ValidationLabel
-          :message="validation.message('email')"
-          for="emailInput"
-          text="Email" />
-      </IftaLabel>
-      <div class="single-panel-center__form__buttons">
-        <Button
-          :disabled="isSubmitting"
-          :loading="isSubmitting"
-          label="Reset Password"
-          @click="handleResetPasswordClick" />
+  <SinglePanelViewWrapper>
+    <Panel class="request-password-reset single-panel-center single-panel-center--no-header">
+      <div class="single-panel-center__form">
+        <IftaLabel class="input input--medium">
+          <InputText
+            id="emailInput"
+            v-model:model-value="formState.email"
+            class="input__field" />
+          <ValidationLabel
+            :message="validation.message('email')"
+            for="emailInput"
+            text="Email" />
+        </IftaLabel>
+        <div class="single-panel-center__form__buttons">
+          <Button
+            :disabled="isSubmitting"
+            :loading="isSubmitting"
+            label="Reset Password"
+            @click="handleResetPasswordClick" />
+        </div>
       </div>
-    </div>
-  </Panel>
+    </Panel>
+  </SinglePanelViewWrapper>
 </template>
 
 <script lang="ts" setup>
@@ -33,6 +35,7 @@ import { Button, IftaLabel, InputText, Panel, useToast } from 'primevue'
 import { reactive, ref } from 'vue'
 import authApi from '@/api/resources/authApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import SinglePanelViewWrapper from '@/components/layout/SinglePanelViewWrapper.vue'
 
 const isSubmitting = ref(false)
 const toast = useToast()

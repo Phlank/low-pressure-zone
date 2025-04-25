@@ -1,65 +1,67 @@
 <template>
-  <Panel class="login single-panel-center single-panel-center--no-header">
-    <div class="single-panel-center__form">
-      <IftaLabel class="input input--medium">
+  <SinglePanelViewWrapper class="login-view">
+    <FormArea is-single-column>
+      <IftaFormField
+        input-id="usernameInput"
+        label="Username"
+        size="m">
         <InputText
           id="usernameInput"
           v-model:model-value="formState.username"
           :autofocus="true"
-          :disabled="isSubmitting"
-          class="input__field" />
-        <ValidationLabel
-          for="usernameInput"
-          message=""
-          text="Username" />
-      </IftaLabel>
-      <IftaLabel class="input input--medium">
+          :disabled="isSubmitting" />
+      </IftaFormField>
+      <IftaFormField
+        input-id="passwordInput"
+        label="Password"
+        size="m">
         <Password
           id="passwordInput"
           v-model:model-value="formState.password"
           :disabled="isSubmitting"
-          :feedback="false"
-          class="input__field" />
-        <ValidationLabel
-          for="passwordInput"
-          message=""
-          text="Password" />
-      </IftaLabel>
-      <div v-if="errorMessage">
+          :feedback="false" />
+      </IftaFormField>
+      <FormField
+        v-if="errorMessage"
+        input-id=""
+        size="m">
         <Message
-          class="input--medium"
-          severity="error">
+          severity="error"
+          style="width: 100%">
           {{ errorMessage }}
         </Message>
-      </div>
-      <div class="buttons">
+      </FormField>
+      <template #actions>
         <Button
           :disabled="isSubmitting"
           :loading="isSubmitting"
           label="Login"
           @click="handleLogin" />
         <Button
-          label="Reset"
+          label="Reset Password"
           outlined
           @click="router.push(Routes.RequestPasswordReset)" />
-      </div>
-    </div>
-  </Panel>
+      </template>
+    </FormArea>
+  </SinglePanelViewWrapper>
 </template>
 
 <script lang="ts" setup>
-import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { KeyName } from '@/constants/keys'
 import { Routes } from '@/router/routes'
 import { useAuthStore } from '@/stores/authStore'
 import { loginRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { onKeyDown } from '@vueuse/core'
-import { Button, IftaLabel, InputText, Message, Panel, Password, useToast } from 'primevue'
+import { Button, InputText, Message, Password, useToast } from 'primevue'
 import { reactive, ref } from 'vue'
 import authApi, { type LoginRequest } from '@/api/resources/authApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import { useRouter } from 'vue-router'
+import SinglePanelViewWrapper from '@/components/layout/SinglePanelViewWrapper.vue'
+import FormArea from '@/components/form/FormArea.vue'
+import FormField from '@/components/form/FormField.vue'
+import IftaFormField from '@/components/form/IftaFormField.vue'
 
 const toast = useToast()
 const router = useRouter()
@@ -109,16 +111,3 @@ const handleLogin = async () => {
   await router.push(Routes.Schedules)
 }
 </script>
-
-<style lang="scss">
-@use '@/assets/styles/variables';
-
-.login {
-  .buttons {
-    display: flex;
-    max-width: variables.$input-width-m;
-    margin-top: variables.$space-m;
-    gap: variables.$space-m;
-  }
-}
-</style>

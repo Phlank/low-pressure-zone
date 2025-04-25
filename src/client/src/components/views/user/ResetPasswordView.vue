@@ -1,39 +1,41 @@
 <template>
-  <Panel class="password-reset single-panel-center single-panel-center--no-header">
-    <div class="single-panel-center__form">
-      <IftaLabel class="input input--medium">
-        <Password
-          id="passwordInput"
-          v-model:model-value="formState.password"
-          :feedback="false"
-          class="input__field"
-          @change="validation.validateIfDirty('password')" />
-        <ValidationLabel
-          :message="validation.message('password')"
-          for="passwordInput"
-          text="New Password" />
-      </IftaLabel>
-      <IftaLabel class="input input--medium">
-        <Password
-          id="confirmPasswordInput"
-          v-model:model-value="formState.confirmPassword"
-          :feedback="false"
-          class="input__field"
-          @change="validation.validateIfDirty('confirmPassword')" />
-        <ValidationLabel
-          :message="validation.message('confirmPassword')"
-          for="confirmPasswordInput"
-          text="Confirm New Password" />
-      </IftaLabel>
-      <div class="buttons">
-        <Button
-          :disabled="isSubmitting"
-          :loading="isSubmitting"
-          label="Update Password"
-          @click="handleUpdatePassword" />
+  <SinglePanelViewWrapper>
+    <Panel class="password-reset single-panel-center single-panel-center--no-header">
+      <div class="single-panel-center__form">
+        <IftaLabel class="input input--medium">
+          <Password
+            id="passwordInput"
+            v-model:model-value="formState.password"
+            :feedback="false"
+            class="input__field"
+            @change="validation.validateIfDirty('password')" />
+          <ValidationLabel
+            :message="validation.message('password')"
+            for="passwordInput"
+            text="New Password" />
+        </IftaLabel>
+        <IftaLabel class="input input--medium">
+          <Password
+            id="confirmPasswordInput"
+            v-model:model-value="formState.confirmPassword"
+            :feedback="false"
+            class="input__field"
+            @change="validation.validateIfDirty('confirmPassword')" />
+          <ValidationLabel
+            :message="validation.message('confirmPassword')"
+            for="confirmPasswordInput"
+            text="Confirm New Password" />
+        </IftaLabel>
+        <div class="buttons">
+          <Button
+            :disabled="isSubmitting"
+            :loading="isSubmitting"
+            label="Update Password"
+            @click="handleUpdatePassword" />
+        </div>
       </div>
-    </div>
-  </Panel>
+    </Panel>
+  </SinglePanelViewWrapper>
 </template>
 
 <script lang="ts" setup>
@@ -48,6 +50,7 @@ import { reactive, ref } from 'vue'
 import authApi from '@/api/resources/authApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import { useRouter } from 'vue-router'
+import SinglePanelViewWrapper from '@/components/layout/SinglePanelViewWrapper.vue'
 
 const toast = useToast()
 const router = useRouter()

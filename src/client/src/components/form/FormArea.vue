@@ -12,23 +12,29 @@
     <div class="form-area__fields">
       <slot></slot>
     </div>
-    <div class="form-area__actions">
+    <div :class="`form-area__actions ${isSingleColumn ? 'form-area__actions--single-column' : ''}`">
       <slot name="actions"></slot>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
+import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import { clamp, useResizeObserver } from '@vueuse/core'
 import { mobileWidth } from '@/constants/size.ts'
 
 const formAreaRef = useTemplateRef('formAreaRef')
 const width = ref(0)
 
-defineProps<{
-  header?: string
-}>()
+withDefaults(
+  defineProps<{
+    header?: string
+    isSingleColumn?: boolean
+  }>(),
+  {
+    isSingleColumn: false
+  }
+)
 
 onMounted(() => {
   if (formAreaRef.value) {
@@ -55,8 +61,6 @@ const widthPx = computed(() => {
   return width.value - (width.value % columnWidth) + 'px'
 })
 const gridColsStyle = computed(() => `repeat(${columns.value}, 1fr)`)
-
-onUnmounted(() => {})
 </script>
 
 <style lang="scss">
@@ -68,6 +72,16 @@ onUnmounted(() => {})
     display: grid;
     grid-template-columns: v-bind(gridColsStyle);
     column-gap: variables.$space-l;
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: row;
+    gap: variables.$space-m;
+
+    &--single-column {
+      flex-direction: column;
+    }
   }
 }
 </style>

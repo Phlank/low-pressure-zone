@@ -1,32 +1,34 @@
 <template>
-  <Panel class="resend-invite single-panel-center single-panel-center--no-header">
-    <Message
-      class="single-panel-center__message"
-      severity="info">
-      Your invitation link is expired. Enter your email to receive a new one.
-    </Message>
-    <div class="single-panel-center__form">
-      <IftaLabel class="input input--medium">
-        <InputText
-          id="emailInput"
-          v-model:model-value="formState.email"
+  <SinglePanelViewWrapper>
+    <Panel class="resend-invite single-panel-center single-panel-center--no-header">
+      <Message
+        class="single-panel-center__message"
+        severity="info">
+        Your invitation link is expired. Enter your email to receive a new one.
+      </Message>
+      <div class="single-panel-center__form">
+        <IftaLabel class="input input--medium">
+          <InputText
+            id="emailInput"
+            v-model:model-value="formState.email"
+            :disabled="isSubmitting"
+            :invalid="!validation.isValid('email')"
+            class="input__field"
+            @change="validation.validateIfDirty('email')" />
+          <ValidationLabel
+            :message="validation.message('email')"
+            for="emailInput"
+            text="Email" />
+        </IftaLabel>
+        <Button
           :disabled="isSubmitting"
-          :invalid="!validation.isValid('email')"
-          class="input__field"
-          @change="validation.validateIfDirty('email')" />
-        <ValidationLabel
-          :message="validation.message('email')"
-          for="emailInput"
-          text="Email" />
-      </IftaLabel>
-      <Button
-        :disabled="isSubmitting"
-        :loading="isSubmitting"
-        class="input"
-        label="Resend Invite"
-        @click="handleResendInviteClick" />
-    </div>
-  </Panel>
+          :loading="isSubmitting"
+          class="input"
+          label="Resend Invite"
+          @click="handleResendInviteClick" />
+      </div>
+    </Panel>
+  </SinglePanelViewWrapper>
 </template>
 
 <script lang="ts" setup>
@@ -38,6 +40,7 @@ import { Button, IftaLabel, InputText, Message, Panel, useToast } from 'primevue
 import { reactive, ref } from 'vue'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import invitesApi from '@/api/resources/invitesApi.ts'
+import SinglePanelViewWrapper from '@/components/layout/SinglePanelViewWrapper.vue'
 
 const toast = useToast()
 const isSubmitting = ref(false)

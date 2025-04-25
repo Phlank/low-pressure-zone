@@ -64,11 +64,12 @@
 }
 
 .single-panel-center {
-  margin: 20dvh auto auto;
-  width: min(340px, calc(100vw - 2 * #{variables.$space-l}));
+  //height: 100%;
+  //margin: 20dvh auto auto;
+
 
   &__message {
-    width: variables.$input-width-m;
+    width: calc(100%);
   }
 
   &__form {

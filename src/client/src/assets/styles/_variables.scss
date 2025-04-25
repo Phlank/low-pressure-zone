@@ -9,8 +9,9 @@ $space-s: 5px;
 $space-m: 10px;
 $space-l: 20px;
 
-$header-height: 64px;
-$footer-height: 96px;
+$header-height: 82px;
+$footer-height: 70px;
+$view-min-height: calc(100dvh - #{$header-height} - #{$footer-height});
 
 $mobile-transition-width: 760px;
 $mobile-element-width: calc(100vw - 2 * $space-m);
