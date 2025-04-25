@@ -78,6 +78,12 @@ const menuItems: MenuItem[] = [
     visible: true
   },
   {
+    label: 'Streaming',
+    icon: 'pi pi-wave-pulse',
+    route: '/dashboard/streaming',
+    visible: true
+  },
+  {
     label: 'Users',
     icon: 'pi pi-user',
     route: '/dashboard/users',
