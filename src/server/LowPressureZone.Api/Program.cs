@@ -2,18 +2,15 @@ using System.Text.Json;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Api.Services;
+using LowPressureZone.Api.Models.Options;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Minerals.StringCases;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.AddJsonFile("appsettings.json");
-if (builder.Environment.IsDevelopment()) builder.Configuration.AddJsonFile("appsettings.Development.json", true);
-if (builder.Environment.IsProduction()) builder.Configuration.AddJsonFile("appsettings.Production.json", true);
 builder.Services.Configure<EmailServiceOptions>(builder.Configuration.GetSection(EmailServiceOptions.Name));
-builder.Services.Configure<UriServiceOptions>(builder.Configuration.GetSection(UriServiceOptions.Name));
+builder.Services.Configure<UrlOptions>(builder.Configuration.GetSection(UrlOptions.Name));
 
 builder.AddDatabases();
 builder.Services.Configure<JsonOptions>(options =>
@@ -54,9 +51,5 @@ app.UseFastEndpoints(config =>
         };
     };
     config.Errors.ProducesMetadataType = typeof(ValidationProblemDetails);
-    config.Endpoints.Configurator = (endpoint) =>
-    {
-        endpoint.Throttle(10, 60);
-    };
 }).UseSwaggerGen();
 app.Run();

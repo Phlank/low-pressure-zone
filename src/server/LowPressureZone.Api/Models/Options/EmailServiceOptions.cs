@@ -1,4 +1,4 @@
-﻿namespace LowPressureZone.Api.Services;
+﻿namespace LowPressureZone.Api.Models.Options;
 
 public class EmailServiceOptions
 {

@@ -1,9 +1,10 @@
-﻿using LowPressureZone.Identity;
+﻿using LowPressureZone.Api.Models.Options;
+using LowPressureZone.Identity;
 using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Api.Services;
 
-public class UriService(IOptions<UriServiceOptions> options)
+public class UriService(IOptions<UrlOptions> options)
 {
     public Uri GetInviteUrl(TokenContext context)
     {
