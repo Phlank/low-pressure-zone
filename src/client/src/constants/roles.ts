@@ -1,6 +1,7 @@
 export default {
   admin: 'Admin',
-  organizer: 'Organizer'
+  organizer: 'Organizer',
+  performer: 'Performer'
 }
 
-export type Role = 'Admin'
+export type Role = 'Admin' | 'Organizer' | 'Performer'
