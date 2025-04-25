@@ -1,56 +1,72 @@
 <template>
-  <SinglePanelViewWrapper>
-    <Panel class="password-reset single-panel-center single-panel-center--no-header">
-      <div class="single-panel-center__form">
-        <IftaLabel class="input input--medium">
-          <Password
-            id="passwordInput"
-            v-model:model-value="formState.password"
-            :feedback="false"
-            class="input__field"
-            @change="validation.validateIfDirty('password')" />
-          <ValidationLabel
-            :message="validation.message('password')"
-            for="passwordInput"
-            text="New Password" />
-        </IftaLabel>
-        <IftaLabel class="input input--medium">
-          <Password
-            id="confirmPasswordInput"
-            v-model:model-value="formState.confirmPassword"
-            :feedback="false"
-            class="input__field"
-            @change="validation.validateIfDirty('confirmPassword')" />
-          <ValidationLabel
-            :message="validation.message('confirmPassword')"
-            for="confirmPasswordInput"
-            text="Confirm New Password" />
-        </IftaLabel>
-        <div class="buttons">
-          <Button
-            :disabled="isSubmitting"
-            :loading="isSubmitting"
-            label="Update Password"
-            @click="handleUpdatePassword" />
-        </div>
-      </div>
-    </Panel>
+  <SinglePanelViewWrapper class="reset-password-view">
+    <FormArea is-single-column>
+      <IftaFormField
+        :message="validation.message('password')"
+        input-id="passwordInput"
+        label="New Password"
+        size="m">
+        <Password
+          id="passwordInput"
+          v-model:model-value="formState.password"
+          :feedback="false"
+          :invalid="!validation.isValid('password')"
+          @change="validation.validateIfDirty('password')" />
+      </IftaFormField>
+      <IftaFormField
+        :message="validation.message('confirmPassword')"
+        input-id="confirmPasswordInput"
+        label="Confirm New Password"
+        size="m">
+        <Password
+          id="confirmPasswordInput"
+          v-model:model-value="formState.confirmPassword"
+          :feedback="false"
+          :invalid="!validation.isValid('confirmPassword')"
+          @change="validation.validateIfDirty('confirmPassword')" />
+      </IftaFormField>
+      <FormField
+        input-id="passwordHelpTextMessage"
+        size="m">
+        <Message>
+          <div style="display: flex; flex-direction: column; justify-content: start">
+            <div>Password must meet the following requirements:</div>
+            <ul>
+              <li>At least 8 characters in length</li>
+              <li>At least one symbol</li>
+              <li>At least one uppercase letter</li>
+              <li>At least one lowercase letter</li>
+              <li>At least one digit</li>
+            </ul>
+          </div>
+        </Message>
+      </FormField>
+      <template #actions>
+        <Button
+          :disabled="isSubmitting"
+          :loading="isSubmitting"
+          label="Update Password"
+          @click="handleUpdatePassword" />
+      </template>
+    </FormArea>
   </SinglePanelViewWrapper>
 </template>
 
 <script lang="ts" setup>
-import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { KeyName } from '@/constants/keys'
 import { Routes } from '@/router/routes'
 import { equals, password, required } from '@/validation/rules/stringRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { onKeyDown } from '@vueuse/core'
-import { Button, IftaLabel, Panel, Password, useToast } from 'primevue'
+import { Button, Message, Password, useToast } from 'primevue'
 import { reactive, ref } from 'vue'
 import authApi from '@/api/resources/authApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import { useRouter } from 'vue-router'
 import SinglePanelViewWrapper from '@/components/layout/SinglePanelViewWrapper.vue'
+import FormArea from '@/components/form/FormArea.vue'
+import IftaFormField from '@/components/form/IftaFormField.vue'
+import FormField from '@/components/form/FormField.vue'
 
 const toast = useToast()
 const router = useRouter()
@@ -92,13 +108,3 @@ const handleUpdatePassword = async () => {
   await router.push(Routes.Login)
 }
 </script>
-
-<style lang="scss">
-@use '@/assets/styles/variables';
-
-.reset-password {
-  .buttons {
-    margin-top: variables.$space-m;
-  }
-}
-</style>

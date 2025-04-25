@@ -1,5 +1,5 @@
 <template>
-  <SinglePanelViewWrapper>
+  <SinglePanelViewWrapper class="register-view">
     <FormArea is-single-column>
       <IftaFormField
         :message="validation.message('username')"

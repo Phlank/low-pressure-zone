@@ -1,5 +1,5 @@
 <template>
-  <SinglePanelViewWrapper>
+  <SinglePanelViewWrapper class="resend-invite-view">
     <FormArea is-single-column>
       <FormField
         input-id=""

@@ -1,6 +1,6 @@
 <template>
-  <SinglePanelViewWrapper>
-    <FormArea>
+  <SinglePanelViewWrapper class="two-factor-view">
+    <FormArea is-single-column>
       <FormField
         input-id="none"
         size="m">
@@ -26,7 +26,6 @@
           :disabled="isSubmitting"
           :loading="isSubmitting"
           label="Verify"
-          style="width: 100%"
           @click="handleVerify" />
       </template>
     </FormArea>
