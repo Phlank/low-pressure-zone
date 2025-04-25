@@ -80,8 +80,6 @@ router.beforeEach(async (to, _, next) => {
   }
 
   const allowedRoles = (to.meta.roles ?? []) as Role[]
-  console.log('Allowed Roles: ' + JSON.stringify(allowedRoles, null, 2))
-  console.log('Roles: ' + JSON.stringify(authStore.getRoles(), null, 2))
   if (allowedRoles.length === 0 || authStore.isInAnySpecifiedRole(...allowedRoles)) {
     next()
     return

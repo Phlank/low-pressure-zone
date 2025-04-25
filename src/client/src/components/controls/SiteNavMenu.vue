@@ -29,6 +29,15 @@
               <span class="ml-2">{{ item.label }}</span>
             </a>
           </RouterLink>
+          <div v-else-if="item.href">
+            <a
+              v-ripple
+              :href="item.href"
+              class="p-menu-item-link">
+              <span :class="item.icon" />
+              <span class="ml-2">{{ item.label }}</span>
+            </a>
+          </div>
           <div v-else>
             <a
               v-ripple
@@ -93,18 +102,14 @@ const loggedInNavMenuItems: MenuItem[] = [
     label: 'Github',
     labelString: 'Github',
     icon: 'pi pi-github',
-    callback: () => {
-      window.location.href = githubUrl
-    },
+    href: githubUrl,
     visible: true
   },
   {
     label: 'Chat',
     labelString: 'Chat',
     icon: 'pi pi-discord',
-    callback: () => {
-      window.location.href = discordInvite
-    },
+    href: discordInvite,
     visible: () => window.innerWidth < 324
   }
 ]
@@ -121,18 +126,14 @@ const loggedOutNavMenuItems: MenuItem[] = [
     label: 'Github',
     labelString: 'Github',
     icon: 'pi pi-github',
-    callback: () => {
-      window.location.href = githubUrl
-    },
+    href: githubUrl,
     visible: true
   },
   {
     label: 'Chat',
     labelString: 'Chat',
     icon: 'pi pi-discord',
-    callback: () => {
-      window.location.href = discordInvite
-    },
+    href: discordInvite,
     visible: () => window.innerWidth < 324
   }
 ]
