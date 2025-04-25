@@ -57,6 +57,7 @@ const router = useRouter()
 const navMenuRef = useTemplateRef('navMenuRef')
 const authStore = useAuthStore()
 const discordInvite = import.meta.env.VITE_DISCORD_INVITE_LINK
+const githubUrl = import.meta.env.VITE_GITHUB_URL
 
 const navMenuItems = computed(() => {
   if (authStore.isLoggedIn()) {
@@ -89,6 +90,15 @@ const loggedInNavMenuItems: MenuItem[] = [
     visible: true
   },
   {
+    label: 'Github',
+    labelString: 'Github',
+    icon: 'pi pi-github',
+    callback: () => {
+      window.location.href = githubUrl
+    },
+    visible: true
+  },
+  {
     label: 'Chat',
     labelString: 'Chat',
     icon: 'pi pi-discord',
@@ -105,6 +115,15 @@ const loggedOutNavMenuItems: MenuItem[] = [
     labelString: 'Login',
     icon: 'pi pi-sign-in',
     route: '/user/login',
+    visible: true
+  },
+  {
+    label: 'Github',
+    labelString: 'Github',
+    icon: 'pi pi-github',
+    callback: () => {
+      window.location.href = githubUrl
+    },
     visible: true
   },
   {
