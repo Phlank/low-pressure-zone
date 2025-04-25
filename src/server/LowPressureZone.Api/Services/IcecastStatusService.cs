@@ -76,6 +76,10 @@ public class IcecastStatusService(IHttpClientFactory clientFactory, ILogger<Icec
         {
             logger.LogError(jsonException, "Unable to retrieve status from Icecast server: The JSON is invalid. -or- TValue is not compatible with the JSON. -or- There is remaining data in the stream.");
         }
+        catch (Exception otherException)
+        {
+            logger.LogError(otherException, "Unable to retrieve status from Icecast server: Unspecified exception was thrown.");
+        }
     }
 
     private async Task ContinuallyRefreshStatusAsync(CancellationToken cancellationToken)
