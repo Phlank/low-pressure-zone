@@ -1,8 +1,6 @@
 <template>
-  <Panel
-    class="register single-panel-center"
-    header="Register User">
-    <FormArea>
+  <SinglePanelViewWrapper class="register-view">
+    <FormArea is-single-column>
       <IftaFormField
         :message="validation.message('username')"
         input-id="usernameInput"
@@ -76,7 +74,7 @@
           @click="handleRegister" />
       </template>
     </FormArea>
-  </Panel>
+  </SinglePanelViewWrapper>
 </template>
 
 <script lang="ts" setup>
@@ -87,7 +85,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { registerRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { onKeyDown } from '@vueuse/core'
-import { Button, InputText, Message, Panel, Password, useToast } from 'primevue'
+import { Button, InputText, Message, Password, useToast } from 'primevue'
 import { onMounted, reactive, ref } from 'vue'
 import authApi, { type RegisterRequest } from '@/api/resources/authApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
@@ -95,6 +93,7 @@ import FormArea from '@/components/form/FormArea.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import { useRouter } from 'vue-router'
 import FormField from '@/components/form/FormField.vue'
+import SinglePanelViewWrapper from '@/components/layout/SinglePanelViewWrapper.vue'
 
 const router = useRouter()
 

@@ -1,38 +1,39 @@
 <template>
-  <Panel class="request-password-reset single-panel-center single-panel-center--no-header">
-    <div class="single-panel-center__form">
-      <IftaLabel class="input input--medium">
+  <SinglePanelViewWrapper class="reset-password-request-view">
+    <FormArea is-single-column>
+      <IftaFormField
+        :message="validation.message('email')"
+        input-id="emailInput"
+        label="Email">
         <InputText
           id="emailInput"
           v-model:model-value="formState.email"
-          class="input__field" />
-        <ValidationLabel
-          :message="validation.message('email')"
-          for="emailInput"
-          text="Email" />
-      </IftaLabel>
-      <div class="single-panel-center__form__buttons">
+          :invalid="!validation.isValid('email')" />
+      </IftaFormField>
+      <template #actions>
         <Button
           :disabled="isSubmitting"
           :loading="isSubmitting"
           label="Reset Password"
           @click="handleResetPasswordClick" />
-      </div>
-    </div>
-  </Panel>
+      </template>
+    </FormArea>
+  </SinglePanelViewWrapper>
 </template>
 
 <script lang="ts" setup>
-import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { KeyName } from '@/constants/keys'
 import { emailAddress, required } from '@/validation/rules/stringRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { combineRules } from '@/validation/types/validationRule'
 import { onKeyDown } from '@vueuse/core'
-import { Button, IftaLabel, InputText, Panel, useToast } from 'primevue'
+import { Button, InputText, useToast } from 'primevue'
 import { reactive, ref } from 'vue'
 import authApi from '@/api/resources/authApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import SinglePanelViewWrapper from '@/components/layout/SinglePanelViewWrapper.vue'
+import FormArea from '@/components/form/FormArea.vue'
+import IftaFormField from '@/components/form/IftaFormField.vue'
 
 const isSubmitting = ref(false)
 const toast = useToast()
@@ -62,13 +63,3 @@ const handleResetPasswordClick = async () => {
   })
 }
 </script>
-
-<style lang="scss">
-@use '@/assets/styles/variables';
-
-.request-password-reset {
-  .buttons {
-    margin-top: variables.$space-m;
-  }
-}
-</style>

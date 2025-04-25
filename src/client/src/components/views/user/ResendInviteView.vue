@@ -1,12 +1,20 @@
 <template>
-  <Panel class="resend-invite single-panel-center single-panel-center--no-header">
-    <Message
-      class="single-panel-center__message"
-      severity="info">
-      Your invitation link is expired. Enter your email to receive a new one.
-    </Message>
-    <div class="single-panel-center__form">
-      <IftaLabel class="input input--medium">
+  <SinglePanelViewWrapper class="resend-invite-view">
+    <FormArea is-single-column>
+      <FormField
+        input-id=""
+        size="m">
+        <Message
+          severity="info"
+          style="width: 100%">
+          Your invitation link is expired. Enter your email to receive a new one.
+        </Message>
+      </FormField>
+      <IftaFormField
+        :message="validation.message('email')"
+        input-id="emailInput"
+        label="Email"
+        size="m">
         <InputText
           id="emailInput"
           v-model:model-value="formState.email"
@@ -14,30 +22,31 @@
           :invalid="!validation.isValid('email')"
           class="input__field"
           @change="validation.validateIfDirty('email')" />
-        <ValidationLabel
-          :message="validation.message('email')"
-          for="emailInput"
-          text="Email" />
-      </IftaLabel>
-      <Button
-        :disabled="isSubmitting"
-        :loading="isSubmitting"
-        class="input"
-        label="Resend Invite"
-        @click="handleResendInviteClick" />
-    </div>
-  </Panel>
+      </IftaFormField>
+      <template #actions>
+        <Button
+          :disabled="isSubmitting"
+          :loading="isSubmitting"
+          class="input"
+          label="Resend Invite"
+          @click="handleResendInviteClick" />
+      </template>
+    </FormArea>
+  </SinglePanelViewWrapper>
 </template>
 
 <script lang="ts" setup>
-import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { emailAddress, required } from '@/validation/rules/stringRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { combineRules } from '@/validation/types/validationRule'
-import { Button, IftaLabel, InputText, Message, Panel, useToast } from 'primevue'
+import { Button, InputText, Message, useToast } from 'primevue'
 import { reactive, ref } from 'vue'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import invitesApi from '@/api/resources/invitesApi.ts'
+import SinglePanelViewWrapper from '@/components/layout/SinglePanelViewWrapper.vue'
+import FormArea from '@/components/form/FormArea.vue'
+import FormField from '@/components/form/FormField.vue'
+import IftaFormField from '@/components/form/IftaFormField.vue'
 
 const toast = useToast()
 const isSubmitting = ref(false)

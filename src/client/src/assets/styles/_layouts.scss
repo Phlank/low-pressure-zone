@@ -62,32 +62,3 @@
   justify-content: space-between;
   align-items: center;
 }
-
-.single-panel-center {
-  margin: 20dvh auto auto;
-  width: min(340px, calc(100vw - 2 * #{variables.$space-l}));
-
-  &__message {
-    width: variables.$input-width-m;
-  }
-
-  &__form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    &__buttons {
-      margin-top: variables.$space-m;
-    }
-  }
-
-  &--no-header {
-    .p-panel-header {
-      display: none;
-    }
-
-    .p-panel-content {
-      padding: 1.125rem;
-    }
-  }
-}

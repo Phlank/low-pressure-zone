@@ -23,6 +23,7 @@ body {
   margin: 0;
   overflow: hidden;
   background-image: url(./bg-invert.jpg);
+  background-attachment: fixed;
   font-family: 'Nunito Sans', 'Helvetica Neue', sans-serif;
   text-rendering: optimizeLegibility;
   overflow-y: scroll;

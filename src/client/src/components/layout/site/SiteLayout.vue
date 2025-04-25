@@ -2,11 +2,11 @@
   <div class="site-layout">
     <div>
       <SiteHeader class="site-layout__header" />
-      <main>
+      <main class="site-layout__view">
         <RouterView class="site-layout__content" />
       </main>
+      <SiteFooter class="site-layout__footer" />
     </div>
-    <SiteFooter class="site-layout__footer" />
   </div>
 </template>
 
@@ -37,9 +37,12 @@ import SiteHeader from './SiteHeader.vue'
     border-radius: 0;
   }
 
+  &__view {
+    min-height: variables.$view-min-height;
+  }
+
   &__footer {
     position: sticky;
-    margin-top: auto;
     text-align: center;
     width: 100%;
   }

@@ -1,6 +1,6 @@
 <template>
-  <Panel class="two-factor single-panel-center single-panel-center--no-header">
-    <FormArea>
+  <SinglePanelViewWrapper class="two-factor-view">
+    <FormArea is-single-column>
       <FormField
         input-id="none"
         size="m">
@@ -26,11 +26,10 @@
           :disabled="isSubmitting"
           :loading="isSubmitting"
           label="Verify"
-          style="width: 100%"
           @click="handleVerify" />
       </template>
     </FormArea>
-  </Panel>
+  </SinglePanelViewWrapper>
 </template>
 
 <script lang="ts" setup>
@@ -38,13 +37,14 @@ import { KeyName } from '@/constants/keys'
 import { Routes } from '@/router/routes'
 import { useAuthStore } from '@/stores/authStore'
 import { onKeyDown } from '@vueuse/core'
-import { Button, InputText, Message, Panel } from 'primevue'
+import { Button, InputText, Message } from 'primevue'
 import { reactive, ref } from 'vue'
 import authApi from '@/api/resources/authApi.ts'
 import FormArea from '@/components/form/FormArea.vue'
 import FormField from '@/components/form/FormField.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import { useRouter } from 'vue-router'
+import SinglePanelViewWrapper from '@/components/layout/SinglePanelViewWrapper.vue'
 
 const router = useRouter()
 
