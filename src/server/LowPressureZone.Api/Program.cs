@@ -51,9 +51,5 @@ app.UseFastEndpoints(config =>
         };
     };
     config.Errors.ProducesMetadataType = typeof(ValidationProblemDetails);
-    config.Endpoints.Configurator = (endpoint) =>
-    {
-        endpoint.Throttle(10, 60);
-    };
 }).UseSwaggerGen();
 app.Run();

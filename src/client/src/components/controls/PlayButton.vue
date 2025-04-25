@@ -24,7 +24,7 @@ import { Button, ProgressSpinner, useToast } from 'primevue'
 import { computed, onMounted, type Ref, ref, watch } from 'vue'
 import delay from '@/utils/delay.ts'
 import { noStatsToast } from '@/constants/toasts.ts'
-import { getLiveSource, type IcecastStats } from '@/types/icecastStats.ts'
+import icecastApi, { type IcecastStatusResponse } from '@/api/resources/icecastApi.ts'
 
 const toast = useToast()
 
@@ -34,10 +34,10 @@ enum PlayState {
 }
 
 const djName: Ref<string> = ref('Nobody')
-const streamType: Ref<string> = ref('Nothing')
 const playState: Ref<PlayState> = ref(PlayState.Paused)
 const isLoading: Ref<boolean> = ref(false)
 const isPlayable: Ref<boolean> = ref(false)
+const icecastStatus: Ref<IcecastStatusResponse | undefined> = ref(undefined)
 let audio: HTMLAudioElement | undefined = undefined
 let audioAbortController = new AbortController()
 
@@ -127,32 +127,46 @@ onMounted(() => {
 })
 
 const pollStreamMetadata = async () => {
+  // noinspection InfiniteLoopJS
   while (true) {
-    const result = await fetch(import.meta.env.VITE_STREAM_STATUS_URL)
-    if (!result.ok) {
+    try {
+      const response = await icecastApi.getStatus()
+      if (response.isSuccess()) {
+        icecastStatus.value = response.data()
+      }
+      await delay(10000)
+    } catch (error: unknown) {
       toast.add(noStatsToast)
-      isPlayable.value = false
-      return
+      console.log(JSON.stringify(error))
+      await delay(10000)
     }
-    const json = await result.json()
-    if (json.icestats === undefined) {
-      toast.add(noStatsToast)
-      isPlayable.value = false
-      return
-    }
-    const stats = json.icestats as IcecastStats
-    const liveSource = getLiveSource(stats)
-    if (liveSource === undefined) {
-      isPlayable.value = false
-      djName.value = 'Nobody'
-    } else {
-      djName.value = liveSource.server_name ?? 'Unknown'
-      streamType.value = 'Live DJ Set'
-      isPlayable.value = true
-    }
-    await delay(10000)
   }
 }
+
+watch(icecastStatus, (newStatus, oldStatus) => {
+  if (newStatus === undefined) return
+  if (newStatus.isLive) {
+    djName.value = newStatus.name ?? 'Unspecified'
+    isPlayable.value = true
+    return
+  }
+
+  if (newStatus.isOnline) {
+    djName.value = 'Nobody'
+    isPlayable.value = false
+    return
+  }
+
+  if (newStatus.isStatusStale && (oldStatus === undefined || !oldStatus.isStatusStale)) {
+    toast.add({
+      summary: 'Issue loading stream information',
+      detail:
+        'No new stream information has been retrieved in some time. Let @phlank know about it.',
+      severity: 'warning',
+      life: 7000
+    })
+  }
+})
 
 const controlIcon = computed(() => {
   if (playState.value === PlayState.Paused) {

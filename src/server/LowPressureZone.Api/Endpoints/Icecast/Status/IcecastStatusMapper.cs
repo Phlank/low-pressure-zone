@@ -9,7 +9,7 @@ public class IcecastStatusMapper : IResponseMapper
     {
         IsOnline = false,
         IsLive = false,
-        IsStale = false,
+        IsStatusStale = false,
         Name = null,
         Type = null,
         ListenUrl = null
@@ -19,7 +19,7 @@ public class IcecastStatusMapper : IResponseMapper
     {
         IsOnline = true,
         IsLive = false,
-        IsStale = false,
+        IsStatusStale = false,
         Name = null,
         Type = null,
         ListenUrl = null
@@ -36,7 +36,7 @@ public class IcecastStatusMapper : IResponseMapper
         {
             IsOnline = true,
             IsLive = true,
-            IsStale = entity.IsStale,
+            IsStatusStale = entity.IsStale,
             Name = liveSource.ServerName,
             Type = liveSource.AudioInfo,
             ListenUrl = liveSource.ListenUrl
