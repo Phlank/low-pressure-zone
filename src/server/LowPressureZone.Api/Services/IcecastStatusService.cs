@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using LowPressureZone.Api.Models.Icecast;
 using Shouldly;
 using IHttpClientFactory = System.Net.Http.IHttpClientFactory;
@@ -33,8 +33,8 @@ public class IcecastStatusService(IHttpClientFactory clientFactory, ILogger<Icec
     {
         if (IsStarted) return;
         IsStarted = true;
-        await RefreshStatusAsync(cancellationToken);
-        _ = ContinuallyRefreshStatusAsync(cancellationToken);
+        await RefreshStatusAsync();
+        _ = ContinuallyRefreshStatusAsync();
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -46,18 +46,18 @@ public class IcecastStatusService(IHttpClientFactory clientFactory, ILogger<Icec
     // Sets the status.
     // If the icecast server is offline, then this service will retain the last held data.
     // An IcecastStatusRaw instance becomes stale 30 seconds after it is created.
-    private async Task RefreshStatusAsync(CancellationToken cancellationToken)
+    private async Task RefreshStatusAsync()
     {
         try
         {
-            var result = await _client.GetAsync(StatusEndpoint, cancellationToken);
+            var result = await _client.GetAsync(StatusEndpoint);
             if (!result.IsSuccessStatusCode)
             {
                 logger.LogWarning($"{nameof(IcecastStatusService)}: Unable to retrieve status from Icecast service | {{Status}} | {{Reason}}", result.StatusCode, result.ReasonPhrase);
                 return;
             }
-            await using var contentStream = await result.Content.ReadAsStreamAsync(cancellationToken);
-            var content = await JsonSerializer.DeserializeAsync<IcecastStatusRootRaw>(contentStream, JsonSerializerOptions.Web, cancellationToken);
+            await using var contentStream = await result.Content.ReadAsStreamAsync();
+            var content = await JsonSerializer.DeserializeAsync<IcecastStatusRootRaw>(contentStream, JsonSerializerOptions.Web);
             content.ShouldNotBeNull();
             lock (_statusLock)
             {
@@ -82,9 +82,9 @@ public class IcecastStatusService(IHttpClientFactory clientFactory, ILogger<Icec
         }
     }
 
-    private async Task ContinuallyRefreshStatusAsync(CancellationToken cancellationToken)
+    private async Task ContinuallyRefreshStatusAsync()
     {
-        while (await _timer.WaitForNextTickAsync(cancellationToken) && IsStarted)
-            await RefreshStatusAsync(cancellationToken);
+        while (await _timer.WaitForNextTickAsync() && IsStarted)
+            await RefreshStatusAsync();
     }
 }

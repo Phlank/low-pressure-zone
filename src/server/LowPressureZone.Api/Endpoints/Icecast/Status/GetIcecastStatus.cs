@@ -8,7 +8,6 @@ public class GetIcecastStatus(IcecastStatusService icecastStatusService) : Endpo
     public override void Configure()
     {
         Get("/icecast/status");
-        Throttle(24, 60);
         AllowAnonymous();
     }
 

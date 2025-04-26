@@ -8,7 +8,7 @@ public class IcecastSourceRaw
     public string? Artist { get; set; }
     public int? Bitrate { get; set; }
     public string? Genre { get; set; }
-    public required string Subtype { get; set; }
+    public string? Subtype { get; set; }
     public string? Title { get; set; }
 
     [JsonPropertyName("audio_bitrate")]
