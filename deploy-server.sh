@@ -12,5 +12,4 @@ sudo chown -R root:www-data /var/www/html/low-pressure-zone-api/*
 sudo chmod -R 650 /var/www/html/low-pressure-zone-api/*
 sudo service lpzapi start
 cd ../../../../..
-git reset --hard
-
+	
