@@ -1,0 +1,25 @@
+﻿services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: l0wpressure
+      POSTGRES_DB: defaultdb  # Required by image, but we'll create our own databases in the init-db script
+    ports:
+      - "5432:5432"
+    volumes:
+      - lpz:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: [
+        "CMD-SHELL",
+        "pg_isready -U postgres -d postgres || exit 1"
+      ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes: #stores database locally so it persists between restarts. Can be removed with 'docker-compose down -v' command
+  lpz:
