@@ -1,0 +1,14 @@
+﻿{
+  "name": "dotnet-dev-environment",
+  "version": "1.0.0",
+  "description": "Development environment for .NET and PostgreSQL",
+  "scripts": {
+    "dev": "npm run start-db && npm run migrate-api && npm run migrate-auth && npm run start-api",
+    "start-db": "docker-compose -f ./Infra/docker-compose.yml up -d",      
+    "start-api": "dotnet watch run --project LowPressureZone.Api",  
+    "stop": "docker-compose -f ./Infra/docker-compose.yml down",              
+    "clean": "docker-compose -f ./Infra/docker-compose.yml down -v",           
+    "migrate-api": "dotnet tool restore && dotnet tool run dotnet-ef database update --context DataContext --project LowPressureZone.Domain --startup-project LowPressureZone.Api",
+    "migrate-auth": "dotnet tool run dotnet-ef database update --context IdentityContext --project LowPressureZone.Identity --startup-project LowPressureZone.Api"
+  }
+}
