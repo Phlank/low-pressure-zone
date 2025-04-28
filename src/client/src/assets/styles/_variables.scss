@@ -11,10 +11,10 @@ $space-l: 20px;
 
 $header-height: 82px;
 $footer-height: 70px;
-$view-min-height: calc(100dvh - #{$header-height} - #{$footer-height});
+$view-min-height: calc(100dvh - #{$header-height} - #{$footer-height} - 1px);
 
 $mobile-transition-width: 760px;
-$mobile-element-width: calc(100vw - 2 * $space-m);
+$mobile-element-width: calc(min(100vw, #{$mobile-transition-width}) - 2 * $space-m);
 
 $grid-action-width: 50px;
 

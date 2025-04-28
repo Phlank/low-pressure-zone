@@ -13,5 +13,8 @@ import UpcomingSchedules from './UpcomingSchedules.vue'
 
 .home-view {
   margin: 0 variables.$space-m;
+  @include variables.desktop {
+    max-width: calc(#{variables.$mobile-element-width} + 200px);
+  }
 }
 </style>
