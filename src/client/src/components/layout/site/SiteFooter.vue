@@ -18,6 +18,5 @@ import PlayButton from '../../controls/PlayButton.vue'
 
 .site-footer {
   position: sticky;
-  bottom: 0;
 }
 </style>
