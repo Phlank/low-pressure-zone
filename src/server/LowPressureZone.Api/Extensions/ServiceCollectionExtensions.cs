@@ -18,6 +18,7 @@ using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -26,6 +27,13 @@ namespace LowPressureZone.Api.Extensions;
 
 public static class ServiceCollectionExtensions
 {
+    private static readonly Action<CookieAuthenticationOptions> ConfigureDevCookieOptions = options =>
+    {
+        options.Cookie.SameSite = SameSiteMode.None;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.HttpOnly = true;
+    };
+
     public static void AddDatabases(this WebApplicationBuilder builder)
     {
         var identityConnectionString = builder.Configuration.GetConnectionString("Identity");
@@ -35,7 +43,7 @@ public static class ServiceCollectionExtensions
         {
             options.UseNpgsql(identityConnectionString);
             if (builder.Environment.IsDevelopment()) options.EnableSensitiveDataLogging();
-        });
+        }).AddDataProtection().PersistKeysToDbContext<IdentityContext>();
         builder.Services.AddDbContext<DataContext>(options =>
         {
             options.UseNpgsql(dataConnectionString);
@@ -57,15 +65,15 @@ public static class ServiceCollectionExtensions
         if (environment.IsDevelopment())
         {
             // Also configure Auth cookies separately, so SameSite works cross domain locally in Chromium
-            services.Configure(IdentityConstants.ExternalScheme,
-                               (Action<CookieAuthenticationOptions>)ConfigureDevCookieOptions);
-            services.Configure(IdentityConstants.TwoFactorUserIdScheme,
-                               (Action<CookieAuthenticationOptions>)ConfigureDevCookieOptions);
-            services.ConfigureApplicationCookie((Action<CookieAuthenticationOptions>)ConfigureDevCookieOptions);
+            services.Configure(IdentityConstants.TwoFactorUserIdScheme, ConfigureDevCookieOptions);
+            services.ConfigureApplicationCookie(ConfigureDevCookieOptions);
         }
         else
         {
-            services.ConfigureApplicationCookie(options => { options.Cookie.SameSite = SameSiteMode.Lax; });
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.Cookie.SameSite = SameSiteMode.Lax;
+            });
         }
         services.ConfigureApplicationCookie(options =>
         {
@@ -84,14 +92,6 @@ public static class ServiceCollectionExtensions
         services.AddAuthentication();
         services.AddAuthorization();
         services.AddTransient<IClaimsTransformation, AppUserClaimsTransformation>();
-        return;
-
-        static void ConfigureDevCookieOptions(CookieAuthenticationOptions options)
-        {
-            options.Cookie.SameSite = SameSiteMode.None;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-            options.Cookie.HttpOnly = true;
-        }
     }
 
     public static void ConfigureWebApi(this IServiceCollection services)

@@ -27,7 +27,10 @@ public class IcecastStatusService(IHttpClientFactory clientFactory, ILogger<Icec
     public bool IsStarted { get; private set; }
 
     public void Dispose()
-        => _timer.Dispose();
+    {
+        _timer.Dispose();
+        GC.SuppressFinalize(this);
+    }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
