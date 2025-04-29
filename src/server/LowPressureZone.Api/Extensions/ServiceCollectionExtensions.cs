@@ -17,6 +17,7 @@ using LowPressureZone.Domain;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -34,7 +35,7 @@ public static class ServiceCollectionExtensions
         {
             options.UseNpgsql(identityConnectionString);
             if (builder.Environment.IsDevelopment()) options.EnableSensitiveDataLogging();
-        });
+        }).AddDataProtection().PersistKeysToDbContext<IdentityContext>();
         builder.Services.AddDbContext<DataContext>(options =>
         {
             options.UseNpgsql(dataConnectionString);

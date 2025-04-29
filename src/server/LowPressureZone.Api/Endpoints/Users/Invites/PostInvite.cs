@@ -1,6 +1,7 @@
 ﻿using FastEndpoints;
 using FluentEmail.Core;
 using LowPressureZone.Api.Constants;
+using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Entities;
@@ -43,13 +44,7 @@ public class PostInvite(UserManager<AppUser> userManager,
         createResult.Errors.ForEach(e => AddError(e.Code + " " + e.Description));
         ThrowIfAnyErrors();
 
-        var inviteToken = await userManager.GenerateUserTokenAsync(user, TokenProviders.Default, TokenPurposes.Invite);
-        var tokenContext = new TokenContext
-        {
-            Email = request.Email,
-            Token = inviteToken
-        };
-        await emailService.SendInviteEmailAsync(request.Email, tokenContext);
+        await userManager.SendWelcomeEmail(user, emailService);
 
         identityContext.Add(invitation);
         await identityContext.SaveChangesAsync(ct);
