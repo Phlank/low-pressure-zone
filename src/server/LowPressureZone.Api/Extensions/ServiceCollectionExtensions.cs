@@ -17,6 +17,7 @@ using LowPressureZone.Domain;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -42,7 +43,7 @@ public static class ServiceCollectionExtensions
         });
     }
 
-    public static void ConfigureIdentity(this IServiceCollection services)
+    public static void ConfigureIdentity(this IServiceCollection services, IWebHostEnvironment environment)
     {
         services.AddIdentity<AppUser, AppRole>(options =>
         {
@@ -53,14 +54,24 @@ public static class ServiceCollectionExtensions
             options.Password.RequiredLength = 8;
             options.User.RequireUniqueEmail = true;
         }).AddEntityFrameworkStores<IdentityContext>().AddDefaultTokenProviders();
-        services.AddAuthentication();
-        services.AddAuthorization();
+        if (environment.IsDevelopment())
+        {
+            // Also configure Auth cookies separately, so SameSite works cross domain locally in Chromium
+            services.Configure(IdentityConstants.ExternalScheme,
+                               (Action<CookieAuthenticationOptions>)ConfigureDevCookieOptions);
+            services.Configure(IdentityConstants.TwoFactorUserIdScheme,
+                               (Action<CookieAuthenticationOptions>)ConfigureDevCookieOptions);
+            services.ConfigureApplicationCookie((Action<CookieAuthenticationOptions>)ConfigureDevCookieOptions);
+        }
+        else
+        {
+            services.ConfigureApplicationCookie(options => { options.Cookie.SameSite = SameSiteMode.Lax; });
+        }
         services.ConfigureApplicationCookie(options =>
         {
             options.Cookie.Name = "LowPressureZoneCookie";
             options.Cookie.HttpOnly = true;
             options.ExpireTimeSpan = TimeSpan.FromDays(1);
-            options.Cookie.SameSite = SameSiteMode.Lax;
             options.LoginPath = "/api/users/login";
             options.ReturnUrlParameter = "/";
 
@@ -70,7 +81,17 @@ public static class ServiceCollectionExtensions
                 return Task.CompletedTask;
             };
         });
+        services.AddAuthentication();
+        services.AddAuthorization();
         services.AddTransient<IClaimsTransformation, AppUserClaimsTransformation>();
+        return;
+
+        static void ConfigureDevCookieOptions(CookieAuthenticationOptions options)
+        {
+            options.Cookie.SameSite = SameSiteMode.None;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.HttpOnly = true;
+        }
     }
 
     public static void ConfigureWebApi(this IServiceCollection services)

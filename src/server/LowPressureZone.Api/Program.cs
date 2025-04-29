@@ -17,7 +17,7 @@ builder.Services.Configure<JsonOptions>(options =>
 {
     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
-builder.Services.ConfigureIdentity();
+builder.Services.ConfigureIdentity(builder.Environment);
 builder.Services.ConfigureWebApi();
 builder.Services.AddApiServices();
 
