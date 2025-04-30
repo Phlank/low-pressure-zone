@@ -14,9 +14,7 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Community>().HasIndex(nameof(Community.Name)).IsUnique();
-
-        modelBuilder.Entity<Performer>().HasIndex(nameof(Performer.Name)).IsUnique();
-
+        
         modelBuilder.Entity<Schedule>().HasIndex(nameof(Schedule.StartsAt)).IsUnique();
         modelBuilder.Entity<Schedule>().HasIndex(nameof(Schedule.EndsAt)).IsUnique();
 
