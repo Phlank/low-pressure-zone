@@ -11,7 +11,7 @@
       - "5432:5432"
     volumes:
       - lpz:/var/lib/postgresql/data
-      - ./init-db:/docker-entrypoint-initdb.d
+      - ./:/docker-entrypoint-initdb.d
     healthcheck:
       test: [
         "CMD-SHELL",
@@ -20,6 +20,29 @@
       interval: 10s
       timeout: 5s
       retries: 5
+  
+  pgadmin:
+    image: elestio/pgadmin:latest
+    container_name: pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_LISTEN_PORT: 5433
+    ports: 
+      - "5433:5433"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+  
+  icecast2:
+    image: pltnk/icecast2:latest
+    container_name: icecast2
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./icecast.xml:/etc/icecast.xml
 
 volumes: #stores database locally so it persists between restarts. Can be removed with 'docker-compose down -v' command
   lpz:
+  pgadmin-data:

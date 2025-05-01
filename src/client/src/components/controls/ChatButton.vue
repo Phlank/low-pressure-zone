@@ -2,7 +2,6 @@
   <a :href="discordInvite">
     <Button
       v-ripple
-      color="#7289da"
       icon="pi pi-discord"
       label="Chat" />
   </a>

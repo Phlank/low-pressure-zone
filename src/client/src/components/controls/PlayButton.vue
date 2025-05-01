@@ -6,10 +6,10 @@
     class="play-button"
     rounded
     size="large"
-    @click="handleControlClick">
+    @click="togglePlaying">
     <template #icon>
       <ProgressSpinner
-        v-if="isLoading"
+        v-if="isLoading || isWaitingForNextDj"
         animationDuration="1s"
         aria-label="Custom ProgressSpinner"
         fill="transparent"
@@ -21,7 +21,7 @@
 
 <script lang="ts" setup>
 import { Button, ProgressSpinner, useToast } from 'primevue'
-import { computed, onMounted, type Ref, ref, watch } from 'vue'
+import { computed, type ComputedRef, onMounted, type Ref, ref, watch } from 'vue'
 import delay from '@/utils/delay.ts'
 import { noStatsToast } from '@/constants/toasts.ts'
 import icecastApi, { type IcecastStatusResponse } from '@/api/resources/icecastApi.ts'
@@ -33,50 +33,66 @@ enum PlayState {
   Paused
 }
 
-const djName: Ref<string> = ref('Nobody')
+const nextDjWaitText = 'Waiting for next DJ...'
+const nobodyDjText = 'Nobody'
+const djName: Ref<string> = ref(nobodyDjText)
 const playState: Ref<PlayState> = ref(PlayState.Paused)
 const isLoading: Ref<boolean> = ref(false)
-const isPlayable: Ref<boolean> = ref(false)
+const isWaitingForNextDj: Ref<boolean> = ref(false)
 const icecastStatus: Ref<IcecastStatusResponse | undefined> = ref(undefined)
 let audio: HTMLAudioElement | undefined = undefined
 let audioAbortController = new AbortController()
 
+const isPlayable: ComputedRef<boolean> = computed(() => djName.value !== nobodyDjText)
+
 window.addEventListener('beforeunload', () => {
-  audioAbortController.abort()
-  audio = undefined
+  if (audio !== undefined) {
+    stopAudio()
+  }
 })
 
-const handleControlClick = () => {
-  toggle(playState)
+const stopAudio = () => {
+  try {
+    if (audio !== undefined) {
+      audio.pause()
+      audioAbortController.abort()
+      audio.src = ''
+      audio = undefined
+    }
+  } catch (error) {
+    console.log(error)
+  }
 }
 
-const toggle = (ref: Ref<PlayState>) => {
-  if (ref.value === PlayState.Paused) {
-    ref.value = PlayState.Playing
+const startAudio = () => {
+  isLoading.value = true
+  console.log('startAudio: isLoading.value = true')
+  audioAbortController = new AbortController()
+  audio = new Audio(import.meta.env.VITE_LISTEN_URL)
+  audio.preload = 'metadata'
+  addAudioEventListeners()
+  audio.play()
+}
+
+const togglePlaying = () => {
+  if (playState.value === PlayState.Paused) {
+    playState.value = PlayState.Playing
   } else {
-    ref.value = PlayState.Paused
+    playState.value = PlayState.Paused
   }
 }
 
 watch(playState, (newPlayState) => {
   if (newPlayState === PlayState.Paused && audio !== undefined) {
-    audio.pause()
-    return
+    // Stream is playing and the user pressed pause
+    stopAudio()
+  } else if (newPlayState === PlayState.Paused && audio === undefined) {
+    // Stream is waiting for next DJ and user pressed pause
+    setNobodyPlaying()
+  } else if (newPlayState === PlayState.Playing && audio === undefined) {
+    // Stream is not playing and user presses play
+    startAudio()
   }
-
-  let isNewAudio = false
-  if (audio === undefined) {
-    isNewAudio = true
-    audioAbortController = new AbortController()
-    audio = new Audio(import.meta.env.VITE_LISTEN_URL)
-    audio.preload = 'metadata'
-    addAudioEventListeners()
-  }
-  isLoading.value = true
-  if (!isNaN(audio.duration) && !isNewAudio) {
-    audio.fastSeek(audio.duration)
-  }
-  audio.play()
 })
 
 const addAudioEventListeners = () => {
@@ -91,6 +107,7 @@ const addAudioEventListeners = () => {
 const handleCanPlay = () => {
   if (playState.value === PlayState.Playing) {
     isLoading.value = false
+    console.log('startAudio: isLoading.value = true')
   }
 }
 
@@ -99,12 +116,17 @@ const handlePlay = () => {
 }
 
 const handleEnded = () => {
+  waitForNextDj()
+}
+
+const waitForNextDj = () => {
+  djName.value = nextDjWaitText
+  stopAudio()
+}
+
+const setNobodyPlaying = () => {
+  djName.value = nobodyDjText
   isLoading.value = false
-  audio?.pause()
-  audio = undefined
-  audioAbortController.abort()
-  // This has to be the last statement of the event listener because it will trigger the watch event
-  // that removes all event listeners and set `audio` to undefined
   playState.value = PlayState.Paused
 }
 
@@ -117,9 +139,10 @@ const handleError = () => {
   toast.add({
     summary: 'Playback error',
     detail: 'Unable to load audio stream',
-    severity: 'error'
+    severity: 'error',
+    life: 7000
   })
-  handleEnded()
+  waitForNextDj()
 }
 
 onMounted(() => {
@@ -134,10 +157,10 @@ const pollStreamMetadata = async () => {
       if (response.isSuccess()) {
         icecastStatus.value = response.data()
       }
-      await delay(10000)
     } catch (error: unknown) {
       toast.add(noStatsToast)
       console.log(JSON.stringify(error))
+    } finally {
       await delay(10000)
     }
   }
@@ -146,22 +169,26 @@ const pollStreamMetadata = async () => {
 watch(icecastStatus, (newStatus, oldStatus) => {
   if (newStatus === undefined) return
   if (newStatus.isLive) {
+    if (djName.value === nextDjWaitText) {
+      startAudio()
+    }
     djName.value = newStatus.name ?? 'Unspecified'
-    isPlayable.value = true
     return
   }
 
   if (newStatus.isOnline) {
-    djName.value = 'Nobody'
-    isPlayable.value = false
+    if (playState.value === PlayState.Playing) {
+      waitForNextDj()
+    } else {
+      setNobodyPlaying()
+    }
     return
   }
 
   if (newStatus.isStatusStale && (oldStatus === undefined || !oldStatus.isStatusStale)) {
     toast.add({
       summary: 'Issue loading stream information',
-      detail:
-        'No new stream information has been retrieved in some time. Let @phlank know about it.',
+      detail: 'No new stream information has been retrieved in 30s. Check the stream status page.',
       severity: 'warning',
       life: 7000
     })
