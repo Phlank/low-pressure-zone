@@ -11,7 +11,7 @@
       - "5432:5432"
     volumes:
       - lpz:/var/lib/postgresql/data
-      - ./init-db:/docker-entrypoint-initdb.d
+      - ./:/docker-entrypoint-initdb.d
     healthcheck:
       test: [
         "CMD-SHELL",
@@ -41,7 +41,7 @@
     ports:
       - "8000:8000"
     volumes:
-      - ./icecast2/icecast.xml:/etc/icecast.xml
+      - ./icecast.xml:/etc/icecast.xml
 
 volumes: #stores database locally so it persists between restarts. Can be removed with 'docker-compose down -v' command
   lpz:
