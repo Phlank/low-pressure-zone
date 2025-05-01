@@ -49,7 +49,7 @@
          If you don't want this, comment out the following line or read up on CORS.
     -->
     <http-headers>
-        <header name="Access-Control-Allow-Origin" value="*" />
+        <header name="Access-Control-Allow-Origin" value="*"/>
     </http-headers>
 
     <!-- Mountpoints
@@ -65,13 +65,7 @@
 
     <mount type="normal">
         <public>0</public>
-        <mount-name>/off-air</mount-name>
-        <stream-name>Off Air</stream-name>
-    </mount>
-
-    <mount type="normal">
-        <public>0</public>
-	    <mount-name>/live</mount-name>
+        <mount-name>/live</mount-name>
         <stream-description>Live DJing performance.</stream-description>
         <stream-url>https://lowpressurezone.com:8443/live</stream-url>
     </mount>
