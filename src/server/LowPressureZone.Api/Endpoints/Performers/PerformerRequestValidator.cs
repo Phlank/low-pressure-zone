@@ -23,18 +23,5 @@ public sealed class PerformerRequestValidator : Validator<PerformerRequest>
                                             .WithMessage(Errors.MaxLength(256))
                                             .AbsoluteHttpUri();
         });
-
-        RuleFor(request => request).CustomAsync(async (request, context, ct) =>
-        {
-            var performerId = accessor.GetGuidRouteParameterOrDefault("id");
-            var dataContext = Resolve<DataContext>();
-
-            var isNameInUse = await dataContext.Performers
-                                               .Where(performer => performer.Name == request.Name && performer.Id != performerId)
-                                               .AnyAsync(ct);
-
-            if (isNameInUse)
-                context.AddFailure(nameof(request.Name), Errors.Unique);
-        });
     }
 }
