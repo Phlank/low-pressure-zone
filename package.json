@@ -4,7 +4,7 @@
   "description": "Handles development dependencies and deployment.",
   "scripts": {
     "dev-setup": "docker compose -f ./tools/docker-compose.yml up -d && npm run migrate-domain && npm run migrate-auth && docker compose -f ./tools/docker-compose.yml down",
-    "migrate-domain": "cd src/server && dotnet tool restore && dotnet tool run dotnet-ef database update --context DataContext --project LowPressureZone.Domain --startup-project LowPressureZone.Api && cd ../..",
+    "migrate-domain": "dotnet ef database update --context DataContext --project ./src/server/LowPressureZone.Domain/LowPressureZone.Domain.csproj --startup-project ./src/server/LowPressureZone.Api/LowPressureZone.Api.csproj",
     "migrate-auth": "dotnet ef database update --context IdentityContext --project ./src/server/LowPressureZone.Identity/LowPressureZone.Identity.csproj --startup-project ./src/server/LowPressureZone.Api/LowPressureZone.Api.csproj",
     "docker-start": "docker compose -f ./tools/docker-compose.yml up -d",
     "docker-stop": "docker-compose -f ./tools/docker-compose.yml down",
