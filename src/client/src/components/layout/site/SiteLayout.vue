@@ -32,7 +32,7 @@ const footerPosition = computed(() => (!isMobile?.value ? 'sticky' : 'absolute')
   justify-content: space-between;
   height: 100dvh;
 
-  &__header {
+  .p-toolbar.site-layout__header {
     margin-bottom: variables.$space-m;
     font-size: 1.2rem;
     position: sticky;
