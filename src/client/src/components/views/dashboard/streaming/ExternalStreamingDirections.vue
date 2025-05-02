@@ -84,7 +84,9 @@ const streamDebug = import.meta.env.VITE_STREAM_DEBUG
 </script>
 
 <style lang="scss">
-.externalStreamingDirections {
+.external-streaming-directions {
+  overflow-x: auto;
+
   img {
     max-width: 100%;
   }

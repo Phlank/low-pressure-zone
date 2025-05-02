@@ -1,6 +1,8 @@
 <template>
   <div class="performers-dashboard">
-    <Tabs v-model:value="tabValue">
+    <Tabs
+      v-model:value="tabValue"
+      scrollable>
       <TabList>
         <Tab value="0"> Mine</Tab>
         <Tab value="1"> All</Tab>

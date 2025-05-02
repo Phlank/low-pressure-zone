@@ -5,6 +5,9 @@
       <main class="site-layout__view">
         <RouterView class="site-layout__content" />
       </main>
+      <div
+        v-if="isMobile"
+        class="site-layout__footer-space" />
       <SiteFooter class="site-layout__footer" />
     </div>
   </div>
@@ -14,6 +17,10 @@
 import { RouterView } from 'vue-router'
 import SiteFooter from './SiteFooter.vue'
 import SiteHeader from './SiteHeader.vue'
+import { computed, inject, type Ref } from 'vue'
+
+const isMobile: Ref<boolean> | undefined = inject('isMobile')
+const footerPosition = computed(() => (!isMobile?.value ? 'sticky' : 'absolute'))
 </script>
 
 <style lang="scss">
@@ -38,12 +45,17 @@ import SiteHeader from './SiteHeader.vue'
   }
 
   &__view {
-    min-height: variables.$view-min-height;
+    min-height: calc(100dvh - #{variables.$header-height} - #{variables.$footer-height});
+  }
+
+  &__footer-space {
+    height: variables.$footer-height;
   }
 
   &__footer {
-    position: sticky;
+    position: v-bind(footerPosition);
     text-align: center;
+    bottom: 0;
     width: 100%;
   }
 }

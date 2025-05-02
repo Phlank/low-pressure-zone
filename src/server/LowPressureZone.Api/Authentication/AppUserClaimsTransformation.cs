@@ -16,8 +16,7 @@ public class AppUserClaimsTransformation(DataContext dataContext) : IClaimsTrans
         if (!principal.HasClaim(claim => claim.Type == ClaimTypes.NameIdentifier))
             return principal;
 
-        if (principal.HasClaim(claim => claim.Type == ClaimTypes.Role && claim.Value == RoleNames.Organizer)
-            || principal.HasClaim(claim => claim.Type == "OrganizerChecked"))
+        if (principal.HasClaim(claim => claim.Type == OrganizerCheckedClaimType))
             return principal;
 
         var identity = new ClaimsIdentity();

@@ -1,7 +1,9 @@
 <template>
   <div class="dashboard-schedules-view">
-    <Tabs v-model:value="tabValue">
-      <TabList style="width: 100%; overflow-x: scroll">
+    <Tabs
+      v-model:value="tabValue"
+      scrollable>
+      <TabList>
         <Tab value="upcoming">Upcoming</Tab>
         <Tab value="past">Past</Tab>
         <Tab
