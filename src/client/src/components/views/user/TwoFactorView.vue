@@ -21,6 +21,17 @@
           :autofocus="true"
           :invalid="errorMessage !== ''" />
       </IftaFormField>
+      <FormField input-id="rememberBrowserInput">
+        <div style="display: flex; flex-direction: column; align-items: center; width: 100%">
+          <div class="checkbox-area__item">
+            <Checkbox
+              id="rememberBrowserInput"
+              v-model="formState.rememberClient"
+              binary />
+            <span>Remember Browser</span>
+          </div>
+        </div>
+      </FormField>
       <template #actions>
         <Button
           :disabled="isSubmitting"
@@ -37,7 +48,7 @@ import { KeyName } from '@/constants/keys'
 import { Routes } from '@/router/routes'
 import { useAuthStore } from '@/stores/authStore'
 import { onKeyDown } from '@vueuse/core'
-import { Button, InputText, Message } from 'primevue'
+import { Button, Checkbox, InputText, Message } from 'primevue'
 import { reactive, ref } from 'vue'
 import authApi from '@/api/resources/authApi.ts'
 import FormArea from '@/components/form/FormArea.vue'
@@ -49,7 +60,8 @@ import SinglePanelViewWrapper from '@/components/layout/SinglePanelViewWrapper.v
 const router = useRouter()
 
 const formState = reactive({
-  code: ''
+  code: '',
+  rememberClient: false
 })
 
 onKeyDown(KeyName.Enter, () => handleVerify())
@@ -68,7 +80,7 @@ const props = withDefaults(
 
 const handleVerify = async () => {
   isSubmitting.value = true
-  const response = await authApi.postTwoFactor(formState.code)
+  const response = await authApi.postTwoFactor(formState)
   if (!response.isSuccess()) {
     errorMessage.value = 'Invalid code'
     isSubmitting.value = false

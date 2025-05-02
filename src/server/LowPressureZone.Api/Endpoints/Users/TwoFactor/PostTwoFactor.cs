@@ -19,7 +19,7 @@ public class PostTwoFactor(SignInManager<AppUser> signInManager) : Endpoint<TwoF
 
     public override async Task HandleAsync(TwoFactorRequest req, CancellationToken ct)
     {
-        var result = await signInManager.TwoFactorSignInAsync(TokenProviders.Email, req.Code, true, false);
+        var result = await signInManager.TwoFactorSignInAsync(TokenProviders.Email, req.Code, true, req.RememberClient);
         if (result.Succeeded)
         {
             await SendNoContentAsync(ct);

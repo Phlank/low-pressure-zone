@@ -7,7 +7,7 @@ export default {
   postLogin: (request: LoginRequest) =>
     sendPost<LoginRequest, LoginResponse>(`${route}/login`, request),
   getLogout: () => sendGet<never>(`${route}/logout`),
-  postTwoFactor: (code: string) => sendPost(`${route}/twoFactor`, { code: code }),
+  postTwoFactor: (request: TwoFactorRequest) => sendPost(`${route}/twoFactor`, request),
   getResetPassword: (email: string) => sendGet(`${route}/resetPassword`, { email: email }),
   postResetPassword: (request: ResetPasswordRequest) => sendPost(`${route}/resetPassword`, request),
   postRegister: (request: RegisterRequest) => sendPost(`${route}/register`, request),
@@ -28,6 +28,11 @@ export interface LoginRequest {
 
 export interface LoginResponse {
   requiresTwoFactor: boolean
+}
+
+export interface TwoFactorRequest {
+  code: string
+  rememberClient: boolean
 }
 
 export interface RegisterRequest {

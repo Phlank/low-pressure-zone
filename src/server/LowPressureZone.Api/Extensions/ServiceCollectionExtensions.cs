@@ -66,6 +66,8 @@ public static class ServiceCollectionExtensions
         {
             // Also configure Auth cookies separately, so SameSite works cross domain locally in Chromium
             services.Configure(IdentityConstants.TwoFactorUserIdScheme, ConfigureDevCookieOptions);
+            services.Configure(IdentityConstants.TwoFactorRememberMeScheme, ConfigureDevCookieOptions);
+            services.Configure(IdentityConstants.ExternalScheme, ConfigureDevCookieOptions);
             services.ConfigureApplicationCookie(ConfigureDevCookieOptions);
         }
         else

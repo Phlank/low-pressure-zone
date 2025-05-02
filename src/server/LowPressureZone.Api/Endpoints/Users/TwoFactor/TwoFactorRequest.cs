@@ -3,4 +3,5 @@
 public class TwoFactorRequest
 {
     public required string Code { get; set; }
+    public bool RememberClient { get; set; }
 }
