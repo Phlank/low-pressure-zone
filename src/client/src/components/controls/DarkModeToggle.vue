@@ -32,7 +32,7 @@ onMounted(() => {
 
   const isDarkModeOnFlipped = isDarkModeRef && !isDocumentDarkMode && !isBodyDarkMode
   const isDarkModeOffFlipped = !isDarkModeRef && isDocumentDarkMode && isBodyDarkMode
-  
+
   if (isDarkModeOffFlipped || isDarkModeOnFlipped) {
     document.documentElement.classList.toggle('dark-mode-toggle')
     document.body.classList.toggle('dark-mode-toggle')

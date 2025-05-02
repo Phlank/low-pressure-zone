@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="software-streaming-directions">
     <h2>Streaming from DJ software</h2>
     <p>
       Most DJing software has streaming capabilities built in. For the purpose of these
@@ -67,3 +67,13 @@ import { Message } from 'primevue'
 
 const streamDebug = import.meta.env.VITE_STREAM_DEBUG
 </script>
+
+<style lang="scss">
+.software-streaming-directions {
+  overflow-x: auto;
+
+  img {
+    max-width: 100%;
+  }
+}
+</style>

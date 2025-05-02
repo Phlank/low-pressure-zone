@@ -1,6 +1,8 @@
 <template>
   <div class="dashboard-users">
-    <Tabs v-model:value="tabValue">
+    <Tabs
+      v-model:value="tabValue"
+      scrollable>
       <TabList>
         <Tab value="users">Active</Tab>
         <Tab value="pending">Pending</Tab>

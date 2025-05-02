@@ -85,7 +85,7 @@ export const useCommunityStore = defineStore('communityStore', () => {
     await loadRelationshipsPromises[communityId]
     loadRelationshipsPromises[communityId] = undefined
   }
-  
+
   const getRelationships = (communityId: string) =>
     loadedCommunityRelationships.value[communityId] ?? []
 

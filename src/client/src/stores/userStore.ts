@@ -27,7 +27,7 @@ export const useUserStore = defineStore('userStore', () => {
     await loadUsersPromise
     loadUsersPromise = undefined
   }
-  
+
   const getUser = (id: string) => {
     return loadedUserMap.value[id]
   }
