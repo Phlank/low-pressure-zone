@@ -40,7 +40,7 @@
       src="@/assets/stream-setup-img/mixxx-broadcasting-test-3.png" />
     <p>
       After clicking on Enable Live Broadcasting, navigate to the server's
-      <a :href="streamDebug">stream debug page</a>. You should see your stream appear like so:
+      <a :href="streamStatus">stream status page</a>. You should see your stream appear like so:
     </p>
     <img
       alt="Broadcasting debug test"
@@ -65,7 +65,7 @@
 <script lang="ts" setup>
 import { Message } from 'primevue'
 
-const streamDebug = import.meta.env.VITE_STREAM_DEBUG
+const streamStatus = import.meta.env.VITE_STREAM_STATUS_URL
 </script>
 
 <style lang="scss">

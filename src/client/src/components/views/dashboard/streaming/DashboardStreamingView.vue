@@ -1,6 +1,8 @@
 <template>
   <div class="dashboard-streaming-view">
-    <Tabs v-model:value="tabValue">
+    <Tabs
+      v-model:value="tabValue"
+      scrollable>
       <TabList>
         <Tab value="dj-software">DJ software</Tab>
         <Tab value="external">Decks and mixer</Tab>

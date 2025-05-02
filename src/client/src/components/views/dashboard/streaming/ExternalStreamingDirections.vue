@@ -51,8 +51,8 @@
     </p>
     <p>
       BUTT should now show that you are successfully connected. Navigate to the
-      <a :href="streamDebug">stream debug page</a> and ensure that the stream shows up in the debug
-      view:
+      <a :href="streamStatus">stream status page</a> and ensure that the stream shows up in the
+      debug view:
     </p>
     <img
       alt="Icecast debug page"
@@ -80,7 +80,7 @@
 <script lang="ts" setup>
 import { Message } from 'primevue'
 
-const streamDebug = import.meta.env.VITE_STREAM_DEBUG
+const streamStatus = import.meta.env.VITE_STREAM_STATUS_URL
 </script>
 
 <style lang="scss">

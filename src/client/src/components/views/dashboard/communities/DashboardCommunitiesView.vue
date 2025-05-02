@@ -1,6 +1,8 @@
 <template>
   <div class="communities-dashboard">
-    <Tabs v-model:value="tabValue">
+    <Tabs
+      v-model:value="tabValue"
+      scrollable>
       <TabList>
         <Tab
           v-if="!useAuthStore().isInRole(roles.admin)"
