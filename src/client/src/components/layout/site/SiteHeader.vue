@@ -48,17 +48,17 @@ const title = import.meta.env.VITE_SITE_NAME
     gap: variables.$space-m;
   }
 
+  &__chat-button {
+    @media (width < 324px) {
+      display: none;
+    }
+  }
+
   .p-toolbar-start {
     a {
       text-decoration: none;
       color: inherit;
     }
-  }
-}
-
-button.site-header__chat-button {
-  @media (width < 324px) {
-    display: none;
   }
 }
 </style>

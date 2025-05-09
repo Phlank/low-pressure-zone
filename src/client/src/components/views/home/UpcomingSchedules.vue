@@ -3,10 +3,8 @@
     <Skeleton
       v-if="!isLoaded"
       height="250px" />
-    <Panel
-      v-else
-      :header="title"
-      class="upcoming-schedules">
+    <div v-else>
+      <h4>{{ title }}</h4>
       <div
         v-if="schedules.length === 0"
         class="upcoming-schedules__content--none">
@@ -48,13 +46,13 @@
             header="Type" />
         </DataTable>
       </div>
-    </Panel>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { formatTimeslot, getPreviousHour, hoursBetween, parseDate } from '@/utils/dateUtils'
-import { Column, DataTable, Panel, Skeleton, useToast } from 'primevue'
+import { Column, DataTable, Skeleton, useToast } from 'primevue'
 import { computed, type ComputedRef, inject, onMounted, ref, type Ref } from 'vue'
 import schedulesApi, { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
