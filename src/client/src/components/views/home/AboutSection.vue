@@ -35,6 +35,11 @@
       </p>
 
       <p>
+        We'd like to hold similar events eventually, but for now we're focusing on hosting regular
+        radio days as we get back into the swing of things.
+      </p>
+
+      <p>
         <b>
           If you would like to participate, join the Discord server by clicking the Chat button and
           make a post in the "i-want-to-stream-please" thread.
