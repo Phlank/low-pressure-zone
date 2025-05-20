@@ -23,7 +23,7 @@ import type { FieldSize } from '@/components/form/forms.ts'
 
 const props = withDefaults(
   defineProps<{
-    inputId: string
+    inputId?: string
     size?: FieldSize
     label?: string
     message?: string

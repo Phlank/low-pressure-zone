@@ -4,16 +4,23 @@
       v-if="!isLoaded"
       height="250px" />
     <div v-else>
-      <h4>{{ title }}</h4>
+      <ScheduleNavigator
+        v-if="schedules.length > 0"
+        :schedules="schedules"
+        @changeSchedule="handleChangeSchedule" />
       <div
         v-if="schedules.length === 0"
-        class="upcoming-schedules__content--none">
+        class="upcoming-schedules__content upcoming-schedules__content--none">
         No upcoming schedule to display.
       </div>
       <div
         v-else
         class="upcoming-schedules__content">
-        <div class="upcoming-schedules__content__description">{{ scheduleData?.description }}</div>
+        <div
+          v-show="scheduleData?.description"
+          class="upcoming-schedules__content__description">
+          {{ scheduleData?.description }}
+        </div>
         <DataTable
           :loading="!isLoaded"
           :value="scheduleData!.timeslots">
@@ -57,6 +64,7 @@ import { computed, type ComputedRef, inject, onMounted, ref, type Ref } from 'vu
 import schedulesApi, { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import ListItem from '@/components/data/ListItem.vue'
+import ScheduleNavigator from '@/components/controls/ScheduleNavigator.vue'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const schedules: Ref<ScheduleResponse[]> = ref([])
@@ -79,6 +87,12 @@ interface TimeslotData {
   type: string
 }
 
+const handleChangeSchedule = (newId: string) => {
+  const index = schedules.value.findIndex((s) => s.id === newId)
+  if (index === -1) return
+  scheduleIndex.value = index
+}
+
 const scheduleData: ComputedRef<ScheduleData | undefined> = computed(() => {
   if (schedules.value.length === 0) return undefined
   const schedule = schedules.value[scheduleIndex.value]
@@ -89,13 +103,6 @@ const scheduleData: ComputedRef<ScheduleData | undefined> = computed(() => {
     community: schedule.community.name,
     timeslots: mapTimeslotDisplayData(schedule)
   }
-})
-
-const title: ComputedRef<string> = computed(() => {
-  if (scheduleData.value) {
-    return `${scheduleData.value.community} - ${scheduleData.value.start.toLocaleDateString()}`
-  }
-  return 'Upcoming Schedules'
 })
 
 const mapTimeslotDisplayData = (schedule: ScheduleResponse) => {
@@ -139,7 +146,12 @@ onMounted(async () => {
 @use '@/assets/styles/variables';
 
 .upcoming-schedules {
+  width: 100%;
+
   &__content {
+    margin-top: variables.$space-m;
+    text-align: center;
+
     &__description {
       padding: variables.$space-l 0;
     }
