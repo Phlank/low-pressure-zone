@@ -78,7 +78,7 @@ const menuItems: MenuItem[] = [
     visible: true
   },
   {
-    label: 'Streaming',
+    label: 'Stream Setup',
     icon: 'pi pi-wave-pulse',
     route: '/dashboard/streaming',
     visible: true
