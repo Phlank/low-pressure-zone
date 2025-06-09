@@ -28,4 +28,6 @@ Scripts are executed on the VPS manually to deploy changes in the software to th
 
 ## Contributing
 
-For the next while, especially in the infancy of the app, I wish to be the sole site maintainer. As things stabilize, this will probably change. I hope to eventually support students in college and give them a way to contribute to OSS prior to finding work, hopefully passing forward to others some of the experiences I had with C9.
+The code is available to fork, though I haven't written any documentation for development setup. If you are interested in working on the site, please reach out to me.
+
+If you want to support me and the site maintainence, feel free to make a donation at https://coff.ee/phlank :)
