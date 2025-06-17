@@ -1,30 +1,17 @@
 using System.Text.Json;
 using LowPressureZone.Api.Models.Icecast;
+using LowPressureZone.Api.Models.Stream;
 using Shouldly;
-using IHttpClientFactory = System.Net.Http.IHttpClientFactory;
 
-namespace LowPressureZone.Api.Services;
+namespace LowPressureZone.Api.Services.Stream;
 
-public class IcecastStatusService(IHttpClientFactory clientFactory, ILogger<IcecastStatusService> logger) : IHostedService, IDisposable
+public class StreamStatusService(IHttpClientFactory clientFactory, IcecastStatusMapper mapper, ILogger<StreamStatusService> logger) : IStreamStatusService, IHostedService, IDisposable
 {
     private const string StatusEndpoint = "/status-json.xsl";
     private readonly HttpClient _client = clientFactory.CreateClient("Icecast");
     private readonly Lock _statusLock = new();
     private readonly PeriodicTimer _timer = new(TimeSpan.FromSeconds(10));
     private IcecastStatusRaw? _icecastStatus;
-
-    public IcecastStatusRaw? Status
-    {
-        get
-        {
-            lock (_statusLock)
-            {
-                return _icecastStatus;
-            }
-        }
-    }
-
-    public bool IsStarted { get; private set; }
 
     public void Dispose()
     {
@@ -46,6 +33,25 @@ public class IcecastStatusService(IHttpClientFactory clientFactory, ILogger<Icec
         return Task.CompletedTask;
     }
 
+    public StreamStatus? Status
+    {
+        get
+        {
+            lock (_statusLock)
+            {
+                return mapper.FromEntity(_icecastStatus);
+            }
+        }
+    }
+
+    public bool IsStarted { get; private set; }
+
+    private async Task ContinuallyRefreshStatusAsync()
+    {
+        while (await _timer.WaitForNextTickAsync() && IsStarted)
+            await RefreshStatusAsync();
+    }
+
     // Sets the status.
     // If the icecast server is offline, then this service will retain the last held data.
     // An IcecastStatusRaw instance becomes stale 30 seconds after it is created.
@@ -56,7 +62,7 @@ public class IcecastStatusService(IHttpClientFactory clientFactory, ILogger<Icec
             var result = await _client.GetAsync(StatusEndpoint);
             if (!result.IsSuccessStatusCode)
             {
-                logger.LogWarning($"{nameof(IcecastStatusService)}: Unable to retrieve status from Icecast service | {{Status}} | {{Reason}}", result.StatusCode, result.ReasonPhrase);
+                logger.LogWarning($"{nameof(StreamStatusService)}: Unable to retrieve status from Icecast service | {{Status}} | {{Reason}}", result.StatusCode, result.ReasonPhrase);
                 return;
             }
             await using var contentStream = await result.Content.ReadAsStreamAsync();
@@ -83,11 +89,5 @@ public class IcecastStatusService(IHttpClientFactory clientFactory, ILogger<Icec
         {
             logger.LogError(otherException, "Unable to retrieve status from Icecast server: Unspecified exception was thrown.");
         }
-    }
-
-    private async Task ContinuallyRefreshStatusAsync()
-    {
-        while (await _timer.WaitForNextTickAsync() && IsStarted)
-            await RefreshStatusAsync();
     }
 }

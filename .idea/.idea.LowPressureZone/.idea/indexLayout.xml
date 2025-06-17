@@ -4,6 +4,7 @@
     <attachedFolders>
       <Path>.github</Path>
       <Path>src/client</Path>
+      <Path>tools</Path>
     </attachedFolders>
     <explicitIncludes />
     <explicitExcludes />

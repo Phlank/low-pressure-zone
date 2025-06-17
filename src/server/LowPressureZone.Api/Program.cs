@@ -9,6 +9,7 @@ using Minerals.StringCases;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.Configure<AzuraCastOptions>(builder.Configuration.GetSection(AzuraCastOptions.Name));
 builder.Services.Configure<EmailServiceOptions>(builder.Configuration.GetSection(EmailServiceOptions.Name));
 builder.Services.Configure<UrlOptions>(builder.Configuration.GetSection(UrlOptions.Name));
 

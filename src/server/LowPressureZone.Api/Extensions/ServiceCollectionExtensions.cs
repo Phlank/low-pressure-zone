@@ -5,7 +5,6 @@ using FluentEmail.Mailgun;
 using LowPressureZone.Api.Authentication;
 using LowPressureZone.Api.Endpoints.Communities;
 using LowPressureZone.Api.Endpoints.Communities.Relationships;
-using LowPressureZone.Api.Endpoints.Icecast.Status;
 using LowPressureZone.Api.Endpoints.Performers;
 using LowPressureZone.Api.Endpoints.Schedules;
 using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
@@ -13,6 +12,7 @@ using LowPressureZone.Api.Endpoints.Users.Invites;
 using LowPressureZone.Api.Models.Options;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services;
+using LowPressureZone.Api.Services.Stream;
 using LowPressureZone.Domain;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;
@@ -148,6 +148,12 @@ public static class ServiceCollectionExtensions
             httpClient.BaseAddress = serviceProvider.GetRequiredService<IOptions<UrlOptions>>().Value.IcecastUrl;
             httpClient.Timeout = TimeSpan.FromSeconds(10);
         });
-        services.AddSingleton<IcecastStatusService>();
+        services.AddHttpClient("AzuraCast", (serviceProvider, httpClient) =>
+        {
+            httpClient.BaseAddress = serviceProvider.GetRequiredService<IOptions<AzuraCastOptions>>().Value.ApiUrl;
+            httpClient.DefaultRequestHeaders.Add("X-API-Key", serviceProvider.GetRequiredService<IOptions<AzuraCastOptions>>().Value.ApiKey);
+            httpClient.Timeout = TimeSpan.FromSeconds(10);
+        });
+        services.AddSingleton<StreamStatusService>();
     }
 }
