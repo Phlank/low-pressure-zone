@@ -1,12 +1,12 @@
 import { sendGet } from '@/api/fetchFunctions.ts'
 
-const route = '/icecast'
+const route = '/stream'
 
 export default {
-  getStatus: () => sendGet<IcecastStatusResponse>(`${route}/status`)
+  getStatus: () => sendGet<StreamStatusResponse>(`${route}/status`)
 }
 
-export interface IcecastStatusResponse {
+export interface StreamStatusResponse {
   isOnline: boolean
   isLive: boolean
   isStatusStale: boolean

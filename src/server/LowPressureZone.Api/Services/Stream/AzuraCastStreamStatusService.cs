@@ -9,7 +9,7 @@ public class AzuraCastStreamStatusService(AzuraCastClient client,
     : IStreamStatusService, IDisposable
 {
     private readonly Lock _statusLock = new();
-    private readonly PeriodicTimer _timer = new(TimeSpan.FromSeconds(10));
+    private readonly PeriodicTimer _timer = new(TimeSpan.FromSeconds(4));
 
     public void Dispose()
     {
@@ -52,10 +52,18 @@ public class AzuraCastStreamStatusService(AzuraCastClient client,
                 return;
             }
             var content = result.Data;
-            if (content is null) return;
+            if (content is null)
+                return;
+
             var name = content.NowPlaying?.Song.Artist ?? "Unknown";
+
+            if (content.NowPlaying?.Song.Title == "Live")
+                content.NowPlaying.Song.Title = null;
+
             if (content.NowPlaying?.Song.Title is not null)
                 name += $" - {content.NowPlaying.Song.Title}";
+
+            name = name.Trim(['-', ' ']);
 
             lock (_statusLock)
             {

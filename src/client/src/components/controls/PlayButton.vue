@@ -1,30 +1,28 @@
 <template>
   <Button
     :disabled="!isPlayable"
-    :icon="controlIcon"
-    :label="controlLabel"
     class="play-button"
     rounded
     size="large"
     @click="togglePlaying">
-    <template #icon>
-      <ProgressSpinner
-        v-if="isLoading || isWaitingForNextDj"
-        animationDuration="1s"
-        aria-label="Custom ProgressSpinner"
-        fill="transparent"
-        strokeWidth="6"
-        style="width: 18px; height: 18px" />
-    </template>
+    <div class="play-button__content">
+      <div class="play-button__content__icon">
+        <span :class="controlIcon"></span>
+      </div>
+      <div class="play-button__content__text-area">
+        <div class="play-button__content__text-area__status">{{ loadingText }}</div>
+        <div class="play-button__content__text-area__now-playing">{{ streamStatus?.name }}</div>
+      </div>
+    </div>
   </Button>
 </template>
 
 <script lang="ts" setup>
-import { Button, ProgressSpinner, useToast } from 'primevue'
+import { Button, useToast } from 'primevue'
 import { computed, type ComputedRef, onMounted, type Ref, ref, watch } from 'vue'
 import delay from '@/utils/delay.ts'
 import { noStatsToast } from '@/constants/toasts.ts'
-import icecastApi, { type IcecastStatusResponse } from '@/api/resources/icecastApi.ts'
+import streamApi, { type StreamStatusResponse } from '@/api/resources/streamApi.ts'
 
 const toast = useToast()
 
@@ -38,12 +36,17 @@ const nobodyDjText = 'Nobody'
 const djName: Ref<string> = ref(nobodyDjText)
 const playState: Ref<PlayState> = ref(PlayState.Paused)
 const isLoading: Ref<boolean> = ref(false)
-const isWaitingForNextDj: Ref<boolean> = ref(false)
-const icecastStatus: Ref<IcecastStatusResponse | undefined> = ref(undefined)
+const streamStatus: Ref<StreamStatusResponse | undefined> = ref(undefined)
 let audio: HTMLAudioElement | undefined = undefined
 let audioAbortController = new AbortController()
 
 const isPlayable: ComputedRef<boolean> = computed(() => djName.value !== nobodyDjText)
+
+const loadingText = computed(() => {
+  if (streamStatus.value?.isLive === undefined) return 'Loading...'
+  if (streamStatus.value?.isLive) return 'Live'
+  return 'Offline'
+})
 
 window.addEventListener('beforeunload', () => {
   if (audio !== undefined) {
@@ -68,7 +71,7 @@ const startAudio = () => {
   isLoading.value = true
   console.log('startAudio: isLoading.value = true')
   audioAbortController = new AbortController()
-  audio = new Audio(import.meta.env.VITE_LISTEN_URL)
+  audio = new Audio(streamStatus.value?.listenUrl ?? '')
   audio.preload = 'metadata'
   addAudioEventListeners()
   audio.play()
@@ -153,26 +156,26 @@ const pollStreamMetadata = async () => {
   // noinspection InfiniteLoopJS
   while (true) {
     try {
-      const response = await icecastApi.getStatus()
+      const response = await streamApi.getStatus()
       if (response.isSuccess()) {
-        icecastStatus.value = response.data()
+        streamStatus.value = response.data()
       }
     } catch (error: unknown) {
       toast.add(noStatsToast)
       console.log(JSON.stringify(error))
     } finally {
-      await delay(10000)
+      await delay(5000)
     }
   }
 }
 
-watch(icecastStatus, (newStatus, oldStatus) => {
+watch(streamStatus, (newStatus, oldStatus) => {
   if (newStatus === undefined) return
-  if (newStatus.isLive) {
+  if (newStatus.isOnline) {
     if (djName.value === nextDjWaitText) {
       startAudio()
     }
-    djName.value = newStatus.name ?? 'Unspecified'
+    djName.value = newStatus.name ?? 'Unknown'
     return
   }
 
@@ -201,12 +204,46 @@ const controlIcon = computed(() => {
   }
   return 'pi pi-pause'
 })
-
-const controlLabel = computed(() => `${djName.value}`)
 </script>
 
 <style lang="scss">
+@use '@/assets/styles/variables';
+
 .play-button {
-  width: fit-content;
+  max-width: min(350px, calc(100dvh - 2 * #{variables.$space-l}));
+
+  &__content {
+    overflow: hidden;
+    display: flex;
+    width: 100%;
+
+    &__icon {
+      margin: auto 0;
+
+      .pi {
+        font-size: large;
+        vertical-align: middle;
+      }
+    }
+
+    &__text-area {
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+      margin-left: 10px;
+      width: 100%;
+
+      &__status {
+        font-size: small;
+      }
+
+      &__now-playing {
+        font-size: medium;
+        text-align: left;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+    }
+  }
 }
 </style>
