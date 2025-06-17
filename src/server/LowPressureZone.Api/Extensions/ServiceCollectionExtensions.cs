@@ -3,6 +3,7 @@ using FastEndpoints.Swagger;
 using FluentEmail.Core.Interfaces;
 using FluentEmail.Mailgun;
 using LowPressureZone.Api.Authentication;
+using LowPressureZone.Api.Clients;
 using LowPressureZone.Api.Endpoints.Communities;
 using LowPressureZone.Api.Endpoints.Communities.Relationships;
 using LowPressureZone.Api.Endpoints.Performers;
@@ -154,6 +155,7 @@ public static class ServiceCollectionExtensions
             httpClient.DefaultRequestHeaders.Add("X-API-Key", serviceProvider.GetRequiredService<IOptions<AzuraCastOptions>>().Value.ApiKey);
             httpClient.Timeout = TimeSpan.FromSeconds(10);
         });
-        services.AddSingleton<StreamStatusService>();
+        services.AddSingleton<AzuraCastClient>();
+        services.AddSingleton<IStreamStatusService, AzuraCastStreamStatusService>();
     }
 }

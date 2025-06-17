@@ -1,7 +1,7 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Models.Stream;
 
-namespace LowPressureZone.Api.Endpoints.Icecast.Status;
+namespace LowPressureZone.Api.Endpoints.Stream.Status;
 
 public class StreamStatusMapper : IResponseMapper
 {

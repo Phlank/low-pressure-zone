@@ -2,7 +2,7 @@
 
 namespace LowPressureZone.Api.Services.Stream;
 
-public interface IStreamStatusService
+public interface IStreamStatusService : IHostedService
 {
     StreamStatus? Status { get; }
     bool IsStarted { get; }

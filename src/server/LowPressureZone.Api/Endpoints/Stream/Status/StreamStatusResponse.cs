@@ -1,4 +1,4 @@
-﻿namespace LowPressureZone.Api.Endpoints.Icecast.Status;
+﻿namespace LowPressureZone.Api.Endpoints.Stream.Status;
 
 public class StreamStatusResponse
 {

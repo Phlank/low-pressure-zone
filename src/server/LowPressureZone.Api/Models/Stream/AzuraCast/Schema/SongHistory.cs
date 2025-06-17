@@ -5,7 +5,7 @@ namespace LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
 public record SongHistory
 {
     [JsonPropertyName("sh_id")]
-    public required string ShId { get; set; }
+    public required int ShId { get; set; }
 
     [JsonPropertyName("played_at")]
     public int PlayedAt { get; set; }

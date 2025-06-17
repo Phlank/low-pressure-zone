@@ -5,7 +5,7 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Services.Stream;
 
-public class StreamStatusService(IHttpClientFactory clientFactory, IcecastStatusMapper mapper, ILogger<StreamStatusService> logger) : IStreamStatusService, IHostedService, IDisposable
+public class IcecastStatusService(IHttpClientFactory clientFactory, IcecastStatusMapper mapper, ILogger<IcecastStatusService> logger) : IStreamStatusService, IHostedService, IDisposable
 {
     private const string StatusEndpoint = "/status-json.xsl";
     private readonly HttpClient _client = clientFactory.CreateClient("Icecast");
@@ -62,7 +62,7 @@ public class StreamStatusService(IHttpClientFactory clientFactory, IcecastStatus
             var result = await _client.GetAsync(StatusEndpoint);
             if (!result.IsSuccessStatusCode)
             {
-                logger.LogWarning($"{nameof(StreamStatusService)}: Unable to retrieve status from Icecast service | {{Status}} | {{Reason}}", result.StatusCode, result.ReasonPhrase);
+                logger.LogWarning($"{nameof(IcecastStatusService)}: Unable to retrieve status from Icecast service | {{Status}} | {{Reason}}", result.StatusCode, result.ReasonPhrase);
                 return;
             }
             await using var contentStream = await result.Content.ReadAsStreamAsync();
