@@ -11,7 +11,11 @@
       </div>
       <div class="play-button__content__text-area">
         <div class="play-button__content__text-area__status">{{ loadingText }}</div>
-        <div class="play-button__content__text-area__now-playing">{{ streamStatus?.name }}</div>
+        <div class="play-button__content__text-area__now-playing">
+          <div class="play-button__content__text-area__now-playing__text">
+            {{ streamStatus?.name }}
+          </div>
+        </div>
       </div>
     </div>
   </Button>
@@ -59,17 +63,20 @@ const stopAudio = () => {
     if (audio !== undefined) {
       audio.pause()
       audioAbortController.abort()
-      audio.src = ''
+      try {
+        audio.src = '' // This will always fail (on purpose), so catch it and ignore it.
+      } catch (e) {
+        console.log(e)
+      }
       audio = undefined
     }
   } catch (error) {
-    console.log(error)
+    console.log(JSON.stringify(error))
   }
 }
 
 const startAudio = () => {
   isLoading.value = true
-  console.log('startAudio: isLoading.value = true')
   audioAbortController = new AbortController()
   audio = new Audio(streamStatus.value?.listenUrl ?? '')
   audio.preload = 'metadata'
@@ -110,7 +117,6 @@ const addAudioEventListeners = () => {
 const handleCanPlay = () => {
   if (playState.value === PlayState.Playing) {
     isLoading.value = false
-    console.log('startAudio: isLoading.value = true')
   }
 }
 
@@ -200,28 +206,63 @@ watch(streamStatus, (newStatus, oldStatus) => {
 
 const controlIcon = computed(() => {
   if (playState.value === PlayState.Paused) {
-    return 'pi pi-play'
+    return 'pi pi-play-circle'
   }
-  return 'pi pi-pause'
+  return 'pi pi-pause-circle'
+})
+
+const textWidth = computed(() => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const updateHook = streamStatus.value?.name ?? '' // Force width update on status change
+  return (
+    document
+      .getElementsByClassName('play-button__content__text-area__now-playing')[0]
+      .getBoundingClientRect().width + 'px'
+  )
+})
+
+const textTranslateAmount = computed(() => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const updateHook = streamStatus.value?.name ?? '' // Force width update on status change
+  const translateAmount =
+    -(
+      document
+        .getElementsByClassName('play-button__content__text-area__now-playing')[0]
+        .getBoundingClientRect().width -
+      350 +
+      32 +
+      30 +
+      10
+    ) +
+    'px' +
+    ' 0'
+  console.log(translateAmount)
+  return translateAmount
 })
 </script>
 
 <style lang="scss">
 @use '@/assets/styles/variables';
 
+$text-width: v-bind(textWidth);
+$text-translate-amount: v-bind(textTranslateAmount);
+
 .play-button {
-  max-width: min(350px, calc(100dvh - 2 * #{variables.$space-l}));
+  width: min(
+    350px,
+    calc(100dvw - 2 * #{variables.$space-l}),
+    calc(30px + 32px + 10px + #{$text-width})
+  );
 
   &__content {
     overflow: hidden;
     display: flex;
-    width: 100%;
 
     &__icon {
       margin: auto 0;
 
       .pi {
-        font-size: large;
+        font-size: 2rem;
         vertical-align: middle;
       }
     }
@@ -242,6 +283,31 @@ const controlIcon = computed(() => {
         text-align: left;
         overflow: hidden;
         white-space: nowrap;
+
+        &__text {
+          animation-name: slide;
+          animation-duration: 20s;
+          animation-timing-function: linear;
+          animation-iteration-count: infinite;
+
+          @keyframes slide {
+            0% {
+              translate: 0 0;
+            }
+            25% {
+              translate: 0 0;
+            }
+            50% {
+              translate: $text-translate-amount;
+            }
+            75% {
+              translate: $text-translate-amount;
+            }
+            100% {
+              translate: 0 0;
+            }
+          }
+        }
       }
     }
   }
