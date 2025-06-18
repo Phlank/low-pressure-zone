@@ -224,20 +224,23 @@ const textWidth = computed(() => {
 const textTranslateAmount = computed(() => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const updateHook = streamStatus.value?.name ?? '' // Force width update on status change
-  const translateAmount =
-    -(
-      document
-        .getElementsByClassName('play-button__content__text-area__now-playing')[0]
-        .getBoundingClientRect().width -
-      350 +
-      32 +
-      30 +
-      10
-    ) +
-    'px' +
-    ' 0'
-  console.log(translateAmount)
-  return translateAmount
+  return -(
+    document
+      .getElementsByClassName('play-button__content__text-area__now-playing')[0]
+      .getBoundingClientRect().width -
+    350 +
+    32 +
+    30 +
+    10
+  )
+})
+
+const textTranslateAmountProperty = computed(() => {
+  return textTranslateAmount.value + 'px 0'
+})
+
+const textScrollAnimationDuration = computed(() => {
+  return (4 * -textTranslateAmount.value) / 50 + 's'
 })
 </script>
 
@@ -245,7 +248,7 @@ const textTranslateAmount = computed(() => {
 @use '@/assets/styles/variables';
 
 $text-width: v-bind(textWidth);
-$text-translate-amount: v-bind(textTranslateAmount);
+$text-translate-amount: v-bind(textTranslateAmountProperty);
 
 .play-button {
   width: min(
@@ -286,7 +289,7 @@ $text-translate-amount: v-bind(textTranslateAmount);
 
         &__text {
           animation-name: slide;
-          animation-duration: 20s;
+          animation-duration: v-bind(textScrollAnimationDuration);
           animation-timing-function: linear;
           animation-iteration-count: infinite;
 
