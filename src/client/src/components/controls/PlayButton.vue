@@ -206,9 +206,9 @@ watch(streamStatus, (newStatus, oldStatus) => {
 
 const controlIcon = computed(() => {
   if (playState.value === PlayState.Paused) {
-    return 'pi pi-play-circle'
+    return 'pi pi-play'
   }
-  return 'pi pi-pause-circle'
+  return 'pi pi-pause'
 })
 
 const textWidth = computed(() => {
@@ -221,6 +221,12 @@ const textWidth = computed(() => {
   )
 })
 
+const buttonWidth = computed(() => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const updateHook = streamStatus.value?.name ?? '' // Force width update on status change
+  return document.getElementsByClassName('play-button')[0].getBoundingClientRect().width
+})
+
 const textTranslateAmount = computed(() => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const updateHook = streamStatus.value?.name ?? '' // Force width update on status change
@@ -228,7 +234,7 @@ const textTranslateAmount = computed(() => {
     document
       .getElementsByClassName('play-button__content__text-area__now-playing')[0]
       .getBoundingClientRect().width -
-    350 +
+    buttonWidth.value +
     32 +
     30 +
     10
@@ -265,7 +271,7 @@ $text-translate-amount: v-bind(textTranslateAmountProperty);
       margin: auto 0;
 
       .pi {
-        font-size: 2rem;
+        font-size: 1.25rem;
         vertical-align: middle;
       }
     }
