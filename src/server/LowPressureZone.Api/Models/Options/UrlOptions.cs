@@ -6,5 +6,4 @@ public class UrlOptions
 
     public required Uri RegisterUrl { get; set; }
     public required Uri ResetPasswordUrl { get; set; }
-    public required Uri IcecastUrl { get; set; }
 }

@@ -1,0 +1,11 @@
+﻿namespace LowPressureZone.Api.Endpoints.Stream.Status;
+
+public class StreamStatusResponse
+{
+    public required bool IsOnline { get; set; }
+    public required bool IsLive { get; set; }
+    public required bool IsStatusStale { get; set; }
+    public string? Name { get; set; }
+    public string? Type { get; set; }
+    public string? ListenUrl { get; set; }
+}

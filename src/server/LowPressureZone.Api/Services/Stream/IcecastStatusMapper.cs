@@ -1,11 +1,11 @@
-﻿using FastEndpoints;
-using LowPressureZone.Api.Models.Icecast;
+﻿using LowPressureZone.Api.Models.Icecast;
+using LowPressureZone.Api.Models.Stream;
 
-namespace LowPressureZone.Api.Endpoints.Icecast.Status;
+namespace LowPressureZone.Api.Services.Stream;
 
-public class IcecastStatusMapper : IResponseMapper
+public class IcecastStatusMapper
 {
-    private static readonly IcecastStatusResponse OfflineResponse = new()
+    private static readonly StreamStatus Offline = new()
     {
         IsOnline = false,
         IsLive = false,
@@ -15,7 +15,7 @@ public class IcecastStatusMapper : IResponseMapper
         ListenUrl = null
     };
 
-    private static readonly IcecastStatusResponse NotLiveResponse = new()
+    private static readonly StreamStatus NotLive = new()
     {
         IsOnline = true,
         IsLive = false,
@@ -25,14 +25,14 @@ public class IcecastStatusMapper : IResponseMapper
         ListenUrl = null
     };
 
-    public IcecastStatusResponse FromEntity(IcecastStatusRaw? entity)
+    public StreamStatus FromEntity(IcecastStatusRaw? entity)
     {
-        if (entity is null || entity.IsStale) return OfflineResponse;
+        if (entity is null || entity.IsStale) return Offline;
 
         var liveSource = entity.Sources.FirstOrDefault(source => source.ListenUrl.EndsWith("/live", StringComparison.OrdinalIgnoreCase));
-        if (liveSource is null) return NotLiveResponse;
+        if (liveSource is null) return NotLive;
 
-        return new IcecastStatusResponse
+        return new StreamStatus
         {
             IsOnline = true,
             IsLive = true,

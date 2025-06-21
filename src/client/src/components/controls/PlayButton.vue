@@ -1,30 +1,34 @@
 <template>
   <Button
+    ref="buttonElement"
     :disabled="!isPlayable"
-    :icon="controlIcon"
-    :label="controlLabel"
     class="play-button"
     rounded
     size="large"
     @click="togglePlaying">
-    <template #icon>
-      <ProgressSpinner
-        v-if="isLoading || isWaitingForNextDj"
-        animationDuration="1s"
-        aria-label="Custom ProgressSpinner"
-        fill="transparent"
-        strokeWidth="6"
-        style="width: 18px; height: 18px" />
-    </template>
+    <div class="play-button__content">
+      <div class="play-button__content__icon">
+        <span :class="controlIcon"></span>
+      </div>
+      <div class="play-button__content__text-area">
+        <div class="play-button__content__text-area__status">{{ loadingText }}</div>
+        <div class="play-button__content__text-area__now-playing">
+          <div class="play-button__content__text-area__now-playing__text">
+            {{ streamStatus?.name }}
+          </div>
+        </div>
+      </div>
+    </div>
   </Button>
 </template>
 
 <script lang="ts" setup>
-import { Button, ProgressSpinner, useToast } from 'primevue'
+import { Button, useToast } from 'primevue'
 import { computed, type ComputedRef, onMounted, type Ref, ref, watch } from 'vue'
 import delay from '@/utils/delay.ts'
-import { noStatsToast } from '@/constants/toasts.ts'
-import icecastApi, { type IcecastStatusResponse } from '@/api/resources/icecastApi.ts'
+import streamApi, { type StreamStatusResponse } from '@/api/resources/streamApi.ts'
+import clamp from '@/utils/clamp.ts'
+import { useResizeObserver } from '@vueuse/core'
 
 const toast = useToast()
 
@@ -33,17 +37,22 @@ enum PlayState {
   Paused
 }
 
-const nextDjWaitText = 'Waiting for next DJ...'
+const disconnectedWaitText = 'Disconnected. Attempting to reconnect...'
 const nobodyDjText = 'Nobody'
-const djName: Ref<string> = ref(nobodyDjText)
+const streamName: Ref<string> = ref(nobodyDjText)
 const playState: Ref<PlayState> = ref(PlayState.Paused)
 const isLoading: Ref<boolean> = ref(false)
-const isWaitingForNextDj: Ref<boolean> = ref(false)
-const icecastStatus: Ref<IcecastStatusResponse | undefined> = ref(undefined)
+const streamStatus: Ref<StreamStatusResponse | undefined> = ref(undefined)
 let audio: HTMLAudioElement | undefined = undefined
 let audioAbortController = new AbortController()
 
-const isPlayable: ComputedRef<boolean> = computed(() => djName.value !== nobodyDjText)
+const isPlayable: ComputedRef<boolean> = computed(() => streamName.value !== nobodyDjText)
+
+const loadingText = computed(() => {
+  if (streamStatus.value?.isLive === undefined) return 'Loading...'
+  if (streamStatus.value?.isLive) return 'Live'
+  return 'Offline'
+})
 
 window.addEventListener('beforeunload', () => {
   if (audio !== undefined) {
@@ -56,19 +65,22 @@ const stopAudio = () => {
     if (audio !== undefined) {
       audio.pause()
       audioAbortController.abort()
-      audio.src = ''
+      try {
+        audio.src = '' // This will always fail (on purpose), so catch it and ignore it.
+      } catch (e) {
+        console.log(e)
+      }
       audio = undefined
     }
   } catch (error) {
-    console.log(error)
+    console.log(JSON.stringify(error))
   }
 }
 
 const startAudio = () => {
   isLoading.value = true
-  console.log('startAudio: isLoading.value = true')
   audioAbortController = new AbortController()
-  audio = new Audio(import.meta.env.VITE_LISTEN_URL)
+  audio = new Audio(streamStatus.value?.listenUrl ?? '')
   audio.preload = 'metadata'
   addAudioEventListeners()
   audio.play()
@@ -107,7 +119,6 @@ const addAudioEventListeners = () => {
 const handleCanPlay = () => {
   if (playState.value === PlayState.Playing) {
     isLoading.value = false
-    console.log('startAudio: isLoading.value = true')
   }
 }
 
@@ -116,16 +127,16 @@ const handlePlay = () => {
 }
 
 const handleEnded = () => {
-  waitForNextDj()
+  waitForReconnect()
 }
 
-const waitForNextDj = () => {
-  djName.value = nextDjWaitText
+const waitForReconnect = () => {
+  streamName.value = disconnectedWaitText
   stopAudio()
 }
 
 const setNobodyPlaying = () => {
-  djName.value = nobodyDjText
+  streamName.value = nobodyDjText
   isLoading.value = false
   playState.value = PlayState.Paused
 }
@@ -142,7 +153,7 @@ const handleError = () => {
     severity: 'error',
     life: 7000
   })
-  waitForNextDj()
+  waitForReconnect()
 }
 
 onMounted(() => {
@@ -153,60 +164,139 @@ const pollStreamMetadata = async () => {
   // noinspection InfiniteLoopJS
   while (true) {
     try {
-      const response = await icecastApi.getStatus()
+      const response = await streamApi.getStatus()
       if (response.isSuccess()) {
-        icecastStatus.value = response.data()
+        updateStatus(response?.data())
       }
     } catch (error: unknown) {
-      toast.add(noStatsToast)
       console.log(JSON.stringify(error))
     } finally {
-      await delay(10000)
+      await delay(5000)
     }
   }
 }
 
-watch(icecastStatus, (newStatus, oldStatus) => {
-  if (newStatus === undefined) return
-  if (newStatus.isLive) {
-    if (djName.value === nextDjWaitText) {
-      startAudio()
+const updateStatus = (newStatus: StreamStatusResponse) => {
+  if (
+    newStatus.isLive !== streamStatus.value?.isLive ||
+    newStatus.isOnline !== streamStatus.value?.isOnline ||
+    (newStatus.name ?? 'Unknown') !== streamStatus.value?.name ||
+    newStatus.listenUrl !== streamStatus.value?.listenUrl ||
+    newStatus.isStatusStale !== streamStatus.value?.isStatusStale ||
+    newStatus.type !== streamStatus.value?.type
+  ) {
+    streamStatus.value = newStatus
+    if (!newStatus.isOnline) {
+      newStatus.name = disconnectedWaitText
     }
-    djName.value = newStatus.name ?? 'Unspecified'
-    return
+    streamName.value = streamStatus.value?.name ?? 'Unknown'
+    setTimeout(() => updateTextScrollingBehavior(), 50)
   }
-
-  if (newStatus.isOnline) {
-    if (playState.value === PlayState.Playing) {
-      waitForNextDj()
-    } else {
-      setNobodyPlaying()
-    }
-    return
-  }
-
-  if (newStatus.isStatusStale && (oldStatus === undefined || !oldStatus.isStatusStale)) {
-    toast.add({
-      summary: 'Issue loading stream information',
-      detail: 'No new stream information has been retrieved in 30s. Check the stream status page.',
-      severity: 'warning',
-      life: 7000
-    })
-  }
-})
+}
 
 const controlIcon = computed(() => {
   if (playState.value === PlayState.Paused) {
-    return 'pi pi-play'
+    return 'pi pi-play-circle'
   }
-  return 'pi pi-pause'
+  return 'pi pi-pause-circle'
 })
 
-const controlLabel = computed(() => `${djName.value}`)
+const textWidth = ref(0)
+const textWidthPx = computed(() => Math.round(textWidth.value) + 'px')
+const buttonWidth = ref(0)
+const buttonPadding = 30
+const playIconWidth = 28
+const centerMargin = 10
+const textTranslateWidth = ref(0)
+const textTranslateWidthPx = computed(() => Math.round(textTranslateWidth.value) + 'px')
+const textScrollAnimationDuration = computed(() => (4 * -textTranslateWidth.value) / 50 + 's')
+
+const buttonElement = ref(null)
+useResizeObserver(buttonElement, () => updateTextScrollingBehavior())
+
+const updateTextScrollingBehavior = () => {
+  textWidth.value = document
+    .getElementsByClassName('play-button__content__text-area__now-playing')[0]
+    .getBoundingClientRect().width
+  buttonWidth.value = document
+    .getElementsByClassName('play-button')[0]
+    .getBoundingClientRect().width
+  textTranslateWidth.value = -clamp(
+    textWidth.value - buttonWidth.value + buttonPadding + playIconWidth + centerMargin,
+    0
+  )
+}
 </script>
 
 <style lang="scss">
+@use '@/assets/styles/variables';
+
+$text-width: v-bind(textWidthPx);
+$text-translate-amount: v-bind(textTranslateWidthPx);
+
 .play-button {
-  width: fit-content;
+  width: min(
+    350px,
+    calc(100dvw - 2 * #{variables.$space-l}),
+    calc(30px + 28px + 10px + #{$text-width})
+  );
+
+  &__content {
+    overflow: hidden;
+    display: flex;
+
+    &__icon {
+      margin: auto 0;
+
+      .pi {
+        font-size: 1.75rem;
+        vertical-align: middle;
+      }
+    }
+
+    &__text-area {
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+      margin-left: 10px;
+      width: 100%;
+
+      &__status {
+        font-size: small;
+      }
+
+      &__now-playing {
+        font-size: medium;
+        text-align: left;
+        overflow: hidden;
+        white-space: nowrap;
+
+        &__text {
+          animation-name: slide;
+          animation-duration: v-bind(textScrollAnimationDuration);
+          animation-timing-function: linear;
+          animation-iteration-count: infinite;
+
+          @keyframes slide {
+            0% {
+              translate: 0 0;
+            }
+            25% {
+              translate: 0 0;
+            }
+            50% {
+              translate: $text-translate-amount;
+            }
+            75% {
+              translate: $text-translate-amount;
+            }
+            100% {
+              translate: 0 0;
+            }
+          }
+        }
+      }
+    }
+  }
 }
 </style>
