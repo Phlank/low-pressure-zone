@@ -1,5 +1,6 @@
 <template>
   <Button
+    ref="buttonElement"
     :disabled="!isPlayable"
     class="play-button"
     rounded
@@ -25,8 +26,9 @@
 import { Button, useToast } from 'primevue'
 import { computed, type ComputedRef, onMounted, type Ref, ref, watch } from 'vue'
 import delay from '@/utils/delay.ts'
-import { noStatsToast } from '@/constants/toasts.ts'
 import streamApi, { type StreamStatusResponse } from '@/api/resources/streamApi.ts'
+import clamp from '@/utils/clamp.ts'
+import { useResizeObserver } from '@vueuse/core'
 
 const toast = useToast()
 
@@ -35,16 +37,16 @@ enum PlayState {
   Paused
 }
 
-const nextDjWaitText = 'Waiting for next DJ...'
+const disconnectedWaitText = 'Disconnected. Attempting to reconnect...'
 const nobodyDjText = 'Nobody'
-const djName: Ref<string> = ref(nobodyDjText)
+const streamName: Ref<string> = ref(nobodyDjText)
 const playState: Ref<PlayState> = ref(PlayState.Paused)
 const isLoading: Ref<boolean> = ref(false)
 const streamStatus: Ref<StreamStatusResponse | undefined> = ref(undefined)
 let audio: HTMLAudioElement | undefined = undefined
 let audioAbortController = new AbortController()
 
-const isPlayable: ComputedRef<boolean> = computed(() => djName.value !== nobodyDjText)
+const isPlayable: ComputedRef<boolean> = computed(() => streamName.value !== nobodyDjText)
 
 const loadingText = computed(() => {
   if (streamStatus.value?.isLive === undefined) return 'Loading...'
@@ -125,16 +127,16 @@ const handlePlay = () => {
 }
 
 const handleEnded = () => {
-  waitForNextDj()
+  waitForReconnect()
 }
 
-const waitForNextDj = () => {
-  djName.value = nextDjWaitText
+const waitForReconnect = () => {
+  streamName.value = disconnectedWaitText
   stopAudio()
 }
 
 const setNobodyPlaying = () => {
-  djName.value = nobodyDjText
+  streamName.value = nobodyDjText
   isLoading.value = false
   playState.value = PlayState.Paused
 }
@@ -151,7 +153,7 @@ const handleError = () => {
     severity: 'error',
     life: 7000
   })
-  waitForNextDj()
+  waitForReconnect()
 }
 
 onMounted(() => {
@@ -164,10 +166,9 @@ const pollStreamMetadata = async () => {
     try {
       const response = await streamApi.getStatus()
       if (response.isSuccess()) {
-        streamStatus.value = response.data()
+        updateStatus(response?.data())
       }
     } catch (error: unknown) {
-      toast.add(noStatsToast)
       console.log(JSON.stringify(error))
     } finally {
       await delay(5000)
@@ -175,92 +176,69 @@ const pollStreamMetadata = async () => {
   }
 }
 
-watch(streamStatus, (newStatus, oldStatus) => {
-  if (newStatus === undefined) return
-  if (newStatus.isOnline) {
-    if (djName.value === nextDjWaitText) {
-      startAudio()
+const updateStatus = (newStatus: StreamStatusResponse) => {
+  if (
+    newStatus.isLive !== streamStatus.value?.isLive ||
+    newStatus.isOnline !== streamStatus.value?.isOnline ||
+    (newStatus.name ?? 'Unknown') !== streamStatus.value?.name ||
+    newStatus.listenUrl !== streamStatus.value?.listenUrl ||
+    newStatus.isStatusStale !== streamStatus.value?.isStatusStale ||
+    newStatus.type !== streamStatus.value?.type
+  ) {
+    streamStatus.value = newStatus
+    if (!newStatus.isOnline) {
+      newStatus.name = disconnectedWaitText
     }
-    djName.value = newStatus.name ?? 'Unknown'
-    return
+    streamName.value = streamStatus.value?.name ?? 'Unknown'
+    setTimeout(() => updateTextScrollingBehavior(), 50)
   }
-
-  if (newStatus.isOnline) {
-    if (playState.value === PlayState.Playing) {
-      waitForNextDj()
-    } else {
-      setNobodyPlaying()
-    }
-    return
-  }
-
-  if (newStatus.isStatusStale && (oldStatus === undefined || !oldStatus.isStatusStale)) {
-    toast.add({
-      summary: 'Issue loading stream information',
-      detail: 'No new stream information has been retrieved in 30s. Check the stream status page.',
-      severity: 'warning',
-      life: 7000
-    })
-  }
-})
+}
 
 const controlIcon = computed(() => {
   if (playState.value === PlayState.Paused) {
-    return 'pi pi-play'
+    return 'pi pi-play-circle'
   }
-  return 'pi pi-pause'
+  return 'pi pi-pause-circle'
 })
 
-const textWidth = computed(() => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const updateHook = streamStatus.value?.name ?? '' // Force width update on status change
-  return (
-    document
-      .getElementsByClassName('play-button__content__text-area__now-playing')[0]
-      .getBoundingClientRect().width + 'px'
+const textWidth = ref(0)
+const textWidthPx = computed(() => Math.round(textWidth.value) + 'px')
+const buttonWidth = ref(0)
+const buttonPadding = 30
+const playIconWidth = 28
+const centerMargin = 10
+const textTranslateWidth = ref(0)
+const textTranslateWidthPx = computed(() => Math.round(textTranslateWidth.value) + 'px')
+const textScrollAnimationDuration = computed(() => (4 * -textTranslateWidth.value) / 50 + 's')
+
+const buttonElement = ref(null)
+useResizeObserver(buttonElement, () => updateTextScrollingBehavior())
+
+const updateTextScrollingBehavior = () => {
+  textWidth.value = document
+    .getElementsByClassName('play-button__content__text-area__now-playing')[0]
+    .getBoundingClientRect().width
+  buttonWidth.value = document
+    .getElementsByClassName('play-button')[0]
+    .getBoundingClientRect().width
+  textTranslateWidth.value = -clamp(
+    textWidth.value - buttonWidth.value + buttonPadding + playIconWidth + centerMargin,
+    0
   )
-})
-
-const buttonWidth = computed(() => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const updateHook = streamStatus.value?.name ?? '' // Force width update on status change
-  return document.getElementsByClassName('play-button')[0].getBoundingClientRect().width
-})
-
-const textTranslateAmount = computed(() => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const updateHook = streamStatus.value?.name ?? '' // Force width update on status change
-  return -(
-    document
-      .getElementsByClassName('play-button__content__text-area__now-playing')[0]
-      .getBoundingClientRect().width -
-    buttonWidth.value +
-    32 +
-    30 +
-    10
-  )
-})
-
-const textTranslateAmountProperty = computed(() => {
-  return textTranslateAmount.value + 'px 0'
-})
-
-const textScrollAnimationDuration = computed(() => {
-  return (4 * -textTranslateAmount.value) / 50 + 's'
-})
+}
 </script>
 
 <style lang="scss">
 @use '@/assets/styles/variables';
 
-$text-width: v-bind(textWidth);
-$text-translate-amount: v-bind(textTranslateAmountProperty);
+$text-width: v-bind(textWidthPx);
+$text-translate-amount: v-bind(textTranslateWidthPx);
 
 .play-button {
   width: min(
     350px,
     calc(100dvw - 2 * #{variables.$space-l}),
-    calc(30px + 32px + 10px + #{$text-width})
+    calc(30px + 28px + 10px + #{$text-width})
   );
 
   &__content {
@@ -271,7 +249,7 @@ $text-translate-amount: v-bind(textTranslateAmountProperty);
       margin: auto 0;
 
       .pi {
-        font-size: 1.25rem;
+        font-size: 1.75rem;
         vertical-align: middle;
       }
     }

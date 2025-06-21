@@ -5,7 +5,7 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Services.Stream;
 
-public class IcecastStatusService(IHttpClientFactory clientFactory, IcecastStatusMapper mapper, ILogger<IcecastStatusService> logger) : IStreamStatusService, IHostedService, IDisposable
+public class IcecastStatusService(IHttpClientFactory clientFactory, IcecastStatusMapper mapper, ILogger<IcecastStatusService> logger) : IStreamStatusService, IDisposable
 {
     private const string StatusEndpoint = "/status-json.xsl";
     private readonly HttpClient _client = clientFactory.CreateClient("Icecast");
@@ -33,7 +33,7 @@ public class IcecastStatusService(IHttpClientFactory clientFactory, IcecastStatu
         return Task.CompletedTask;
     }
 
-    public StreamStatus? Status
+    public StreamStatus Status
     {
         get
         {

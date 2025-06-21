@@ -1,4 +1,5 @@
-﻿using FastEndpoints;
+﻿using System.Text.Json;
+using FastEndpoints;
 using FastEndpoints.Swagger;
 using FluentEmail.Core.Interfaces;
 using FluentEmail.Mailgun;
@@ -146,7 +147,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<UriService>();
         services.AddHttpClient("Icecast", (serviceProvider, httpClient) =>
         {
-            httpClient.BaseAddress = serviceProvider.GetRequiredService<IOptions<UrlOptions>>().Value.IcecastUrl;
+            httpClient.BaseAddress = serviceProvider.GetRequiredService<IOptions<IcecastOptions>>().Value.IcecastUrl;
             httpClient.Timeout = TimeSpan.FromSeconds(10);
         });
         services.AddHttpClient("AzuraCast", (serviceProvider, httpClient) =>
@@ -156,6 +157,19 @@ public static class ServiceCollectionExtensions
             httpClient.Timeout = TimeSpan.FromSeconds(10);
         });
         services.AddSingleton<AzuraCastClient>();
-        services.AddSingleton<IStreamStatusService, AzuraCastStreamStatusService>();
+        services.AddSingleton<AzuraCastStreamStatusService>();
+        services.AddSingleton<IcecastStatusService>();
+        services.AddSingleton<IStreamStatusService>(serviceProvider =>
+        {
+            var options = serviceProvider.GetRequiredService<IOptions<StreamingOptions>>().Value;
+            Console.WriteLine(JsonSerializer.Serialize(options));
+            var type = options.ServerType;
+            return type switch
+            {
+                "AzuraCast" => serviceProvider.GetRequiredService<AzuraCastStreamStatusService>(),
+                "Icecast" => serviceProvider.GetRequiredService<IcecastStatusService>(),
+                _ => throw new InvalidOperationException($"Unknown streaming server type: {type}")
+            };
+        });
     }
 }
