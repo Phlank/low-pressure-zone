@@ -68,5 +68,3 @@ onMounted(async () => {
   testItems.value.push({ label: 'Stream Title Field', value: testInfo.streamTitleField })
 })
 </script>
-
-<style lang="scss" scoped></style>
