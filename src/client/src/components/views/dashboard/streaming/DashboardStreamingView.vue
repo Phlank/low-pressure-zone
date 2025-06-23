@@ -6,6 +6,7 @@
       <TabList>
         <Tab value="dj-software">DJ software</Tab>
         <Tab value="external">Decks and mixer</Tab>
+        <Tab value="info">Streaming info</Tab>
       </TabList>
       <TabPanels>
         <TabPanel value="dj-software">
@@ -13,6 +14,9 @@
         </TabPanel>
         <TabPanel value="external">
           <ExternalStreamingDirections />
+        </TabPanel>
+        <TabPanel value="info">
+          <StreamInformation />
         </TabPanel>
       </TabPanels>
     </Tabs>
@@ -24,6 +28,7 @@ import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primevue'
 import { ref, type Ref } from 'vue'
 import SoftwareStreamingDirections from '@/components/views/dashboard/streaming/SoftwareStreamingDirections.vue'
 import ExternalStreamingDirections from '@/components/views/dashboard/streaming/ExternalStreamingDirections.vue'
+import StreamInformation from '@/components/views/dashboard/streaming/StreamInformation.vue'
 
 const tabValue: Ref<string | number> = ref('dj-software')
 </script>

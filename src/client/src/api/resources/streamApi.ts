@@ -14,3 +14,13 @@ export interface StreamStatusResponse {
   type: string | null
   listenUrl: string | null
 }
+
+export interface ConnectionInformationResponse {
+  streamType: string
+  host: string
+  port: string
+  username: string
+  password: string
+  type: string
+  streamTitleField: string
+}

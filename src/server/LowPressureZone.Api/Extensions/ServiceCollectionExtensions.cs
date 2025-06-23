@@ -157,6 +157,7 @@ public static class ServiceCollectionExtensions
             httpClient.Timeout = TimeSpan.FromSeconds(10);
         });
         services.AddSingleton<AzuraCastClient>();
+        services.AddSingleton<StreamInformationService>();
         services.AddSingleton<AzuraCastStreamStatusService>();
         services.AddSingleton<IcecastStatusService>();
         services.AddSingleton<IStreamStatusService>(serviceProvider =>
