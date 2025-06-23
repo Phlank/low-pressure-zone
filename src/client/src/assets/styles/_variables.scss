@@ -10,7 +10,8 @@ $space-m: 10px;
 $space-l: 20px;
 
 $header-height: 82px;
-$footer-height: 70px;
+$play-button-height: 62px;
+$footer-height: calc(#{$play-button-height} + 24px);
 $view-min-height: calc(100dvh - #{$header-height} - #{$footer-height} - 1px);
 
 $mobile-transition-width: 760px;

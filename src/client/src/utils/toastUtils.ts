@@ -58,3 +58,12 @@ export const showApiStatusToast = (toast: ToastServiceMethods, status: number) =
     })
   }
 }
+
+export const showErrorToast = (toast: ToastServiceMethods, error: string) => {
+  toast.add({
+    severity: 'error',
+    summary: 'Error',
+    detail: error,
+    life: TOAST_DURATION
+  })
+}

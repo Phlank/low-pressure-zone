@@ -9,7 +9,7 @@ public class AzuraCastStreamStatusService(AzuraCastClient client,
     : IStreamStatusService, IDisposable
 {
     private readonly Lock _statusLock = new();
-    private readonly PeriodicTimer _timer = new(TimeSpan.FromSeconds(4));
+    private readonly PeriodicTimer _timer = new(TimeSpan.FromSeconds(5));
 
     public void Dispose()
     {
