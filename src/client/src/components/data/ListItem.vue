@@ -25,7 +25,6 @@ const emit = defineEmits<{
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  user-select: none;
   flex-wrap: nowrap;
   width: 100%;
   min-height: 4rem;

@@ -3,7 +3,9 @@ import { sendGet } from '@/api/fetchFunctions.ts'
 const route = '/stream'
 
 export default {
-  getStatus: () => sendGet<StreamStatusResponse>(`${route}/status`)
+  getStatus: () => sendGet<StreamStatusResponse>(`${route}/status`),
+  getConnectionInformation: () =>
+    sendGet<ConnectionInformationResponse[]>(`${route}/connectioninfo`)
 }
 
 export interface StreamStatusResponse {
