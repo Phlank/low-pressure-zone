@@ -26,6 +26,7 @@ import performersApi, {
   type PerformerResponse
 } from '@/api/resources/performersApi.ts'
 import { usePerformerStore } from '@/stores/performerStore.ts'
+import { useScheduleStore } from '@/stores/scheduleStore.ts'
 
 const toast = useToast()
 const performerStore = usePerformerStore()
@@ -60,6 +61,10 @@ const handleCreatePerformer = async () => {
     isEditable: true
   }
   performerStore.add(newPerformer)
+  if (performerStore.performers.length === 1) {
+    // This was their first performer, so reload the schedules
+    await useScheduleStore().loadDefaultSchedulesAsync()
+  }
   createForm.value.reset()
 }
 </script>

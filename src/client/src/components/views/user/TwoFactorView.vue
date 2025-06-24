@@ -56,6 +56,7 @@ import FormField from '@/components/form/FormField.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import { useRouter } from 'vue-router'
 import SinglePanelViewWrapper from '@/components/layout/SinglePanelViewWrapper.vue'
+import { useScheduleStore } from '@/stores/scheduleStore.ts'
 
 const router = useRouter()
 
@@ -88,6 +89,7 @@ const handleVerify = async () => {
   }
 
   await useAuthStore().load()
+  await useScheduleStore().loadDefaultSchedulesAsync()
   await router.push(props.redirect)
 }
 </script>
