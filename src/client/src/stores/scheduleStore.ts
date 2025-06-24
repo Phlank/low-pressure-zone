@@ -23,9 +23,7 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
   }
 
   const loadDefaultSchedulesAsync = async (): Promise<void> => {
-    if (loadDefaultSchedulesPromise === undefined) {
-      loadDefaultSchedulesPromise = loadDefaultSchedules()
-    }
+    loadDefaultSchedulesPromise ??= loadDefaultSchedules()
     await loadDefaultSchedulesPromise
     loadDefaultSchedulesPromise = undefined
   }
