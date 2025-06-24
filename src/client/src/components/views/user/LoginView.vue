@@ -62,6 +62,7 @@ import SinglePanelViewWrapper from '@/components/layout/SinglePanelViewWrapper.v
 import FormArea from '@/components/form/FormArea.vue'
 import FormField from '@/components/form/FormField.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
+import { useScheduleStore } from '@/stores/scheduleStore.ts'
 
 const toast = useToast()
 const router = useRouter()
@@ -92,8 +93,8 @@ const handleLogin = async () => {
 
   isSubmitting.value = true
   const response = await authApi.postLogin(formState)
-  isSubmitting.value = false
   if (!response.isSuccess()) {
+    isSubmitting.value = false
     if (response.status === 403) {
       errorMessage.value = 'Invalid credentials'
       return
@@ -107,6 +108,7 @@ const handleLogin = async () => {
   }
 
   await useAuthStore().load()
+  await useScheduleStore().loadDefaultSchedulesAsync()
   isSubmitting.value = false
   await router.push(Routes.Schedules)
 }
