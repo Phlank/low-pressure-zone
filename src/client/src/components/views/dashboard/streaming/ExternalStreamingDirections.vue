@@ -110,9 +110,13 @@
       src="@/assets/stream-setup-img/broadcasting-debug-test.png" />
     <p>
       If everything is sounding good, go ahead and stop the stream with the square button next to
-      the play button in Butt. After that, go back to settings. Click Edit on the Server settings
-      and update the information to match the Live Stream configuration below. The password is the
-      same as the test stream.
+      the play button in Butt.
+    </p>
+    <h4>Live stream settings</h4>
+    <p>
+      After that, go back to the Butt settings. Click Edit on the Server settings and update the
+      information to match the Live Stream configuration below. The password is the same as the test
+      stream.
     </p>
     <img
       alt="Set the server settings to match the live stream"
