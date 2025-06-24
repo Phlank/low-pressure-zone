@@ -1,94 +1,153 @@
 <template>
   <div class="external-streaming-directions">
+    <h4>Introduction</h4>
     <p>
       Streaming from external decks and mixer, or similar all-in-one hardware like a Numark
       Mixstream+, requires that you have a way to get audio from the output of your device into your
       computer. This could be either a USB mixer or an audio interface of some kind. I personally
-      use a Focusrite 2i4, with the two audio inputs serving as my L/R channels.
+      use a Focusrite Scarlett 2i4, with the two audio inputs serving as my L/R channels.
     </p>
     <p>
       If you don't have a way to get audio from your devices to your computer currently, you might
-      ask around in the Discord server with your setup info and look for recommendations.
+      ask around in the Discord server with your setup info and look for recommendations. If you are
+      using a proper mixer and just need RCA lines sending audio into your computer, the Behringer
+      UCA222 is a very affordable option.
     </p>
     <p>
       Assuming you have a way to get audio coming out of your setup and into your computer, you can
-      download <a href="https://danielnoethen.de/butt/">BUTT</a>. It is hands down the best, most
+      download <a href="https://danielnoethen.de/butt/">Butt</a>. It is hands down the best, most
       simple software for this.
     </p>
+    <h4>Server settings</h4>
     <p>
-      After downloading and installing BUTT, open it and click the Settings button. After this,
+      After downloading and installing Butt, open it and click the Settings button. After this,
       under Server Settings, click the Add button. In the window that appears, match the following
       setup:
     </p>
     <img
-      alt="BUTT settings"
+      alt="Butt settings"
       src="@/assets/stream-setup-img/butt-server-settings.png" />
-    <p>You will need to get the password from @phlank in the discord server.</p>
     <p>
-      Hit Add on that window, and then under Stream Infos, hit Add. This will open up another
-      window. Configure it as follows, and then click the Add button:
+      The password is
+      <kbd>{{ connectionInfoStore.liveInfo()?.password }}</kbd
+      >. Please do not share this! In the future, each performer will have their own username and
+      password for streaming, but that time hasn't arrived yet.
+    </p>
+    <h4>Stream info</h4>
+    <p>
+      Under Stream Infos, hit Add. This will open up another window. Configure it as follows, and
+      then click the Add button:
     </p>
     <img
-      alt="BUTT stream info"
+      alt="Butt stream info"
       src="@/assets/stream-setup-img/butt-stream-infos.png" />
+    <h4>Audio settings</h4>
     <p>
       Next, in the settings window, select the Audio tab. Here, under Primary Audio Device, select
       your audio input. In mine, I have my Focusrite 2i4's analog 1&2 inputs selected. Also set the
-      streaming codec here.
+      streaming codec here to MP3, and set the bitrate to either 256 or 320 kbps.
     </p>
     <img
-      alt="Shows the fields to set for the audio tab for BUTT"
+      alt="Shows the fields to set for the audio tab for Butt"
       src="@/assets/stream-setup-img/butt-audio-device.png" />
     <Message severity="warn">
       You <i>MUST</i> use MP3 for the encoding in order for all browsers to be able to listen to the
       stream. 256kbps is the minimum bitrate we will use for quality reasons.
     </Message>
+    <h4>Stream title</h4>
     <p>
-      Finally, hit the play button on the main BUTT window. Start playing, and you should see audio
-      show up in the meter. You want this to be higher, but you don't want it to be at 0 (0 = all
-      the way to the right, in the red), otherwise you'll clip. I try to get my peaks down to a
-      couple of pixels below 0.
+      Create a text file somewhere on your computer. In it, you'll write whatever title you want
+      your stream to have on the play button on the site.
+    </p>
+    <img
+      alt="Shows the contents of a text file"
+      src="@/assets/stream-setup-img/text-file.png" />
+    <p>
+      Then in Butt, go to the Stream tab. Under the "Update song name from file" area, click the
+      file folder and navigate to the text file you just created. After that, click the "Activate"
+      checkbox. This will set your stream title for live performances whenever you connect to the
+      stream.
+    </p>
+    <img
+      alt="Butt settings for the stream title"
+      src="@/assets/stream-setup-img/butt-stream-title.png" />
+    <h4>Sound check</h4>
+    <p>
+      Start playing audio. On Butt, you should see in the main window the word "idle" at the top and
+      below that, volume meters showing left and right audio levels. When audio is playing, you
+      should see the meter levels change. Stop sending audio, and the meters should show no audio.
+      If the meters show audio when you are not playing, you may have the computer microphone set as
+      the audio source.
+    </p>
+    <img
+      alt="Audio meter in Butt"
+      src="@/assets/stream-setup-img/butt-sound-check.png" />
+    <p>
+      You want this to be higher when you're playing music, but you don't want it to be at 0 (0 =
+      all the way to the right, in the red), otherwise you'll clip. I try to get my peaks down to a
+      couple of pixels below 0. A little bit of clipping won't be too noticeable though, and the
+      chat can always inform you of sound issues.
+    </p>
+    <h4>Test stream</h4>
+    <p>
+      Finally, hit the play button on the main Butt window. You should see text appear in the white
+      section of the main window indicating that you are connected and that your stream metadata has
+      been updated.
+    </p>
+    <img
+      alt="Butt log update on successful stream connection"
+      src="@/assets/stream-setup-img/butt-log-update.png" />
+    <p>
+      View your stream metadata at the
+      <a href="https://lowpressurezone.com:8443">test stream info page.</a>
     </p>
     <p>
-      BUTT should now show that you are successfully connected. Navigate to the
-      <a :href="streamStatus">stream status page</a> and ensure that the stream shows up in the
-      debug view:
+      Take a listen on your phone to the sound you're sending on the
+      <a href="https://lowpressurezone.com:8443/test">audio page.</a>
     </p>
     <img
       alt="Icecast debug page"
       src="@/assets/stream-setup-img/broadcasting-debug-test.png" />
     <p>
-      Take a listen to the stream on
-      <a href="https://lowpressurezone.com:8443/test">https://lowpressurezone.com:8443/test</a>.
-    </p>
-    <p>
       If everything is sounding good, go ahead and stop the stream with the square button next to
-      the play button in BUTT. After that, go back to settings, click EDIT on the Server settings,
-      and set the mount to
-      <kbd>live</kbd>.
+      the play button in Butt. After that, go back to settings. Click Edit on the Server settings
+      and update the information to match the Live Stream configuration below. The password is the
+      same as the test stream.
     </p>
     <img
-      alt="Set the icecast mountpoint to 'live'"
+      alt="Set the server settings to match the live stream"
       src="@/assets/stream-setup-img/butt-live.png" />
+    <h4>Enjoy streaming!</h4>
     <p>
       That's it! The next time you connect to the server for a stream, your audio will be accessible
-      via the play button on the website :)
+      via the play button on the website.
     </p>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { Message } from 'primevue'
+import { onMounted } from 'vue'
+import { useConnectionInfoStore } from '@/stores/connectionInfoStore.ts'
 
-const streamStatus = import.meta.env.VITE_STREAM_STATUS_URL
+const connectionInfoStore = useConnectionInfoStore()
+
+onMounted(async () => {
+  await connectionInfoStore.loadIfNotInitialized()
+})
 </script>
 
 <style lang="scss">
 .external-streaming-directions {
   overflow-x: auto;
+  text-align: center;
 
   img {
     max-width: 100%;
+  }
+
+  p {
+    text-align: left;
   }
 }
 </style>
