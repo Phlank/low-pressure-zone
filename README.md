@@ -12,7 +12,7 @@ The tech stack of C9 was messy, built on Wordpress, Google Sheets, some cronjobs
 
 ## Technical information
 
-Low Pressure Zone is a web application deployed through Digital Ocean. The server is a VPS which, alongside a managed database, serves all consumers of the application. 
+Low Pressure Zone is a web application deployed through Digital Ocean. The server is a VPS which, alongside a managed database, serves all consumers of the application. The VPS hosts the static client files, the site API, and an Icecast instance where DJs can test their stream setup and audio quality. Another VPS hosts [AzuraCast](https://www.azuracast.com/), an all-in-one open-source online radio solution. The extensive API of AzuraCast will help to power many site features and integrations in the future.
 
 ### Tech stack
 
@@ -20,7 +20,7 @@ The browser client is a Typescript/VueJS frontend built and deployed statically.
 
 The web API is a C#/AspNetCore application managing identity and data.
 
-Nginx serves the static content and reverse-proxies API requests to the .NET app's Kestrel server. The site audio is served using an [Icecast 2 server](https://icecast.org/). SSL certificates are managed through Certbot.
+Nginx serves the static content and reverse-proxies API requests to the .NET app's Kestrel server. SSL certificates are managed through Certbot.
 
 ### Deployment
 
