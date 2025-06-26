@@ -1,31 +1,47 @@
 <template>
-  <Button
-    ref="buttonElement"
-    :disabled="!isPlayable"
-    class="play-button"
-    rounded
-    size="large"
-    @click="togglePlaying">
-    <div class="play-button__content">
-      <div class="play-button__content__icon">
-        <span :class="controlIcon"></span>
-      </div>
-      <div class="play-button__content__text-area">
-        <div class="play-button__content__text-area__status">
-          {{ loadingText }} | {{ listenerText }}
-        </div>
-        <div class="play-button__content__text-area__now-playing">
-          <div class="play-button__content__text-area__now-playing__text">
-            {{ streamStatus?.name }}
+  <div class="play-button">
+    <div class="play-button__buttons">
+      <Button
+        ref="buttonElement"
+        :disabled="!isPlayable"
+        class="play-button__play-element"
+        rounded
+        size="large"
+        @click="togglePlaying">
+        <div class="play-button__content">
+          <div class="play-button__content__icon">
+            <span :class="controlIcon"></span>
+          </div>
+          <div class="play-button__content__text-area">
+            <div class="play-button__content__text-area__status">
+              {{ loadingText }} | {{ listenerText }}
+            </div>
+            <div class="play-button__content__text-area__now-playing">
+              <div class="play-button__content__text-area__now-playing__text">
+                {{ streamStatus?.name }}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </Button>
+      <Button
+        class="play-button__volume-element"
+        rounded
+        size="large"
+        @click="toggleVolumeSlider">
+        <span class="pi pi-volume-up" />
+      </Button>
     </div>
-  </Button>
+    <div class="play-button__volume">
+      <Slider
+        v-model.number="volumeSliderAmount"
+        class="play-button__volume__slider" />
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
-import { Button, useToast } from 'primevue'
+import { Button, Slider, useToast } from 'primevue'
 import { computed, type ComputedRef, onMounted, type Ref, ref, watch } from 'vue'
 import delay from '@/utils/delay.ts'
 import streamApi, { type StreamStatusResponse } from '@/api/resources/streamApi.ts'
@@ -197,7 +213,7 @@ const updateStatus = (newStatus: StreamStatusResponse) => {
       newStatus.name = disconnectedWaitText
     }
     streamName.value = streamStatus.value?.name ?? 'Unknown'
-    setTimeout(() => updateTextScrollingBehavior(), 50)
+    setTimeout(() => updateTextScrollingBehavior(), 100)
   }
 }
 
@@ -216,7 +232,9 @@ const playIconWidth = 28
 const centerMargin = 10
 const textTranslateWidth = ref(0)
 const textTranslateWidthPx = computed(() => Math.round(textTranslateWidth.value) + 'px')
-const textScrollAnimationDuration = computed(() => (4 * -textTranslateWidth.value) / 50 + 's')
+const textScrollAnimationDuration = computed(
+  () => clamp((4 * -textTranslateWidth.value) / 50, 4) + 's'
+)
 
 const buttonElement = ref(null)
 useResizeObserver(buttonElement, () => updateTextScrollingBehavior())
@@ -226,12 +244,42 @@ const updateTextScrollingBehavior = () => {
     .getElementsByClassName('play-button__content__text-area__now-playing')[0]
     .getBoundingClientRect().width
   buttonWidth.value = document
-    .getElementsByClassName('play-button')[0]
+    .getElementsByClassName('play-button__play-element')[0]
     .getBoundingClientRect().width
-  textTranslateWidth.value = -clamp(
-    textWidth.value - buttonWidth.value + buttonPadding + playIconWidth + centerMargin,
-    0
+  let translateWidth = Math.round(
+    clamp(textWidth.value - buttonWidth.value + buttonPadding + playIconWidth + centerMargin, 0)
   )
+  if (Math.abs(translateWidth) < 5) {
+    translateWidth = 0
+  } else {
+    translateWidth = -translateWidth
+  }
+  textTranslateWidth.value = translateWidth
+}
+
+const volumeSliderAmount = ref(100)
+const volume = computed(() => volumeSliderAmount.value / 100)
+const showVolumeSliderArea = ref(false)
+const showVolumeSlider = ref(false)
+const volumeSliderDisplayValue = computed(() => (showVolumeSlider.value ? 'block' : 'none'))
+const volumeSliderAreaPaddingValue = computed(() => (showVolumeSliderArea.value ? '20px' : '0px'))
+const volumeSliderAreaMarginTopValue = computed(() => (showVolumeSliderArea.value ? '10px' : '0px'))
+const volumeSliderAreaBorder = computed(() =>
+  showVolumeSliderArea.value ? '1px solid var(--p-button-primary-border-color)' : 'none'
+)
+
+watch(volume, () => {
+  if (audio !== undefined) {
+    audio.volume = volume.value
+  }
+})
+
+const toggleVolumeSlider = () => {
+  const isDisplayed = showVolumeSliderArea.value
+  showVolumeSliderArea.value = !isDisplayed
+  setTimeout(() => {
+    showVolumeSlider.value = !isDisplayed
+  }, 100)
 }
 </script>
 
@@ -243,10 +291,32 @@ $text-translate-amount: v-bind(textTranslateWidthPx);
 
 .play-button {
   width: min(
-    350px,
+    400px,
     calc(100dvw - 2 * #{variables.$space-l}),
-    calc(30px + 28px + 10px + #{$text-width})
+    calc(30px + 28px + 10px + 46px + 10px + #{$text-width})
   );
+
+  &__buttons {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: variables.$space-m;
+  }
+
+  &__play-element {
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+  }
+
+  &__volume-element {
+    height: 46px;
+
+    .pi {
+      font-size: 1.25rem;
+    }
+  }
 
   &__content {
     overflow: hidden;
@@ -303,6 +373,25 @@ $text-translate-amount: v-bind(textTranslateWidthPx);
           }
         }
       }
+    }
+  }
+
+  &__volume {
+    width: 100%;
+    z-index: 5;
+    height: 0;
+    background-color: var(--p-surface-800);
+    padding: v-bind(volumeSliderAreaPaddingValue);
+    margin-top: v-bind(volumeSliderAreaMarginTopValue);
+    transition:
+      padding 0.1s ease-in-out,
+      margin-top 0.1s ease-in-out,
+      border 0.1s ease-in-out;
+    border-radius: calc(2 * #{variables.$space-l});
+    border: v-bind(volumeSliderAreaBorder);
+
+    div.p-slider {
+      display: v-bind(volumeSliderDisplayValue);
     }
   }
 }
