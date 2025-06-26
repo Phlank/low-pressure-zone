@@ -12,7 +12,8 @@ public class IcecastStatusMapper
         IsStatusStale = false,
         Name = null,
         Type = null,
-        ListenUrl = null
+        ListenUrl = null,
+        ListenerCount = 0
     };
 
     private static readonly StreamStatus NotLive = new()
@@ -22,7 +23,8 @@ public class IcecastStatusMapper
         IsStatusStale = false,
         Name = null,
         Type = null,
-        ListenUrl = null
+        ListenUrl = null,
+        ListenerCount = 0
     };
 
     public StreamStatus FromEntity(IcecastStatusRaw? entity)
@@ -39,7 +41,8 @@ public class IcecastStatusMapper
             IsStatusStale = entity.IsStale,
             Name = liveSource.ServerName,
             Type = liveSource.AudioInfo,
-            ListenUrl = liveSource.ListenUrl
+            ListenUrl = liveSource.ListenUrl,
+            ListenerCount = liveSource.Listeners
         };
     }
 }

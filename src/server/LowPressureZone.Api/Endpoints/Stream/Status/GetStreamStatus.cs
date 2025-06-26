@@ -15,8 +15,8 @@ public class GetStreamStatus(IStreamStatusService streamStatusService) : Endpoin
     {
         if (!streamStatusService.IsStarted) await streamStatusService.StartAsync(ct);
         var status = streamStatusService.Status;
-        if (status == null) throw new NullReferenceException();
-        var response = Map.FromEntity(status!);
+        ArgumentNullException.ThrowIfNull(status);
+        var response = Map.FromEntity(status);
         await SendOkAsync(response, ct);
     }
 }
