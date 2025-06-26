@@ -232,7 +232,9 @@ const playIconWidth = 28
 const centerMargin = 10
 const textTranslateWidth = ref(0)
 const textTranslateWidthPx = computed(() => Math.round(textTranslateWidth.value) + 'px')
-const textScrollAnimationDuration = computed(() => (4 * -textTranslateWidth.value) / 50 + 's')
+const textScrollAnimationDuration = computed(
+  () => clamp((4 * -textTranslateWidth.value) / 50, 4) + 's'
+)
 
 const buttonElement = ref(null)
 useResizeObserver(buttonElement, () => updateTextScrollingBehavior())
