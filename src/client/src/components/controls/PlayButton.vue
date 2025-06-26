@@ -244,10 +244,15 @@ const updateTextScrollingBehavior = () => {
   buttonWidth.value = document
     .getElementsByClassName('play-button__play-element')[0]
     .getBoundingClientRect().width
-  textTranslateWidth.value = -clamp(
-    textWidth.value - buttonWidth.value + buttonPadding + playIconWidth + centerMargin,
-    0
+  let translateWidth = Math.round(
+    clamp(textWidth.value - buttonWidth.value + buttonPadding + playIconWidth + centerMargin, 0)
   )
+  if (Math.abs(translateWidth) < 5) {
+    translateWidth = 0
+  } else {
+    translateWidth = -translateWidth
+  }
+  textTranslateWidth.value = translateWidth
 }
 
 const volumeSliderAmount = ref(100)
