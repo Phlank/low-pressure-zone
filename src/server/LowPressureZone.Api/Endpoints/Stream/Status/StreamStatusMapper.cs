@@ -13,6 +13,7 @@ public class StreamStatusMapper : IResponseMapper
             IsStatusStale = status.IsStatusStale,
             Name = status.Name,
             Type = status.Type,
-            ListenUrl = status.ListenUrl
+            ListenUrl = status.ListenUrl,
+            ListenerCount = status.ListenerCount
         };
 }

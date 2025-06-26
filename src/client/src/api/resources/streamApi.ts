@@ -15,6 +15,7 @@ export interface StreamStatusResponse {
   name: string | null
   type: string | null
   listenUrl: string | null
+  listenerCount: number
 }
 
 export interface ConnectionInformationResponse {

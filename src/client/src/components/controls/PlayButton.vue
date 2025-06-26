@@ -11,7 +11,9 @@
         <span :class="controlIcon"></span>
       </div>
       <div class="play-button__content__text-area">
-        <div class="play-button__content__text-area__status">{{ loadingText }}</div>
+        <div class="play-button__content__text-area__status">
+          {{ loadingText }} | {{ listenerText }}
+        </div>
         <div class="play-button__content__text-area__now-playing">
           <div class="play-button__content__text-area__now-playing__text">
             {{ streamStatus?.name }}
@@ -53,6 +55,10 @@ const loadingText = computed(() => {
   if (streamStatus.value?.isLive) return 'Live'
   return 'Offline'
 })
+
+const listenerText = computed(() =>
+  streamStatus.value ? 'Listeners: ' + streamStatus.value.listenerCount : ''
+)
 
 window.addEventListener('beforeunload', () => {
   if (audio !== undefined) {
@@ -183,7 +189,8 @@ const updateStatus = (newStatus: StreamStatusResponse) => {
     (newStatus.name ?? 'Unknown') !== streamStatus.value?.name ||
     newStatus.listenUrl !== streamStatus.value?.listenUrl ||
     newStatus.isStatusStale !== streamStatus.value?.isStatusStale ||
-    newStatus.type !== streamStatus.value?.type
+    newStatus.type !== streamStatus.value?.type ||
+    newStatus.listenerCount !== streamStatus.value?.listenerCount
   ) {
     streamStatus.value = newStatus
     if (!newStatus.isOnline) {

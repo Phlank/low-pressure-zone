@@ -8,4 +8,5 @@ public class StreamStatusResponse
     public string? Name { get; set; }
     public string? Type { get; set; }
     public string? ListenUrl { get; set; }
+    public int ListenerCount { get; set; }
 }

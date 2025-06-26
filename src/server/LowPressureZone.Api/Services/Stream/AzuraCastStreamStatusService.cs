@@ -74,7 +74,8 @@ public class AzuraCastStreamStatusService(AzuraCastClient client,
                     IsStatusStale = false,
                     Name = name,
                     Type = "AzuraCast",
-                    ListenUrl = content.Station.ListenUrl
+                    ListenUrl = content.Station.ListenUrl,
+                    ListenerCount = content.Listeners.Current
                 };
             }
         }
