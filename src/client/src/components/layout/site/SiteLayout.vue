@@ -20,14 +20,9 @@ import { RouterView } from 'vue-router'
 import SiteFooter from './SiteFooter.vue'
 import SiteHeader from './SiteHeader.vue'
 import { computed, inject, ref, type Ref } from 'vue'
-import { useResizeObserver } from '@vueuse/core'
 
 const footer: Ref<HTMLDivElement | undefined> = ref(undefined)
-useResizeObserver(footer, () => {
-  playButtonHeight.value = footer.value?.getBoundingClientRect().height ?? 0
-})
 
-const playButtonHeight = ref(0)
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const footerPosition = computed(() => (!isMobile?.value ? 'sticky' : 'absolute'))
 </script>
