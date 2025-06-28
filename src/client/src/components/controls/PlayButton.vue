@@ -340,6 +340,8 @@ $text-translate-amount: v-bind(textTranslateWidthPx);
 
       &__status {
         font-size: small;
+        text-align: left;
+        white-space: nowrap;
       }
 
       &__now-playing {
