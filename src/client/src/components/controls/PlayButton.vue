@@ -197,6 +197,9 @@ const pollStreamMetadata = async () => {
 
 const updateStatus = (newStatus: StreamStatusResponse) => {
   if (
+    streamName.value === undefined ||
+    streamName.value === disconnectedWaitText ||
+    streamStatus.value === undefined ||
     newStatus.isLive !== streamStatus.value?.isLive ||
     newStatus.isOnline !== streamStatus.value?.isOnline ||
     (newStatus.name ?? 'Unknown') !== streamStatus.value?.name ||
