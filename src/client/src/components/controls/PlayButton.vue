@@ -3,7 +3,6 @@
     <div class="play-button__buttons">
       <Button
         ref="buttonElement"
-        :disabled="!isPlayable"
         class="play-button__play-element"
         rounded
         size="large"
@@ -42,7 +41,7 @@
 
 <script lang="ts" setup>
 import { Button, Slider, useToast } from 'primevue'
-import { computed, type ComputedRef, onMounted, type Ref, ref, watch } from 'vue'
+import { computed, onMounted, type Ref, ref, watch } from 'vue'
 import delay from '@/utils/delay.ts'
 import streamApi, { type StreamStatusResponse } from '@/api/resources/streamApi.ts'
 import clamp from '@/utils/clamp.ts'
@@ -63,8 +62,6 @@ const isLoading: Ref<boolean> = ref(false)
 const streamStatus: Ref<StreamStatusResponse | undefined> = ref(undefined)
 let audio: HTMLAudioElement | undefined = undefined
 let audioAbortController = new AbortController()
-
-const isPlayable: ComputedRef<boolean> = computed(() => streamName.value !== nobodyDjText)
 
 const loadingText = computed(() => {
   if (streamStatus.value?.isLive === undefined) return 'Loading...'
