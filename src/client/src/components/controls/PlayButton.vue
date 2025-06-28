@@ -100,6 +100,7 @@ const startAudio = () => {
   isLoading.value = true
   audioAbortController = new AbortController()
   audio = new Audio(streamStatus.value?.listenUrl ?? '')
+  audio.volume = volume.value
   audio.preload = 'metadata'
   addAudioEventListeners()
   audio.play()
