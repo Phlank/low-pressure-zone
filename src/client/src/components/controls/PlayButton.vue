@@ -13,7 +13,7 @@
           </div>
           <div class="play-button__content__text-area">
             <div class="play-button__content__text-area__status">
-              {{ loadingText }} | {{ listenerText }}
+              {{ statusText }}
             </div>
             <div class="play-button__content__text-area__now-playing">
               <div class="play-button__content__text-area__now-playing__text">
@@ -57,21 +57,18 @@ enum PlayState {
 const disconnectedWaitText = 'Disconnected. Attempting to reconnect...'
 const nobodyDjText = 'Nobody'
 const streamName: Ref<string> = ref(nobodyDjText)
-const playState: Ref<PlayState> = ref(PlayState.Paused)
 const isLoading: Ref<boolean> = ref(false)
 const streamStatus: Ref<StreamStatusResponse | undefined> = ref(undefined)
-let audio: HTMLAudioElement | undefined = undefined
-let audioAbortController = new AbortController()
 
-const loadingText = computed(() => {
+const statusText = computed(() => {
   if (streamStatus.value?.isLive === undefined) return 'Loading...'
-  if (streamStatus.value?.isLive) return 'Live'
-  return 'Offline'
+  const liveText = streamStatus.value.isLive ? 'Live' : 'Offline'
+  return `${liveText} | Listeners: ${streamStatus.value.listenerCount}`
 })
 
-const listenerText = computed(() =>
-  streamStatus.value ? 'Listeners: ' + streamStatus.value.listenerCount : ''
-)
+const playState: Ref<PlayState> = ref(PlayState.Paused)
+let audio: HTMLAudioElement | undefined = undefined
+let audioAbortController = new AbortController()
 
 window.addEventListener('beforeunload', () => {
   if (audio !== undefined) {
@@ -209,10 +206,10 @@ const updateStatus = (newStatus: StreamStatusResponse) => {
     newStatus.type !== streamStatus.value?.type ||
     newStatus.listenerCount !== streamStatus.value?.listenerCount
   ) {
-    streamStatus.value = newStatus
     if (!newStatus.isOnline) {
       newStatus.name = disconnectedWaitText
     }
+    streamStatus.value = newStatus
     streamName.value = streamStatus.value?.name ?? 'Unknown'
     setTimeout(() => updateTextScrollingBehavior(), 100)
   }
@@ -233,17 +230,23 @@ const playIconWidth = 28
 const centerMargin = 10
 const textTranslateWidth = ref(0)
 const textTranslateWidthPx = computed(() => Math.round(textTranslateWidth.value) + 'px')
+
+const minimumScrollTimeSeconds = 4
 const textScrollAnimationDuration = computed(
-  () => clamp((4 * -textTranslateWidth.value) / 50, 4) + 's'
+  () => clamp((4 * -textTranslateWidth.value) / 50, minimumScrollTimeSeconds) + 's'
 )
 
 const buttonElement = ref(null)
 useResizeObserver(buttonElement, () => updateTextScrollingBehavior())
 
 const updateTextScrollingBehavior = () => {
-  textWidth.value = document
+  const artistTextWidth = document
     .getElementsByClassName('play-button__content__text-area__now-playing')[0]
     .getBoundingClientRect().width
+  const statusTextWidth = document
+    .getElementsByClassName('play-button__content__text-area__status')[0]
+    .getBoundingClientRect().width
+  textWidth.value = Math.max(artistTextWidth, statusTextWidth)
   buttonWidth.value = document
     .getElementsByClassName('play-button__play-element')[0]
     .getBoundingClientRect().width
