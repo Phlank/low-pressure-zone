@@ -4,7 +4,15 @@
       <RouterLink
         :to="'/'"
         class="site-header__title">
-        {{ title }}
+        <img
+          ref="logo"
+          v-ripple
+          :src="logoSrc"
+          alt="Low Pressure Zone"
+          @mousedown="logoSrc = '/site-logo-click.png'"
+          @mouseenter="logoSrc = '/site-logo-hover.png'"
+          @mouseleave="logoSrc = '/site-logo.png'"
+          @mouseup="logoSrc = '/site-logo-hover.png'" />
       </RouterLink>
     </template>
     <template #end>
@@ -22,8 +30,15 @@ import { Toolbar } from 'primevue'
 import DarkModeToggle from '../../controls/DarkModeToggle.vue'
 import SiteNavMenu from '../../controls/SiteNavMenu.vue'
 import ChatButton from '@/components/controls/ChatButton.vue'
+import { ref, useTemplateRef } from 'vue'
+import { onClickOutside } from '@vueuse/core'
 
-const title = import.meta.env.VITE_SITE_NAME
+const logoSrc = ref('/site-logo.png')
+const logo = useTemplateRef('logo')
+
+onClickOutside(logo, () => {
+  logoSrc.value = '/site-logo.png'
+})
 </script>
 
 <style lang="scss">
@@ -31,13 +46,16 @@ const title = import.meta.env.VITE_SITE_NAME
 
 .site-header {
   &__title {
-    @media (width < 350px) {
-      font-size: 1rem;
+    vertical-align: middle;
+
+    img {
+      display: block;
+      height: 46px;
     }
   }
 
   &__dark-mode-toggle {
-    @media (width < 472px) {
+    @media (width < 360px) {
       display: none;
     }
   }
