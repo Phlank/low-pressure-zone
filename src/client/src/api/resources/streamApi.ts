@@ -18,6 +18,16 @@ export interface StreamStatusResponse {
   listenerCount: number
 }
 
+export const defaultStreamStatus: StreamStatusResponse = {
+  isOnline: false,
+  isLive: false,
+  isStatusStale: false,
+  name: null,
+  type: null,
+  listenUrl: null,
+  listenerCount: 0
+}
+
 export interface ConnectionInformationResponse {
   streamType: string
   host: string

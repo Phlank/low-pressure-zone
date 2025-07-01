@@ -46,8 +46,10 @@ import delay from '@/utils/delay.ts'
 import streamApi, { type StreamStatusResponse } from '@/api/resources/streamApi.ts'
 import clamp from '@/utils/clamp.ts'
 import { useResizeObserver } from '@vueuse/core'
+import { useStreamStore } from '@/stores/streamStore.ts'
 
 const toast = useToast()
+const streamStore = useStreamStore()
 
 enum PlayState {
   Playing,
@@ -119,7 +121,7 @@ watch(playState, (newPlayState) => {
     // Stream is waiting for next DJ and user pressed pause
     setNobodyPlaying()
   } else if (newPlayState === PlayState.Playing && audio === undefined) {
-    // Stream is not playing and user presses play
+    // Stream is not playing and the user presses play
     startAudio()
   }
 })
