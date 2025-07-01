@@ -9,7 +9,7 @@
         @click="togglePlaying">
         <div class="play-button__content">
           <div class="play-button__content__icon">
-            <span :class="controlIcon"></span>
+            <span :class="controlIconClass"></span>
           </div>
           <div class="play-button__content__text-area">
             <div class="play-button__content__text-area__status">
@@ -17,7 +17,7 @@
             </div>
             <div class="play-button__content__text-area__now-playing">
               <div class="play-button__content__text-area__now-playing__text">
-                {{ streamStatus?.name }}
+                {{ streamStore.status.name ?? 'Connecting...' }}
               </div>
             </div>
           </div>
@@ -42,8 +42,6 @@
 <script lang="ts" setup>
 import { Button, Slider, useToast } from 'primevue'
 import { computed, onMounted, type Ref, ref, watch } from 'vue'
-import delay from '@/utils/delay.ts'
-import streamApi, { type StreamStatusResponse } from '@/api/resources/streamApi.ts'
 import clamp from '@/utils/clamp.ts'
 import { useResizeObserver } from '@vueuse/core'
 import { useStreamStore } from '@/stores/streamStore.ts'
@@ -56,16 +54,11 @@ enum PlayState {
   Paused
 }
 
-const disconnectedWaitText = 'Disconnected. Attempting to reconnect...'
-const nobodyDjText = 'Nobody'
-const streamName: Ref<string> = ref(nobodyDjText)
-const isLoading: Ref<boolean> = ref(false)
-const streamStatus: Ref<StreamStatusResponse | undefined> = ref(undefined)
-
-const statusText = computed(() => {
-  if (streamStatus.value?.isLive === undefined) return 'Loading...'
-  const liveText = streamStatus.value.isLive ? 'Live' : 'Offline'
-  return `${liveText} | Listeners: ${streamStatus.value.listenerCount}`
+const controlIconClass = computed(() => {
+  if (playState.value === PlayState.Paused) {
+    return 'pi pi-play-circle'
+  }
+  return 'pi pi-pause-circle'
 })
 
 const playState: Ref<PlayState> = ref(PlayState.Paused)
@@ -96,9 +89,8 @@ const stopAudio = () => {
 }
 
 const startAudio = () => {
-  isLoading.value = true
   audioAbortController = new AbortController()
-  audio = new Audio(streamStatus.value?.listenUrl ?? '')
+  audio = new Audio(streamStore.status.listenUrl ?? '')
   audio.volume = volume.value
   audio.preload = 'metadata'
   addAudioEventListeners()
@@ -135,34 +127,23 @@ const addAudioEventListeners = () => {
   audio?.addEventListener('error', handleError, listenerOptions)
 }
 
-const handleCanPlay = () => {
-  if (playState.value === PlayState.Playing) {
-    isLoading.value = false
-  }
-}
+const handleCanPlay = () => {}
 
-const handlePlay = () => {
-  isLoading.value = false
-}
+const handlePlay = () => {}
 
 const handleEnded = () => {
   waitForReconnect()
 }
 
 const waitForReconnect = () => {
-  streamName.value = disconnectedWaitText
   stopAudio()
 }
 
 const setNobodyPlaying = () => {
-  streamName.value = nobodyDjText
-  isLoading.value = false
   playState.value = PlayState.Paused
 }
 
-const handleWaiting = () => {
-  isLoading.value = true
-}
+const handleWaiting = () => {}
 
 const handleError = () => {
   if (audio?.src === '') return
@@ -176,52 +157,12 @@ const handleError = () => {
 }
 
 onMounted(() => {
-  pollStreamMetadata().then(() => {})
+  streamStore.start()
 })
 
-const pollStreamMetadata = async () => {
-  // noinspection InfiniteLoopJS
-  while (true) {
-    try {
-      const response = await streamApi.getStatus()
-      if (response.isSuccess()) {
-        updateStatus(response?.data())
-      }
-    } catch (error: unknown) {
-      console.log(JSON.stringify(error))
-    } finally {
-      await delay(5000)
-    }
-  }
-}
-
-const updateStatus = (newStatus: StreamStatusResponse) => {
-  if (
-    streamName.value === undefined ||
-    streamName.value === disconnectedWaitText ||
-    streamStatus.value === undefined ||
-    newStatus.isLive !== streamStatus.value?.isLive ||
-    newStatus.isOnline !== streamStatus.value?.isOnline ||
-    (newStatus.name ?? 'Unknown') !== streamStatus.value?.name ||
-    newStatus.listenUrl !== streamStatus.value?.listenUrl ||
-    newStatus.isStatusStale !== streamStatus.value?.isStatusStale ||
-    newStatus.type !== streamStatus.value?.type ||
-    newStatus.listenerCount !== streamStatus.value?.listenerCount
-  ) {
-    if (!newStatus.isOnline) {
-      newStatus.name = disconnectedWaitText
-    }
-    streamStatus.value = newStatus
-    streamName.value = streamStatus.value?.name ?? 'Unknown'
-    setTimeout(() => updateTextScrollingBehavior(), 100)
-  }
-}
-
-const controlIcon = computed(() => {
-  if (playState.value === PlayState.Paused) {
-    return 'pi pi-play-circle'
-  }
-  return 'pi pi-pause-circle'
+const statusText = computed(() => {
+  const liveText = streamStore.status.isLive ? 'Live' : 'Offline'
+  return `${liveText} | Listeners: ${streamStore.status.listenerCount}`
 })
 
 const textWidth = ref(0)

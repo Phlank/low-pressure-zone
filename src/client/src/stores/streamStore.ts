@@ -1,4 +1,4 @@
-﻿import { computed, ref } from 'vue'
+﻿import { computed, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import streamApi, {
   defaultStreamStatus,
@@ -30,6 +30,16 @@ export const useStreamStore = defineStore('streamStore', () => {
         await delay(5000)
       }
     }
+  }
+
+  watch(status, (newStatus) => {
+    updateSiteTitle(newStatus)
+  })
+
+  const updateSiteTitle = (newStatus: StreamStatusResponse) => {
+    const nameText = newStatus.name ?? 'Unknown'
+    const liveText = newStatus.isLive ? 'Live' : 'Offline'
+    document.title = `${nameText} - ${liveText} - Low Pressure Zone`
   }
 
   const stop = () => {
