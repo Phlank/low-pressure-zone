@@ -67,7 +67,7 @@ onClickOutside(logo, () => {
   }
 
   &__chat-button {
-    @media (width < 324px) {
+    @media (width < 240px) {
       display: none;
     }
   }

@@ -110,7 +110,7 @@ const loggedInNavMenuItems: MenuItem[] = [
     labelString: 'Chat',
     icon: 'pi pi-discord',
     href: discordInvite,
-    visible: () => window.innerWidth < 324
+    visible: () => window.innerWidth < 240
   }
 ]
 
@@ -134,7 +134,7 @@ const loggedOutNavMenuItems: MenuItem[] = [
     labelString: 'Chat',
     icon: 'pi pi-discord',
     href: discordInvite,
-    visible: () => window.innerWidth < 324
+    visible: () => window.innerWidth < 240
   }
 ]
 
