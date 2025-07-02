@@ -11,7 +11,7 @@ export const useStreamStore = defineStore('streamStore', () => {
   const status = computed(() => statusRef.value)
 
   let isStarted = false
-  const start = () => {
+  const startPolling = () => {
     if (isStarted) return
     isStarted = true
     pollStream().then(() => {})
@@ -32,20 +32,35 @@ export const useStreamStore = defineStore('streamStore', () => {
     }
   }
 
+  const stopPolling = () => {
+    if (isStarted) {
+      isStarted = false
+    }
+  }
+
+  let isTitleUpdatingStarted = false
+  const startTitleUpdating = () => {
+    if (isTitleUpdatingStarted) return
+
+    isTitleUpdatingStarted = true
+    updateSiteTitle(status.value)
+  }
+
   watch(status, (newStatus) => {
     updateSiteTitle(newStatus)
   })
 
   const updateSiteTitle = (newStatus: StreamStatusResponse) => {
+    if (!isTitleUpdatingStarted) return
+
     const nameText = newStatus.name ?? 'Unknown'
     const liveText = newStatus.isLive ? 'Live' : 'Offline'
     document.title = `${nameText} - ${liveText} - Low Pressure Zone`
   }
 
-  const stop = () => {
-    if (isStarted) {
-      isStarted = false
-    }
+  const stopTitleUpdating = () => {
+    isTitleUpdatingStarted = false
+    document.title = 'Low Pressure Zone'
   }
 
   const updateStatus = (newStatus: StreamStatusResponse) => {
@@ -64,7 +79,9 @@ export const useStreamStore = defineStore('streamStore', () => {
 
   return {
     status,
-    start,
-    stop
+    startPolling,
+    stopPolling,
+    startTitleUpdating,
+    stopTitleUpdating
   }
 })

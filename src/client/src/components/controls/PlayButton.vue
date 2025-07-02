@@ -43,7 +43,7 @@
 import { Button, Slider, useToast } from 'primevue'
 import { computed, onMounted, type Ref, ref, watch } from 'vue'
 import clamp from '@/utils/clamp.ts'
-import { useResizeObserver } from '@vueuse/core'
+import { useResizeObserver, useThrottleFn } from '@vueuse/core'
 import { useStreamStore } from '@/stores/streamStore.ts'
 
 const toast = useToast()
@@ -109,12 +109,15 @@ watch(playState, (newPlayState) => {
   if (newPlayState === PlayState.Paused && audio !== undefined) {
     // Stream is playing and the user pressed pause
     stopAudio()
+    streamStore.stopTitleUpdating()
   } else if (newPlayState === PlayState.Paused && audio === undefined) {
     // Stream is waiting for next DJ and user pressed pause
     setNobodyPlaying()
+    streamStore.stopTitleUpdating()
   } else if (newPlayState === PlayState.Playing && audio === undefined) {
     // Stream is not playing and the user presses play
     startAudio()
+    streamStore.startTitleUpdating()
   }
 })
 
@@ -156,53 +159,64 @@ const handleError = () => {
   waitForReconnect()
 }
 
-onMounted(() => {
-  streamStore.start()
-})
-
 const statusText = computed(() => {
   const liveText = streamStore.status.isLive ? 'Live' : 'Offline'
   return `${liveText} | Listeners: ${streamStore.status.listenerCount}`
 })
 
 const textWidth = ref(0)
-const textWidthPx = computed(() => Math.round(textWidth.value) + 'px')
+const nameWidthPx = computed(() => Math.round(textWidth.value) + 'px')
 const buttonWidth = ref(0)
 const buttonPadding = 30
 const playIconWidth = 28
 const centerMargin = 10
-const textTranslateWidth = ref(0)
-const textTranslateWidthPx = computed(() => Math.round(textTranslateWidth.value) + 'px')
+const nameTranslateWidth = ref(0)
+const nameTranslateWidthPx = computed(() => Math.round(nameTranslateWidth.value) + 'px')
 
 const minimumScrollTimeSeconds = 4
 const textScrollAnimationDuration = computed(
-  () => clamp((4 * -textTranslateWidth.value) / 50, minimumScrollTimeSeconds) + 's'
+  () => clamp((4 * -nameTranslateWidth.value) / 50, minimumScrollTimeSeconds) + 's'
 )
 
 const buttonElement = ref(null)
 useResizeObserver(buttonElement, () => updateTextScrollingBehavior())
-
-const updateTextScrollingBehavior = () => {
-  const artistTextWidth = document
-    .getElementsByClassName('play-button__content__text-area__now-playing')[0]
-    .getBoundingClientRect().width
-  const statusTextWidth = document
-    .getElementsByClassName('play-button__content__text-area__status')[0]
-    .getBoundingClientRect().width
-  textWidth.value = Math.max(artistTextWidth, statusTextWidth)
-  buttonWidth.value = document
-    .getElementsByClassName('play-button__play-element')[0]
-    .getBoundingClientRect().width
-  let translateWidth = Math.round(
-    clamp(textWidth.value - buttonWidth.value + buttonPadding + playIconWidth + centerMargin, 0)
-  )
-  if (Math.abs(translateWidth) < 5) {
-    translateWidth = 0
-  } else {
-    translateWidth = -translateWidth
+watch(
+  () => streamStore.status,
+  (newStatus, oldStatus) => {
+    if (newStatus.name !== oldStatus.name) {
+      setTimeout(() => {
+        updateTextScrollingBehavior()
+      })
+    }
   }
-  textTranslateWidth.value = translateWidth
-}
+)
+
+const updateTextScrollingBehavior = useThrottleFn(
+  () => {
+    const artistTextWidth = document
+      .getElementsByClassName('play-button__content__text-area__now-playing')[0]
+      .getBoundingClientRect().width
+    const statusTextWidth = document
+      .getElementsByClassName('play-button__content__text-area__status')[0]
+      .getBoundingClientRect().width
+    textWidth.value = Math.max(artistTextWidth, statusTextWidth)
+    buttonWidth.value = document
+      .getElementsByClassName('play-button__play-element')[0]
+      .getBoundingClientRect().width
+    let translateWidth = Math.round(
+      clamp(textWidth.value - buttonWidth.value + buttonPadding + playIconWidth + centerMargin, 0)
+    )
+    if (Math.abs(translateWidth) < 5) {
+      translateWidth = 0
+    } else {
+      translateWidth = -translateWidth
+    }
+    nameTranslateWidth.value = translateWidth
+  },
+  75,
+  true,
+  false
+)
 
 const volumeSliderAmount = ref(100)
 const volume = computed(() => volumeSliderAmount.value / 100)
@@ -228,13 +242,17 @@ const toggleVolumeSlider = () => {
     showVolumeSlider.value = !isDisplayed
   }, 100)
 }
+
+onMounted(() => {
+  streamStore.startPolling()
+})
 </script>
 
 <style lang="scss">
 @use '@/assets/styles/variables';
 
-$text-width: v-bind(textWidthPx);
-$text-translate-amount: v-bind(textTranslateWidthPx);
+$text-width: v-bind(nameWidthPx);
+$text-translate-amount: v-bind(nameTranslateWidthPx);
 
 .play-button {
   width: min(
