@@ -347,7 +347,7 @@ $text-translate-amount: v-bind(nameTranslateWidthPx);
     width: 100%;
     z-index: 5;
     height: 0;
-    background-color: var(--p-surface-800);
+    background-color: var(--p-panel-background);
     padding: v-bind(volumeSliderAreaPaddingValue);
     margin-top: v-bind(volumeSliderAreaMarginTopValue);
     transition:
