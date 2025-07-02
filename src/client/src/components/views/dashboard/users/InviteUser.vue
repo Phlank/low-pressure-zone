@@ -64,10 +64,8 @@
 </template>
 
 <script lang="ts" setup>
-import { KeyName } from '@/constants/keys'
 import { inviteRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
-import { onKeyDown } from '@vueuse/core'
 import { Button, Checkbox, InputText, Select, useToast } from 'primevue'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import invitesApi from '@/api/resources/invitesApi.ts'
@@ -84,8 +82,6 @@ const communityStore = useCommunityStore()
 const availableCommunities = computed(() =>
   communityStore.communities.filter((community) => community.isOrganizable)
 )
-
-onKeyDown(KeyName.Enter, () => handleSubmit())
 
 const formState = reactive({
   email: '',
