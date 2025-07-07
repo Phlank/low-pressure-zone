@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using LowPressureZone.Domain.Entities;
 using LowPressureZone.Domain.Extensions;
+using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
 using Shouldly;
 
@@ -23,6 +24,7 @@ public class TimeslotRules(IHttpContextAccessor contextAccessor)
         timeslot.Performer.ShouldNotBeNull();
         if (User == null) return false;
         if (timeslot.StartsAt < DateTime.UtcNow) return false;
+        if (User.IsInRole(RoleNames.Admin)) return true;
         return timeslot.Performer.LinkedUserIds.Contains(User.GetIdOrDefault());
     }
 }
