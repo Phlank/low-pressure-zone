@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using LowPressureZone.Api.Models.Icecast;
 using LowPressureZone.Api.Models.Stream;
@@ -55,6 +56,7 @@ public class IcecastStatusService(IHttpClientFactory clientFactory, IcecastStatu
     // Sets the status.
     // If the icecast server is offline, then this service will retain the last held data.
     // An IcecastStatusRaw instance becomes stale 30 seconds after it is created.
+    [SuppressMessage("Performance", "CA1848:Use the LoggerMessage delegates", Justification = "Not performance sensitive")]
     private async Task RefreshStatusAsync()
     {
         try
