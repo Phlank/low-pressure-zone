@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using LowPressureZone.Api.Clients;
 using LowPressureZone.Api.Models.Stream;
 
@@ -41,6 +42,7 @@ public class AzuraCastStreamStatusService(AzuraCastClient client,
             await RefreshStatusAsync();
     }
 
+    [SuppressMessage("Performance", "CA1848:Use the LoggerMessage delegates", Justification = "Not performance sensitive")]
     private async Task RefreshStatusAsync()
     {
         try

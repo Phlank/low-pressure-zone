@@ -10,7 +10,6 @@ namespace LowPressureZone.Api.Services;
 public class EmailService(IOptions<EmailServiceOptions> options, UriService uriService, ISender sender, ILogger<EmailService> logger)
 {
     private static readonly Action<ILogger, string, Exception?> LogEmailFailure = LoggerMessage.Define<string>(LogLevel.Error, new EventId(0, nameof(LogEmailFailure)), "Failed to send email: {Response}");
-
     private async Task Send(string toAddress, string subject, string body)
     {
         var email = Email.From(options.Value.FromAddress)
