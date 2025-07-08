@@ -1,6 +1,7 @@
 ﻿using LowPressureZone.Api.Models;
 using LowPressureZone.Api.Models.Options;
 using LowPressureZone.Api.Models.Stream.AzuraCast;
+using LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
 using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Api.Clients;
@@ -21,5 +22,18 @@ public class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<AzuraCas
             return new Result<NowPlayingResponse, HttpResponseMessage>(response);
 
         return new Result<NowPlayingResponse, HttpResponseMessage>(content);
+    }
+
+    public async Task<Result<Broadcast[], HttpResponseMessage>> GetBroadcastsAsync()
+    {
+        var response = await _client.GetAsync($"/api/stations/{_stationId}/streamers/broadcasts");
+        if (!response.IsSuccessStatusCode)
+            return new Result<Broadcast[], HttpResponseMessage>(response);
+
+        var content = await response.Content.ReadFromJsonAsync<Broadcast[]>();
+        if (content is null)
+            return new Result<Broadcast[], HttpResponseMessage>(response);
+
+        return new Result<Broadcast[], HttpResponseMessage>(content);
     }
 }

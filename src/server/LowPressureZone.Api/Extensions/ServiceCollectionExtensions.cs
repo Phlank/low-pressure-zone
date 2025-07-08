@@ -5,6 +5,7 @@ using FluentEmail.Core.Interfaces;
 using FluentEmail.Mailgun;
 using LowPressureZone.Api.Authentication;
 using LowPressureZone.Api.Clients;
+using LowPressureZone.Api.Endpoints.Broadcasts;
 using LowPressureZone.Api.Endpoints.Communities;
 using LowPressureZone.Api.Endpoints.Communities.Relationships;
 using LowPressureZone.Api.Endpoints.Performers;
@@ -66,7 +67,7 @@ public static class ServiceCollectionExtensions
         }).AddEntityFrameworkStores<IdentityContext>().AddDefaultTokenProviders();
         if (environment.IsDevelopment())
         {
-            // Also configure Auth cookies separately, so SameSite works cross domain locally in Chromium
+            // Also configure Auth cookies separately, so SameSite works cross-domain locally in Chromium
             services.Configure(IdentityConstants.TwoFactorUserIdScheme, ConfigureDevCookieOptions);
             services.Configure(IdentityConstants.TwoFactorRememberMeScheme, ConfigureDevCookieOptions);
             services.Configure(IdentityConstants.ExternalScheme, ConfigureDevCookieOptions);
@@ -131,6 +132,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<TimeslotMapper>();
         services.AddSingleton<InviteMapper>();
         services.AddSingleton<IcecastStatusMapper>();
+        services.AddSingleton<BroadcastMapper>();
 
         services.AddSingleton<CommunityRules>();
         services.AddSingleton<CommunityRelationshipRules>();
