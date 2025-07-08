@@ -61,3 +61,15 @@ export const minimumDate = (...dates: Date[]) => {
 }
 
 export const formatTimeslot = (date: Date) => formatDate(date, 'h:mm A')
+
+export const formatDuration = (timechangeMs: number) => {
+  const seconds = timechangeMs / 1000
+  const minutes = seconds / 60
+  const hours = minutes / 60
+
+  let result = ''
+  if (hours > 1) result += hours.toFixed(0) + 'h '
+  result += (minutes % 60).toFixed(0) + 'm '
+  result += (seconds % 60).toFixed(0) + 's'
+  return result
+}
