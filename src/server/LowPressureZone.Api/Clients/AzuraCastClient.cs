@@ -26,7 +26,7 @@ public class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<AzuraCas
 
     public async Task<Result<Broadcast[], HttpResponseMessage>> GetBroadcastsAsync()
     {
-        var response = await _client.GetAsync($"/api/stations/{_stationId}/streamers/broadcasts");
+        var response = await _client.GetAsync($"/api/station/{_stationId}/streamers/broadcasts");
         if (!response.IsSuccessStatusCode)
             return new Result<Broadcast[], HttpResponseMessage>(response);
 

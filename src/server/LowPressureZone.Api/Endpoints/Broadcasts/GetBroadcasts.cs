@@ -34,11 +34,12 @@ public class GetBroadcasts(AzuraCastClient client, DataContext context) : Endpoi
         }
 
         var orderedBroadcasts = broadcasts.OrderBy(broadcast => broadcast.TimestampStart);
-        var minBroadcastsStart = broadcasts.First().TimestampStart;
-        var maxBroadcastsStart = broadcasts.Last().TimestampStart;
+        var minBroadcastsStart = broadcasts.Min(broadcast => broadcast.TimestampStart);
+        var maxBroadcastsStart = broadcasts.Max(broadcast => broadcast.TimestampStart);
 
         var minTimeslotStart = minBroadcastsStart.AddHours(-1);
         var maxTimeslotStart = maxBroadcastsStart.AddHours(1);
+        Console.WriteLine($"FIND ME {minTimeslotStart} - {maxTimeslotStart}");
         var timeslots = await context.Timeslots
                                      .Where(timeslot => timeslot.StartsAt > minTimeslotStart && timeslot.EndsAt < maxTimeslotStart).Include(timeslot => timeslot.Performer)
                                      .ToListAsync(ct);

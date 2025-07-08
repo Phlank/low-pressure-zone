@@ -53,6 +53,12 @@ const router = createRouter({
             import('@/components/views/dashboard/performers/DashboardPerformersView.vue')
         },
         {
+          path: 'broadcasts',
+          name: 'Broadcasts',
+          component: () =>
+            import('@/components/views/dashboard/broadcasts/DashboardBroadcastsView.vue')
+        },
+        {
           path: 'streaming',
           name: 'Streaming',
           component: () =>
