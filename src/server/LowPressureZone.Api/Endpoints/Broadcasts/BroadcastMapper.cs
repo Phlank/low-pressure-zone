@@ -1,9 +1,10 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
+using LowPressureZone.Api.Rules;
 
 namespace LowPressureZone.Api.Endpoints.Broadcasts;
 
-public class BroadcastMapper : IResponseMapper
+public class BroadcastMapper(BroadcastRules rules) : IResponseMapper
 {
     public BroadcastResponse FromEntity(Broadcast broadcast)
         => new()
@@ -13,7 +14,8 @@ public class BroadcastMapper : IResponseMapper
             BroadcastId = broadcast.Id,
             StreamerId = broadcast.Streamer?.Id,
             BroadcasterDisplayName = broadcast.Streamer?.DisplayName,
-            IsDownloadable = broadcast.Recording is not null,
+            IsDownloadable = rules.IsDownloadable(broadcast),
+            IsDeletable = rules.IsDeletable(broadcast),
             RecordingPath = broadcast.Recording?.Path
         };
 }

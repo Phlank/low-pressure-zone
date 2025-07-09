@@ -7,6 +7,7 @@ public class BroadcastResponse
     public DateTime Start { get; set; }
     public DateTime? End { get; set; }
     public bool IsDownloadable { get; set; }
+    public bool IsDeletable { get; set; }
     public string? RecordingPath { get; set; }
     public string? NearestPerformerName { get; set; }
     public int BroadcastId { get; set; }

@@ -15,7 +15,7 @@
         <Column header="Duration">
           <template #body="{ data }: { data: BroadcastResponse }">
             <div v-if="data.end">
-              {{ formatDuration(parseDate(data.end).getTime() - parseDate(data.start).getTime()) }}
+              {{ formatDuration(getDuration(data.end, data.start)) }}
             </div>
           </template>
         </Column>
@@ -35,25 +35,81 @@
         <Column class="grid-action-col grid-action-col--2">
           <template #body="{ data }: { data: BroadcastResponse }">
             <GridActions
+              :show-delete="data.isDeletable"
               :show-download="data.isDownloadable"
+              @delete="handleDeleteClicked(data)"
               @download="handleDownloadClicked(data)" />
           </template>
         </Column>
       </DataTable>
     </div>
+    <DataView
+      v-if="isMobile"
+      :paginator="broadcastStore.broadcasts.length > 5"
+      :paginator-template="mobilePaginatorTemplate"
+      :rows="5"
+      :value="broadcastStore.broadcasts"
+      data-key="broadcastId">
+      <template #empty>
+        <ListItem>
+          <template #left>No items to display.</template>
+        </ListItem>
+      </template>
+      <template #list="{ items }: { items: BroadcastResponse[] }">
+        <div
+          v-for="(broadcast, index) in items"
+          :key="broadcast.broadcastId">
+          <ListItem>
+            <template #left>
+              <div style="font-size: small">
+                {{ formatMobileTimeInfo(broadcast) }}
+              </div>
+              <div>
+                {{
+                  broadcast.nearestPerformerName ?? broadcast.broadcasterDisplayName ?? 'Unknown'
+                }}
+              </div>
+            </template>
+            <template #right>
+              <GridActions
+                :show-delete="broadcast.isDeletable"
+                :show-download="broadcast.isDownloadable"
+                @delete="handleDeleteClicked(broadcast)"
+                @download="handleDownloadClicked(broadcast)" />
+            </template>
+          </ListItem>
+          <Divider v-if="index < items.length - 1" />
+          <div
+            v-else
+            style="padding-bottom: 20px"></div>
+        </div>
+      </template>
+    </DataView>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { inject, type Ref } from 'vue'
 import { useBroadcastStore } from '@/stores/broadcastStore.ts'
-import { Column, DataTable } from 'primevue'
+import { Column, DataTable, DataView, Divider } from 'primevue'
 import type { BroadcastResponse } from '@/api/resources/broadcastsApi.ts'
-import { formatDuration, formatTimeslot, parseDate } from '@/utils/dateUtils.ts'
+import { formatDuration, formatTimeslot, getDuration, parseDate } from '@/utils/dateUtils.ts'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
+import { mobilePaginatorTemplate } from '@/constants/componentTemplates.ts'
+import ListItem from '@/components/data/ListItem.vue'
 
 const broadcastStore = useBroadcastStore()
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 
+const formatMobileTimeInfo = (broadcast: BroadcastResponse) => {
+  let out = parseDate(broadcast.start).toLocaleString()
+  if (broadcast.end) {
+    out += ` - ${formatDuration(getDuration(broadcast.start, broadcast.end))}`
+  }
+  return out
+}
+
 const handleDownloadClicked = (data: BroadcastResponse) => {}
+
+const handleDeleteClicked = (data: BroadcastResponse) => {}
 </script>

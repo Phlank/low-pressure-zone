@@ -13,6 +13,7 @@ export interface BroadcastResponse {
   start: string
   end: string | null
   isDownloadable: boolean
+  isDeletable: boolean
   recordingPath: string | null
   nearestPerformerName: string | null
 }

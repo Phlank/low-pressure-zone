@@ -139,6 +139,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ScheduleRules>();
         services.AddSingleton<PerformerRules>();
         services.AddSingleton<TimeslotRules>();
+        services.AddSingleton<BroadcastRules>();
 
         services.AddSingleton<ISender>(serviceProvider =>
         {

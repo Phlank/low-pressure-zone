@@ -62,6 +62,12 @@ export const minimumDate = (...dates: Date[]) => {
 
 export const formatTimeslot = (date: Date) => formatDate(date, 'h:mm A')
 
+export const getDuration = (start: Date | string, end: Date | string) => {
+  const timeA = typeof start === 'string' ? parseDate(start).getTime() : start.getTime()
+  const timeB = typeof end === 'string' ? parseDate(end).getTime() : end.getTime()
+  return Math.abs(timeB - timeA)
+}
+
 export const formatDuration = (timechangeMs: number) => {
   const seconds = timechangeMs / 1000
   const minutes = seconds / 60
