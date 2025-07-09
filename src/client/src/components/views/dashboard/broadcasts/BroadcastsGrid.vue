@@ -36,9 +36,7 @@
           <template #body="{ data }: { data: BroadcastResponse }">
             <GridActions
               :show-delete="data.isDeletable"
-              :show-download="data.isDownloadable"
-              @delete="handleDeleteClicked(data)"
-              @download="handleDownloadClicked(data)" />
+              :show-download="data.isDownloadable" />
           </template>
         </Column>
       </DataTable>
@@ -73,9 +71,7 @@
             <template #right>
               <GridActions
                 :show-delete="broadcast.isDeletable"
-                :show-download="broadcast.isDownloadable"
-                @delete="handleDeleteClicked(broadcast)"
-                @download="handleDownloadClicked(broadcast)" />
+                :show-download="broadcast.isDownloadable" />
             </template>
           </ListItem>
           <Divider v-if="index < items.length - 1" />
@@ -108,8 +104,4 @@ const formatMobileTimeInfo = (broadcast: BroadcastResponse) => {
   }
   return out
 }
-
-const handleDownloadClicked = (data: BroadcastResponse) => {}
-
-const handleDeleteClicked = (data: BroadcastResponse) => {}
 </script>
