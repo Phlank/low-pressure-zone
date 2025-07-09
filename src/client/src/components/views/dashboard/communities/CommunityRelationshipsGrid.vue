@@ -41,6 +41,7 @@
       <DataView
         v-if="isMobile"
         :paginator="communityStore.getRelationships(props.community.id).length > 5"
+        :paginator-template="mobilePaginatorTemplate"
         :rows="5"
         :value="communityStore.getRelationships(props.community.id)"
         data-key="id">
@@ -120,6 +121,7 @@ import { useUserStore } from '@/stores/userStore.ts'
 import ListItem from '@/components/data/ListItem.vue'
 import FormArea from '@/components/form/FormArea.vue'
 import { useCommunityStore } from '@/stores/communityStore.ts'
+import { mobilePaginatorTemplate } from '@/constants/componentTemplates.ts'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const toast = useToast()

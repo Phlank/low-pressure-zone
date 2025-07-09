@@ -78,6 +78,12 @@ const menuItems: MenuItem[] = [
     visible: true
   },
   {
+    label: 'Broadcasts',
+    icon: 'pi pi-receipt',
+    route: '/dashboard/broadcasts',
+    visible: authStore.isInRole(roles.admin) || authStore.isInRole(roles.organizer)
+  },
+  {
     label: 'Stream Setup',
     icon: 'pi pi-wave-pulse',
     route: '/dashboard/streaming',

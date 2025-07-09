@@ -8,9 +8,9 @@
       <Button
         v-for="action in visibleActions"
         :key="action.name"
+        :severity="action.severity"
         class="button"
         outlined
-        severity="secondary"
         @click="emit('actionClicked', action)">
         <div class="button-content">
           <i :class="action.icon"></i>

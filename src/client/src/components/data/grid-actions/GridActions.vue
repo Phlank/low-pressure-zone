@@ -43,6 +43,7 @@ const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const props = withDefaults(
   defineProps<{
     showCreate?: boolean
+    showDownload?: boolean
     showEdit?: boolean
     showDelete?: boolean
     showInfo?: boolean
@@ -51,6 +52,7 @@ const props = withDefaults(
   }>(),
   {
     showCreate: false,
+    showDownload: false,
     showEdit: false,
     showDelete: false,
     showInfo: false,
@@ -64,6 +66,7 @@ const emit = defineEmits<GridActionEmits>()
 const visibleActions = computed(() => {
   const actions: GridAction[] = []
   if (props.showCreate) actions.push(gridActions.create)
+  if (props.showDownload) actions.push(gridActions.download)
   if (props.showEdit) actions.push(gridActions.edit)
   if (props.showDelete) actions.push(gridActions.delete)
   if (props.showInfo) actions.push(gridActions.info)

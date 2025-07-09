@@ -1,5 +1,6 @@
 export interface GridActionEmits {
   create: []
+  download: []
   edit: []
   delete: []
   info: []
@@ -19,6 +20,12 @@ export const gridActions = {
     icon: 'pi pi-plus',
     severity: 'success',
     emit: 'create'
+  } as GridAction,
+  download: {
+    name: 'Download',
+    icon: 'pi pi-download',
+    severity: 'info',
+    emit: 'download'
   } as GridAction,
   edit: {
     name: 'Edit',

@@ -8,5 +8,6 @@ export enum Routes {
   ResendInvite = '/user/resendinvite',
   Schedules = '/dashboard',
   Communities = '/dashboard/communities',
-  Performers = '/dashboard/performers'
+  Performers = '/dashboard/performers',
+  Broadcasts = '/dashboard/broadcasts'
 }
