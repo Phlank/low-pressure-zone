@@ -1,4 +1,5 @@
 import { ApiResponse, type ValidationProblemDetails } from '@/api/apiResponse'
+import { err, ok, type Result } from '@/types/result.ts'
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -54,6 +55,34 @@ export const sendPost = async <TRequest extends object, TResponse = never>(
 
 export const sendDelete = async (route: string) => {
   return await sendRequest<never, never>('DELETE', route)
+}
+
+export const sendDownload = async (
+  route: string,
+  fileName: string
+): Promise<Result<null, Response | null>> => {
+  try {
+    console.log(`Sending ${route}...`)
+    const response = await fetch(`${API_URL}${route}`, {
+      method: 'GET',
+      credentials: 'include'
+    })
+    if (!response.ok) {
+      return err(response)
+    }
+    const fileBlob = await response.blob()
+    const url = URL.createObjectURL(fileBlob)
+    const anchor = document.createElement('a')
+    anchor.style.display = 'none'
+    anchor.href = url
+    anchor.download = fileName
+    document.body.appendChild(anchor)
+    anchor.click()
+    window.URL.revokeObjectURL(url)
+    return ok(null)
+  } catch {
+    return err(null)
+  }
 }
 
 export type QueryParameters = Record<string, string | number | boolean | null | undefined>

@@ -36,7 +36,8 @@
           <template #body="{ data }: { data: BroadcastResponse }">
             <GridActions
               :show-delete="data.isDeletable"
-              :show-download="data.isDownloadable" />
+              :show-download="data.isDownloadable"
+              @download="handleDownloadClicked(data)" />
           </template>
         </Column>
       </DataTable>
@@ -88,7 +89,7 @@
 import { inject, type Ref } from 'vue'
 import { useBroadcastStore } from '@/stores/broadcastStore.ts'
 import { Column, DataTable, DataView, Divider } from 'primevue'
-import type { BroadcastResponse } from '@/api/resources/broadcastsApi.ts'
+import broadcastsApi, { type BroadcastResponse } from '@/api/resources/broadcastsApi.ts'
 import { formatDuration, formatTimeslot, getDuration, parseDate } from '@/utils/dateUtils.ts'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import { mobilePaginatorTemplate } from '@/constants/componentTemplates.ts'
@@ -103,5 +104,9 @@ const formatMobileTimeInfo = (broadcast: BroadcastResponse) => {
     out += ` - ${formatDuration(getDuration(broadcast.start, broadcast.end))}`
   }
   return out
+}
+
+const handleDownloadClicked = async (data: BroadcastResponse) => {
+  await broadcastsApi.download(data)
 }
 </script>
