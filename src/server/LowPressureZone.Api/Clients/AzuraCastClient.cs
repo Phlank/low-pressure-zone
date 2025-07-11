@@ -24,6 +24,19 @@ public class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<AzuraCas
         return new Result<NowPlayingResponse, HttpResponseMessage>(content);
     }
 
+    public async Task<Result<Streamer, HttpResponseMessage>> GetStreamerAsync(int streamerId)
+    {
+        var response = await _client.GetAsync($"/api/station/{_stationId}/streamer/{streamerId}");
+        if (!response.IsSuccessStatusCode)
+            return new Result<Streamer, HttpResponseMessage>(response);
+
+        var content = await response.Content.ReadFromJsonAsync<Streamer>();
+        if (content is null)
+            return new Result<Streamer, HttpResponseMessage>(response);
+
+        return new Result<Streamer, HttpResponseMessage>(content);
+    }
+
     public async Task<Result<Broadcast[], HttpResponseMessage>> GetBroadcastsAsync(int? streamerId = null)
     {
         var endpoint = streamerId is null

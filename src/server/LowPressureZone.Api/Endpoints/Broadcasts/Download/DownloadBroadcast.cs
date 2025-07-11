@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using System.Net.Mime;
 using FastEndpoints;
 using LowPressureZone.Api.Clients;
 using LowPressureZone.Identity.Constants;
@@ -16,7 +15,19 @@ public class DownloadBroadcast(AzuraCastClient client) : Endpoint<DownloadBroadc
 
     public override async Task HandleAsync(DownloadBroadcastRequest req, CancellationToken ct)
     {
-        var getBroadcastsResult = await client.GetBroadcastsAsync();
+        var getStreamer = client.GetStreamerAsync(req.StreamerId);
+        var getBroadcasts = client.GetBroadcastsAsync(req.StreamerId);
+        await Task.WhenAll(getStreamer, getBroadcasts);
+
+        var getStreamerResult = getStreamer.Result;
+        var getBroadcastsResult = getBroadcasts.Result;
+
+        if (!getStreamerResult.IsSuccess)
+        {
+            await SendNotFoundAsync(ct);
+            return;
+        }
+
         if (!getBroadcastsResult.IsSuccess)
         {
             await SendNotFoundAsync(ct);
@@ -29,7 +40,7 @@ public class DownloadBroadcast(AzuraCastClient client) : Endpoint<DownloadBroadc
             await SendNotFoundAsync(ct);
             return;
         }
-        var fileName = $"{broadcast.Streamer?.DisplayName ?? "NoStreamer"} {broadcast.TimestampStart.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture)}.mp3";
+        var fileName = $"{getStreamerResult.Data?.DisplayName ?? getStreamerResult.Data?.StreamerUsername ?? "Unknown DJ"} {broadcast.TimestampStart.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture)}.mp3";
 
         var downloadResult = await client.DownloadBroadcastAsync(req.StreamerId, req.BroadcastId);
         if (!downloadResult.IsSuccess)

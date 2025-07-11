@@ -8,23 +8,7 @@
       <div
         v-for="action in visibleActions"
         :key="action.name">
-        <a
-          v-if="action.name === 'Download'"
-          :href="downloadUrl"
-          download>
-          <Button
-            :severity="action.severity"
-            class="button"
-            outlined>
-            <div class="button-content">
-              <i :class="action.icon"></i>
-              <span>{{ action.name }}</span>
-              <i class="pi pi-chevron-right"></i>
-            </div>
-          </Button>
-        </a>
         <Button
-          v-else
           :severity="action.severity"
           class="button"
           outlined
