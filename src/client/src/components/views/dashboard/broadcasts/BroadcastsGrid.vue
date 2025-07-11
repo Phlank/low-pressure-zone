@@ -64,16 +64,14 @@
                 {{ formatMobileTimeInfo(broadcast) }}
               </div>
               <div>
-                {{
-                  broadcast.nearestPerformerName ?? broadcast.streamerDisplayName ?? 'Unknown'
-                }}
+                {{ broadcast.nearestPerformerName ?? broadcast.streamerDisplayName ?? 'Unknown' }}
               </div>
             </template>
             <template #right>
               <GridActions
-                :download-url="broadcastsApi.downloadUrl(broadcast)"
                 :show-delete="broadcast.isDeletable"
-                :show-download="broadcast.isDownloadable" />
+                :show-download="broadcast.isDownloadable"
+                @download="handleDownloadClicked(broadcast)" />
             </template>
           </ListItem>
           <Divider v-if="index < items.length - 1" />
@@ -108,6 +106,6 @@ const formatMobileTimeInfo = (broadcast: BroadcastResponse) => {
 }
 
 const handleDownloadClicked = (broadcast: BroadcastResponse) => {
-  broadcastsApi.download(broadcast)
+  broadcastsApi.download(broadcast.streamerId ?? 0, broadcast.broadcastId)
 }
 </script>

@@ -46,7 +46,6 @@ const props = withDefaults(
   defineProps<{
     showCreate?: boolean
     showDownload?: boolean
-    downloadUrl?: string
     showEdit?: boolean
     showDelete?: boolean
     showInfo?: boolean

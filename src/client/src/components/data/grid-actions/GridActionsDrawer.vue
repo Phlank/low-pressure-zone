@@ -31,7 +31,6 @@ import type { GridAction } from './gridAction'
 
 defineProps<{
   visibleActions: GridAction[]
-  downloadUrl?: string
 }>()
 
 const visible: Ref<boolean | undefined> = defineModel('visible', { default: false })
