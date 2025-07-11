@@ -16,7 +16,7 @@ public class DownloadBroadcast(AzuraCastClient client) : Endpoint<DownloadBroadc
 
     public override async Task HandleAsync(DownloadBroadcastRequest req, CancellationToken ct)
     {
-        var getBroadcastsResult = await client.GetBroadcastsAsync(req.StreamerId);
+        var getBroadcastsResult = await client.GetBroadcastsAsync();
         if (!getBroadcastsResult.IsSuccess)
         {
             await SendNotFoundAsync(ct);
