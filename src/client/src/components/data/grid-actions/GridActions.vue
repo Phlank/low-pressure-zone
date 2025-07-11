@@ -4,16 +4,31 @@
       <div
         v-if="!isCombinedIcon"
         class="grid-actions__buttons__multi">
-        <Button
+        <div
           v-for="action in visibleActions"
-          :key="action.name"
-          :disabled="props.disabled"
-          :icon="action.icon"
-          :severity="action.severity"
-          class="grid-actions__buttons__item"
-          outlined
-          rounded
-          @click="emit(action.emit as any)" />
+          :key="action.name">
+          <a
+            v-if="action.name === 'Download'"
+            :href="downloadUrl"
+            download>
+            <Button
+              :disabled="props.disabled"
+              :icon="action.icon"
+              :severity="action.severity"
+              class="grid-actions__buttons__item"
+              outlined
+              rounded />
+          </a>
+          <Button
+            v-else
+            :disabled="props.disabled"
+            :icon="action.icon"
+            :severity="action.severity"
+            class="grid-actions__buttons__item"
+            outlined
+            rounded
+            @click="emit(action.emit as any)" />
+        </div>
       </div>
       <Button
         v-else
@@ -44,6 +59,7 @@ const props = withDefaults(
   defineProps<{
     showCreate?: boolean
     showDownload?: boolean
+    downloadUrl?: string
     showEdit?: boolean
     showDelete?: boolean
     showInfo?: boolean
@@ -97,6 +113,11 @@ const handleDrawerActionClick = (action: GridAction) => {
     width: 100px;
     min-height: 40px;
     text-align: center;
+
+    &__multi {
+      display: flex;
+      flex-direction: row;
+    }
 
     @include variables.mobile {
       width: 40px;

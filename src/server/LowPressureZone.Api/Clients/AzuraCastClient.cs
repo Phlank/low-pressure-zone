@@ -41,12 +41,12 @@ public class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<AzuraCas
         return new Result<Broadcast[], HttpResponseMessage>(content);
     }
 
-    public async Task<Result<Stream, HttpResponseMessage>> DownloadBroadcastAsync(int streamerId, int broadcastId)
+    public async Task<Result<HttpContent, HttpResponseMessage>> DownloadBroadcastAsync(int streamerId, int broadcastId)
     {
-        var response = await _client.GetAsync($"/api/station/{_stationId}/streamer/{streamerId}/broadcast/{broadcastId}/download");
+        var response = await _client.GetAsync($"/api/station/{_stationId}/streamer/{streamerId}/broadcast/{broadcastId}/download", HttpCompletionOption.ResponseHeadersRead);
         if (!response.IsSuccessStatusCode)
-            return new Result<Stream, HttpResponseMessage>(response);
+            return new Result<HttpContent, HttpResponseMessage>(response);
 
-        return new Result<Stream, HttpResponseMessage>(await response.Content.ReadAsStreamAsync());
+        return new Result<HttpContent, HttpResponseMessage>(response.Content);
     }
 }

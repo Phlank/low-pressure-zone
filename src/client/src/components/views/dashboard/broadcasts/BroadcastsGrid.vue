@@ -35,9 +35,9 @@
         <Column class="grid-action-col grid-action-col--2">
           <template #body="{ data }: { data: BroadcastResponse }">
             <GridActions
+              :download-url="broadcastsApi.downloadUrl(data)"
               :show-delete="data.isDeletable"
-              :show-download="data.isDownloadable"
-              @download="handleDownloadClicked(data)" />
+              :show-download="data.isDownloadable" />
           </template>
         </Column>
       </DataTable>
@@ -71,6 +71,7 @@
             </template>
             <template #right>
               <GridActions
+                :download-url="broadcastsApi.downloadUrl(broadcast)"
                 :show-delete="broadcast.isDeletable"
                 :show-download="broadcast.isDownloadable" />
             </template>
@@ -104,9 +105,5 @@ const formatMobileTimeInfo = (broadcast: BroadcastResponse) => {
     out += ` - ${formatDuration(getDuration(broadcast.start, broadcast.end))}`
   }
   return out
-}
-
-const handleDownloadClicked = async (data: BroadcastResponse) => {
-  await broadcastsApi.download(data)
 }
 </script>

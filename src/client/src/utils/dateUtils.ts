@@ -79,3 +79,6 @@ export const formatDuration = (timechangeMs: number) => {
   result += (seconds % 60).toFixed(0) + 's'
   return result
 }
+
+export const formatForFilename = (date: Date) =>
+  `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}_${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}`

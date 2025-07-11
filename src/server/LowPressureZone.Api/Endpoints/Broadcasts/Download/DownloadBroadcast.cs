@@ -1,4 +1,6 @@
-﻿using FastEndpoints;
+﻿using System.Globalization;
+using System.Net.Mime;
+using FastEndpoints;
 using LowPressureZone.Api.Clients;
 using LowPressureZone.Identity.Constants;
 
@@ -27,6 +29,7 @@ public class DownloadBroadcast(AzuraCastClient client) : Endpoint<DownloadBroadc
             await SendNotFoundAsync(ct);
             return;
         }
+        var fileName = $"{broadcast.Streamer?.DisplayName ?? "NoStreamer"} {broadcast.TimestampStart.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture)}.mp3";
 
         var downloadResult = await client.DownloadBroadcastAsync(req.StreamerId, req.BroadcastId);
         if (!downloadResult.IsSuccess)
@@ -34,6 +37,8 @@ public class DownloadBroadcast(AzuraCastClient client) : Endpoint<DownloadBroadc
             await SendNotFoundAsync(ct);
             return;
         }
-        await SendStreamAsync(downloadResult.Data!, cancellation: ct);
+        var size = downloadResult.Data!.Headers.ContentLength ?? 0;
+        var stream = await downloadResult.Data!.ReadAsStreamAsync(ct);
+        await SendStreamAsync(stream, fileName, cancellation: ct, fileLengthBytes: size);
     }
 }
