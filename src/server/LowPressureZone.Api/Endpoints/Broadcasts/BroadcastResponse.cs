@@ -3,7 +3,7 @@
 public class BroadcastResponse
 {
     public int? StreamerId { get; set; }
-    public string? BroadcasterDisplayName { get; set; }
+    public string? StreamerDisplayName { get; set; }
     public DateTime Start { get; set; }
     public DateTime? End { get; set; }
     public bool IsDownloadable { get; set; }

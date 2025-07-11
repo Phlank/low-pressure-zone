@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
-using System.Net.Mime;
+using System.Net;
 using FastEndpoints;
+using FluentValidation.Results;
 using LowPressureZone.Api.Clients;
 using LowPressureZone.Identity.Constants;
 
@@ -16,9 +17,29 @@ public class DownloadBroadcast(AzuraCastClient client) : Endpoint<DownloadBroadc
 
     public override async Task HandleAsync(DownloadBroadcastRequest req, CancellationToken ct)
     {
-        var getBroadcastsResult = await client.GetBroadcastsAsync();
-        if (!getBroadcastsResult.IsSuccess)
+        var getStreamer = client.GetStreamerAsync(req.StreamerId);
+        var getBroadcasts = client.GetBroadcastsAsync(req.StreamerId);
+
+        try
         {
+            await Task.WhenAll(getStreamer, getBroadcasts);
+        }
+        catch (HttpRequestException exception)
+        {
+            Logger.LogError(exception, $"{nameof(DownloadBroadcast)}: Failed to retrieve streamer information");
+        }
+
+        var getStreamerResult = getStreamer.Result;
+        var getBroadcastsResult = getBroadcasts.Result;
+
+        if (!getStreamerResult.IsSuccess || !getBroadcastsResult.IsSuccess)
+        {
+            if (getStreamerResult.Error?.StatusCode == HttpStatusCode.NotFound)
+                AddError(new ValidationFailure(nameof(req.StreamerId), "Streamer not found"));
+            if (getBroadcastsResult.Error?.StatusCode == HttpStatusCode.NotFound)
+                AddError(new ValidationFailure(nameof(req.StreamerId), "Streamer broadcasts not found"));
+            ThrowIfAnyErrors();
+
             await SendNotFoundAsync(ct);
             return;
         }
@@ -27,14 +48,24 @@ public class DownloadBroadcast(AzuraCastClient client) : Endpoint<DownloadBroadc
         if (broadcast is null)
         {
             await SendNotFoundAsync(ct);
+            Logger.LogError($"{nameof(DownloadBroadcast)}: Broadcast not found");
             return;
         }
-        var fileName = $"{broadcast.Streamer?.DisplayName ?? "NoStreamer"} {broadcast.TimestampStart.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture)}.mp3";
+
+        if (string.IsNullOrEmpty(broadcast.Recording?.DownloadUrl))
+        {
+            await SendNotFoundAsync(ct);
+            Logger.LogError($"{nameof(DownloadBroadcast)}: Broadcast recording not available for download");
+            return;
+        }
+
+        var fileName = $"{getStreamerResult.Data?.DisplayName ?? getStreamerResult.Data?.StreamerUsername ?? "Unknown DJ"} {broadcast.TimestampStart.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture)}.mp3";
 
         var downloadResult = await client.DownloadBroadcastAsync(req.StreamerId, req.BroadcastId);
         if (!downloadResult.IsSuccess)
         {
             await SendNotFoundAsync(ct);
+            Logger.LogError($"{nameof(DownloadBroadcast)}: Broadcast download did not succeed");
             return;
         }
         var size = downloadResult.Data!.Headers.ContentLength ?? 0;

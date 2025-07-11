@@ -13,7 +13,7 @@ public class BroadcastMapper(BroadcastRules rules) : IResponseMapper
             End = broadcast.TimestampEnd,
             BroadcastId = broadcast.Id,
             StreamerId = broadcast.Streamer?.Id,
-            BroadcasterDisplayName = broadcast.Streamer?.DisplayName,
+            StreamerDisplayName = broadcast.Streamer?.DisplayName,
             IsDownloadable = rules.IsDownloadable(broadcast),
             IsDeletable = rules.IsDeletable(broadcast),
             RecordingPath = broadcast.Recording?.Path

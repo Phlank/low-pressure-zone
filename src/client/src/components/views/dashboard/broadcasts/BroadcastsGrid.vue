@@ -35,9 +35,9 @@
         <Column class="grid-action-col grid-action-col--2">
           <template #body="{ data }: { data: BroadcastResponse }">
             <GridActions
-              :download-url="broadcastsApi.downloadUrl(data)"
               :show-delete="data.isDeletable"
-              :show-download="data.isDownloadable" />
+              :show-download="data.isDownloadable"
+              @download="handleDownloadClicked(data)" />
           </template>
         </Column>
       </DataTable>
@@ -64,16 +64,14 @@
                 {{ formatMobileTimeInfo(broadcast) }}
               </div>
               <div>
-                {{
-                  broadcast.nearestPerformerName ?? broadcast.broadcasterDisplayName ?? 'Unknown'
-                }}
+                {{ broadcast.nearestPerformerName ?? broadcast.streamerDisplayName ?? 'Unknown' }}
               </div>
             </template>
             <template #right>
               <GridActions
-                :download-url="broadcastsApi.downloadUrl(broadcast)"
                 :show-delete="broadcast.isDeletable"
-                :show-download="broadcast.isDownloadable" />
+                :show-download="broadcast.isDownloadable"
+                @download="handleDownloadClicked(broadcast)" />
             </template>
           </ListItem>
           <Divider v-if="index < items.length - 1" />
@@ -105,5 +103,9 @@ const formatMobileTimeInfo = (broadcast: BroadcastResponse) => {
     out += ` - ${formatDuration(getDuration(broadcast.start, broadcast.end))}`
   }
   return out
+}
+
+const handleDownloadClicked = (broadcast: BroadcastResponse) => {
+  broadcastsApi.download(broadcast.streamerId ?? 0, broadcast.broadcastId)
 }
 </script>

@@ -7,20 +7,7 @@
         <div
           v-for="action in visibleActions"
           :key="action.name">
-          <a
-            v-if="action.name === 'Download'"
-            :href="downloadUrl"
-            download>
-            <Button
-              :disabled="props.disabled"
-              :icon="action.icon"
-              :severity="action.severity"
-              class="grid-actions__buttons__item"
-              outlined
-              rounded />
-          </a>
           <Button
-            v-else
             :disabled="props.disabled"
             :icon="action.icon"
             :severity="action.severity"
@@ -59,7 +46,6 @@ const props = withDefaults(
   defineProps<{
     showCreate?: boolean
     showDownload?: boolean
-    downloadUrl?: string
     showEdit?: boolean
     showDelete?: boolean
     showInfo?: boolean

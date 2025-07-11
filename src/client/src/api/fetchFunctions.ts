@@ -57,28 +57,15 @@ export const sendDelete = async (route: string) => {
   return await sendRequest<never, never>('DELETE', route)
 }
 
-export const sendDownload = async (
-  route: string,
-  fileName: string
-): Promise<Result<null, Response | null>> => {
+export const sendDownload = async (route: string): Promise<Result<null, null>> => {
   try {
-    console.log(`Sending ${route}...`)
-    const response = await fetch(`${API_URL}${route}`, {
-      method: 'GET',
-      credentials: 'include'
-    })
-    if (!response.ok) {
-      return err(response)
-    }
-    const fileBlob = await response.blob()
-    const url = URL.createObjectURL(fileBlob)
+    const url = `${API_URL}${route}`
     const anchor = document.createElement('a')
     anchor.style.display = 'none'
     anchor.href = url
-    anchor.download = fileName
+    anchor.download = 'download'
     document.body.appendChild(anchor)
     anchor.click()
-    window.URL.revokeObjectURL(url)
     return ok(null)
   } catch {
     return err(null)
