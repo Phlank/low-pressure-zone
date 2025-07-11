@@ -11,4 +11,5 @@ public class AppUser : IdentityUser<Guid>
     public required string DisplayName { get; set; }
 
     public Invitation<Guid, AppUser>? Invitation { get; set; }
+    public int? StreamerId { get; set; }
 }
