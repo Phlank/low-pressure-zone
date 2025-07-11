@@ -24,9 +24,13 @@ public class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<AzuraCas
         return new Result<NowPlayingResponse, HttpResponseMessage>(content);
     }
 
-    public async Task<Result<Broadcast[], HttpResponseMessage>> GetBroadcastsAsync()
+    public async Task<Result<Broadcast[], HttpResponseMessage>> GetBroadcastsAsync(int? streamerId = null)
     {
-        var response = await _client.GetAsync($"/api/station/{_stationId}/streamers/broadcasts");
+        var endpoint = streamerId is null
+            ? $"/api/station/{_stationId}/streamers/broadcasts"
+            : $"/api/station/{_stationId}/streamer/{streamerId}/broadcasts";
+
+        var response = await _client.GetAsync(endpoint);
         if (!response.IsSuccessStatusCode)
             return new Result<Broadcast[], HttpResponseMessage>(response);
 
@@ -35,5 +39,14 @@ public class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<AzuraCas
             return new Result<Broadcast[], HttpResponseMessage>(response);
 
         return new Result<Broadcast[], HttpResponseMessage>(content);
+    }
+
+    public async Task<Result<HttpContent, HttpResponseMessage>> DownloadBroadcastAsync(int streamerId, int broadcastId)
+    {
+        var response = await _client.GetAsync($"/api/station/{_stationId}/streamer/{streamerId}/broadcast/{broadcastId}/download", HttpCompletionOption.ResponseHeadersRead);
+        if (!response.IsSuccessStatusCode)
+            return new Result<HttpContent, HttpResponseMessage>(response);
+
+        return new Result<HttpContent, HttpResponseMessage>(response.Content);
     }
 }

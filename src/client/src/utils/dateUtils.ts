@@ -74,8 +74,11 @@ export const formatDuration = (timechangeMs: number) => {
   const hours = minutes / 60
 
   let result = ''
-  if (hours > 1) result += hours.toFixed(0) + 'h '
-  result += (minutes % 60).toFixed(0) + 'm '
+  if (hours > 1) result += Math.floor(hours).toFixed(0) + 'h '
+  if (minutes > 1 || hours > 1) result += (Math.floor(minutes) % 60).toFixed(0) + 'm '
   result += (seconds % 60).toFixed(0) + 's'
   return result
 }
+
+export const formatForFilename = (date: Date) =>
+  `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}_${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}`

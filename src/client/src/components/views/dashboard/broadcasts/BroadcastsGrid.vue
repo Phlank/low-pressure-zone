@@ -35,6 +35,7 @@
         <Column class="grid-action-col grid-action-col--2">
           <template #body="{ data }: { data: BroadcastResponse }">
             <GridActions
+              :download-url="broadcastsApi.downloadUrl(data)"
               :show-delete="data.isDeletable"
               :show-download="data.isDownloadable" />
           </template>
@@ -70,6 +71,7 @@
             </template>
             <template #right>
               <GridActions
+                :download-url="broadcastsApi.downloadUrl(broadcast)"
                 :show-delete="broadcast.isDeletable"
                 :show-download="broadcast.isDownloadable" />
             </template>
@@ -88,7 +90,7 @@
 import { inject, type Ref } from 'vue'
 import { useBroadcastStore } from '@/stores/broadcastStore.ts'
 import { Column, DataTable, DataView, Divider } from 'primevue'
-import type { BroadcastResponse } from '@/api/resources/broadcastsApi.ts'
+import broadcastsApi, { type BroadcastResponse } from '@/api/resources/broadcastsApi.ts'
 import { formatDuration, formatTimeslot, getDuration, parseDate } from '@/utils/dateUtils.ts'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import { mobilePaginatorTemplate } from '@/constants/componentTemplates.ts'

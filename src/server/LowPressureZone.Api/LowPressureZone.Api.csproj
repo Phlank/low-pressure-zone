@@ -10,16 +10,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FastEndpoints" Version="6.0.0"/>
-        <PackageReference Include="FastEndpoints.Security" Version="6.0.0"/>
-        <PackageReference Include="FastEndpoints.Swagger" Version="6.0.0"/>
+        <PackageReference Include="FastEndpoints" Version="6.2.0"/>
+        <PackageReference Include="FastEndpoints.Security" Version="6.2.0"/>
+        <PackageReference Include="FastEndpoints.Swagger" Version="6.2.0"/>
         <PackageReference Include="FluentEmail.Mailgun" Version="3.0.2"/>
-        <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="9.0.4"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
+        <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="9.0.7"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.7">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Minerals.StringCases" Version="0.2.1"/>
+        <PackageReference Include="Minerals.StringCases" Version="0.2.2"/>
         <PackageReference Include="Shouldly" Version="4.3.0"/>
     </ItemGroup>
 
