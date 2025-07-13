@@ -14,6 +14,13 @@ public class Result<T, TErr>
     {
         _error = error;
     }
+
+    public Result(T? data, TErr? error)
+    {
+        _data = data;
+        _error = error;
+    }
+
     public T? Data => _data;
     public TErr? Error => _error;
     public bool IsSuccess => Error is null;

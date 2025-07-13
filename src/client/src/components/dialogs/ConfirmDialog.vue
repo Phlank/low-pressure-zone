@@ -1,23 +1,22 @@
-<template>
+﻿<template>
   <Dialog
     :draggable="false"
     :header="header"
     :visible="visible"
-    class="delete-dialog"
+    class="confirm-dialog"
     modal
     @hide="emit('close')"
     @update:visible="isSubmitting ? undefined : emit('close')">
     <template #default>
-      <span v-if="entityName"> Delete {{ entityType }} {{ entityName }}? </span>
-      <span v-else> Delete {{ entityType }}? </span>
+      {{ text }}
     </template>
     <template #footer>
-      <div class="delete-dialog__footer">
+      <div class="form-dialog__footer">
         <Button
           class="input"
-          label="Delete"
-          severity="danger"
-          @click="emit('delete')" />
+          label="Yes"
+          severity="success"
+          @click="emit('confirm')" />
       </div>
     </template>
   </Dialog>
@@ -26,24 +25,28 @@
 <script lang="ts" setup>
 import { Button, Dialog } from 'primevue'
 
-defineProps<{
-  header: string
-  visible: boolean
-  isSubmitting: boolean
-  entityType: string
-  entityName?: string
-}>()
+withDefaults(
+  defineProps<{
+    visible: boolean
+    isSubmitting: boolean
+    text: string
+    header?: string
+  }>(),
+  {
+    header: 'Confirm Action'
+  }
+)
 
 const emit = defineEmits<{
   close: []
-  delete: []
+  confirm: []
 }>()
 </script>
 
 <style lang="scss">
 @use '@/assets/styles/variables';
 
-.delete-dialog {
+.confirm-dialog {
   min-width: min-content;
   width: min(600px, calc(100vw - 2 * #{variables.$space-l}));
 }

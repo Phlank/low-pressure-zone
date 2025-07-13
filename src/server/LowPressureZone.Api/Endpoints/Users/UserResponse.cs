@@ -6,4 +6,5 @@ public class UserResponse
     public required string DisplayName { get; set; }
     public required bool IsAdmin { get; set; }
     public required DateTime? RegistrationDate { get; set; }
+    public required bool IsStreamer { get; set; }
 }
