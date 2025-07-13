@@ -100,10 +100,8 @@ const isSubmittingConfirmDialog = ref(false)
 const handleCreateStreamers = async () => {
   isSubmittingConfirmDialog.value = true
   const response = await usersApi.createStreamers()
-  if (response.isSuccess()) {
+  if (!tryHandleUnsuccessfulResponse(response, toast)) {
     showCreateSuccessToast(toast, 'Streamers', 'All')
-  } else {
-    tryHandleUnsuccessfulResponse(response, toast)
   }
   showConfirmDialog.value = false
   isSubmittingConfirmDialog.value = false

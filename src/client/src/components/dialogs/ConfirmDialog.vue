@@ -13,6 +13,8 @@
     <template #footer>
       <div class="form-dialog__footer">
         <Button
+          :disabled="isSubmitting"
+          :loading="isSubmitting"
           class="input"
           label="Yes"
           severity="success"
