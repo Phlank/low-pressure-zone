@@ -1,9 +1,10 @@
-import { sendGet } from '../fetchFunctions.ts'
+import { sendGet, sendPost } from '../fetchFunctions.ts'
 
 const route = '/users'
 
 export default {
-  get: () => sendGet<UserResponse[]>(route)
+  get: () => sendGet<UserResponse[]>(route),
+  createStreamers: () => sendPost(`${route}/streamers`)
 }
 
 export interface UserResponse {
@@ -11,4 +12,5 @@ export interface UserResponse {
   displayName: string
   registrationDate: string
   isAdmin: boolean
+  isStreamer: boolean
 }

@@ -10,7 +10,7 @@
       </TabList>
       <TabPanels v-if="isLoaded">
         <TabPanel value="users">
-          <UsersGrid :users="users" />
+          <ActiveTab />
         </TabPanel>
         <TabPanel value="pending">
           <InvitesGrid :invites="invites" />
@@ -31,10 +31,10 @@ import { Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs, useToast } from 'pri
 import { onMounted, ref, type Ref } from 'vue'
 import InvitesGrid from './InvitesGrid.vue'
 import InviteUser from './InviteUser.vue'
-import UsersGrid from './UsersGrid.vue'
 import usersApi, { type UserResponse } from '@/api/resources/usersApi.ts'
 import invitesApi, { type InviteResponse } from '@/api/resources/invitesApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import ActiveTab from '@/components/views/dashboard/users/ActiveTab.vue'
 
 const isLoaded = ref(false)
 const tabValue: Ref<string | number> = ref('users')

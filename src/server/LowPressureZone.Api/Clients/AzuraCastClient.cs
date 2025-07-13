@@ -50,6 +50,38 @@ public class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<AzuraCas
         return new Result<Streamer, HttpResponseMessage>(content);
     }
 
+    public async Task<Result<int, HttpResponseMessage>> CreateStreamerAsync(string username, string password, string displayName)
+    {
+        Streamer body = new()
+        {
+            Id = 0,
+            StreamerUsername = username,
+            StreamerPassword = password,
+            DisplayName = displayName,
+            Comments = null,
+            IsActive = true,
+            EnforceSchedule = false,
+            ReactivateAt = null
+        };
+        var result = await _client.PostAsJsonAsync($"/api/station/{_stationId}/streamers", body);
+        if (!result.IsSuccessStatusCode) return new Result<int, HttpResponseMessage>(result);
+
+        var streamers = await GetStreamersAsync();
+        var streamerId = streamers.Data?.FirstOrDefault(streamer => streamer.StreamerUsername == username)?.Id;
+        if (streamerId is null)
+            return new Result<int, HttpResponseMessage>(streamers.Error!);
+
+        return new Result<int, HttpResponseMessage>(streamerId.Value);
+    }
+
+    public async Task<Result<bool, HttpResponseMessage>> UpdateStreamerAsync(Streamer streamer)
+    {
+        var result = await _client.PutAsJsonAsync($"/api/station/{_stationId}/streamer/{streamer.Id}", streamer);
+        return !result.IsSuccessStatusCode
+            ? new Result<bool, HttpResponseMessage>(result)
+            : new Result<bool, HttpResponseMessage>(true);
+    }
+
     public async Task<Result<Broadcast[], HttpResponseMessage>> GetBroadcastsAsync(int? streamerId = null)
     {
         var endpoint = streamerId is null
