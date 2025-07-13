@@ -2,8 +2,10 @@
 using FastEndpoints;
 using FluentEmail.Core;
 using FluentValidation.Results;
+using LowPressureZone.Api.Clients;
 using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Extensions;
+using LowPressureZone.Api.Services;
 using LowPressureZone.Api.Utilities;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;
@@ -12,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Users.Register;
 
-public class PostRegister(UserManager<AppUser> userManager, IdentityContext identityContext) : Endpoint<RegisterRequest>
+public class PostRegister(UserManager<AppUser> userManager, IdentityContext identityContext, AzuraCastClient radioClient, EmailService emailService) : Endpoint<RegisterRequest>
 {
     private readonly DateTime _requestTime = DateTime.UtcNow;
 
@@ -85,6 +87,13 @@ public class PostRegister(UserManager<AppUser> userManager, IdentityContext iden
         user.DisplayName = req.DisplayName;
         user.TwoFactorEnabled = true;
         await userManager.UpdateAsync(user);
+
+        var createStreamerResult = await userManager.LinkToNewStreamer(user, radioClient);
+        if (!createStreamerResult.IsSuccess)
+        {
+            Logger.LogWarning("Error when creating streamer for new user");
+            _ = await emailService.SendAdminMessage($"Failure to create streamer for new user: {createStreamerResult.Error}", "Streamer creation failed");
+        }
 
         invitation.IsRegistered = true;
         invitation.RegistrationDate = DateTime.UtcNow;
