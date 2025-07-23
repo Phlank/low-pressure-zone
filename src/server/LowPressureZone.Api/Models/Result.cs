@@ -5,17 +5,7 @@ public class Result<T, TErr>
     private T? _data;
     private TErr? _error;
 
-    public Result(T data)
-    {
-        _data = data;
-    }
-
-    public Result(TErr error)
-    {
-        _error = error;
-    }
-
-    public Result(T? data, TErr? error)
+    private Result(T? data, TErr? error)
     {
         _data = data;
         _error = error;
@@ -24,4 +14,7 @@ public class Result<T, TErr>
     public T? Data => _data;
     public TErr? Error => _error;
     public bool IsSuccess => Error is null;
+
+    public static Result<T, TErr> Ok(T data) => new(data, default);
+    public static Result<T, TErr> Err(TErr error) => new(default, error);
 }

@@ -10,6 +10,7 @@ namespace LowPressureZone.Api.Extensions;
 
 public static class UserManagerExtensions
 {
+    private static string NewStreamerPassword => Guid.NewGuid().ToString().Replace("-", "");
     public static async Task SendWelcomeEmail(this UserManager<AppUser> userManager, AppUser user, EmailService emailService)
     {
         var inviteToken = await userManager.GenerateUserTokenAsync(user, TokenProviders.Default, TokenPurposes.Invite);
@@ -27,29 +28,41 @@ public static class UserManagerExtensions
         var username = user.UserName;
         var password = Guid.NewGuid().ToString().Replace("-", "");
 
-        if (user.StreamerId != null) return new Result<string, string>(null, "User already linked to streamer");
+        if (user.StreamerId != null) return Result<string, string>.Err("User already linked to streamer");
 
         var createResult = await client.CreateStreamerAsync(username!, password, displayName);
-        if (!createResult.IsSuccess) return new Result<string, string>(null, $"Unable to create streamer for user: ${createResult.Error?.ReasonPhrase ?? "No reason given by AzuraCast"}");
+        if (!createResult.IsSuccess) return Result<string, string>.Err($"Unable to create streamer for user: ${createResult.Error?.ReasonPhrase ?? "No reason given by AzuraCast"}");
 
         user.StreamerId = createResult.Data;
         await userManager.UpdateAsync(user);
-        return new Result<string, string>(password, null);
+        return Result<string, string>.Ok(password);
     }
 
-    public static async Task<Result<string, string>> LinkToExistingStreamer(this UserManager<AppUser> userManager, AppUser user, AzuraCastClient client)
+    public static async Task<Result<bool, string>> LinkToExistingStreamer(this UserManager<AppUser> userManager, AppUser user, AzuraCastClient client)
     {
-        var password = Guid.NewGuid().ToString().Replace("-", "");
         var streamersResult = await client.GetStreamersAsync();
-        if (!streamersResult.IsSuccess) return new Result<string, string>(null, "Unable to get streamers");
+        if (!streamersResult.IsSuccess) return Result<bool, string>.Err("Unable to get streamers");
 
         var match = streamersResult.Data!.FirstOrDefault(streamer => streamer.StreamerUsername == user.UserName);
-        if (match is null) return new Result<string, string>(null, "No streamer found with matching username");
-
-        match.StreamerPassword = password;
+        if (match is null) return Result<bool, string>.Err("No streamer found with matching username");
 
         user.StreamerId = match.Id;
         await userManager.UpdateAsync(user);
-        return new Result<string, string>(password, null);
+        return Result<bool, string>.Ok(true);
+    }
+
+    public static async Task<Result<string, string>> GenerateStreamerPassword(this UserManager<AppUser> userManager, AppUser user, AzuraCastClient client)
+    {
+        if (user.StreamerId is null) return Result<string, string>.Err("User does not have linked streamer");
+
+        var getStreamerResult = await client.GetStreamerAsync(user.StreamerId.Value);
+        if (!getStreamerResult.IsSuccess) return Result<string, string>.Err($"Unable to get streamer: {getStreamerResult.Error!.ReasonPhrase}");
+
+        var streamer = getStreamerResult.Data!;
+        streamer.StreamerPassword = NewStreamerPassword;
+        var updateStreamerResult = await client.UpdateStreamerAsync(streamer);
+        if (updateStreamerResult.IsSuccess) return Result<string, string>.Ok(streamer.StreamerPassword);
+
+        return Result<string, string>.Err($"Unable to save streamer password: {updateStreamerResult.Error!.ReasonPhrase}");
     }
 }

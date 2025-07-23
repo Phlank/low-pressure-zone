@@ -19,16 +19,15 @@ public class EmailService(IOptions<EmailServiceOptions> options, UriService uriS
                          .Subject(subject)
                          .Body(body);
         var sendResponse = await sender.SendAsync(email);
-        if (!sendResponse.Successful)
-        {
-            LogEmailFailure(logger, JsonSerializer.Serialize(sendResponse), null);
-            // Don't send an admin message regarding email failure if the failed email was an admin message
-            var adminEmailBody = "Begin errors";
-            adminEmailBody += "\n" + string.Join("\n", sendResponse.ErrorMessages);
-            if (!subject.Contains("Admin Message", StringComparison.InvariantCulture)) _ = await SendAdminMessage(adminEmailBody, "Error sending email");
-            return new Result<SendResponse, SendResponse>(null, sendResponse);
-        }
-        return new Result<SendResponse, SendResponse>(sendResponse, null);
+        if (sendResponse.Successful)
+            return Result<SendResponse, SendResponse>.Ok(sendResponse);
+
+        LogEmailFailure(logger, JsonSerializer.Serialize(sendResponse), null);
+        // Don't send an admin message regarding email failure if the failed email was an admin message
+        var adminEmailBody = "Begin errors";
+        adminEmailBody += "\n" + string.Join("\n", sendResponse.ErrorMessages);
+        if (!subject.Contains("Admin Message", StringComparison.InvariantCulture)) _ = await SendAdminMessage(adminEmailBody, "Error sending email");
+        return Result<SendResponse, SendResponse>.Err(sendResponse);
     }
 
 
@@ -61,7 +60,7 @@ public class EmailService(IOptions<EmailServiceOptions> options, UriService uriS
         subject += " | Admin Message | Low Pressure Zone";
         if (!subject.EndsWith("Low Pressure Zone", StringComparison.InvariantCulture)) subject += " - Low Pressure Zone";
         var result = await SendAsync(adminEmail, subject, message);
-        if (!result.IsSuccess) return new Result<bool, SendResponse>(result.Error!);
-        return new Result<bool, SendResponse>(true);
+        if (!result.IsSuccess) return Result<bool, SendResponse>.Err(result.Error!);
+        return Result<bool, SendResponse>.Ok(true);
     }
 }
