@@ -1,20 +1,21 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Endpoints.Performers;
+using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Entities;
-using LowPressureZone.Domain.Extensions;
 using Shouldly;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
-public class TimeslotMapper(IHttpContextAccessor contextAccessor,
-                            TimeslotRules rules,
-                            PerformerMapper performerMapper)
+public class TimeslotMapper(
+    IHttpContextAccessor contextAccessor,
+    TimeslotRules rules,
+    PerformerMapper performerMapper)
     : IRequestMapper, IResponseMapper
 {
     public Timeslot ToEntity(TimeslotRequest req)
-        => new Timeslot
+        => new()
         {
             Name = req.Name?.Trim(),
             StartsAt = req.StartsAt.ToUniversalTime(),

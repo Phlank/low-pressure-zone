@@ -1,5 +1,5 @@
-﻿using LowPressureZone.Api.Models.Icecast;
-using LowPressureZone.Api.Models.Stream;
+﻿using LowPressureZone.Api.Models.Stream;
+using LowPressureZone.Api.Models.Stream.Icecast;
 
 namespace LowPressureZone.Api.Services.Stream;
 
@@ -31,7 +31,9 @@ public class IcecastStatusMapper
     {
         if (entity is null || entity.IsStale) return Offline;
 
-        var liveSource = entity.Sources.FirstOrDefault(source => source.ListenUrl.EndsWith("/live", StringComparison.OrdinalIgnoreCase));
+        var liveSource =
+            entity.Sources.FirstOrDefault(source =>
+                                              source.ListenUrl.EndsWith("/live", StringComparison.OrdinalIgnoreCase));
         if (liveSource is null) return NotLive;
 
         return new StreamStatus

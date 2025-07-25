@@ -1,20 +1,18 @@
 ﻿namespace LowPressureZone.Api.Models;
 
-public class Result<T, TErr>
+public class Result<T, TErr>(T? value, TErr? error)
 {
-    private T? _data;
-    private TErr? _error;
+    public T Value =>
+        value ?? throw new InvalidOperationException("Cannot access the value of an unsuccessful result");
 
-    private Result(T? data, TErr? error)
-    {
-        _data = data;
-        _error = error;
-    }
+    public TErr Error =>
+        error ?? throw new InvalidOperationException("Cannot access the error of a successful result");
 
-    public T? Data => _data;
-    public TErr? Error => _error;
     public bool IsSuccess => Error is null;
+}
 
-    public static Result<T, TErr> Ok(T data) => new(data, default);
-    public static Result<T, TErr> Err(TErr error) => new(default, error);
+public static class Result
+{
+    public static Result<T, TErr> Ok<T, TErr>(T data) => new(data, default);
+    public static Result<T, TErr> Err<T, TErr>(TErr error) => new(default, error);
 }

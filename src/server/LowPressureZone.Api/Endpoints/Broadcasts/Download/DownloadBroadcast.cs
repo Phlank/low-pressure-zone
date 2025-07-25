@@ -44,7 +44,7 @@ public class DownloadBroadcast(AzuraCastClient client) : Endpoint<DownloadBroadc
             return;
         }
 
-        var broadcast = getBroadcastsResult.Data!.FirstOrDefault(broadcast => broadcast.Id == req.BroadcastId);
+        var broadcast = getBroadcastsResult.Value!.FirstOrDefault(broadcast => broadcast.Id == req.BroadcastId);
         if (broadcast is null)
         {
             await SendNotFoundAsync(ct);
@@ -59,7 +59,8 @@ public class DownloadBroadcast(AzuraCastClient client) : Endpoint<DownloadBroadc
             return;
         }
 
-        var fileName = $"{getStreamerResult.Data?.DisplayName ?? getStreamerResult.Data?.StreamerUsername ?? "Unknown DJ"} {broadcast.TimestampStart.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture)}.mp3";
+        var fileName =
+            $"{getStreamerResult.Value?.DisplayName ?? getStreamerResult.Value?.StreamerUsername ?? "Unknown DJ"} {broadcast.TimestampStart.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture)}.mp3";
 
         var downloadResult = await client.DownloadBroadcastAsync(req.StreamerId, req.BroadcastId);
         if (!downloadResult.IsSuccess)
@@ -68,8 +69,9 @@ public class DownloadBroadcast(AzuraCastClient client) : Endpoint<DownloadBroadc
             Logger.LogError($"{nameof(DownloadBroadcast)}: Broadcast download did not succeed");
             return;
         }
-        var size = downloadResult.Data!.Headers.ContentLength ?? 0;
-        var stream = await downloadResult.Data!.ReadAsStreamAsync(ct);
+
+        var size = downloadResult.Value!.Headers.ContentLength ?? 0;
+        var stream = await downloadResult.Value!.ReadAsStreamAsync(ct);
         await SendStreamAsync(stream, fileName, cancellation: ct, fileLengthBytes: size);
     }
 }

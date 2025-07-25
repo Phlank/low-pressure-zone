@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
+using LowPressureZone.Api.Extensions;
 using LowPressureZone.Domain.Entities;
-using LowPressureZone.Domain.Extensions;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
 using Shouldly;
@@ -18,7 +18,9 @@ public class ScheduleRules(IHttpContextAccessor contextAccessor)
         if (schedule.EndsAt < DateTime.UtcNow) return false;
         if (User == null) return false;
         if (User.IsInRole(RoleNames.Admin)) return true;
-        return schedule.Community.Relationships.Any(relationship => relationship.UserId == User.GetIdOrDefault() && relationship.IsPerformer);
+        return schedule.Community.Relationships.Any(relationship =>
+                                                        relationship.UserId == User.GetIdOrDefault() &&
+                                                        relationship.IsPerformer);
     }
 
     public bool IsEditAuthorized(Schedule schedule)
@@ -28,7 +30,9 @@ public class ScheduleRules(IHttpContextAccessor contextAccessor)
         if (User == null) return false;
         if (schedule.EndsAt < DateTime.UtcNow) return false;
         if (User.IsInRole(RoleNames.Admin)) return true;
-        return schedule.Community.Relationships.Any(relationship => relationship.UserId == User.GetIdOrDefault() && relationship.IsOrganizer);
+        return schedule.Community.Relationships.Any(relationship =>
+                                                        relationship.UserId == User.GetIdOrDefault() &&
+                                                        relationship.IsOrganizer);
     }
 
     public bool IsDeleteAuthorized(Schedule schedule)
@@ -38,7 +42,9 @@ public class ScheduleRules(IHttpContextAccessor contextAccessor)
         if (User == null) return false;
         if (schedule.EndsAt < DateTime.UtcNow) return false;
         if (User.IsInRole(RoleNames.Admin)) return true;
-        return schedule.Community.Relationships.Any(relationship => relationship.UserId == User.GetIdOrDefault() && relationship.IsOrganizer);
+        return schedule.Community.Relationships.Any(relationship =>
+                                                        relationship.UserId == User.GetIdOrDefault() &&
+                                                        relationship.IsOrganizer);
     }
 
     public bool IsHiddenFromApi(Schedule schedule)

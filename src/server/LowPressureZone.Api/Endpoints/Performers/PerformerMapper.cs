@@ -1,15 +1,16 @@
 ﻿using System.Security.Claims;
 using FastEndpoints;
+using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Entities;
-using LowPressureZone.Domain.Extensions;
 using LowPressureZone.Identity.Extensions;
 using Shouldly;
 
 namespace LowPressureZone.Api.Endpoints.Performers;
 
-public sealed class PerformerMapper(IHttpContextAccessor contextAccessor, PerformerRules rules) : IRequestMapper, IResponseMapper
+public sealed class PerformerMapper(IHttpContextAccessor contextAccessor, PerformerRules rules)
+    : IRequestMapper, IResponseMapper
 {
     private ClaimsPrincipal? User => contextAccessor.GetAuthenticatedUserOrDefault();
 
@@ -39,7 +40,7 @@ public sealed class PerformerMapper(IHttpContextAccessor contextAccessor, Perfor
     }
 
     public PerformerResponse FromEntity(Performer performer)
-        => new PerformerResponse
+        => new()
         {
             Id = performer.Id,
             Name = performer.Name,

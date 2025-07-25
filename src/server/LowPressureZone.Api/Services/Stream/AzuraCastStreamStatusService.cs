@@ -5,8 +5,9 @@ using LowPressureZone.Api.Models.Stream;
 
 namespace LowPressureZone.Api.Services.Stream;
 
-public class AzuraCastStreamStatusService(AzuraCastClient client,
-                                          ILogger<IcecastStatusService> logger)
+public class AzuraCastStreamStatusService(
+    AzuraCastClient client,
+    ILogger<IcecastStatusService> logger)
     : IStreamStatusService, IDisposable
 {
     private readonly Lock _statusLock = new();
@@ -42,7 +43,8 @@ public class AzuraCastStreamStatusService(AzuraCastClient client,
             await RefreshStatusAsync();
     }
 
-    [SuppressMessage("Performance", "CA1848:Use the LoggerMessage delegates", Justification = "Not performance sensitive")]
+    [SuppressMessage("Performance", "CA1848:Use the LoggerMessage delegates",
+                     Justification = "Not performance sensitive")]
     private async Task RefreshStatusAsync()
     {
         try
@@ -53,7 +55,8 @@ public class AzuraCastStreamStatusService(AzuraCastClient client,
                 logger.LogError($"{nameof(AzuraCastStreamStatusService)}: Unable to retrieve status from AzuraCast");
                 return;
             }
-            var content = result.Data;
+
+            var content = result.Value;
             if (content is null)
                 return;
 
@@ -65,7 +68,7 @@ public class AzuraCastStreamStatusService(AzuraCastClient client,
             if (content.NowPlaying?.Song.Title is not null)
                 name += $" - {content.NowPlaying.Song.Title}";
 
-            name = name.Trim(['-', ' ']);
+            name = name.Trim('-', ' ');
 
             lock (_statusLock)
             {
@@ -83,15 +86,18 @@ public class AzuraCastStreamStatusService(AzuraCastClient client,
         }
         catch (HttpRequestException httpRequestException)
         {
-            logger.LogError(httpRequestException, "Unable to retrieve status from server: The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation or timeout.");
+            logger.LogError(httpRequestException,
+                            "Unable to retrieve status from server: The request failed due to an underlying issue such as network connectivity, DNS failure, server certificate validation or timeout.");
         }
         catch (TaskCanceledException taskCanceledException)
         {
-            logger.LogError(taskCanceledException, "Unable to retrieve status from server: The request failed due to timeout.");
+            logger.LogError(taskCanceledException,
+                            "Unable to retrieve status from server: The request failed due to timeout.");
         }
         catch (JsonException jsonException)
         {
-            logger.LogError(jsonException, "Unable to retrieve status from server: The JSON is invalid. -or- TValue is not compatible with the JSON. -or- There is remaining data in the stream.");
+            logger.LogError(jsonException,
+                            "Unable to retrieve status from server: The JSON is invalid. -or- TValue is not compatible with the JSON. -or- There is remaining data in the stream.");
         }
         catch (Exception otherException)
         {

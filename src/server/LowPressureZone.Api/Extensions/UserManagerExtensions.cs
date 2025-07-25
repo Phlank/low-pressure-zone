@@ -13,7 +13,8 @@ public static class UserManagerExtensions
 {
     private static string NewStreamerPassword => Guid.NewGuid().ToString().Replace("-", "");
 
-    public static async Task SendWelcomeEmail(this UserManager<AppUser> userManager, AppUser user,
+    public static async Task SendWelcomeEmail(this UserManager<AppUser> userManager,
+                                              AppUser user,
                                               EmailService emailService)
     {
         var inviteToken = await userManager.GenerateUserTokenAsync(user, TokenProviders.Default, TokenPurposes.Invite);
@@ -26,69 +27,70 @@ public static class UserManagerExtensions
     }
 
     public static async Task<Result<string, string>> LinkToNewStreamer(this UserManager<AppUser> userManager,
-                                                                       AppUser user, AzuraCastClient client)
+                                                                       AppUser user,
+                                                                       AzuraCastClient client)
     {
         var displayName = user.DisplayName;
         var username = user.UserName;
         var password = Guid.NewGuid().ToString().Replace("-", "");
 
-        if (user.StreamerId != null) return Result<string, string>.Err("User already linked to streamer");
+        if (user.StreamerId != null) return Result.Err<string, string>("User already linked to streamer");
 
         var createResult = await client.CreateStreamerAsync(username!, password, displayName);
         if (!createResult.IsSuccess)
             return
-                Result<string, string>
-                    .Err($"Unable to create streamer for user: ${createResult.Error?.ReasonPhrase ?? "No reason given by AzuraCast"}");
+                Result.Err<string, string>($"Unable to create streamer for user: ${createResult.Error?.ReasonPhrase ?? "No reason given by AzuraCast"}");
 
-        user.StreamerId = createResult.Data;
+        user.StreamerId = createResult.Value;
         await userManager.UpdateAsync(user);
-        return Result<string, string>.Ok(password);
+        return Result.Ok<string, string>(password);
     }
 
-    public static async Task<Result<bool, string>> LinkToExistingStreamer(
-        this UserManager<AppUser> userManager, AppUser user, AzuraCastClient client)
+    public static async Task<Result<bool, string>> LinkToExistingStreamer(this UserManager<AppUser> userManager,
+                                                                          AppUser user,
+                                                                          AzuraCastClient client)
     {
         var streamersResult = await client.GetStreamersAsync();
-        if (!streamersResult.IsSuccess) return Result<bool, string>.Err("Unable to get streamers");
+        if (!streamersResult.IsSuccess) return Result.Err<bool, string>("Unable to get streamers");
 
-        var match = streamersResult.Data!.FirstOrDefault(streamer => streamer.StreamerUsername == user.UserName);
-        if (match is null) return Result<bool, string>.Err("No streamer found with matching username");
+        var match = streamersResult.Value!.FirstOrDefault(streamer => streamer.StreamerUsername == user.UserName);
+        if (match is null) return Result.Err<bool, string>("No streamer found with matching username");
 
         user.StreamerId = match.Id;
         await userManager.UpdateAsync(user);
-        return Result<bool, string>.Ok(true);
+        return Result.Ok<bool, string>(true);
     }
 
-    public static async Task<Result<string, string>> GenerateStreamerPassword(
-        this UserManager<AppUser> userManager, AppUser user, AzuraCastClient client)
+    public static async Task<Result<string, string>> GenerateStreamerPassword(this UserManager<AppUser> userManager,
+                                                                              AppUser user,
+                                                                              AzuraCastClient client)
     {
-        if (user.StreamerId is null) return Result<string, string>.Err("User does not have linked streamer");
+        if (user.StreamerId is null) return Result.Err<string, string>("User does not have linked streamer");
 
         var getStreamerResult = await client.GetStreamerAsync(user.StreamerId.Value);
         if (!getStreamerResult.IsSuccess)
-            return Result<string, string>.Err($"Unable to get streamer: {getStreamerResult.Error!.ReasonPhrase}");
+            return Result.Err<string, string>($"Unable to get streamer: {getStreamerResult.Error!.ReasonPhrase}");
 
-        var streamer = getStreamerResult.Data!;
+        var streamer = getStreamerResult.Value!;
         streamer.StreamerPassword = NewStreamerPassword;
         var updateStreamerResult = await client.UpdateStreamerAsync(streamer);
-        if (updateStreamerResult.IsSuccess) return Result<string, string>.Ok(streamer.StreamerPassword);
+        if (updateStreamerResult.IsSuccess) return Result.Ok<string, string>(streamer.StreamerPassword);
 
         return
-            Result<string, string>.Err($"Unable to save streamer password: {updateStreamerResult.Error!.ReasonPhrase}");
+            Result.Err<string, string>($"Unable to save streamer password: {updateStreamerResult.Error!.ReasonPhrase}");
     }
 
-    public static async Task<Result<Streamer, string>> GetStreamerAsync(
-        this UserManager<AppUser> userManager, string username, AzuraCastClient client)
+    public static async Task<Result<Streamer, string>> GetStreamerAsync(this UserManager<AppUser> userManager,
+                                                                        AppUser user,
+                                                                        AzuraCastClient client)
     {
-        var user = await userManager.FindByNameAsync(username);
-        if (user is null) return Result<Streamer, string>.Err("Could not locate user");
         if (!user.StreamerId.HasValue)
-            return Result<Streamer, string>.Err("User is not linked to streamer");
+            return Result.Err<Streamer, string>("User is not linked to streamer");
 
         var getStreamerResult = await client.GetStreamerAsync(user.StreamerId.Value);
         if (!getStreamerResult.IsSuccess)
-            return Result<Streamer, string>.Err($"Unable to get streamer: {getStreamerResult.Error!.ReasonPhrase}");
+            return Result.Err<Streamer, string>($"Unable to get streamer: {getStreamerResult.Error!.ReasonPhrase}");
 
-        return Result<Streamer, string>.Ok(getStreamerResult.Data!);
+        return Result.Ok<Streamer, string>(getStreamerResult.Value!);
     }
 }

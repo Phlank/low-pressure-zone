@@ -75,11 +75,9 @@ public static class ServiceCollectionExtensions
         }
         else
         {
-            services.ConfigureApplicationCookie(options =>
-            {
-                options.Cookie.SameSite = SameSiteMode.Lax;
-            });
+            services.ConfigureApplicationCookie(options => { options.Cookie.SameSite = SameSiteMode.Lax; });
         }
+
         services.ConfigureApplicationCookie(options =>
         {
             options.Cookie.Name = "LowPressureZoneCookie";
@@ -109,16 +107,16 @@ public static class ServiceCollectionExtensions
             options.AddPolicy("Development", builder =>
             {
                 builder.WithOrigins("http://localhost:4001")
-                       .AllowAnyHeader()
-                       .WithMethods("GET", "PUT", "POST", "DELETE")
-                       .AllowCredentials();
+                    .AllowAnyHeader()
+                    .WithMethods("GET", "PUT", "POST", "DELETE")
+                    .AllowCredentials();
             });
             options.AddPolicy("Production", builder =>
             {
                 builder.WithOrigins("https://lowpressurezone.com")
-                       .AllowAnyHeader()
-                       .WithMethods("GET", "PUT", "POST", "DELETE")
-                       .AllowCredentials();
+                    .AllowAnyHeader()
+                    .WithMethods("GET", "PUT", "POST", "DELETE")
+                    .AllowCredentials();
             });
         });
     }
@@ -156,11 +154,13 @@ public static class ServiceCollectionExtensions
         services.AddHttpClient("AzuraCast", (serviceProvider, httpClient) =>
         {
             httpClient.BaseAddress = serviceProvider.GetRequiredService<IOptions<AzuraCastOptions>>().Value.ApiUrl;
-            httpClient.DefaultRequestHeaders.Add("X-API-Key", serviceProvider.GetRequiredService<IOptions<AzuraCastOptions>>().Value.ApiKey);
+            httpClient.DefaultRequestHeaders.Add("X-API-Key",
+                                                 serviceProvider.GetRequiredService<IOptions<AzuraCastOptions>>().Value
+                                                     .ApiKey);
             httpClient.Timeout = TimeSpan.FromSeconds(10);
         });
         services.AddSingleton<AzuraCastClient>();
-        services.AddSingleton<StreamInformationService>();
+        services.AddSingleton<ConnectionInformationService>();
         services.AddSingleton<AzuraCastStreamStatusService>();
         services.AddSingleton<IcecastStatusService>();
         services.AddSingleton<IStreamStatusService>(serviceProvider =>

@@ -1,15 +1,16 @@
 ﻿using FastEndpoints;
+using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Entities;
-using LowPressureZone.Domain.Extensions;
 
 namespace LowPressureZone.Api.Endpoints.Communities;
 
-public sealed class CommunityMapper(IHttpContextAccessor contextAccessor, CommunityRules rules) : IRequestMapper, IResponseMapper
+public sealed class CommunityMapper(IHttpContextAccessor contextAccessor, CommunityRules rules)
+    : IRequestMapper, IResponseMapper
 {
     public Community ToEntity(CommunityRequest request)
-        => new Community
+        => new()
         {
             Id = Guid.NewGuid(),
             Name = request.Name.Trim(),
@@ -31,7 +32,7 @@ public sealed class CommunityMapper(IHttpContextAccessor contextAccessor, Commun
     }
 
     public CommunityResponse FromEntity(Community community)
-        => new CommunityResponse
+        => new()
         {
             Id = community.Id,
             Name = community.Name,
