@@ -39,7 +39,6 @@ public class GetBroadcasts(AzuraCastClient client, DataContext context) : Endpoi
 
         var minTimeslotStart = minBroadcastsStart.AddHours(-1);
         var maxTimeslotStart = maxBroadcastsStart.AddHours(1);
-        Console.WriteLine($"FIND ME {minTimeslotStart} - {maxTimeslotStart}");
         var timeslots = await context.Timeslots
                                      .Where(timeslot => timeslot.StartsAt > minTimeslotStart && timeslot.EndsAt < maxTimeslotStart).Include(timeslot => timeslot.Performer)
                                      .ToListAsync(ct);

@@ -1,70 +1,74 @@
 ﻿<template>
   <div class="stream-information">
-    <h3>Live Stream</h3>
-    <DataView
-      v-if="connectionInfoStore.liveInfo() !== undefined"
-      :value="liveItems"
-      class="stream-information__live">
-      <template #list="slotProps">
-        <div
-          v-for="(item, index) in slotProps.items as LabeledField[]"
-          :key="index">
-          <ListItem>
-            <template #left>{{ item.label }}</template>
-            <template #right>{{ item.value }}</template>
-          </ListItem>
-          <Divider
-            v-if="index < slotProps.items.length - 1"
-            style="margin: 0" />
-        </div>
+    <h2>Live Stream</h2>
+    <h4>Broadcast Name</h4>
+    <BroadcastingForm />
+    <h4>Connection Information</h4>
+    <ListItem>
+      <template #left>Host/Server</template>
+      <template #right>{{ connectionInfoStore.liveInfo()?.host }}</template>
+    </ListItem>
+    <Divider style="margin: 0" />
+    <ListItem>
+      <template #left>Port</template>
+      <template #right>{{ connectionInfoStore.liveInfo()?.port }}</template>
+    </ListItem>
+    <Divider style="margin: 0" />
+    <ListItem>
+      <template #left>Mount</template>
+      <template #right>{{ connectionInfoStore.liveInfo()?.mount }}</template>
+    </ListItem>
+    <Divider style="margin: 0" />
+    <ListItem>
+      <template #left>Username</template>
+      <template #right>{{ connectionInfoStore.liveInfo()?.username }}</template>
+    </ListItem>
+    <Divider style="margin: 0" />
+    <ListItem>
+      <template #left>Password</template>
+      <template #right>
+        <Button label="Get New Password" />
       </template>
-    </DataView>
-    <h3>Test Stream</h3>
-    <DataView
-      v-if="connectionInfoStore.testInfo() !== undefined"
-      :value="testItems"
-      class="stream-information__live">
-      <template #list="slotProps">
-        <div
-          v-for="(item, index) in slotProps.items as LabeledField[]"
-          :key="index">
-          <ListItem>
-            <template #left>{{ item.label }}</template>
-            <template #right>{{ item.value }}</template>
-          </ListItem>
-          <Divider
-            v-if="index < slotProps.items.length - 1"
-            style="margin: 0" />
-        </div>
-      </template>
-    </DataView>
+    </ListItem>
+    <h2>Test Stream</h2>
+    <h4>Connection Information</h4>
+    <ListItem>
+      <template #left>Host/Server</template>
+      <template #right>{{ connectionInfoStore.testInfo()?.host }}</template>
+    </ListItem>
+    <Divider style="margin: 0" />
+    <ListItem>
+      <template #left>Port</template>
+      <template #right>{{ connectionInfoStore.testInfo()?.port }}</template>
+    </ListItem>
+    <Divider style="margin: 0" />
+    <ListItem>
+      <template #left>Mount</template>
+      <template #right>{{ connectionInfoStore.testInfo()?.mount }}</template>
+    </ListItem>
+    <Divider style="margin: 0" />
+    <ListItem>
+      <template #left>Username</template>
+      <template #right>{{ connectionInfoStore.testInfo()?.username }}</template>
+    </ListItem>
+    <Divider style="margin: 0" />
+    <ListItem>
+      <template #left>Password</template>
+      <template #right>{{ connectionInfoStore.testInfo()?.password }}</template>
+    </ListItem>
   </div>
 </template>
 
 <script lang="ts" setup>
 import ListItem from '@/components/data/ListItem.vue'
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import { useConnectionInfoStore } from '@/stores/connectionInfoStore.ts'
-import { DataView, Divider } from 'primevue'
-import type { LabeledField } from '@/types/labeledField.ts'
+import { Button, Divider } from 'primevue'
+import BroadcastingForm from '@/components/form/requestForms/BroadcastingForm.vue'
 
 const connectionInfoStore = useConnectionInfoStore()
-const liveItems = ref<LabeledField[]>([])
-const testItems = ref<LabeledField[]>([])
 
 onMounted(async () => {
   await connectionInfoStore.loadIfNotInitialized()
-  const liveInfo = connectionInfoStore.liveInfo()!
-  liveItems.value.push({ label: 'Host/Server', value: liveInfo.host })
-  liveItems.value.push({ label: 'Port', value: liveInfo.port })
-  liveItems.value.push({ label: 'Username', value: liveInfo.username })
-  liveItems.value.push({ label: 'Password', value: liveInfo.password })
-  liveItems.value.push({ label: 'Stream Title Field', value: liveInfo.streamTitleField })
-  const testInfo = connectionInfoStore.testInfo()!
-  testItems.value.push({ label: 'Host/Server', value: testInfo.host })
-  testItems.value.push({ label: 'Port', value: testInfo.port })
-  testItems.value.push({ label: 'Username', value: testInfo.username })
-  testItems.value.push({ label: 'Password', value: testInfo.password })
-  testItems.value.push({ label: 'Stream Title Field', value: testInfo.streamTitleField })
 })
 </script>

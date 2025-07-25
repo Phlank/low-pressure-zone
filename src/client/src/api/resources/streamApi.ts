@@ -32,8 +32,9 @@ export interface ConnectionInformationResponse {
   streamType: string
   host: string
   port: string
+  mount: string
   username: string
   password: string
   type: string
-  streamTitleField: string
+  displayName: string
 }

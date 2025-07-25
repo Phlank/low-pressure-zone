@@ -5,8 +5,9 @@ public class ConnectionInfoResponse
     public required string StreamType { get; set; }
     public required string Host { get; set; }
     public required string Port { get; set; }
-    public required string Username { get; set; }
-    public required string Password { get; set; }
+    public required string Mount { get; set; }
+    public string? Username { get; set; }
+    public string? Password { get; set; }
     public required string Type { get; set; }
-    public required string StreamTitleField { get; set; }
+    public string? DisplayName { get; set; }
 }
