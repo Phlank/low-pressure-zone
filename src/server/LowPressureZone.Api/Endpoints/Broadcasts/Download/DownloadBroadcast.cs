@@ -44,7 +44,7 @@ public class DownloadBroadcast(AzuraCastClient client) : Endpoint<DownloadBroadc
             return;
         }
 
-        var broadcast = getBroadcastsResult.Value!.FirstOrDefault(broadcast => broadcast.Id == req.BroadcastId);
+        var broadcast = getBroadcastsResult.Value.FirstOrDefault(broadcast => broadcast.Id == req.BroadcastId);
         if (broadcast is null)
         {
             await SendNotFoundAsync(ct);
@@ -70,8 +70,8 @@ public class DownloadBroadcast(AzuraCastClient client) : Endpoint<DownloadBroadc
             return;
         }
 
-        var size = downloadResult.Value!.Headers.ContentLength ?? 0;
-        var stream = await downloadResult.Value!.ReadAsStreamAsync(ct);
+        var size = downloadResult.Value.Headers.ContentLength ?? 0;
+        var stream = await downloadResult.Value.ReadAsStreamAsync(ct);
         await SendStreamAsync(stream, fileName, cancellation: ct, fileLengthBytes: size);
     }
 }

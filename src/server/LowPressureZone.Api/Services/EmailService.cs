@@ -72,7 +72,7 @@ public class EmailService(
         if (!subject.EndsWith("Low Pressure Zone", StringComparison.InvariantCulture))
             subject += " - Low Pressure Zone";
         var result = await SendAsync(adminEmail, subject, message);
-        if (!result.IsSuccess) return Result.Err<bool, SendResponse>(result.Error!);
+        if (!result.IsSuccess) return Result.Err<bool, SendResponse>(result.Error);
         return Result.Ok<bool, SendResponse>(true);
     }
 }

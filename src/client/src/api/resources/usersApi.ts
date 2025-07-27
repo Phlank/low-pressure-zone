@@ -4,7 +4,8 @@ const route = '/users'
 
 export default {
   get: () => sendGet<UserResponse[]>(route),
-  createStreamers: () => sendPost(`${route}/streamers`)
+  createStreamer: (userId: string) => sendPost(`${route}/streamers/link/${userId}`),
+  createStreamers: () => sendPost(`${route}/streamers/link`)
 }
 
 export interface UserResponse {

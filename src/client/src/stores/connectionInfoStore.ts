@@ -23,8 +23,9 @@ export const useConnectionInfoStore = defineStore('connectionInfoStore', () => {
     if (!response.isSuccess()) {
       return err<boolean, string>('Failed to load connection information')
     }
-    liveInfoRef.value = response.data().find((info) => info.streamType === 'Live')
-    testInfoRef.value = response.data().find((info) => info.streamType === 'Test')
+    liveInfoRef.value = response.data().find((info) => info.streamType === 'Live Stream')
+    testInfoRef.value = response.data().find((info) => info.streamType === 'Test Stream')
+    console.log(JSON.stringify(liveInfoRef.value))
     return ok<boolean, string>(true)
   }
 

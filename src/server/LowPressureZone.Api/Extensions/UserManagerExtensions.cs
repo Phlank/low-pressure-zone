@@ -53,7 +53,7 @@ public static class UserManagerExtensions
         var streamersResult = await client.GetStreamersAsync();
         if (!streamersResult.IsSuccess) return Result.Err<bool, string>("Unable to get streamers");
 
-        var match = streamersResult.Value!.FirstOrDefault(streamer => streamer.StreamerUsername == user.UserName);
+        var match = streamersResult.Value.FirstOrDefault(streamer => streamer.StreamerUsername == user.UserName);
         if (match is null) return Result.Err<bool, string>("No streamer found with matching username");
 
         user.StreamerId = match.Id;
@@ -69,15 +69,15 @@ public static class UserManagerExtensions
 
         var getStreamerResult = await client.GetStreamerAsync(user.StreamerId.Value);
         if (!getStreamerResult.IsSuccess)
-            return Result.Err<string, string>($"Unable to get streamer: {getStreamerResult.Error!.ReasonPhrase}");
+            return Result.Err<string, string>($"Unable to get streamer: {getStreamerResult.Error.ReasonPhrase}");
 
-        var streamer = getStreamerResult.Value!;
+        var streamer = getStreamerResult.Value;
         streamer.StreamerPassword = NewStreamerPassword;
         var updateStreamerResult = await client.UpdateStreamerAsync(streamer);
         if (updateStreamerResult.IsSuccess) return Result.Ok<string, string>(streamer.StreamerPassword);
 
         return
-            Result.Err<string, string>($"Unable to save streamer password: {updateStreamerResult.Error!.ReasonPhrase}");
+            Result.Err<string, string>($"Unable to save streamer password: {updateStreamerResult.Error.ReasonPhrase}");
     }
 
     public static async Task<Result<Streamer, string>> GetStreamerAsync(this UserManager<AppUser> userManager,
@@ -89,8 +89,8 @@ public static class UserManagerExtensions
 
         var getStreamerResult = await client.GetStreamerAsync(user.StreamerId.Value);
         if (!getStreamerResult.IsSuccess)
-            return Result.Err<Streamer, string>($"Unable to get streamer: {getStreamerResult.Error!.ReasonPhrase}");
+            return Result.Err<Streamer, string>($"Unable to get streamer: {getStreamerResult.Error.ReasonPhrase}");
 
-        return Result.Ok<Streamer, string>(getStreamerResult.Value!);
+        return Result.Ok<Streamer, string>(getStreamerResult.Value);
     }
 }

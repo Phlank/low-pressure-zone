@@ -7,7 +7,7 @@
         size="m">
         <InputText
           id="playButtonTextInput"
-          v-model:value="formState.displayName" />
+          v-model="formState.displayName" />
       </IftaFormField>
       <template #actions>
         <Button label="Save" />

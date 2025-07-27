@@ -70,7 +70,7 @@ public class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<AzuraCas
         var streamers = await GetStreamersAsync();
         var streamerId = streamers.Value?.FirstOrDefault(streamer => streamer.StreamerUsername == username)?.Id;
         if (streamerId is null)
-            return Result.Err<int, HttpResponseMessage>(streamers.Error!);
+            return Result.Err<int, HttpResponseMessage>(streamers.Error);
 
         return Result.Ok<int, HttpResponseMessage>(streamerId.Value);
     }

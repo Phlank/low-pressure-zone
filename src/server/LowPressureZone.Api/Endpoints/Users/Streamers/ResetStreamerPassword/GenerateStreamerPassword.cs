@@ -32,7 +32,7 @@ public class GenerateStreamerPassword(UserManager<AppUser> userManager, AzuraCas
 
         GenerateStreamerPasswordResponse response = new()
         {
-            Password = generateResult.Value!
+            Password = generateResult.Value
         };
         await SendOkAsync(response, ct);
     }

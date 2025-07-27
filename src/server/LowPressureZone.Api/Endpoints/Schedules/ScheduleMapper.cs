@@ -51,7 +51,7 @@ public class ScheduleMapper(
             StartsAt = schedule.StartsAt,
             EndsAt = schedule.EndsAt,
             Description = schedule.Description,
-            Community = communityMapper.FromEntity(schedule.Community!),
+            Community = communityMapper.FromEntity(schedule.Community),
             Timeslots = schedule.Timeslots.Select(timeslotMapper.FromEntity),
             IsEditable = rules.IsEditAuthorized(schedule),
             IsDeletable = rules.IsDeleteAuthorized(schedule),

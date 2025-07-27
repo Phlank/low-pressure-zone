@@ -47,7 +47,7 @@ public class TimeslotMapper(
             StartsAt = timeslot.StartsAt,
             EndsAt = timeslot.EndsAt,
             Name = timeslot.Name,
-            Performer = performerMapper.FromEntity(timeslot.Performer!),
+            Performer = performerMapper.FromEntity(timeslot.Performer),
             PerformanceType = timeslot.Type,
             IsEditable = rules.IsEditAuthorized(timeslot),
             IsDeletable = rules.IsDeleteAuthorized(timeslot)
