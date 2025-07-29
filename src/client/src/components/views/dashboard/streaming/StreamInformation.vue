@@ -2,7 +2,9 @@
   <div class="stream-information">
     <h2>Live Stream</h2>
     <h4>Broadcast Name</h4>
-    <BroadcastingForm />
+    <BroadcastingForm
+      v-if="connectionInfoStore.liveInfo()"
+      :info="connectionInfoStore.liveInfo()!" />
     <h4>Connection Information</h4>
     <ListItem>
       <template #left>Host/Server</template>
