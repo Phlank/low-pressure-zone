@@ -28,10 +28,9 @@
       alt="Butt settings"
       src="@/assets/stream-setup-img/butt-server-settings.png" />
     <p>
-      The password is
-      <kbd>{{ connectionInfoStore.liveInfo()?.password }}</kbd
-      >. Please do not share this! In the future, each performer will have their own username and
-      password for streaming, but that time hasn't arrived yet.
+      The password for the test stream is
+      <kbd>{{ connectionInfoStore.testInfo()?.password }}</kbd
+      >.
     </p>
     <h4>Stream info</h4>
     <p>

@@ -44,7 +44,7 @@
           <div
             v-for="(user, index) in items"
             :key="user.id">
-            <ListItem style="width: 100%">
+            <ListItem>
               <template #left>
                 <div style="display: flex; flex-direction: column; overflow-x: hidden">
                   <span class="ellipsis">{{ user.displayName }}</span>

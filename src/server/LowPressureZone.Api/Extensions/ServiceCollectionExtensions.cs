@@ -107,16 +107,16 @@ public static class ServiceCollectionExtensions
             options.AddPolicy("Development", builder =>
             {
                 builder.WithOrigins("http://localhost:4001")
-                    .AllowAnyHeader()
-                    .WithMethods("GET", "PUT", "POST", "DELETE")
-                    .AllowCredentials();
+                       .AllowAnyHeader()
+                       .WithMethods("GET", "PUT", "POST", "DELETE")
+                       .AllowCredentials();
             });
             options.AddPolicy("Production", builder =>
             {
                 builder.WithOrigins("https://lowpressurezone.com")
-                    .AllowAnyHeader()
-                    .WithMethods("GET", "PUT", "POST", "DELETE")
-                    .AllowCredentials();
+                       .AllowAnyHeader()
+                       .WithMethods("GET", "PUT", "POST", "DELETE")
+                       .AllowCredentials();
             });
         });
     }
@@ -148,15 +148,21 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<UriService>();
         services.AddHttpClient("Icecast", (serviceProvider, httpClient) =>
         {
-            httpClient.BaseAddress = serviceProvider.GetRequiredService<IOptions<IcecastOptions>>().Value.IcecastUrl;
+            var config = serviceProvider.GetRequiredService<IOptions<StreamingOptions>>();
+            var icecastOptions =
+                config.Value.Streams.First(stream => stream.Server == StreamServerType.Icecast).Icecast;
+            httpClient.BaseAddress = icecastOptions!.IcecastUrl;
             httpClient.Timeout = TimeSpan.FromSeconds(10);
         });
         services.AddHttpClient("AzuraCast", (serviceProvider, httpClient) =>
         {
-            httpClient.BaseAddress = serviceProvider.GetRequiredService<IOptions<AzuraCastOptions>>().Value.ApiUrl;
-            httpClient.DefaultRequestHeaders.Add("X-API-Key",
-                                                 serviceProvider.GetRequiredService<IOptions<AzuraCastOptions>>().Value
-                                                     .ApiKey);
+            var config = serviceProvider.GetRequiredService<IOptions<StreamingOptions>>();
+            var azuraCastOptions = config.Value
+                                         .Streams
+                                         .First(stream => stream.Server == StreamServerType.AzuraCast)
+                                         .AzuraCast;
+            httpClient.BaseAddress = azuraCastOptions!.ApiUrl;
+            httpClient.DefaultRequestHeaders.Add("X-API-Key", azuraCastOptions.ApiKey!);
             httpClient.Timeout = TimeSpan.FromSeconds(10);
         });
         services.AddSingleton<AzuraCastClient>();
@@ -165,7 +171,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IStreamStatusService>(serviceProvider =>
         {
             var options = serviceProvider.GetRequiredService<IOptions<StreamingOptions>>().Value;
-            return options.Live.Connection.Type switch
+            var live = options.Streams.FirstOrDefault(stream => stream.Use == options.Primary);
+            if (live is null) throw new InvalidOperationException("No live stream configured");
+            return live.Server switch
             {
                 StreamServerType.AzuraCast => serviceProvider.GetRequiredService<AzuraCastStreamStatusService>(),
                 StreamServerType.Icecast => serviceProvider.GetRequiredService<IcecastStatusService>(),

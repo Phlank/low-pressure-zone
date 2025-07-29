@@ -1,7 +1,7 @@
 ﻿<template>
   <div class="stream-information">
     <h2>Live Stream</h2>
-    <h4>Broadcast Name</h4>
+    <h4>Broadcasting</h4>
     <BroadcastingForm
       v-if="connectionInfoStore.liveInfo()"
       :info="connectionInfoStore.liveInfo()!" />

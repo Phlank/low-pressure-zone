@@ -19,8 +19,9 @@
     <p>
       From here, find the Live Broadcasting section on the left-side navigation of the Preferences
       menu. In here, you will set up the connection and stream info. Set the first sections up to
-      match what is given in the below image. The password is
-      {{ connectionInfoStore.testInfo()?.password }}
+      match what is given in the below image. The password for the test stream is
+      <kbd>{{ connectionInfoStore.testInfo()?.password }}</kbd
+      >.
     </p>
     <img
       alt="How to locate the Live Broadcasting section, and the first set of items available"

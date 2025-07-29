@@ -5,27 +5,30 @@ namespace LowPressureZone.Api.Models.Options;
 public sealed class StreamingOptions
 {
     public const string Name = "Streaming";
-    public required StreamInstanceOptions Live { get; init; }
-    public required StreamInstanceOptions Test { get; init; }
+    public required StreamUseType Primary { get; set; }
+    public required IReadOnlyCollection<StreamInstanceOptions> Streams { get; set; }
 }
 
 public sealed class StreamInstanceOptions
 {
-    public required StreamConnectionOptions Connection { get; set; }
-    public StreamUserOptions? User { get; set; }
+    public required StreamUseType Use { get; init; }
+    public required StreamServerType Server { get; init; }
+    public required StreamConnectionOptions Connection { get; init; }
+    public StreamCredentialOptions? Credentials { get; init; }
+    public IcecastOptions? Icecast { get; init; }
+    public AzuraCastOptions? AzuraCast { get; init; }
 }
 
 public sealed class StreamConnectionOptions
 {
-    public required string Host { get; set; }
-    public required string Port { get; set; }
-    public required string Mount { get; set; }
-    public required StreamServerType Type { get; set; }
+    public required string Host { get; init; }
+    public required string Port { get; init; }
+    public required string Mount { get; init; }
 }
 
-public sealed class StreamUserOptions
+public sealed class StreamCredentialOptions
 {
-    public required string Username { get; set; }
-    public required string Password { get; set; }
-    public string? DisplayName { get; set; }
+    public required string Username { get; init; }
+    public required string Password { get; init; }
+    public string? DisplayName { get; init; }
 }

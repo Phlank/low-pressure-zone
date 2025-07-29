@@ -16,8 +16,11 @@ public class ConnectionInformationService(
     UserManager<AppUser> userManager,
     AzuraCastClient azuraCastClient)
 {
-    private readonly StreamInstanceOptions _liveInfo = streamOptions.Value.Live;
-    private readonly StreamInstanceOptions _testInfo = streamOptions.Value.Test;
+    private readonly StreamInstanceOptions _liveInfo =
+        streamOptions.Value.Streams.First(stream => stream.Use == streamOptions.Value.Primary);
+
+    private readonly StreamInstanceOptions _testInfo =
+        streamOptions.Value.Streams.First(stream => stream.Use == StreamUseType.Test);
 
     public Task<Result<StreamingInfo, string>> GetLiveInfoAsync() => GetInfo(_liveInfo);
 
@@ -25,11 +28,11 @@ public class ConnectionInformationService(
 
     private async Task<Result<StreamingInfo, string>> GetInfo(
         StreamInstanceOptions options) =>
-        options.Connection.Type switch
+        options.Server switch
         {
             StreamServerType.Icecast => GetIcecastInfo(options),
             StreamServerType.AzuraCast => await GetAzuracastInfoAsync(options),
-            _ => throw new InvalidOperationException()
+            _ => throw new InvalidOperationException("Streaming server type not specified correctly")
         };
 
     private async Task<Result<StreamingInfo, string>> GetAzuracastInfoAsync(
@@ -52,7 +55,7 @@ public class ConnectionInformationService(
             Mount = options.Connection.Mount,
             Username = streamer.StreamerUsername,
             DisplayName = streamer.DisplayName,
-            Type = options.Connection.Type
+            Type = options.Server
         });
     }
 
@@ -63,9 +66,9 @@ public class ConnectionInformationService(
             Host = options.Connection.Host,
             Port = options.Connection.Port,
             Mount = options.Connection.Mount,
-            Type = options.Connection.Type,
-            Username = options.User?.Username,
-            Password = options.User?.Password,
-            DisplayName = options.User?.DisplayName
+            Type = options.Server,
+            Username = options.Credentials?.Username,
+            Password = options.Credentials?.Password,
+            DisplayName = options.Credentials?.DisplayName
         });
 }
