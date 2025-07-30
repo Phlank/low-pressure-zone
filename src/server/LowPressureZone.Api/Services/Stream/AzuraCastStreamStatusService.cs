@@ -97,8 +97,7 @@ public class AzuraCastStreamStatusService(
     {
         var streamerName = nowPlaying.NowPlaying?.Streamer;
         if (!string.IsNullOrEmpty(streamerName))
-            if (streamerName != "LPZ")
-                return streamerName;
+            return streamerName;
 
         var songArtist = nowPlaying.NowPlaying?.Song.Artist ?? "Unknown";
         var songTitle = nowPlaying.NowPlaying?.Song.Title;
