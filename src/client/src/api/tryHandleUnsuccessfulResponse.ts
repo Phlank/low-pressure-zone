@@ -36,7 +36,8 @@ const tryHandleInvalidResponse = <TRequest extends object, TResponse>(
     toast.add({
       severity: 'error',
       summary: 'Error',
-      detail: unmappedErrors.join('\n')
+      detail: unmappedErrors.join('\n'),
+      life: 7000
     })
   }
   return true
@@ -47,7 +48,8 @@ const tryHandleFailure = (response: ApiResponse<object, unknown>, toast: ToastSe
     toast.add({
       severity: 'error',
       summary: 'HTTP Failure',
-      detail: 'There was an issue when sending a request to the API. Is the API operational?'
+      detail: 'There was an issue when sending a request to the API. Is the API operational?',
+      life: 7000
     })
     return true
   }

@@ -3,6 +3,7 @@ using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Models;
 using LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
 using LowPressureZone.Api.Services;
+using LowPressureZone.Api.Utilities;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -11,7 +12,7 @@ namespace LowPressureZone.Api.Extensions;
 
 public static class UserManagerExtensions
 {
-    private static string NewStreamerPassword => Guid.NewGuid().ToString().Replace("-", "");
+    private static string NewStreamerPassword => PasswordGenerator.Generate(15);
 
     public static async Task SendWelcomeEmail(this UserManager<AppUser> userManager,
                                               AppUser user,

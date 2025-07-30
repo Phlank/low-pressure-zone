@@ -5,9 +5,9 @@ using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 
-namespace LowPressureZone.Api.Endpoints.Users.Streamers.LinkStreamers;
+namespace LowPressureZone.Api.Endpoints.Users.Streamers.Link;
 
-public class LinkStreamer(AzuraCastClient client, UserManager<AppUser> userManager)
+public class PostLinkStreamer(AzuraCastClient client, UserManager<AppUser> userManager)
     : EndpointWithoutRequest<EmptyResponse>
 {
     public override void Configure()
@@ -34,7 +34,7 @@ public class LinkStreamer(AzuraCastClient client, UserManager<AppUser> userManag
         }
 
         Logger.LogWarning("{Controller}: Failed to create new streamer for {UserName}: {CreateResultError}",
-                          nameof(LinkStreamers), user.UserName, createResult.Error);
+                          nameof(PostLinkStreamers), user.UserName, createResult.Error);
 
         var linkResult = await userManager.LinkToExistingStreamer(user, client);
         if (linkResult.IsSuccess)
@@ -44,8 +44,8 @@ public class LinkStreamer(AzuraCastClient client, UserManager<AppUser> userManag
         }
 
         Logger.LogWarning("{Controller}: Failed to link existing streamer to {UserName}: {LinkResultError}",
-                          nameof(LinkStreamers), user.UserName, linkResult.Error);
+                          nameof(PostLinkStreamers), user.UserName, linkResult.Error);
 
-        ThrowError($"Failed to create or link streamer for user. Check {nameof(LinkStreamer)} logs for more information.");
+        ThrowError($"Failed to create or link streamer for user. Check {nameof(PostLinkStreamer)} logs for more information.");
     }
 }

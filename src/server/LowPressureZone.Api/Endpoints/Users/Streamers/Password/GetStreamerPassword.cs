@@ -4,13 +4,13 @@ using LowPressureZone.Api.Extensions;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 
-namespace LowPressureZone.Api.Endpoints.Users.Streamers.ResetStreamerPassword;
+namespace LowPressureZone.Api.Endpoints.Users.Streamers.Password;
 
-public class GenerateStreamerPassword(UserManager<AppUser> userManager, AzuraCastClient client)
-    : EndpointWithoutRequest<GenerateStreamerPasswordResponse>
+public class GetStreamerPassword(UserManager<AppUser> userManager, AzuraCastClient client)
+    : EndpointWithoutRequest<StreamerPasswordResponse>
 {
     public override void Configure()
-        => Post("/users/streamers/generatepassword");
+        => Get("/users/streamers/password");
 
     public override async Task HandleAsync(CancellationToken ct)
     {
@@ -30,7 +30,7 @@ public class GenerateStreamerPassword(UserManager<AppUser> userManager, AzuraCas
         var generateResult = await userManager.GenerateStreamerPassword(user, client);
         if (!generateResult.IsSuccess) ThrowError(generateResult.Error ?? "Unable to generate new password");
 
-        GenerateStreamerPasswordResponse response = new()
+        StreamerPasswordResponse response = new()
         {
             Password = generateResult.Value
         };
