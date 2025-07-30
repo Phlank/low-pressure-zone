@@ -17,7 +17,8 @@ public class RegisterRequestValidator : Validator<RegisterRequest>
                                                .WithMessage(Errors.MaxLength(AppUser.DisplayNameMaxLength));
         RuleFor(request => request.Username).Username();
         RuleFor(request => request.Password).Password();
-        RuleFor(request => request.ConfirmPassword).Must((request, confirmPassword) => request.Password == confirmPassword)
-                                                   .WithMessage("Does not match");
+        RuleFor(request => request.ConfirmPassword)
+            .Must((request, confirmPassword) => request.Password == confirmPassword)
+            .WithMessage("Does not match");
     }
 }

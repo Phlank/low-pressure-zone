@@ -2,6 +2,7 @@
 using System.Text.Json;
 using LowPressureZone.Api.Clients;
 using LowPressureZone.Api.Models.Stream;
+using LowPressureZone.Api.Models.Stream.AzuraCast;
 
 namespace LowPressureZone.Api.Services.Stream;
 
@@ -57,19 +58,6 @@ public class AzuraCastStreamStatusService(
             }
 
             var content = result.Value;
-            if (content is null)
-                return;
-
-            var name = content.NowPlaying?.Song.Artist ?? "Unknown";
-
-            if (content.NowPlaying?.Song.Title == "Live")
-                content.NowPlaying.Song.Title = null;
-
-            if (content.NowPlaying?.Song.Title is not null)
-                name += $" - {content.NowPlaying.Song.Title}";
-
-            name = name.Trim('-', ' ');
-
             lock (_statusLock)
             {
                 Status = new StreamStatus
@@ -77,7 +65,7 @@ public class AzuraCastStreamStatusService(
                     IsOnline = content.IsOnline,
                     IsLive = content.Live.IsLive,
                     IsStatusStale = false,
-                    Name = name,
+                    Name = GetStreamName(content),
                     Type = "AzuraCast",
                     ListenUrl = content.Station.ListenUrl,
                     ListenerCount = content.Listeners.Current
@@ -103,5 +91,18 @@ public class AzuraCastStreamStatusService(
         {
             logger.LogError(otherException, "Unable to retrieve status from server: Unspecified exception was thrown.");
         }
+    }
+
+    private static string GetStreamName(NowPlayingResponse nowPlaying)
+    {
+        var streamerName = nowPlaying.NowPlaying?.Streamer;
+        if (!string.IsNullOrEmpty(streamerName))
+            return streamerName;
+
+        var songArtist = nowPlaying.NowPlaying?.Song.Artist ?? "Unknown";
+        var songTitle = nowPlaying.NowPlaying?.Song.Title;
+        if (songTitle is null or "" or "Live") return $"{songArtist}".Trim('-', ' ');
+
+        return $"{songArtist} - {songTitle}".Trim('-', ' ');
     }
 }
