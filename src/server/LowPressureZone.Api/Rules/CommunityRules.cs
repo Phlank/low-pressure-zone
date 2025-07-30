@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
+using LowPressureZone.Api.Extensions;
 using LowPressureZone.Domain.Entities;
-using LowPressureZone.Domain.Extensions;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
 using Shouldly;
@@ -17,7 +17,9 @@ public class CommunityRules(IHttpContextAccessor contextAccessor)
         if (community.IsDeleted) return false;
         if (User == null) return false;
         if (User.IsInRole(RoleNames.Admin)) return true;
-        return community.Relationships.Any(relationship => relationship.UserId == User.GetIdOrDefault() && relationship.IsPerformer);
+        return community.Relationships.Any(relationship =>
+                                               relationship.UserId == User.GetIdOrDefault() &&
+                                               relationship.IsPerformer);
     }
 
     public bool IsOrganizingAuthorized(Community community)
@@ -26,7 +28,9 @@ public class CommunityRules(IHttpContextAccessor contextAccessor)
         if (community.IsDeleted) return false;
         if (User == null) return false;
         if (User.IsInRole(RoleNames.Admin)) return true;
-        return community.Relationships.Any(relationship => relationship.UserId == User.GetIdOrDefault() && relationship.IsOrganizer);
+        return community.Relationships.Any(relationship =>
+                                               relationship.UserId == User.GetIdOrDefault() &&
+                                               relationship.IsOrganizer);
     }
 
     public bool IsEditAuthorized(Community community)

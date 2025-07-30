@@ -1,10 +1,10 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Endpoints.Communities;
 using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
+using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Entities;
-using LowPressureZone.Domain.Extensions;
 using Shouldly;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
@@ -17,7 +17,7 @@ public class ScheduleMapper(
     : IRequestMapper, IResponseMapper
 {
     public Schedule ToEntity(ScheduleRequest req)
-        => new Schedule
+        => new()
         {
             Id = Guid.NewGuid(),
             CommunityId = req.CommunityId,
@@ -43,10 +43,7 @@ public class ScheduleMapper(
     {
         schedule.Community.ShouldNotBeNull();
         schedule.Timeslots.ShouldNotBeNull();
-        foreach (var timeslot in schedule.Timeslots)
-        {
-            timeslot.Performer.ShouldNotBeNull();
-        }
+        foreach (var timeslot in schedule.Timeslots) timeslot.Performer.ShouldNotBeNull();
 
         return new ScheduleResponse
         {
@@ -54,7 +51,7 @@ public class ScheduleMapper(
             StartsAt = schedule.StartsAt,
             EndsAt = schedule.EndsAt,
             Description = schedule.Description,
-            Community = communityMapper.FromEntity(schedule.Community!),
+            Community = communityMapper.FromEntity(schedule.Community),
             Timeslots = schedule.Timeslots.Select(timeslotMapper.FromEntity),
             IsEditable = rules.IsEditAuthorized(schedule),
             IsDeletable = rules.IsDeleteAuthorized(schedule),

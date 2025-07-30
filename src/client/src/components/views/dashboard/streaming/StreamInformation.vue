@@ -1,70 +1,183 @@
 ﻿<template>
   <div class="stream-information">
-    <h3>Live Stream</h3>
-    <DataView
-      v-if="connectionInfoStore.liveInfo() !== undefined"
-      :value="liveItems"
-      class="stream-information__live">
-      <template #list="slotProps">
-        <div
-          v-for="(item, index) in slotProps.items as LabeledField[]"
-          :key="index">
-          <ListItem>
-            <template #left>{{ item.label }}</template>
-            <template #right>{{ item.value }}</template>
-          </ListItem>
-          <Divider
-            v-if="index < slotProps.items.length - 1"
-            style="margin: 0" />
+    <div class="stream-information__live">
+      <h2>Live Stream</h2>
+      <h4>Broadcasting</h4>
+      <BroadcastingForm
+        v-if="connectionInfoStore.liveInfo()"
+        :info="connectionInfoStore.liveInfo()!"
+        class="stream-information__live__broadcasting-form" />
+      <h4>Connection Information</h4>
+      <div>
+        <ListItem>
+          <template #left>Host/Server</template>
+          <template #right>{{ connectionInfoStore.liveInfo()?.host }}</template>
+        </ListItem>
+        <Divider style="margin: 0" />
+        <ListItem>
+          <template #left>Port</template>
+          <template #right>{{ connectionInfoStore.liveInfo()?.port }}</template>
+        </ListItem>
+        <Divider style="margin: 0" />
+        <ListItem>
+          <template #left>Mount</template>
+          <template #right>{{ connectionInfoStore.liveInfo()?.mount }}</template>
+        </ListItem>
+        <Divider style="margin: 0" />
+        <ListItem>
+          <template #left>Username</template>
+          <template #right>{{ connectionInfoStore.liveInfo()?.username }}</template>
+        </ListItem>
+        <Divider style="margin: 0" />
+        <ListItem>
+          <template #left>Password</template>
+          <template #right>
+            <Button
+              :loading="isPasswordLoading"
+              icon="pi pi-key"
+              label="Get New Password"
+              @click="handleGetPassword" />
+          </template>
+        </ListItem>
+      </div>
+    </div>
+    <div class="stream-information__test">
+      <h2>Test Stream</h2>
+      <h4>Connection Information</h4>
+      <div>
+        <ListItem>
+          <template #left>Host/Server</template>
+          <template #right>{{ connectionInfoStore.testInfo()?.host }}</template>
+        </ListItem>
+        <Divider style="margin: 0" />
+        <ListItem>
+          <template #left>Port</template>
+          <template #right>{{ connectionInfoStore.testInfo()?.port }}</template>
+        </ListItem>
+        <Divider style="margin: 0" />
+        <ListItem>
+          <template #left>Mount</template>
+          <template #right>{{ connectionInfoStore.testInfo()?.mount }}</template>
+        </ListItem>
+        <Divider style="margin: 0" />
+        <ListItem>
+          <template #left>Username</template>
+          <template #right>{{ connectionInfoStore.testInfo()?.username }}</template>
+        </ListItem>
+        <Divider style="margin: 0" />
+        <ListItem>
+          <template #left>Password</template>
+          <template #right>{{ connectionInfoStore.testInfo()?.password }}</template>
+        </ListItem>
+      </div>
+    </div>
+    <Dialog
+      v-model:visible="showPasswordDialog"
+      :draggable="false"
+      header="New Password"
+      modal
+      @hide="handleCloseDialog">
+      <template #default>
+        <InputText
+          :value="password"
+          readonly
+          style="width: 100%; margin-bottom: 1rem" />
+        <div>Your old streaming password has been replaced.</div>
+      </template>
+      <template #footer>
+        <div class="stream-information__modal-footer">
+          <Button
+            :loading="isPasswordLoading"
+            icon="pi pi-copy"
+            label="Copy Password"
+            @click="handleCopyPassword" />
         </div>
       </template>
-    </DataView>
-    <h3>Test Stream</h3>
-    <DataView
-      v-if="connectionInfoStore.testInfo() !== undefined"
-      :value="testItems"
-      class="stream-information__live">
-      <template #list="slotProps">
-        <div
-          v-for="(item, index) in slotProps.items as LabeledField[]"
-          :key="index">
-          <ListItem>
-            <template #left>{{ item.label }}</template>
-            <template #right>{{ item.value }}</template>
-          </ListItem>
-          <Divider
-            v-if="index < slotProps.items.length - 1"
-            style="margin: 0" />
-        </div>
-      </template>
-    </DataView>
+    </Dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
 import ListItem from '@/components/data/ListItem.vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, type Ref, ref } from 'vue'
 import { useConnectionInfoStore } from '@/stores/connectionInfoStore.ts'
-import { DataView, Divider } from 'primevue'
-import type { LabeledField } from '@/types/labeledField.ts'
+import { Button, Dialog, Divider, InputText, useToast } from 'primevue'
+import BroadcastingForm from '@/components/form/requestForms/BroadcastingForm.vue'
+import usersApi from '@/api/resources/usersApi.ts'
+import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import copyToClipboard from '@/utils/copyToClipboard.ts'
 
+const toast = useToast()
 const connectionInfoStore = useConnectionInfoStore()
-const liveItems = ref<LabeledField[]>([])
-const testItems = ref<LabeledField[]>([])
 
 onMounted(async () => {
   await connectionInfoStore.loadIfNotInitialized()
-  const liveInfo = connectionInfoStore.liveInfo()!
-  liveItems.value.push({ label: 'Host/Server', value: liveInfo.host })
-  liveItems.value.push({ label: 'Port', value: liveInfo.port })
-  liveItems.value.push({ label: 'Username', value: liveInfo.username })
-  liveItems.value.push({ label: 'Password', value: liveInfo.password })
-  liveItems.value.push({ label: 'Stream Title Field', value: liveInfo.streamTitleField })
-  const testInfo = connectionInfoStore.testInfo()!
-  testItems.value.push({ label: 'Host/Server', value: testInfo.host })
-  testItems.value.push({ label: 'Port', value: testInfo.port })
-  testItems.value.push({ label: 'Username', value: testInfo.username })
-  testItems.value.push({ label: 'Password', value: testInfo.password })
-  testItems.value.push({ label: 'Stream Title Field', value: testInfo.streamTitleField })
 })
+
+const isPasswordLoading = ref(false)
+const showPasswordDialog = ref(false)
+const isCopySuccessful: Ref<boolean | null> = ref(null)
+const password = ref('')
+
+const handleGetPassword = async () => {
+  isCopySuccessful.value = null
+  isPasswordLoading.value = true
+  const response = await usersApi.getStreamerPassword()
+  isPasswordLoading.value = false
+  if (tryHandleUnsuccessfulResponse(response, toast)) return
+  password.value = response.data().password
+  showPasswordDialog.value = true
+}
+
+const handleCopyPassword = async () => {
+  const success = await copyToClipboard(password.value)
+  if (success) {
+    toast.add({
+      severity: 'success',
+      life: 7000,
+      summary: 'Password Copied',
+      detail: 'Your new streaming password has been copied to your clipboard.'
+    })
+  } else {
+    toast.add({
+      severity: 'error',
+      life: 7000,
+      summary: 'Failed to Copy Password',
+      detail: 'Your new streaming password could not be copied to your clipboard.'
+    })
+  }
+}
+
+const handleCloseDialog = () => {
+  showPasswordDialog.value = false
+  isCopySuccessful.value = null
+  password.value = ''
+}
 </script>
+
+<style lang="scss">
+@use '@/assets/styles/variables';
+
+.stream-information {
+  &__live {
+    display: flex;
+    flex-direction: column;
+
+    &__broadcasting-form {
+      margin-bottom: variables.$space-l;
+    }
+  }
+
+  &__test {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__modal-footer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: variables.$space-m;
+  }
+}
+</style>

@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using FastEndpoints;
+﻿using FastEndpoints;
 using FastEndpoints.Swagger;
 using FluentEmail.Core.Interfaces;
 using FluentEmail.Mailgun;
@@ -13,6 +12,7 @@ using LowPressureZone.Api.Endpoints.Schedules;
 using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 using LowPressureZone.Api.Endpoints.Users.Invites;
 using LowPressureZone.Api.Models.Options;
+using LowPressureZone.Api.Models.Stream;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Api.Services.Stream;
@@ -75,11 +75,9 @@ public static class ServiceCollectionExtensions
         }
         else
         {
-            services.ConfigureApplicationCookie(options =>
-            {
-                options.Cookie.SameSite = SameSiteMode.Lax;
-            });
+            services.ConfigureApplicationCookie(options => { options.Cookie.SameSite = SameSiteMode.Lax; });
         }
+
         services.ConfigureApplicationCookie(options =>
         {
             options.Cookie.Name = "LowPressureZoneCookie";
@@ -150,30 +148,39 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<UriService>();
         services.AddHttpClient("Icecast", (serviceProvider, httpClient) =>
         {
-            httpClient.BaseAddress = serviceProvider.GetRequiredService<IOptions<IcecastOptions>>().Value.IcecastUrl;
+            var config = serviceProvider.GetRequiredService<IOptions<StreamingOptions>>();
+            var icecastOptions =
+                config.Value.Streams.First(stream => stream.Server == StreamServerType.Icecast).Icecast;
+            httpClient.BaseAddress = icecastOptions!.IcecastUrl;
             httpClient.Timeout = TimeSpan.FromSeconds(10);
         });
         services.AddHttpClient("AzuraCast", (serviceProvider, httpClient) =>
         {
-            httpClient.BaseAddress = serviceProvider.GetRequiredService<IOptions<AzuraCastOptions>>().Value.ApiUrl;
-            httpClient.DefaultRequestHeaders.Add("X-API-Key", serviceProvider.GetRequiredService<IOptions<AzuraCastOptions>>().Value.ApiKey);
+            var config = serviceProvider.GetRequiredService<IOptions<StreamingOptions>>();
+            var azuraCastOptions = config.Value
+                                         .Streams
+                                         .First(stream => stream.Server == StreamServerType.AzuraCast)
+                                         .AzuraCast;
+            httpClient.BaseAddress = azuraCastOptions!.ApiUrl;
+            httpClient.DefaultRequestHeaders.Add("X-API-Key", azuraCastOptions.ApiKey);
             httpClient.Timeout = TimeSpan.FromSeconds(10);
         });
         services.AddSingleton<AzuraCastClient>();
-        services.AddSingleton<StreamInformationService>();
         services.AddSingleton<AzuraCastStreamStatusService>();
         services.AddSingleton<IcecastStatusService>();
         services.AddSingleton<IStreamStatusService>(serviceProvider =>
         {
             var options = serviceProvider.GetRequiredService<IOptions<StreamingOptions>>().Value;
-            Console.WriteLine(JsonSerializer.Serialize(options));
-            var type = options.ServerType;
-            return type switch
+            var live = options.Streams.FirstOrDefault(stream => stream.Use == options.Primary);
+            if (live is null) throw new InvalidOperationException("No live stream configured");
+            return live.Server switch
             {
-                "AzuraCast" => serviceProvider.GetRequiredService<AzuraCastStreamStatusService>(),
-                "Icecast" => serviceProvider.GetRequiredService<IcecastStatusService>(),
-                _ => throw new InvalidOperationException($"Unknown streaming server type: {type}")
+                StreamServerType.AzuraCast => serviceProvider.GetRequiredService<AzuraCastStreamStatusService>(),
+                StreamServerType.Icecast => serviceProvider.GetRequiredService<IcecastStatusService>(),
+                _ => throw new InvalidOperationException("Unknown streaming server type")
             };
         });
+
+        services.AddScoped<ConnectionInformationService>();
     }
 }

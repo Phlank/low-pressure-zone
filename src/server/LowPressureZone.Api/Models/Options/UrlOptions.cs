@@ -4,6 +4,6 @@ public class UrlOptions
 {
     public const string Name = "Urls";
 
-    public required Uri RegisterUrl { get; set; }
-    public required Uri ResetPasswordUrl { get; set; }
+    public required Uri RegisterUrl { get; init; }
+    public required Uri ResetPasswordUrl { get; init; }
 }

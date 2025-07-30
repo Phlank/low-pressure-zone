@@ -3,7 +3,7 @@
     <div v-if="!isMobile">
       <DataTable
         :rows="10"
-        :value="users"
+        :value="userStore.users"
         data-key="id"
         paginator>
         <Column
@@ -18,7 +18,11 @@
         </Column>
         <Column header="Streamer">
           <template #body="{ data }: { data: UserResponse }">
-            {{ data.isStreamer ? 'Yes' : '' }}
+            <span v-if="data.isStreamer">Yes</span>
+            <Button
+              v-else
+              label="Create Streamer"
+              @click="handleCreateStreamer(data)" />
           </template>
         </Column>
         <template #footer>
@@ -33,27 +37,33 @@
       <DataView
         :paginator-templat="mobilePaginatorTemplate"
         :rows="5"
-        :value="users"
+        :value="userStore.users"
         data-key="id"
         paginator>
         <template #list="{ items }: { items: UserResponse[] }">
           <div
             v-for="(user, index) in items"
             :key="user.id">
-            <ListItem style="width: 100%">
+            <ListItem>
               <template #left>
                 <div style="display: flex; flex-direction: column; overflow-x: hidden">
                   <span class="ellipsis">{{ user.displayName }}</span>
                   <span class="text-s ellipsis mobile-info-text">
                     <span v-if="user.isStreamer">Streamer</span>
-                    <span v-if="user.registrationDate">{{
-                      parseDate(user.registrationDate).toLocaleDateString()
-                    }}</span>
+                    <span v-if="user.registrationDate">
+                      {{ parseDate(user.registrationDate).toLocaleDateString() }}
+                    </span>
                   </span>
                 </div>
               </template>
+              <template #right>
+                <Button
+                  v-if="!user.isStreamer"
+                  label="Create Streamer"
+                  @click="handleCreateStreamer(user)" />
+              </template>
             </ListItem>
-            <Divider v-if="index !== users.length - 1" />
+            <Divider v-if="index !== userStore.users.length - 1" />
           </div>
         </template>
         <template #footer>
@@ -77,7 +87,7 @@
 import ListItem from '@/components/data/ListItem.vue'
 import { parseDate } from '@/utils/dateUtils'
 import { Button, Column, DataTable, DataView, Divider, useToast } from 'primevue'
-import { inject, ref, type Ref } from 'vue'
+import { inject, onMounted, ref, type Ref } from 'vue'
 import usersApi, { type UserResponse } from '@/api/resources/usersApi.ts'
 import { showCreateSuccessToast } from '@/utils/toastUtils.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
@@ -85,14 +95,12 @@ import ConfirmDialog from '@/components/dialogs/ConfirmDialog.vue'
 import { mobilePaginatorTemplate } from '@/constants/componentTemplates.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
 import Roles from '@/constants/roles.ts'
+import { useUserStore } from '@/stores/userStore.ts'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const toast = useToast()
 const authStore = useAuthStore()
-
-defineProps<{
-  users: UserResponse[]
-}>()
+const userStore = useUserStore()
 
 const showConfirmDialog = ref(false)
 const isSubmittingConfirmDialog = ref(false)
@@ -106,6 +114,18 @@ const handleCreateStreamers = async () => {
   showConfirmDialog.value = false
   isSubmittingConfirmDialog.value = false
 }
+
+const handleCreateStreamer = async (user: UserResponse) => {
+  const response = await usersApi.createStreamer(user.id)
+  if (!tryHandleUnsuccessfulResponse(response, toast)) {
+    showCreateSuccessToast(toast, 'Streamer', user.displayName)
+  }
+  await userStore.loadUsersAsync()
+}
+
+onMounted(async () => {
+  await userStore.loadUsersAsync()
+})
 </script>
 
 <style lang="scss">

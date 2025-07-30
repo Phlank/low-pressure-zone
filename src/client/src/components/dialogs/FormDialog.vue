@@ -45,6 +45,5 @@ const emit = defineEmits<{
 
 .form-dialog {
   min-width: min-content;
-  width: min(600px, calc(100vw - 2 * #{variables.$space-l}));
 }
 </style>

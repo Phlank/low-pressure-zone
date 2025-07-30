@@ -1,24 +1,21 @@
 ﻿using FastEndpoints;
-using LowPressureZone.Api.Models.Stream;
+using LowPressureZone.Api.Models.Stream.Info;
 
 namespace LowPressureZone.Api.Endpoints.Stream.ConnectionInfo;
 
-public class ConnectionInfoMapper : IResponseMapper
+public sealed class ConnectionInfoMapper : IResponseMapper
 {
-    public ConnectionInfoResponse FromEntity(StreamingInfo info, string streamType)
-    {
-        ArgumentNullException.ThrowIfNull(info.Username);
-        ArgumentNullException.ThrowIfNull(info.Password);
-
-        return new ConnectionInfoResponse
+    public ConnectionInfoResponse FromEntity(StreamingInfo info, string streamType) =>
+        new()
         {
             StreamType = streamType,
-            Type = info.Type,
+            Type = info.Type.ToString(),
             Host = info.Host,
             Port = info.Port,
+            Mount = info.Mount,
             Username = info.Username,
             Password = info.Password,
-            StreamTitleField = info.StreamTitleField
+            DisplayName = info.DisplayName,
+            IsDisplayNameEditable = info.IsDisplayNameEditable
         };
-    }
 }

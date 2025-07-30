@@ -19,6 +19,7 @@ import type { ScheduleRequest } from '@/api/resources/schedulesApi.ts'
 import type { TimeslotRequest } from '@/api/resources/timeslotsApi.ts'
 import type { LoginRequest, RegisterRequest } from '@/api/resources/authApi.ts'
 import type { InviteRequest } from '@/api/resources/invitesApi.ts'
+import type { StreamerRequest } from '@/api/resources/usersApi.ts'
 
 export const communityRequestRules: PropertyRules<CommunityRequest> = {
   name: combineRules(required(), maximumLength(64)),
@@ -89,4 +90,8 @@ export const registerRequestRules = (
     ),
     confirmPassword: equals(() => formState.password)
   }
+}
+
+export const streamerRequestRules: PropertyRules<StreamerRequest> = {
+  displayName: combineRules(required(), maximumLength(128))
 }

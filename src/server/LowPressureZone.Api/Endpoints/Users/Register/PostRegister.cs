@@ -31,7 +31,7 @@ public class PostRegister(UserManager<AppUser> userManager, IdentityContext iden
         try
         {
             context = TokenContext.Decode(req.Context);
-            if (context == null)
+            if (context is null)
             {
                 await this.SendDelayedForbiddenAsync(_requestTime, ct);
                 return;
@@ -66,7 +66,6 @@ public class PostRegister(UserManager<AppUser> userManager, IdentityContext iden
         {
             await TaskUtilities.DelaySensitiveResponse(_requestTime);
             ThrowError(new ValidationFailure(null, Errors.ExpiredToken));
-            return;
         }
 
         var setUsernameResult = await userManager.SetUserNameAsync(user, req.Username);
