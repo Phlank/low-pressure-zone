@@ -1,67 +1,76 @@
 ﻿<template>
   <div class="stream-information">
-    <h2>Live Stream</h2>
-    <h4>Broadcasting</h4>
-    <BroadcastingForm
-      v-if="connectionInfoStore.liveInfo()"
-      :info="connectionInfoStore.liveInfo()!" />
-    <h4>Connection Information</h4>
-    <ListItem>
-      <template #left>Host/Server</template>
-      <template #right>{{ connectionInfoStore.liveInfo()?.host }}</template>
-    </ListItem>
-    <Divider style="margin: 0" />
-    <ListItem>
-      <template #left>Port</template>
-      <template #right>{{ connectionInfoStore.liveInfo()?.port }}</template>
-    </ListItem>
-    <Divider style="margin: 0" />
-    <ListItem>
-      <template #left>Mount</template>
-      <template #right>{{ connectionInfoStore.liveInfo()?.mount }}</template>
-    </ListItem>
-    <Divider style="margin: 0" />
-    <ListItem>
-      <template #left>Username</template>
-      <template #right>{{ connectionInfoStore.liveInfo()?.username }}</template>
-    </ListItem>
-    <Divider style="margin: 0" />
-    <ListItem>
-      <template #left>Password</template>
-      <template #right>
-        <Button
-          :loading="isPasswordLoading"
-          icon="pi pi-key"
-          label="Get New Password"
-          @click="handleGetPassword" />
-      </template>
-    </ListItem>
-    <h2>Test Stream</h2>
-    <h4>Connection Information</h4>
-    <ListItem>
-      <template #left>Host/Server</template>
-      <template #right>{{ connectionInfoStore.testInfo()?.host }}</template>
-    </ListItem>
-    <Divider style="margin: 0" />
-    <ListItem>
-      <template #left>Port</template>
-      <template #right>{{ connectionInfoStore.testInfo()?.port }}</template>
-    </ListItem>
-    <Divider style="margin: 0" />
-    <ListItem>
-      <template #left>Mount</template>
-      <template #right>{{ connectionInfoStore.testInfo()?.mount }}</template>
-    </ListItem>
-    <Divider style="margin: 0" />
-    <ListItem>
-      <template #left>Username</template>
-      <template #right>{{ connectionInfoStore.testInfo()?.username }}</template>
-    </ListItem>
-    <Divider style="margin: 0" />
-    <ListItem>
-      <template #left>Password</template>
-      <template #right>{{ connectionInfoStore.testInfo()?.password }}</template>
-    </ListItem>
+    <div class="stream-information__live">
+      <h2>Live Stream</h2>
+      <h4>Broadcasting</h4>
+      <BroadcastingForm
+        v-if="connectionInfoStore.liveInfo()"
+        :info="connectionInfoStore.liveInfo()!"
+        class="stream-information__live__broadcasting-form" />
+      <h4>Connection Information</h4>
+      <div>
+        <ListItem>
+          <template #left>Host/Server</template>
+          <template #right>{{ connectionInfoStore.liveInfo()?.host }}</template>
+        </ListItem>
+        <Divider style="margin: 0" />
+        <ListItem>
+          <template #left>Port</template>
+          <template #right>{{ connectionInfoStore.liveInfo()?.port }}</template>
+        </ListItem>
+        <Divider style="margin: 0" />
+        <ListItem>
+          <template #left>Mount</template>
+          <template #right>{{ connectionInfoStore.liveInfo()?.mount }}</template>
+        </ListItem>
+        <Divider style="margin: 0" />
+        <ListItem>
+          <template #left>Username</template>
+          <template #right>{{ connectionInfoStore.liveInfo()?.username }}</template>
+        </ListItem>
+        <Divider style="margin: 0" />
+        <ListItem>
+          <template #left>Password</template>
+          <template #right>
+            <Button
+              :loading="isPasswordLoading"
+              icon="pi pi-key"
+              label="Get New Password"
+              @click="handleGetPassword" />
+          </template>
+        </ListItem>
+      </div>
+    </div>
+    <div class="stream-information__test">
+      <h2>Test Stream</h2>
+      <h4>Connection Information</h4>
+      <div>
+        <ListItem>
+          <template #left>Host/Server</template>
+          <template #right>{{ connectionInfoStore.testInfo()?.host }}</template>
+        </ListItem>
+        <Divider style="margin: 0" />
+        <ListItem>
+          <template #left>Port</template>
+          <template #right>{{ connectionInfoStore.testInfo()?.port }}</template>
+        </ListItem>
+        <Divider style="margin: 0" />
+        <ListItem>
+          <template #left>Mount</template>
+          <template #right>{{ connectionInfoStore.testInfo()?.mount }}</template>
+        </ListItem>
+        <Divider style="margin: 0" />
+        <ListItem>
+          <template #left>Username</template>
+          <template #right>{{ connectionInfoStore.testInfo()?.username }}</template>
+        </ListItem>
+        <Divider style="margin: 0" />
+        <ListItem>
+          <template #left>Password</template>
+          <template #right>{{ connectionInfoStore.testInfo()?.password }}</template>
+        </ListItem>
+      </div>
+    </div>
     <Dialog
       v-model:visible="showPasswordDialog"
       :draggable="false"
@@ -150,6 +159,20 @@ const handleCloseDialog = () => {
 @use '@/assets/styles/variables';
 
 .stream-information {
+  &__live {
+    display: flex;
+    flex-direction: column;
+
+    &__broadcasting-form {
+      margin-bottom: variables.$space-l;
+    }
+  }
+
+  &__test {
+    display: flex;
+    flex-direction: column;
+  }
+
   &__modal-footer {
     display: flex;
     flex-direction: row;

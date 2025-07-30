@@ -162,7 +162,7 @@ public static class ServiceCollectionExtensions
                                          .First(stream => stream.Server == StreamServerType.AzuraCast)
                                          .AzuraCast;
             httpClient.BaseAddress = azuraCastOptions!.ApiUrl;
-            httpClient.DefaultRequestHeaders.Add("X-API-Key", azuraCastOptions.ApiKey!);
+            httpClient.DefaultRequestHeaders.Add("X-API-Key", azuraCastOptions.ApiKey);
             httpClient.Timeout = TimeSpan.FromSeconds(10);
         });
         services.AddSingleton<AzuraCastClient>();

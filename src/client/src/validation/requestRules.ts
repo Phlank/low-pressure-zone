@@ -93,5 +93,5 @@ export const registerRequestRules = (
 }
 
 export const streamerRequestRules: PropertyRules<StreamerRequest> = {
-  displayName: required()
+  displayName: combineRules(required(), maximumLength(128))
 }

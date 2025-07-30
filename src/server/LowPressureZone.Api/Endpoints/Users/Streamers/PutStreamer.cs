@@ -29,12 +29,7 @@ public class PutStreamer(UserManager<AppUser> userManager, AzuraCastClient clien
         var streamerRequest = streamerResult.Value;
         streamerRequest.DisplayName = req.DisplayName;
         var updateResult = await client.UpdateStreamerAsync(streamerRequest);
-        if (!updateResult.IsSuccess)
-        {
-            AddError("Could not update broadcast information");
-            await SendErrorsAsync(400, ct);
-            return;
-        }
+        if (!updateResult.IsSuccess) ThrowError("Could not update broadcast information");
 
         await SendNoContentAsync(ct);
     }

@@ -13,3 +13,7 @@ div.p-datepicker-minute-picker {
 th.p-datatable-column-sorted {
   background: var(--p-datatable-header-cell-background);
 }
+
+div.p-dialog.p-component {
+  width: min(600px, calc(100vw - 2 * #{variables.$space-l}));
+}
