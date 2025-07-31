@@ -96,7 +96,7 @@ public class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<Streamin
     }
 
     private string BroadcastsEndpoint(int? streamerId) => streamerId is null
-                                                              ? $"/api/station/{_stationId}/broadcasts"
+                                                              ? $"/api/station/{_stationId}/streamers/broadcasts"
                                                               : $"/api/station/{_stationId}/streamer/{streamerId}/broadcasts";
 
     public async Task<Result<Broadcast[], HttpResponseMessage>> GetBroadcastsAsync(int? streamerId = null)

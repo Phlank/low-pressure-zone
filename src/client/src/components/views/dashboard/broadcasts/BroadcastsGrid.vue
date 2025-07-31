@@ -20,18 +20,9 @@
           </template>
         </Column>
         <Column
-          field="broadcasterDisplayName"
+          v-if="showStreamerName"
+          field="streamerDisplayName"
           header="AzuraCaster" />
-        <Column
-          field="nearestPerformerName"
-          header="Performer (based on timeslots)" />
-        <Column
-          field="isDownloadable"
-          header="Downloadable">
-          <template #body="{ data }: { data: BroadcastResponse }">
-            {{ data.isDownloadable ? 'Yes' : '' }}
-          </template>
-        </Column>
         <Column class="grid-action-col grid-action-col--2">
           <template #body="{ data }: { data: BroadcastResponse }">
             <GridActions
@@ -64,7 +55,7 @@
                 {{ formatMobileTimeInfo(broadcast) }}
               </div>
               <div>
-                {{ broadcast.nearestPerformerName ?? broadcast.streamerDisplayName ?? 'Unknown' }}
+                {{ broadcast.streamerDisplayName ?? 'Unknown' }}
               </div>
             </template>
             <template #right>
@@ -96,6 +87,10 @@ import ListItem from '@/components/data/ListItem.vue'
 
 const broadcastStore = useBroadcastStore()
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
+
+defineProps<{
+  showStreamerName?: boolean
+}>()
 
 const formatMobileTimeInfo = (broadcast: BroadcastResponse) => {
   let out = parseDate(broadcast.start).toLocaleString()
