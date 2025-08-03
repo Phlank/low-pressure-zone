@@ -14,8 +14,6 @@ public class BroadcastMapper(BroadcastRules rules) : IResponseMapper
             BroadcastId = broadcast.Id,
             StreamerId = broadcast.Streamer?.Id,
             StreamerDisplayName = broadcast.Streamer?.DisplayName,
-            IsDownloadable = rules.IsDownloadable(broadcast),
-            IsDeletable = rules.IsDeletable(broadcast),
-            RecordingPath = broadcast.Recording?.Path
+            IsDownloadable = rules.IsDownloadable(broadcast)
         };
 }

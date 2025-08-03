@@ -8,7 +8,7 @@
           field="start"
           header="Start">
           <template #body="{ data }: { data: TimeslotRow }">
-            {{ formatTimeslot(data.start) }}
+            {{ formatReadableTime(data.start) }}
           </template>
         </Column>
         <Column
@@ -43,7 +43,7 @@
         :key="row.start.getTime()"
         class="timeslots-grid__item">
         <template #left>
-          <div>{{ formatTimeslot(row.start) }}</div>
+          <div>{{ formatReadableTime(row.start) }}</div>
           <div>{{ row.timeslot?.performer.name ?? '' }}</div>
         </template>
         <template #right>
@@ -91,7 +91,7 @@ import ListItem from '@/components/data/ListItem.vue'
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
 import FormDialog from '@/components/dialogs/FormDialog.vue'
 import TimeslotForm from '@/components/form/requestForms/TimeslotForm.vue'
-import { formatTimeslot, getNextHour, hoursBetween, parseDate } from '@/utils/dateUtils'
+import { formatReadableTime, getNextHour, hoursBetween, parseDate } from '@/utils/dateUtils'
 import {
   showCreateSuccessToast,
   showDeleteSuccessToast,
@@ -192,13 +192,13 @@ const handleSave = async () => {
     showEditSuccessToast(
       toast,
       'timeslot',
-      `${formatTimeslot(parseDate(request.startsAt))} | ${performer!.name}`
+      `${formatReadableTime(parseDate(request.startsAt))} | ${performer!.name}`
     )
   } else {
     showCreateSuccessToast(
       toast,
       'timeslot',
-      `${formatTimeslot(parseDate(request.startsAt))} | ${performer!.name}`
+      `${formatReadableTime(parseDate(request.startsAt))} | ${performer!.name}`
     )
   }
   await scheduleStore.reloadTimeslotsAsync(props.schedule.id)
@@ -211,7 +211,7 @@ const deletingName = ref('')
 const handleDeleteClicked = async (row: TimeslotRow) => {
   if (!row.timeslot) return
   deletingId = row.timeslot!.id
-  deletingName.value = `${formatTimeslot(parseDate(row.timeslot.startsAt))} - ${row.timeslot.performer.name}`
+  deletingName.value = `${formatReadableTime(parseDate(row.timeslot.startsAt))} - ${row.timeslot.performer.name}`
   showDeleteDialog.value = true
 }
 const handleDelete = async () => {

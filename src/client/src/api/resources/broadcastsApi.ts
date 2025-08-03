@@ -21,6 +21,4 @@ export interface BroadcastResponse {
   end: string | null
   isDownloadable: boolean
   isDeletable: boolean
-  recordingPath: string | null
-  nearestPerformerName: string | null
 }

@@ -28,8 +28,8 @@
             field="end"
             header="Time">
             <template #body="{ data }: { data: ScheduleResponse }">
-              {{ formatTimeslot(parseDate(data.startsAt)) }} -
-              {{ formatTimeslot(parseDate(data.endsAt)) }}
+              {{ formatReadableTime(parseDate(data.startsAt)) }} -
+              {{ formatReadableTime(parseDate(data.endsAt)) }}
             </template>
           </Column>
           <Column v-if="isMobile">
@@ -84,7 +84,7 @@ import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
 import FormDialog from '@/components/dialogs/FormDialog.vue'
 import ScheduleForm from '@/components/form/requestForms/ScheduleForm.vue'
-import { formatTimeslot, parseDate, parseTime } from '@/utils/dateUtils'
+import { formatReadableTime, parseDate, parseTime } from '@/utils/dateUtils'
 import { showEditSuccessToast } from '@/utils/toastUtils'
 import { Column, DataTable, useToast } from 'primevue'
 import { computed, inject, reactive, ref, type Ref, useTemplateRef } from 'vue'

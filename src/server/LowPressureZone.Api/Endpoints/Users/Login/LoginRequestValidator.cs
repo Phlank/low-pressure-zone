@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace LowPressureZone.Api.Endpoints.Users.Login;
 
-public class LoginRequestValidator : Validator<LoginRequest>
+public sealed class LoginRequestValidator : Validator<LoginRequest>
 {
     public LoginRequestValidator()
     {
