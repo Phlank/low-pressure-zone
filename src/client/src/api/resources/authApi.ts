@@ -19,6 +19,7 @@ export interface UserInfoResponse {
   username: string
   email: string
   roles: string[]
+  streamerId: number | null
 }
 
 export interface LoginRequest {

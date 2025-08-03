@@ -99,17 +99,18 @@ public class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<Streamin
                                                               ? $"/api/station/{_stationId}/streamers/broadcasts"
                                                               : $"/api/station/{_stationId}/streamer/{streamerId}/broadcasts";
 
-    public async Task<Result<Broadcast[], HttpResponseMessage>> GetBroadcastsAsync(int? streamerId = null)
+    public async Task<Result<IReadOnlyCollection<Broadcast>, HttpResponseMessage>> GetBroadcastsAsync(
+        int? streamerId = null)
     {
         var response = await _client.GetAsync(BroadcastsEndpoint(streamerId));
         if (!response.IsSuccessStatusCode)
-            return Result.Err<Broadcast[], HttpResponseMessage>(response);
+            return Result.Err<IReadOnlyCollection<Broadcast>, HttpResponseMessage>(response);
 
         var content = await response.Content.ReadFromJsonAsync<Broadcast[]>();
         if (content is null)
-            return Result.Err<Broadcast[], HttpResponseMessage>(response);
+            return Result.Err<IReadOnlyCollection<Broadcast>, HttpResponseMessage>(response);
 
-        return Result.Ok<Broadcast[], HttpResponseMessage>(content);
+        return Result.Ok<IReadOnlyCollection<Broadcast>, HttpResponseMessage>(content);
     }
 
     private string DownloadBroadcastEndpoint(int streamerId, int broadcastId) =>

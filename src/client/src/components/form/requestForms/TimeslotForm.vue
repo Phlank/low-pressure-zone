@@ -4,7 +4,7 @@
       <IftaLabel class="input input--small">
         <InputText
           id="startInput"
-          :model-value="formatTimeslot(parseDate(formState.startsAt))"
+          :model-value="formatReadableTime(parseDate(formState.startsAt))"
           class="input__field"
           disabled />
         <label for="startInput">Start</label>
@@ -60,7 +60,7 @@
 </template>
 
 <script lang="ts" setup>
-import { formatTimeslot, parseDate } from '@/utils/dateUtils'
+import { formatReadableTime, parseDate } from '@/utils/dateUtils'
 import { timeslotRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { IftaLabel, InputText, Select } from 'primevue'

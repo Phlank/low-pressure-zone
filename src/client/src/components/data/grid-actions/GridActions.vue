@@ -103,6 +103,7 @@ const handleDrawerActionClick = (action: GridAction) => {
     &__multi {
       display: flex;
       flex-direction: row;
+      justify-content: center;
     }
 
     @include variables.mobile {

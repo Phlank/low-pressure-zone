@@ -60,7 +60,7 @@ export const minimumDate = (...dates: Date[]) => {
   return new Date(minimum)
 }
 
-export const formatTimeslot = (date: Date) => formatDate(date, 'h:mm A')
+export const formatReadableTime = (date: Date) => formatDate(date, 'h:mm A')
 
 export const getDuration = (start: Date | string, end: Date | string) => {
   const timeA = typeof start === 'string' ? parseDate(start).getTime() : start.getTime()
@@ -68,17 +68,14 @@ export const getDuration = (start: Date | string, end: Date | string) => {
   return Math.abs(timeB - timeA)
 }
 
-export const formatDuration = (timechangeMs: number) => {
-  const seconds = timechangeMs / 1000
+export const formatDuration = (durationMs: number) => {
+  const seconds = durationMs / 1000
   const minutes = seconds / 60
   const hours = minutes / 60
-
-  let result = ''
-  if (hours > 1) result += Math.floor(hours).toFixed(0) + 'h '
-  if (minutes > 1 || hours > 1) result += (Math.floor(minutes) % 60).toFixed(0) + 'm '
-  result += (seconds % 60).toFixed(0) + 's'
-  return result
+  return `${Math.floor(hours).toFixed(0)}:${formatTwoDigits(minutes % 60)}:${formatTwoDigits(seconds % 60)}`
 }
+
+const formatTwoDigits = (value: number) => ('0' + value.toFixed(0)).slice(-2)
 
 export const formatForFilename = (date: Date) =>
   `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}_${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}`

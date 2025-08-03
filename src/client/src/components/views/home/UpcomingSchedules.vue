@@ -28,7 +28,7 @@
             field="start"
             header="Time">
             <template #body="{ data }">
-              {{ formatTimeslot(data.start) }}
+              {{ formatReadableTime(data.start) }}
             </template>
           </Column>
           <Column
@@ -58,7 +58,7 @@
 </template>
 
 <script lang="ts" setup>
-import { formatTimeslot, getPreviousHour, hoursBetween, parseDate } from '@/utils/dateUtils'
+import { formatReadableTime, getPreviousHour, hoursBetween, parseDate } from '@/utils/dateUtils'
 import { Column, DataTable, Skeleton, useToast } from 'primevue'
 import { computed, type ComputedRef, inject, onMounted, ref, type Ref } from 'vue'
 import schedulesApi, { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'

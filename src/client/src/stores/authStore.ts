@@ -10,6 +10,7 @@ export const useAuthStore = defineStore('authStore', () => {
     id: '',
     email: '',
     username: '',
+    streamerId: null,
     roles: []
   })
 
@@ -63,6 +64,7 @@ export const useAuthStore = defineStore('authStore', () => {
     userInfo.value.email = ''
     userInfo.value.username = ''
     userInfo.value.roles = []
+    userInfo.value.streamerId = null
   }
 
   return {

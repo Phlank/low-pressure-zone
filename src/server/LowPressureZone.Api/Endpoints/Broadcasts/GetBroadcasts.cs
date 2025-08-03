@@ -1,12 +1,17 @@
-﻿using FastEndpoints;
+﻿using System.Collections.Immutable;
+using FastEndpoints;
 using LowPressureZone.Api.Clients;
 using LowPressureZone.Domain;
 using LowPressureZone.Identity.Constants;
+using LowPressureZone.Identity.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.Endpoints.Broadcasts;
 
-public class GetBroadcasts(AzuraCastClient client, DataContext context)
-    : EndpointWithoutRequest<IEnumerable<BroadcastResponse>, BroadcastMapper>
+public class GetBroadcasts(
+    UserManager<AppUser> userManager,
+    AzuraCastClient client,
+    DataContext context) : EndpointWithoutRequest<IEnumerable<BroadcastResponse>, BroadcastMapper>
 {
     private const int BroadcastBufferMinutes = 20;
 
@@ -18,23 +23,26 @@ public class GetBroadcasts(AzuraCastClient client, DataContext context)
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var broadcastResult = await client.GetBroadcastsAsync();
-        if (!broadcastResult.IsSuccess)
-            ThrowError(broadcastResult.Error.ReasonPhrase ?? "Unknown reason",
-                       (int)broadcastResult.Error.StatusCode);
-
-        var broadcasts = broadcastResult.Value;
-        if (broadcasts.Length == 0)
+        var user = await userManager.GetUserAsync(User);
+        if (user?.StreamerId is null)
         {
-            await SendOkAsync(ct);
+            await SendForbiddenAsync(ct);
             return;
         }
 
-        var orderedBroadcasts = broadcasts.OrderBy(broadcast => broadcast.TimestampStart);
+        var broadcastsResult = await client.GetBroadcastsAsync();
 
+        if (!broadcastsResult.IsSuccess)
+            ThrowError(broadcastsResult.Error.ReasonPhrase ?? "Unknown reason",
+                       (int)broadcastsResult.Error.StatusCode);
+
+        var broadcasts = broadcastsResult.Value;
+        if (!User.IsInRole(RoleNames.Admin))
+            broadcasts = broadcasts.Where(broadcast => broadcast.Streamer?.Id == user.StreamerId).ToImmutableList();
+
+        var orderedBroadcasts = broadcasts.OrderByDescending(broadcast => broadcast.TimestampStart);
         var responses = orderedBroadcasts.Select(Map.FromEntity);
-        var broadcastResponses = responses as BroadcastResponse[] ?? responses.ToArray();
 
-        await SendOkAsync(broadcastResponses, ct);
+        await SendOkAsync(responses, ct);
     }
 }

@@ -9,21 +9,21 @@ namespace LowPressureZone.Api.Authentication;
 
 public class AppUserClaimsTransformation(DataContext dataContext) : IClaimsTransformation
 {
-    private const string OrganizerCheckedClaimType = "OrganizerChecked";
+    private const string AdditionalClaimsCheckedClaimType = "AdditionalClaimsChecked";
 
     public async Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
     {
         if (!principal.HasClaim(claim => claim.Type == ClaimTypes.NameIdentifier))
             return principal;
 
-        if (principal.HasClaim(claim => claim.Type == OrganizerCheckedClaimType))
+        if (principal.HasClaim(claim => claim.Type == AdditionalClaimsCheckedClaimType))
             return principal;
 
         var identity = new ClaimsIdentity();
         var isOrganizer = await dataContext.CommunityRelationships
                                            .AnyAsync(relationship => relationship.IsOrganizer
                                                                      && relationship.UserId == principal.GetIdOrDefault());
-        identity.AddClaim(new Claim(OrganizerCheckedClaimType, "true"));
+        identity.AddClaim(new Claim(AdditionalClaimsCheckedClaimType, "true"));
         if (isOrganizer)
             identity.AddClaim(new Claim(ClaimTypes.Role, RoleNames.Organizer));
         principal.AddIdentity(identity);

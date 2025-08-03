@@ -2,15 +2,15 @@
 using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Services;
-using LowPressureZone.Domain;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.Endpoints.Users.Login;
 
-public class PostLogin(SignInManager<AppUser> signInManager,
-                       UserManager<AppUser> userManager,
-                       EmailService emailService) : Endpoint<LoginRequest, LoginResponse>
+public sealed class PostLogin(
+    SignInManager<AppUser> signInManager,
+    UserManager<AppUser> userManager,
+    EmailService emailService) : Endpoint<LoginRequest, LoginResponse>
 {
     private readonly DateTime _requestStart = DateTime.UtcNow;
 

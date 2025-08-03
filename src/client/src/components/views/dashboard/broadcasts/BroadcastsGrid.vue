@@ -2,14 +2,16 @@
   <div class="broadcasts-grid">
     <div v-if="!isMobile">
       <DataTable
+        :rows="10"
         :value="broadcastStore.broadcasts"
-        data-key="broadcastId">
+        data-key="broadcastId"
+        paginator>
         <Column
           field="start"
           header="Start">
           <template #body="{ data }: { data: BroadcastResponse }">
             {{ parseDate(data.start).toLocaleDateString() }} <br />
-            {{ formatTimeslot(parseDate(data.start)) }}
+            {{ formatReadableTime(parseDate(data.start)) }}
           </template>
         </Column>
         <Column header="Duration">
@@ -22,11 +24,10 @@
         <Column
           v-if="showStreamerName"
           field="streamerDisplayName"
-          header="AzuraCaster" />
+          header="Streamer" />
         <Column class="grid-action-col grid-action-col--2">
           <template #body="{ data }: { data: BroadcastResponse }">
             <GridActions
-              :show-delete="data.isDeletable"
               :show-download="data.isDownloadable"
               @download="handleDownloadClicked(data)" />
           </template>
@@ -51,8 +52,9 @@
           :key="broadcast.broadcastId">
           <ListItem>
             <template #left>
-              <div style="font-size: small">
-                {{ formatMobileTimeInfo(broadcast) }}
+              <div class="broadcasts-grid__mobile-time-info">
+                <span>{{ formatMobileTimeInfo(broadcast) }}</span>
+                <span style="word-break: break-all">{{ formatBroadcastDuration(broadcast) }}</span>
               </div>
               <div>
                 {{ broadcast.streamerDisplayName ?? 'Unknown' }}
@@ -60,7 +62,6 @@
             </template>
             <template #right>
               <GridActions
-                :show-delete="broadcast.isDeletable"
                 :show-download="broadcast.isDownloadable"
                 @download="handleDownloadClicked(broadcast)" />
             </template>
@@ -80,7 +81,7 @@ import { inject, type Ref } from 'vue'
 import { useBroadcastStore } from '@/stores/broadcastStore.ts'
 import { Column, DataTable, DataView, Divider } from 'primevue'
 import broadcastsApi, { type BroadcastResponse } from '@/api/resources/broadcastsApi.ts'
-import { formatDuration, formatTimeslot, getDuration, parseDate } from '@/utils/dateUtils.ts'
+import { formatDuration, formatReadableTime, getDuration, parseDate } from '@/utils/dateUtils.ts'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import { mobilePaginatorTemplate } from '@/constants/componentTemplates.ts'
 import ListItem from '@/components/data/ListItem.vue'
@@ -93,14 +94,25 @@ defineProps<{
 }>()
 
 const formatMobileTimeInfo = (broadcast: BroadcastResponse) => {
-  let out = parseDate(broadcast.start).toLocaleString()
-  if (broadcast.end) {
-    out += ` - ${formatDuration(getDuration(broadcast.start, broadcast.end))}`
-  }
-  return out
+  const date = parseDate(broadcast.start).toLocaleDateString()
+  const time = formatReadableTime(parseDate(broadcast.start))
+  const duration =
+    broadcast.end === null ? 'Live' : formatDuration(getDuration(broadcast.start, broadcast.end))
+  return `${date} ${time} | ${duration}`
 }
+
+const formatBroadcastDuration = (broadcast: BroadcastResponse) =>
+  broadcast.end === null ? 'Live' : formatDuration(getDuration(broadcast.start, broadcast.end))
 
 const handleDownloadClicked = (broadcast: BroadcastResponse) => {
   broadcastsApi.download(broadcast.streamerId ?? 0, broadcast.broadcastId)
 }
 </script>
+
+<style lang="scss">
+.broadcasts-grid {
+  &__mobile-time-info {
+    font-size: small;
+  }
+}
+</style>
