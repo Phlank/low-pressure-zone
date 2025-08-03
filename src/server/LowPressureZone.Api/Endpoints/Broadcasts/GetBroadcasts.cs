@@ -37,7 +37,7 @@ public class GetBroadcasts(
                        (int)broadcastsResult.Error.StatusCode);
 
         var broadcasts = broadcastsResult.Value;
-        if (!User.IsInRole(RoleNames.Admin))
+        if (!User.IsInRole(RoleNames.Admin) && !User.IsInRole(RoleNames.Organizer))
             broadcasts = broadcasts.Where(broadcast => broadcast.Streamer?.Id == user.StreamerId).ToImmutableList();
 
         var orderedBroadcasts = broadcasts.OrderByDescending(broadcast => broadcast.TimestampStart);

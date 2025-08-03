@@ -2,7 +2,6 @@ import { hasIntersection } from '@/utils/arrayUtils'
 import { defineStore } from 'pinia'
 import { ref, type Ref } from 'vue'
 import authApi, { type UserInfoResponse } from '@/api/resources/authApi.ts'
-import type { Role } from '@/constants/roles.ts'
 
 export const useAuthStore = defineStore('authStore', () => {
   const isLoggedInRef: Ref<boolean | undefined> = ref(undefined)
@@ -52,7 +51,7 @@ export const useAuthStore = defineStore('authStore', () => {
     return getRoles().includes(roleToCheck)
   }
 
-  const isInAnySpecifiedRole = (...rolesToCheck: Role[]): boolean => {
+  const isInAnySpecifiedRole = (...rolesToCheck: string[]): boolean => {
     if (rolesToCheck.length === 0) return true
 
     return hasIntersection(rolesToCheck, getRoles())
