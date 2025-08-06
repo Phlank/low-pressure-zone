@@ -17,9 +17,6 @@
         <Column
           field="timeslot.performanceType"
           header="Type" />
-        <Column
-          field="timeslot.name"
-          header="Name" />
         <Column class="grid-action-col grid-action-col--2">
           <template #body="{ data }: { data: TimeslotRow }">
             <GridActions
@@ -71,7 +68,8 @@
         ref="timeslotForm"
         :disabled="isSubmitting"
         :initial-state="formInitialValue"
-        :performers="performerStore.linkablePerformers" />
+        :performers="performerStore.linkablePerformers"
+        :schedule-id="schedule.id" />
     </FormDialog>
     <DeleteDialog
       :entity-name="deletingName"
@@ -85,18 +83,13 @@
 </template>
 
 <script lang="ts" setup>
-import type { ApiResponse } from '@/api/apiResponse'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import ListItem from '@/components/data/ListItem.vue'
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
 import FormDialog from '@/components/dialogs/FormDialog.vue'
 import TimeslotForm from '@/components/form/requestForms/TimeslotForm.vue'
 import { formatReadableTime, getNextHour, hoursBetween, parseDate } from '@/utils/dateUtils'
-import {
-  showCreateSuccessToast,
-  showDeleteSuccessToast,
-  showEditSuccessToast
-} from '@/utils/toastUtils'
+import { showDeleteSuccessToast } from '@/utils/toastUtils'
 import { Column, DataTable, useToast } from 'primevue'
 import { computed, inject, onMounted, ref, type Ref, useTemplateRef } from 'vue'
 import type { ScheduleResponse } from '@/api/resources/schedulesApi.ts'
@@ -170,37 +163,10 @@ const handleEditClicked = (row: TimeslotRow) => {
 }
 const handleSave = async () => {
   if (!timeslotForm.value) return
-  const isValid = timeslotForm.value.validation.validate()
-  if (!isValid) return
-
   isSubmitting.value = true
-  const request = timeslotForm.value.formState
-  let response: ApiResponse<TimeslotRequest, never> | undefined
-  if (editingId) {
-    response = await timeslotsApi.put(props.schedule.id, editingId, request)
-  } else {
-    response = await timeslotsApi.post(props.schedule.id, request)
-  }
+  timeslotForm.value.submit()
   isSubmitting.value = false
-  if (tryHandleUnsuccessfulResponse(response, toast, timeslotForm.value.validation)) return
-
   showFormDialog.value = false
-  editingId = ''
-
-  const performer = performerStore.get(request.performerId)
-  if (editingId) {
-    showEditSuccessToast(
-      toast,
-      'timeslot',
-      `${formatReadableTime(parseDate(request.startsAt))} | ${performer!.name}`
-    )
-  } else {
-    showCreateSuccessToast(
-      toast,
-      'timeslot',
-      `${formatReadableTime(parseDate(request.startsAt))} | ${performer!.name}`
-    )
-  }
   await scheduleStore.reloadTimeslotsAsync(props.schedule.id)
   setupRows()
 }

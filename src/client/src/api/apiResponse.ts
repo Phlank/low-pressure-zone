@@ -69,7 +69,7 @@ export class ApiResponse<TRequest, TResponse> {
   /**
    * @returns the resource id from the location header after a successful POST
    */
-  readonly getCreatedId = () => this.headers?.get('location')?.split('/').pop()
+  readonly getCreatedId = () => String(this.headers?.get('location')?.split('/').pop())
 }
 
 export interface ValidationProblemDetails<TRequest> {

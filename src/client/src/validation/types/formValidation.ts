@@ -1,5 +1,5 @@
 import type { ErrorMessageDictionary } from '@/api/apiResponse'
-import { ref } from 'vue'
+import { type Ref, ref } from 'vue'
 import { alwaysValid } from '../rules/untypedRules'
 import type { FormValidationState } from './../types/formValidationState'
 import type { PropertyRules } from './../types/propertyRules'
@@ -7,13 +7,14 @@ import { invalid, valid, type ValidationResult } from './../types/validationResu
 import type { ValidationRule } from './../types/validationRule'
 
 class FormValidationImplementation<TForm extends object> implements FormValidation<TForm> {
-  private readonly formState: TForm
+  private readonly formState: TForm | Ref<TForm>
   private readonly propertyState: FormValidationState<TForm>
 
-  constructor(formState: TForm, rules: PropertyRules<TForm>) {
+  constructor(formState: TForm | Ref<TForm>, rules: PropertyRules<TForm>) {
     this.formState = formState
     this.propertyState = {} as FormValidationState<TForm>
     const formKeys = this.getKeys()
+    console.log(JSON.stringify(formKeys))
     formKeys.forEach((key) => {
       this.propertyState[key] = {
         rule: rules[key] ?? alwaysValid,
@@ -40,7 +41,14 @@ class FormValidationImplementation<TForm extends object> implements FormValidati
       keys = this.getKeys()
     }
     keys.forEach((key) => {
-      this.setValidity(key, this.propertyState[key].rule(this.formState[key]))
+      if (Object.keys(this.formState).includes('_value')) {
+        this.setValidity(
+          key,
+          this.propertyState[key].rule((this.formState as Ref<TForm>).value[key])
+        )
+      } else {
+        this.setValidity(key, this.propertyState[key].rule((this.formState as TForm)[key]))
+      }
     })
     return this.isValid(...keys)
   }
@@ -92,7 +100,12 @@ class FormValidationImplementation<TForm extends object> implements FormValidati
   }
 
   private getKeys(): (keyof TForm)[] {
-    return Object.keys(this.formState) as (keyof TForm)[]
+    const keys = Object.keys(this.formState)
+    if (keys.includes('_value')) {
+      const asRef = this.formState as Ref<TForm>
+      return Object.keys(asRef.value) as (keyof TForm)[]
+    }
+    return keys as (keyof TForm)[]
   }
 }
 
@@ -112,6 +125,6 @@ export interface FormValidation<TForm extends object> {
 }
 
 export const createFormValidation = <TForm extends object>(
-  formState: TForm,
+  formState: TForm | Ref<TForm>,
   rules: PropertyRules<TForm>
 ): FormValidation<TForm> => new FormValidationImplementation<TForm>(formState, rules)

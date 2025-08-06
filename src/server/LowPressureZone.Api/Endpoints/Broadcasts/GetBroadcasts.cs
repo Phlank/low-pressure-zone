@@ -1,20 +1,15 @@
-﻿using System.Collections.Immutable;
-using FastEndpoints;
+﻿using FastEndpoints;
 using LowPressureZone.Api.Clients;
-using LowPressureZone.Domain;
+using LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.Endpoints.Broadcasts;
 
-public class GetBroadcasts(
-    UserManager<AppUser> userManager,
-    AzuraCastClient client,
-    DataContext context) : EndpointWithoutRequest<IEnumerable<BroadcastResponse>, BroadcastMapper>
+public class GetBroadcasts(UserManager<AppUser> userManager, AzuraCastClient client)
+    : EndpointWithoutRequest<IEnumerable<BroadcastResponse>, BroadcastMapper>
 {
-    private const int BroadcastBufferMinutes = 20;
-
     public override void Configure()
     {
         Get("/broadcasts");
@@ -36,12 +31,12 @@ public class GetBroadcasts(
             ThrowError(broadcastsResult.Error.ReasonPhrase ?? "Unknown reason",
                        (int)broadcastsResult.Error.StatusCode);
 
-        var broadcasts = broadcastsResult.Value;
+        IEnumerable<Broadcast> broadcasts = broadcastsResult.Value;
         if (!User.IsInRole(RoleNames.Admin) && !User.IsInRole(RoleNames.Organizer))
-            broadcasts = broadcasts.Where(broadcast => broadcast.Streamer?.Id == user.StreamerId).ToImmutableList();
+            broadcasts = broadcasts.Where(broadcast => broadcast.Streamer?.Id == user.StreamerId);
 
-        var orderedBroadcasts = broadcasts.OrderByDescending(broadcast => broadcast.TimestampStart);
-        var responses = orderedBroadcasts.Select(Map.FromEntity);
+        var responses = broadcasts.OrderByDescending(broadcast => broadcast.TimestampStart)
+                                  .Select(Map.FromEntity);
 
         await SendOkAsync(responses, ct);
     }
