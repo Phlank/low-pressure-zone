@@ -66,10 +66,10 @@
       the information to match the Live Stream configuration below. The next time you stream, it
       will be accessible through the play button on the website.
     </p>
-    <img
-      alt="Mixxx live configuration"
-      src="@/assets/stream-setup-img/mixxx-live-config.png" />
-    <p>The password for the live stream is the same as the test stream.</p>
+    <LiveConnectionInformation />
+    <h4>Set Stream Title</h4>
+    <p>Enter the text you want to appear on the website's play button and click Save.</p>
+    <BroadcastingForm />
     <h4>Software without streaming</h4>
     <p>
       Several people on the server use Serato. However, those users typically use some type of
@@ -85,6 +85,8 @@
 import { Message } from 'primevue'
 import { useConnectionInfoStore } from '@/stores/connectionInfoStore.ts'
 import { onMounted } from 'vue'
+import LiveConnectionInformation from '@/components/views/dashboard/streaming/LiveConnectionInformation.vue'
+import BroadcastingForm from '@/components/form/requestForms/BroadcastingForm.vue'
 
 const connectionInfoStore = useConnectionInfoStore()
 
