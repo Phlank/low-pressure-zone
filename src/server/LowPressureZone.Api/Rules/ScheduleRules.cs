@@ -49,8 +49,9 @@ public class ScheduleRules(IHttpContextAccessor contextAccessor)
 
     public bool IsHiddenFromApi(Schedule schedule)
     {
-        var isUserAdmin = User != null && User.IsInRole(RoleNames.Admin);
+        var isUserAdminOrOrganizer =
+            User != null && (User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Organizer));
         var isScheduleInPast = schedule.EndsAt < DateTime.UtcNow;
-        return isScheduleInPast && !isUserAdmin;
+        return isScheduleInPast && !isUserAdminOrOrganizer;
     }
 }

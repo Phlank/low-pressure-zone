@@ -10,11 +10,7 @@ namespace LowPressureZone.Api.Endpoints.Broadcasts;
 public class GetBroadcasts(UserManager<AppUser> userManager, AzuraCastClient client)
     : EndpointWithoutRequest<IEnumerable<BroadcastResponse>, BroadcastMapper>
 {
-    public override void Configure()
-    {
-        Get("/broadcasts");
-        Roles(RoleNames.Admin, RoleNames.Organizer);
-    }
+    public override void Configure() => Get("/broadcasts");
 
     public override async Task HandleAsync(CancellationToken ct)
     {
@@ -32,7 +28,7 @@ public class GetBroadcasts(UserManager<AppUser> userManager, AzuraCastClient cli
                        (int)broadcastsResult.Error.StatusCode);
 
         IEnumerable<Broadcast> broadcasts = broadcastsResult.Value;
-        if (!User.IsInRole(RoleNames.Admin) && !User.IsInRole(RoleNames.Organizer))
+        if (!(User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Organizer)))
             broadcasts = broadcasts.Where(broadcast => broadcast.Streamer?.Id == user.StreamerId);
 
         var responses = broadcasts.OrderByDescending(broadcast => broadcast.TimestampStart)
