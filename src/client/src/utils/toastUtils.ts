@@ -2,6 +2,20 @@ import type { ToastServiceMethods } from 'primevue'
 
 const TOAST_DURATION = 5000
 
+export const showSuccessToast = (
+  toast: ToastServiceMethods,
+  action: 'Created' | 'Updated' | 'Deleted' | 'Registered',
+  entityType: string,
+  entityName?: string
+) => {
+  toast.add({
+    severity: 'success',
+    summary: 'Success',
+    detail: `${action} ${entityType}${entityName ? ': ' + entityName : ''}`,
+    life: TOAST_DURATION
+  })
+}
+
 export const showCreateSuccessToast = (
   toast: ToastServiceMethods,
   entityType: string,

@@ -8,18 +8,30 @@ export default {
   get: (scheduleId: string) => sendGet<TimeslotResponse[]>(route(scheduleId)),
   getById: (scheduleId: string, timeslotId: string) =>
     sendGet<TimeslotResponse>(route(scheduleId, timeslotId)),
-  put: (scheduleId: string, timeslotId: string, request: TimeslotRequest) =>
-    sendPut(route(scheduleId, timeslotId), request),
-  post: (scheduleId: string, request: TimeslotRequest) => sendPost(route(scheduleId), request),
+  put: <TRequest extends TimeslotRequest>(
+    scheduleId: string,
+    timeslotId: string,
+    request: TRequest
+  ) => sendPut(route(scheduleId, timeslotId), mapRequest(request)),
+  post: <TRequest extends TimeslotRequest>(scheduleId: string, request: TRequest) =>
+    sendPost(route(scheduleId), mapRequest(request)),
   delete: (scheduleId: string, timeslotId: string) => sendDelete(route(scheduleId, timeslotId))
 }
 
 export interface TimeslotRequest {
   performerId: string
   performanceType: PerformanceType
-  name: string | null
   startsAt: string
   endsAt: string
+}
+
+const mapRequest = <TRequest extends TimeslotRequest>(request: TRequest): TimeslotRequest => {
+  return {
+    performerId: request.performerId,
+    performanceType: request.performanceType,
+    startsAt: request.startsAt,
+    endsAt: request.endsAt
+  }
 }
 
 export interface TimeslotResponse {

@@ -9,10 +9,11 @@
         <h4>{{ header }}</h4>
       </slot>
     </div>
-    <div class="form-area__fields">
+    <div :class="`form-area__fields ${useSingleColumn ? 'form-area__fields--single-column' : ''}`">
       <slot></slot>
     </div>
-    <div :class="`form-area__actions ${isSingleColumn ? 'form-area__actions--single-column' : ''}`">
+    <div
+      :class="`form-area__actions ${useSingleColumn ? 'form-area__actions--single-column' : ''}`">
       <slot name="actions"></slot>
     </div>
   </div>
@@ -26,15 +27,19 @@ import { mobileWidth } from '@/constants/size.ts'
 const formAreaRef = useTemplateRef('formAreaRef')
 const width = ref(0)
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     header?: string
     isSingleColumn?: boolean
+    alignActions?: 'left' | 'right'
   }>(),
   {
-    isSingleColumn: false
+    isSingleColumn: false,
+    alignActions: 'left'
   }
 )
+
+const useSingleColumn = computed(() => props.isSingleColumn || width.value <= 402)
 
 onMounted(() => {
   if (formAreaRef.value) {
@@ -61,6 +66,7 @@ const widthPx = computed(() => {
   return width.value - (width.value % columnWidth) + 'px'
 })
 const gridColsStyle = computed(() => `repeat(${columns.value}, 1fr)`)
+const actionColumnDirection = computed(() => (props.alignActions === 'left' ? 'ltr' : 'rtl'))
 </script>
 
 <style lang="scss">
@@ -72,14 +78,23 @@ const gridColsStyle = computed(() => `repeat(${columns.value}, 1fr)`)
     display: grid;
     grid-template-columns: v-bind(gridColsStyle);
     column-gap: variables.$space-l;
+
+    &--single-column {
+      .form-field {
+        grid-column: span 4;
+      }
+    }
   }
 
   &__actions {
-    display: flex;
-    flex-direction: row;
-    gap: variables.$space-m;
+    display: grid;
+    grid-template-columns: v-bind(gridColsStyle);
+    direction: v-bind(actionColumnDirection);
+    column-gap: variables.$space-l;
 
     &--single-column {
+      display: flex;
+      gap: variables.$space-m;
       flex-direction: column;
     }
   }

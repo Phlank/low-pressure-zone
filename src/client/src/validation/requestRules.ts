@@ -52,7 +52,6 @@ export const timeslotRequestRules = (
   return {
     performerId: required(),
     performanceType: required(),
-    name: maximumLength(64),
     startsAt: combineRules(required(), hourOnly()),
     endsAt: combineRules(
       required(),

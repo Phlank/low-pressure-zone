@@ -17,9 +17,6 @@
         <Column
           field="timeslot.performanceType"
           header="Type" />
-        <Column
-          field="timeslot.name"
-          header="Name" />
         <Column class="grid-action-col grid-action-col--2">
           <template #body="{ data }: { data: TimeslotRow }">
             <GridActions
@@ -61,18 +58,20 @@
         </template>
       </ListItem>
     </div>
-    <FormDialog
-      :header="editingId ? 'Edit Timeslot' : 'Create Timeslot'"
-      :is-submitting="isSubmitting"
-      :visible="showFormDialog"
-      @close="showFormDialog = false"
-      @save="handleSave">
+    <Dialog
+      v-model:visible="showFormDialog"
+      :draggable="false"
+      :header="formDialogTitle"
+      modal>
       <TimeslotForm
         ref="timeslotForm"
         :disabled="isSubmitting"
         :initial-state="formInitialValue"
-        :performers="performerStore.linkablePerformers" />
-    </FormDialog>
+        :performers="performerStore.linkablePerformers"
+        :schedule-id="schedule.id"
+        :timeslot-id="editingId"
+        @after-submit="onSubmitted" />
+    </Dialog>
     <DeleteDialog
       :entity-name="deletingName"
       :is-submitting="false"
@@ -85,19 +84,13 @@
 </template>
 
 <script lang="ts" setup>
-import type { ApiResponse } from '@/api/apiResponse'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import ListItem from '@/components/data/ListItem.vue'
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
-import FormDialog from '@/components/dialogs/FormDialog.vue'
 import TimeslotForm from '@/components/form/requestForms/TimeslotForm.vue'
 import { formatReadableTime, getNextHour, hoursBetween, parseDate } from '@/utils/dateUtils'
-import {
-  showCreateSuccessToast,
-  showDeleteSuccessToast,
-  showEditSuccessToast
-} from '@/utils/toastUtils'
-import { Column, DataTable, useToast } from 'primevue'
+import { showDeleteSuccessToast } from '@/utils/toastUtils'
+import { Column, DataTable, Dialog, useToast } from 'primevue'
 import { computed, inject, onMounted, ref, type Ref, useTemplateRef } from 'vue'
 import type { ScheduleResponse } from '@/api/resources/schedulesApi.ts'
 import timeslotsApi, {
@@ -148,7 +141,8 @@ onMounted(() => {
 const rows: Ref<TimeslotRow[]> = ref([])
 
 const showFormDialog = ref(false)
-let editingId = ''
+const formDialogTitle = ref('')
+const editingId = ref('')
 const formInitialValue: Ref<TimeslotRequest> = ref({
   startsAt: '',
   endsAt: '',
@@ -158,50 +152,24 @@ const formInitialValue: Ref<TimeslotRequest> = ref({
 })
 const timeslotForm = useTemplateRef('timeslotForm')
 const handleEditClicked = (row: TimeslotRow) => {
+  if (row.timeslot === undefined) {
+    formDialogTitle.value = 'Create Timeslot'
+  } else {
+    editingId.value = row.timeslot.id
+    formDialogTitle.value = 'Edit Timeslot'
+  }
   showFormDialog.value = true
-  editingId = row.timeslot?.id ?? ''
   formInitialValue.value = {
     startsAt: row.start.toISOString(),
     endsAt: getNextHour(row.start).toISOString(),
     performerId: row.timeslot?.performer.id ?? '',
-    performanceType: row.timeslot?.performanceType ?? PerformanceType.Live,
-    name: row.timeslot?.name ?? ''
+    performanceType: row.timeslot?.performanceType ?? PerformanceType.Live
   }
 }
-const handleSave = async () => {
-  if (!timeslotForm.value) return
-  const isValid = timeslotForm.value.validation.validate()
-  if (!isValid) return
 
-  isSubmitting.value = true
-  const request = timeslotForm.value.formState
-  let response: ApiResponse<TimeslotRequest, never> | undefined
-  if (editingId) {
-    response = await timeslotsApi.put(props.schedule.id, editingId, request)
-  } else {
-    response = await timeslotsApi.post(props.schedule.id, request)
-  }
-  isSubmitting.value = false
-  if (tryHandleUnsuccessfulResponse(response, toast, timeslotForm.value.validation)) return
-
+const onSubmitted = async () => {
   showFormDialog.value = false
-  editingId = ''
-
-  const performer = performerStore.get(request.performerId)
-  if (editingId) {
-    showEditSuccessToast(
-      toast,
-      'timeslot',
-      `${formatReadableTime(parseDate(request.startsAt))} | ${performer!.name}`
-    )
-  } else {
-    showCreateSuccessToast(
-      toast,
-      'timeslot',
-      `${formatReadableTime(parseDate(request.startsAt))} | ${performer!.name}`
-    )
-  }
-  await scheduleStore.reloadTimeslotsAsync(props.schedule.id)
+  formDialogTitle.value = ''
   setupRows()
 }
 
