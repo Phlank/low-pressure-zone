@@ -27,8 +27,9 @@
       alt="How to locate the Live Broadcasting section, and the first set of items available"
       src="@/assets/stream-setup-img/mixxx-broadcasting-test-1.png" />
     <Message severity="warn">
-      You <i>MUST</i> use MP3 for the encoding in order for all browsers to be able to listen to the
-      stream. 256kbps is the minimum bitrate we will use for quality reasons.
+      Unless you are streaming from Traktor, you should use MP3 for the encoding. Vorbis or Opus
+      will still work, but will require re-encoding on the server, resulting in quality loss.
+      256kbps is the minimum bitrate we use for quality reasons.
     </Message>
     <h4>Stream metadata</h4>
     <p>

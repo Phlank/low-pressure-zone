@@ -50,8 +50,9 @@
       alt="Shows the fields to set for the audio tab for Butt"
       src="@/assets/stream-setup-img/butt-audio-device.png" />
     <Message severity="warn">
-      You <i>MUST</i> use MP3 for the encoding in order for all browsers to be able to listen to the
-      stream. 256kbps is the minimum bitrate we will use for quality reasons.
+      You should use MP3 for the encoding. Vorbis or Opus will still work, but will require
+      re-encoding on the server, resulting in quality loss. 256kbps is the minimum bitrate we use
+      for quality reasons.
     </Message>
     <h4>Sound check</h4>
     <p>
