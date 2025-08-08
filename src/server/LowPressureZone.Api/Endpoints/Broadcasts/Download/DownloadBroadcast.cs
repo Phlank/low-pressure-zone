@@ -4,19 +4,28 @@ using FastEndpoints;
 using FluentValidation.Results;
 using LowPressureZone.Api.Clients;
 using LowPressureZone.Identity.Constants;
+using LowPressureZone.Identity.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.Endpoints.Broadcasts.Download;
 
-public class DownloadBroadcast(AzuraCastClient client) : Endpoint<DownloadBroadcastRequest, IFormFile>
+public class DownloadBroadcast(AzuraCastClient client, UserManager<AppUser> userManager)
+    : Endpoint<DownloadBroadcastRequest, IFormFile>
 {
-    public override void Configure()
-    {
-        Get("/broadcasts/download");
-        Roles(RoleNames.Admin, RoleNames.Organizer);
-    }
+    public override void Configure() => Get("/broadcasts/download");
 
     public override async Task HandleAsync(DownloadBroadcastRequest req, CancellationToken ct)
     {
+        if (!(User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Organizer)))
+        {
+            var user = await userManager.GetUserAsync(User);
+            if (user?.StreamerId != req.StreamerId)
+            {
+                await SendUnauthorizedAsync(ct);
+                return;
+            }
+        }
+
         var getStreamer = client.GetStreamerAsync(req.StreamerId);
         var getBroadcasts = client.GetBroadcastsAsync(req.StreamerId);
 
