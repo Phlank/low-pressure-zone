@@ -1,14 +1,28 @@
 <template>
   <div class="timeslot-form">
-    <FormArea>
+    <FormArea align-actions="right">
       <IftaFormField
         input-id="startInput"
         label="Start"
-        size="m">
+        size="xs">
         <InputText
           id="startInput"
           :model-value="formatReadableTime(parseDate(formState.startsAt))"
           disabled />
+      </IftaFormField>
+      <IftaFormField
+        :message="validation.message('performanceType')"
+        input-id="typeInput"
+        label="Type"
+        size="xs">
+        <Select
+          id="typeInput"
+          v-model:model-value="formState.performanceType"
+          :disabled="isSubmitting || disabled"
+          :invalid="!validation.isValid('performanceType')"
+          :options="performanceTypes"
+          class="input__field"
+          @change="() => validation.validateIfDirty('performanceType')" />
       </IftaFormField>
       <IftaFormField
         v-if="performerStore.performers.length > 0"
@@ -52,20 +66,13 @@
           :disabled="isSubmitting || disabled"
           :invalid="!validation.isValid('url')" />
       </IftaFormField>
-      <IftaFormField
-        :message="validation.message('performanceType')"
-        input-id="typeInput"
-        label="Type"
-        size="m">
-        <Select
-          id="typeInput"
-          v-model:model-value="formState.performanceType"
+      <template #actions>
+        <Button
           :disabled="isSubmitting || disabled"
-          :invalid="!validation.isValid('performanceType')"
-          :options="performanceTypes"
-          class="input__field"
-          @change="() => validation.validateIfDirty('performanceType')" />
-      </IftaFormField>
+          :loading="isSubmitting"
+          label="Save"
+          @click="submit" />
+      </template>
     </FormArea>
   </div>
 </template>
@@ -74,7 +81,7 @@
 import { formatReadableTime, parseDate } from '@/utils/dateUtils'
 import { performerRequestRules, timeslotRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
-import { InputText, Select, useToast } from 'primevue'
+import { Button, InputText, Select, useToast } from 'primevue'
 import { computed, onMounted, type Ref, ref } from 'vue'
 import timeslotsApi, {
   PerformanceType,
@@ -92,10 +99,12 @@ import { required } from '@/validation/rules/stringRules.ts'
 import { applyRuleIf } from '@/validation/rules/untypedRules.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import { err, ok, type Result } from '@/types/result.ts'
-import { showCreateSuccessToast } from '@/utils/toastUtils.ts'
+import { showSuccessToast } from '@/utils/toastUtils.ts'
+import { useScheduleStore } from '@/stores/scheduleStore.ts'
 
 const toast = useToast()
 const performerStore = usePerformerStore()
+const scheduleStore = useScheduleStore()
 
 const props = defineProps<{
   scheduleId: string
@@ -132,23 +141,31 @@ const validation = createFormValidation(formState, {
 const isSubmitting = ref(false)
 const submit = async () => {
   if (!validation.validate()) return
-  if (props.timeslotId === undefined) {
-    await submitPost()
-    return
+  let result
+  if (props.timeslotId === '' || props.timeslotId === undefined) {
+    result = await submitPost()
+  } else {
+    result = await submitPut()
   }
-  await submitPut()
+  if (result.isSuccess) {
+    await scheduleStore.reloadTimeslotsAsync(props.scheduleId)
+    reset()
+    emits('afterSubmit')
+  }
 }
-const submitPost = async () => {
+
+const submitPost = async (): Promise<Result<null, null>> => {
   if (formState.value.performerId === '') {
     const createPerformerResult = await createPerformer()
-    if (!createPerformerResult.isSuccess) return
+    if (!createPerformerResult.isSuccess) return err(null)
     formState.value.performerId = createPerformerResult.value!
   }
   const createTimeslotResponse = await timeslotsApi.post(props.scheduleId, formState.value)
-  if (tryHandleUnsuccessfulResponse(createTimeslotResponse, toast, validation)) return
-  showCreateSuccessToast(toast, 'Timeslot', formState.value.startsAt)
-  reset()
+  if (tryHandleUnsuccessfulResponse(createTimeslotResponse, toast, validation)) return err(null)
+  showSuccessToast(toast, 'Created', 'Timeslot', formatReadableTime(formState.value.startsAt))
+  return ok(null)
 }
+
 const createPerformer = async (): Promise<Result<string, null>> => {
   const response = await performersApi.post(formState.value)
   if (tryHandleUnsuccessfulResponse(response, toast, validation)) return err(null)
@@ -162,7 +179,15 @@ const createPerformer = async (): Promise<Result<string, null>> => {
   })
   return ok(response.getCreatedId())
 }
-const submitPut = async () => {}
+
+const submitPut = async (): Promise<Result<null, null>> => {
+  if (props.timeslotId === '' || props.timeslotId === undefined) return err(null)
+  console.log(props.timeslotId)
+  const response = await timeslotsApi.put(props.scheduleId, props.timeslotId, formState.value)
+  if (tryHandleUnsuccessfulResponse(response, toast, validation)) err(null)
+  showSuccessToast(toast, 'Updated', 'Timeslot', formatReadableTime(formState.value.startsAt))
+  return ok(null)
+}
 
 onMounted(async () => {
   reset()
@@ -178,5 +203,7 @@ const reset = () => {
   formState.value.url = ''
 }
 
-defineExpose({ formState, validation, reset, submit })
+const emits = defineEmits<{
+  afterSubmit: []
+}>()
 </script>

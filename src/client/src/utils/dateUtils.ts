@@ -60,7 +60,13 @@ export const minimumDate = (...dates: Date[]) => {
   return new Date(minimum)
 }
 
-export const formatReadableTime = (date: Date) => formatDate(date, 'h:mm A')
+const readableFormat = 'h:mm A'
+export const formatReadableTime = (date: Date | string) => {
+  if (typeof date === 'string') {
+    return formatDate(parseDate(date), readableFormat)
+  }
+  return formatDate(date, readableFormat)
+}
 
 export const getDuration = (start: Date | string, end: Date | string) => {
   const timeA = typeof start === 'string' ? parseDate(start).getTime() : start.getTime()
