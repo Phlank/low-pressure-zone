@@ -54,7 +54,6 @@
             <template #left>
               <div class="broadcasts-grid__mobile-time-info">
                 <span>{{ formatMobileTimeInfo(broadcast) }}</span>
-                <span style="word-break: break-all">{{ formatBroadcastDuration(broadcast) }}</span>
               </div>
               <div>
                 {{ broadcast.streamerDisplayName ?? 'Unknown' }}
@@ -100,9 +99,6 @@ const formatMobileTimeInfo = (broadcast: BroadcastResponse) => {
     broadcast.end === null ? 'Live' : formatDuration(getDuration(broadcast.start, broadcast.end))
   return `${date} ${time} | ${duration}`
 }
-
-const formatBroadcastDuration = (broadcast: BroadcastResponse) =>
-  broadcast.end === null ? 'Live' : formatDuration(getDuration(broadcast.start, broadcast.end))
 
 const handleDownloadClicked = (broadcast: BroadcastResponse) => {
   broadcastsApi.download(broadcast.streamerId ?? 0, broadcast.broadcastId)

@@ -75,9 +75,9 @@ export const getDuration = (start: Date | string, end: Date | string) => {
 }
 
 export const formatDuration = (durationMs: number) => {
-  const seconds = durationMs / 1000
-  const minutes = seconds / 60
-  const hours = minutes / 60
+  const seconds = Math.floor(durationMs / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
   return `${Math.floor(hours).toFixed(0)}:${formatTwoDigits(minutes % 60)}:${formatTwoDigits(seconds % 60)}`
 }
 
