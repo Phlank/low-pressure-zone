@@ -22,16 +22,13 @@
     <p>
       After downloading and installing Butt, open it and click the Settings button. After this,
       under Server Settings, click the Add button. In the window that appears, match the following
-      setup:
+      setup.
     </p>
+    <StreamPasswordButton use-type="test" />
+    <br />
     <img
       alt="Butt settings"
       src="@/assets/stream-setup-img/butt-server-settings.png" />
-    <p>
-      The password for the test stream is
-      <kbd>{{ connectionInfoStore.testInfo()?.password }}</kbd
-      >.
-    </p>
     <h4>Stream info</h4>
     <p>
       Under Stream Infos, hit Add. This will open up another window. Configure it as follows, and
@@ -121,6 +118,7 @@ import { onMounted } from 'vue'
 import { useConnectionInfoStore } from '@/stores/connectionInfoStore.ts'
 import LiveConnectionInformation from '@/components/views/dashboard/streaming/LiveConnectionInformation.vue'
 import BroadcastingForm from '@/components/form/requestForms/BroadcastingForm.vue'
+import StreamPasswordButton from '@/components/controls/StreamPasswordButton.vue'
 
 const connectionInfoStore = useConnectionInfoStore()
 
