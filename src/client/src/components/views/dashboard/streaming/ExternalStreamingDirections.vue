@@ -50,26 +50,10 @@
       alt="Shows the fields to set for the audio tab for Butt"
       src="@/assets/stream-setup-img/butt-audio-device.png" />
     <Message severity="warn">
-      You <i>MUST</i> use MP3 for the encoding in order for all browsers to be able to listen to the
-      stream. 256kbps is the minimum bitrate we will use for quality reasons.
+      You should use MP3 for the encoding. Vorbis or Opus will still work, but will require
+      re-encoding on the server, resulting in quality loss. 256kbps is the minimum bitrate we use
+      for quality reasons.
     </Message>
-    <h4>Stream title</h4>
-    <p>
-      Create a text file somewhere on your computer. In it, you'll write whatever title you want
-      your stream to have on the play button on the site.
-    </p>
-    <img
-      alt="Shows the contents of a text file"
-      src="@/assets/stream-setup-img/text-file.png" />
-    <p>
-      Then in Butt, go to the Stream tab. Under the "Update song name from file" area, click the
-      file folder and navigate to the text file you just created. After that, click the "Activate"
-      checkbox. This will set your stream title for live performances whenever you connect to the
-      stream.
-    </p>
-    <img
-      alt="Butt settings for the stream title"
-      src="@/assets/stream-setup-img/butt-stream-title.png" />
     <h4>Sound check</h4>
     <p>
       Start playing audio. On Butt, you should see in the main window the word "idle" at the top and
@@ -114,12 +98,15 @@
     <h4>Live stream settings</h4>
     <p>
       After that, go back to the Butt settings. Click Edit on the Server settings and update the
-      information to match the Live Stream configuration below. The password is the same as the test
-      stream.
+      settings as follows:
     </p>
-    <img
-      alt="Set the server settings to match the live stream"
-      src="@/assets/stream-setup-img/butt-live.png" />
+    <LiveConnectionInformation />
+    <h4>Set Stream Title</h4>
+    <p>Enter the text you want to appear on the website's play button and click Save.</p>
+    <BroadcastingForm
+      v-if="connectionInfoStore.liveInfo()"
+      :info="connectionInfoStore.liveInfo()!" />
+    <p>The above setting is also visible on the Streaming Info tab at the top of this page.</p>
     <h4>Enjoy streaming!</h4>
     <p>
       That's it! The next time you connect to the server for a stream, your audio will be accessible
@@ -132,6 +119,8 @@
 import { Message } from 'primevue'
 import { onMounted } from 'vue'
 import { useConnectionInfoStore } from '@/stores/connectionInfoStore.ts'
+import LiveConnectionInformation from '@/components/views/dashboard/streaming/LiveConnectionInformation.vue'
+import BroadcastingForm from '@/components/form/requestForms/BroadcastingForm.vue'
 
 const connectionInfoStore = useConnectionInfoStore()
 
