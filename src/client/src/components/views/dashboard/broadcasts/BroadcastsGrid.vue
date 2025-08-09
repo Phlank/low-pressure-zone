@@ -1,6 +1,6 @@
 ﻿<template>
   <div class="broadcasts-grid">
-    <div v-if="!isMobile">
+    <div v-if="!isMobile && !isLoading">
       <DataTable
         :rows="10"
         :value="broadcastStore.broadcasts"
@@ -35,7 +35,7 @@
       </DataTable>
     </div>
     <DataView
-      v-if="isMobile"
+      v-if="isMobile && !isLoading"
       :paginator="broadcastStore.broadcasts.length > 5"
       :paginator-template="mobilePaginatorTemplate"
       :rows="5"
@@ -43,7 +43,7 @@
       data-key="broadcastId">
       <template #empty>
         <ListItem>
-          <template #left>No items to display.</template>
+          <template #left>{{ isLoading ? 'Loading...' : 'No items to display' }}</template>
         </ListItem>
       </template>
       <template #list="{ items }: { items: BroadcastResponse[] }">
@@ -72,13 +72,16 @@
         </div>
       </template>
     </DataView>
+    <Skeleton
+      v-if="isLoading"
+      style="height: 300px" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { inject, type Ref } from 'vue'
+import { inject, onMounted, ref, type Ref } from 'vue'
 import { useBroadcastStore } from '@/stores/broadcastStore.ts'
-import { Column, DataTable, DataView, Divider } from 'primevue'
+import { Column, DataTable, DataView, Divider, Skeleton } from 'primevue'
 import broadcastsApi, { type BroadcastResponse } from '@/api/resources/broadcastsApi.ts'
 import { formatDuration, formatReadableTime, getDuration, parseDate } from '@/utils/dateUtils.ts'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
@@ -103,6 +106,12 @@ const formatMobileTimeInfo = (broadcast: BroadcastResponse) => {
 const handleDownloadClicked = (broadcast: BroadcastResponse) => {
   broadcastsApi.download(broadcast.streamerId ?? 0, broadcast.broadcastId)
 }
+
+const isLoading = ref(true)
+onMounted(async () => {
+  await broadcastStore.loadIfNotInitialized()
+  isLoading.value = false
+})
 </script>
 
 <style lang="scss">

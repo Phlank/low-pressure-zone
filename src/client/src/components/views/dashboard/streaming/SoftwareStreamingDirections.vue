@@ -19,10 +19,10 @@
     <p>
       From here, find the Live Broadcasting section on the left-side navigation of the Preferences
       menu. In here, you will set up the connection and stream info. Set the first sections up to
-      match what is given in the below image. The password for the test stream is
-      <kbd>{{ connectionInfoStore.testInfo()?.password }}</kbd
-      >.
+      match what is given in the below image.
     </p>
+    <StreamPasswordButton use-type="test" />
+    <br />
     <img
       alt="How to locate the Live Broadcasting section, and the first set of items available"
       src="@/assets/stream-setup-img/mixxx-broadcasting-test-1.png" />
@@ -88,6 +88,7 @@ import { useConnectionInfoStore } from '@/stores/connectionInfoStore.ts'
 import { onMounted } from 'vue'
 import LiveConnectionInformation from '@/components/views/dashboard/streaming/LiveConnectionInformation.vue'
 import BroadcastingForm from '@/components/form/requestForms/BroadcastingForm.vue'
+import StreamPasswordButton from '@/components/controls/StreamPasswordButton.vue'
 
 const connectionInfoStore = useConnectionInfoStore()
 
