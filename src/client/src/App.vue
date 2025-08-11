@@ -9,11 +9,12 @@
 
 <script lang="ts" setup>
 import { Toast } from 'primevue'
-import { onMounted, provide, ref, type Ref } from 'vue'
+import { computed, onMounted, provide, ref, type Ref } from 'vue'
 import SiteLayout from './components/layout/site/SiteLayout.vue'
-import { useResizeObserver } from '@vueuse/core'
+import { useLocalStorage, useResizeObserver } from '@vueuse/core'
 import { mobileWidth } from '@/constants/size.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
+import { isTrueString } from '@/utils/booleanUtils.ts'
 
 const authStore = useAuthStore()
 
@@ -26,6 +27,21 @@ useResizeObserver(document.body, () => {
   isMobile.value = document.body.offsetWidth <= mobileWidth
 })
 provide('isMobile', isMobile)
+
+const isDarkModeStored = useLocalStorage('isDarkMode', 'true')
+const isDarkMode = computed({
+  get() {
+    return isTrueString(isDarkModeStored.value)
+  },
+  set(value) {
+    if (value) {
+      isDarkModeStored.value = 'true'
+    } else {
+      isDarkModeStored.value = 'false'
+    }
+  }
+})
+provide('isDarkMode', isDarkMode)
 </script>
 
 <style lang="scss">

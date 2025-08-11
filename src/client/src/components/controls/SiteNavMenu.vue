@@ -25,7 +25,13 @@
               :href="href"
               v-bind="props.action"
               @click="navigate">
-              <span :class="item.icon" />
+              <span
+                v-if="item.icon"
+                :class="item.icon" />
+              <img
+                v-if="item.iconSvg"
+                :src="item.iconSvg()"
+                style="max-width: 16px; max-height: 16px" />
               <span class="ml-2">{{ item.label }}</span>
             </a>
           </RouterLink>
@@ -34,7 +40,13 @@
               v-ripple
               :href="item.href"
               class="p-menu-item-link">
-              <span :class="item.icon" />
+              <span
+                v-if="item.icon"
+                :class="item.icon" />
+              <img
+                v-if="item.iconSvg"
+                :src="item.iconSvg()"
+                style="max-width: 16px; max-height: 16px" />
               <span class="ml-2">{{ item.label }}</span>
             </a>
           </div>
@@ -43,7 +55,13 @@
               v-ripple
               class="p-menu-item-link"
               @click="item.callback">
-              <span :class="item.icon" />
+              <span
+                v-if="item.icon"
+                :class="item.icon" />
+              <img
+                v-if="item.iconSvg"
+                :src="item.iconSvg()"
+                style="max-width: 16px; max-height: 16px" />
               <span class="ml-2">{{ item.label }}</span>
             </a>
           </div>
@@ -58,7 +76,7 @@ import { Routes } from '@/router/routes'
 import { useAuthStore } from '@/stores/authStore'
 import { Button, Menu } from 'primevue'
 import type { MenuItem } from 'primevue/menuitem'
-import { computed, onMounted, useTemplateRef } from 'vue'
+import { computed, inject, onMounted, ref, type Ref, useTemplateRef } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import authApi from '@/api/resources/authApi.ts'
 
@@ -67,6 +85,8 @@ const navMenuRef = useTemplateRef('navMenuRef')
 const authStore = useAuthStore()
 const discordInvite = import.meta.env.VITE_DISCORD_INVITE_LINK
 const githubUrl = import.meta.env.VITE_GITHUB_URL
+const soundcloudUrl = import.meta.env.VITE_SOUNDCLOUD_URL
+const isDarkMode: Ref<boolean> = inject('isDarkMode', ref(true))
 
 const navMenuItems = computed(() => {
   if (authStore.isLoggedIn()) {
@@ -111,6 +131,13 @@ const loggedInNavMenuItems: MenuItem[] = [
     icon: 'pi pi-discord',
     href: discordInvite,
     visible: () => window.innerWidth < 240
+  },
+  {
+    label: 'Soundcloud',
+    labelString: 'Soundcloud',
+    href: soundcloudUrl,
+    iconSvg: () => (isDarkMode.value ? '/soundcloud-logo-white.svg' : '/soundcloud-logo-black.svg'),
+    visible: true
   }
 ]
 
@@ -135,6 +162,13 @@ const loggedOutNavMenuItems: MenuItem[] = [
     icon: 'pi pi-discord',
     href: discordInvite,
     visible: () => window.innerWidth < 240
+  },
+  {
+    label: 'Soundcloud',
+    labelString: 'Soundcloud',
+    href: soundcloudUrl,
+    iconSvg: () => (isDarkMode.value ? '/soundcloud-logo-white.svg' : '/soundcloud-logo-black.svg'),
+    visible: true
   }
 ]
 

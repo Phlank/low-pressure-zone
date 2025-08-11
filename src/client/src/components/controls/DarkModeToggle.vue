@@ -10,20 +10,13 @@
 </template>
 
 <script lang="ts" setup>
-import { isTrueString } from '@/utils/booleanUtils'
-import { useLocalStorage } from '@vueuse/core'
 import { ToggleSwitch } from 'primevue'
-import { computed, onMounted } from 'vue'
+import { inject, onMounted, ref, type Ref } from 'vue'
 
-const isDarkModeStored = useLocalStorage('isDarkMode', 'true')
+const isDarkMode: Ref<boolean> = inject('isDarkMode', ref(true))
 const toggleDarkModeStored = () => {
-  if (isTrueString(isDarkModeStored.value)) {
-    isDarkModeStored.value = 'false'
-  } else {
-    isDarkModeStored.value = 'true'
-  }
+  isDarkMode!.value = !isDarkMode!.value
 }
-const isDarkMode = computed(() => isTrueString(isDarkModeStored.value))
 
 onMounted(() => {
   const isDarkModeRef = isDarkMode.value
