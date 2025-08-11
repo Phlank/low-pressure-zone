@@ -11,15 +11,15 @@
 
 <script lang="ts" setup>
 import { ToggleSwitch } from 'primevue'
-import { inject, onMounted, type Ref } from 'vue'
+import { inject, onMounted, ref, type Ref } from 'vue'
 
-const isDarkMode: Ref<boolean> | undefined = inject('isDarkMode')
+const isDarkMode: Ref<boolean> = inject('isDarkMode', ref(true))
 const toggleDarkModeStored = () => {
   isDarkMode!.value = !isDarkMode!.value
 }
 
 onMounted(() => {
-  const isDarkModeRef = isDarkMode!.value
+  const isDarkModeRef = isDarkMode.value
   const isDocumentDarkMode = document.documentElement.classList.contains('dark-mode-toggle')
   const isBodyDarkMode = document.body.classList.contains('dark-mode-toggle')
 

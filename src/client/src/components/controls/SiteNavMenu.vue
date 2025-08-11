@@ -60,7 +60,7 @@
                 :class="item.icon" />
               <img
                 v-if="item.iconSvg"
-                :src="item.iconSvg"
+                :src="item.iconSvg()"
                 style="max-width: 16px; max-height: 16px" />
               <span class="ml-2">{{ item.label }}</span>
             </a>
@@ -76,10 +76,9 @@ import { Routes } from '@/router/routes'
 import { useAuthStore } from '@/stores/authStore'
 import { Button, Menu } from 'primevue'
 import type { MenuItem } from 'primevue/menuitem'
-import { computed, onMounted, useTemplateRef } from 'vue'
+import { computed, inject, onMounted, ref, type Ref, useTemplateRef } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import authApi from '@/api/resources/authApi.ts'
-import { useLocalStorage } from '@vueuse/core'
 
 const router = useRouter()
 const navMenuRef = useTemplateRef('navMenuRef')
@@ -87,6 +86,7 @@ const authStore = useAuthStore()
 const discordInvite = import.meta.env.VITE_DISCORD_INVITE_LINK
 const githubUrl = import.meta.env.VITE_GITHUB_URL
 const soundcloudUrl = import.meta.env.VITE_SOUNDCLOUD_URL
+const isDarkMode: Ref<boolean> = inject('isDarkMode', ref(true))
 
 const navMenuItems = computed(() => {
   if (authStore.isLoggedIn()) {
@@ -175,9 +175,6 @@ const loggedOutNavMenuItems: MenuItem[] = [
 onMounted(async () => {
   await authStore.loadIfNotInitialized()
 })
-
-const isDarkModeStored = useLocalStorage('isDarkMode', 'true')
-const isDarkMode = computed(() => isDarkModeStored.value === 'true')
 
 const toggleMenu = (event: MouseEvent) => {
   navMenuRef.value?.toggle(event)
