@@ -31,14 +31,6 @@
       will still work, but will require re-encoding on the server, resulting in quality loss.
       256kbps is the minimum bitrate we use for quality reasons.
     </Message>
-    <h4>Stream metadata</h4>
-    <p>
-      Scroll down and set up the stream info. In whatever software you are using, the track title is
-      what will appear on the play button on the website.
-    </p>
-    <img
-      alt="Stream info setup"
-      src="@/assets/stream-setup-img/mixxx-broadcasting-test-2.png" />
     <p>Finally, click the Apply button at the bottom right and close the Preferences window.</p>
     <h4>Test stream</h4>
     <p>
