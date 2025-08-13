@@ -138,8 +138,10 @@ const handleEnded = () => {
 }
 
 const reconnectAttempts = ref(0)
+const maxReconnectAttempts = 10
 const waitAndTryReconnect = async () => {
   stopAudio()
+  if (reconnectAttempts.value > maxReconnectAttempts) return
   await delay(3000)
   reconnectAttempts.value++
   startAudio()
@@ -152,8 +154,8 @@ const setNobodyPlaying = () => {
 const handleError = () => {
   if (audio?.src === '') return
   toast.add({
-    summary: `Reconnecting: Attempt ${reconnectAttempts.value}`,
-    detail: 'Unable to load audio stream. Attempting to reconnect...',
+    summary: `Reconnecting`,
+    detail: `Attempt ${reconnectAttempts.value} of ${maxReconnectAttempts}`,
     severity: 'error',
     life: 3000
   })
