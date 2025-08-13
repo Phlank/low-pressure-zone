@@ -24,7 +24,7 @@
       </ListItem>
       <Divider style="margin: 0" />
       <ListItem>
-        <template #left>Username</template>
+        <template #left>User/Login</template>
         <template #right
           ><kbd>{{ connectionInfoStore.liveInfo()?.username }}</kbd></template
         >
