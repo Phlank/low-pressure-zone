@@ -45,6 +45,7 @@ import { computed, onMounted, type Ref, ref, watch } from 'vue'
 import clamp from '@/utils/clamp.ts'
 import { useResizeObserver, useThrottleFn } from '@vueuse/core'
 import { useStreamStore } from '@/stores/streamStore.ts'
+import delay from '@/utils/delay.ts'
 
 const toast = useToast()
 const streamStore = useStreamStore()
@@ -123,40 +124,40 @@ watch(playState, (newPlayState) => {
 
 const addAudioEventListeners = () => {
   const listenerOptions = { signal: audioAbortController.signal }
-  audio?.addEventListener('canplay', handleCanPlay, listenerOptions)
-  audio?.addEventListener('play', handlePlay, listenerOptions)
+  audio?.addEventListener('playing', handlePlaying, listenerOptions)
   audio?.addEventListener('ended', handleEnded, listenerOptions)
-  audio?.addEventListener('waiting', handleWaiting, listenerOptions)
   audio?.addEventListener('error', handleError, listenerOptions)
 }
 
-const handleCanPlay = () => {}
-
-const handlePlay = () => {}
-
-const handleEnded = () => {
-  waitForReconnect()
+const handlePlaying = () => {
+  reconnectAttempts.value = 0
 }
 
-const waitForReconnect = () => {
+const handleEnded = () => {
+  waitAndTryReconnect()
+}
+
+const reconnectAttempts = ref(0)
+const waitAndTryReconnect = async () => {
   stopAudio()
+  await delay(3000)
+  reconnectAttempts.value++
+  startAudio()
 }
 
 const setNobodyPlaying = () => {
   playState.value = PlayState.Paused
 }
 
-const handleWaiting = () => {}
-
 const handleError = () => {
   if (audio?.src === '') return
   toast.add({
-    summary: 'Playback error',
-    detail: 'Unable to load audio stream',
+    summary: `Reconnecting: Attempt ${reconnectAttempts.value}`,
+    detail: 'Unable to load audio stream. Attempting to reconnect...',
     severity: 'error',
-    life: 7000
+    life: 3000
   })
-  waitForReconnect()
+  waitAndTryReconnect()
 }
 
 const statusText = computed(() => {
