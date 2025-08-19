@@ -45,6 +45,7 @@ import { computed, onMounted, type Ref, ref, watch } from 'vue'
 import clamp from '@/utils/clamp.ts'
 import { useResizeObserver, useThrottleFn } from '@vueuse/core'
 import { useStreamStore } from '@/stores/streamStore.ts'
+import delay from '@/utils/delay.ts'
 
 const toast = useToast()
 const streamStore = useStreamStore()
@@ -123,40 +124,47 @@ watch(playState, (newPlayState) => {
 
 const addAudioEventListeners = () => {
   const listenerOptions = { signal: audioAbortController.signal }
-  audio?.addEventListener('canplay', handleCanPlay, listenerOptions)
-  audio?.addEventListener('play', handlePlay, listenerOptions)
+  audio?.addEventListener('playing', handlePlaying, listenerOptions)
   audio?.addEventListener('ended', handleEnded, listenerOptions)
-  audio?.addEventListener('waiting', handleWaiting, listenerOptions)
   audio?.addEventListener('error', handleError, listenerOptions)
 }
 
-const handleCanPlay = () => {}
-
-const handlePlay = () => {}
-
-const handleEnded = () => {
-  waitForReconnect()
+const handlePlaying = () => {
+  reconnectAttempts.value = 0
 }
 
-const waitForReconnect = () => {
+const handleEnded = () => {
+  waitAndTryReconnect()
+}
+
+const reconnectAttempts = ref(0)
+const maxReconnectAttempts = 10
+const waitAndTryReconnect = async () => {
   stopAudio()
+  if (reconnectAttempts.value >= maxReconnectAttempts) {
+    playState.value = PlayState.Paused
+    return
+  }
+  await delay(3000)
+  // If the playState becomes `Paused` before the delay completes, don't try and reconnect again
+  if (playState.value === PlayState.Paused) return
+  reconnectAttempts.value++
+  startAudio()
 }
 
 const setNobodyPlaying = () => {
   playState.value = PlayState.Paused
 }
 
-const handleWaiting = () => {}
-
 const handleError = () => {
   if (audio?.src === '') return
   toast.add({
-    summary: 'Playback error',
-    detail: 'Unable to load audio stream',
+    summary: `Reconnecting`,
+    detail: `Attempt ${reconnectAttempts.value} of ${maxReconnectAttempts}`,
     severity: 'error',
-    life: 7000
+    life: 3000
   })
-  waitForReconnect()
+  waitAndTryReconnect()
 }
 
 const statusText = computed(() => {
