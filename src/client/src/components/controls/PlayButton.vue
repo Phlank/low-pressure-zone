@@ -146,6 +146,8 @@ const waitAndTryReconnect = async () => {
     return
   }
   await delay(3000)
+  // If the playState becomes `Paused` before the delay completes, don't try and reconnect again
+  if (playState.value === PlayState.Paused) return
   reconnectAttempts.value++
   startAudio()
 }
