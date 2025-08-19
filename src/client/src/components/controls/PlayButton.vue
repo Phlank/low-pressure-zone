@@ -141,7 +141,7 @@ const reconnectAttempts = ref(0)
 const maxReconnectAttempts = 10
 const waitAndTryReconnect = async () => {
   stopAudio()
-  if (reconnectAttempts.value > maxReconnectAttempts) {
+  if (reconnectAttempts.value >= maxReconnectAttempts) {
     playState.value = PlayState.Paused
     return
   }
