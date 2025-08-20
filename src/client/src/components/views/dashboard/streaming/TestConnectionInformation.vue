@@ -4,27 +4,27 @@
     <div>
       <ListItem>
         <template #left>Host/Server</template>
-        <template #right
-          ><kbd>{{ connectionInfoStore.testInfo()?.host }}</kbd></template
-        >
+        <template #right>
+          <kbd>{{ connectionInfoStore.testInfo()?.host }}</kbd>
+        </template>
       </ListItem>
       <Divider style="margin: 0" />
       <ListItem>
         <template #left>Port</template>
-        <template #right
-          ><kbd>{{ connectionInfoStore.testInfo()?.port }}</kbd></template
-        >
+        <template #right>
+          <kbd>{{ connectionInfoStore.testInfo()?.port }}</kbd>
+        </template>
       </ListItem>
       <Divider style="margin: 0" />
       <ListItem>
         <template #left>Mount</template>
-        <template #right
-          ><kbd>{{ connectionInfoStore.testInfo()?.mount }}</kbd></template
-        >
+        <template #right>
+          <kbd>{{ connectionInfoStore.testInfo()?.mount }}</kbd>
+        </template>
       </ListItem>
       <Divider style="margin: 0" />
       <ListItem>
-        <template #left>Username</template>
+        <template #left>User/Login</template>
         <template #right>
           <kbd>{{ connectionInfoStore.testInfo()?.username }}</kbd>
         </template>
