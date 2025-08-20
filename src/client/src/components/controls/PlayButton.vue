@@ -191,7 +191,7 @@ useResizeObserver(buttonElement, () => updateTextScrollingBehavior())
 watch(
   () => streamStore.status,
   (newStatus, oldStatus) => {
-    if (newStatus.name !== oldStatus.name) {
+    if (newStatus.name !== oldStatus.name || newStatus.listenerCount !== oldStatus.listenerCount) {
       setTimeout(() => {
         updateTextScrollingBehavior()
       })
