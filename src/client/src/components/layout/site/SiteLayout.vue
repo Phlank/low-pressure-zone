@@ -22,7 +22,7 @@ import { computed, inject, ref, type Ref } from 'vue'
 const footer: Ref<HTMLDivElement | undefined> = ref(undefined)
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
-const footerPosition = computed(() => (!isMobile?.value ? 'sticky' : 'absolute'))
+const footerPosition = computed(() => (!isMobile?.value ? 'sticky' : 'fixed'))
 </script>
 
 <style lang="scss">
