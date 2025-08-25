@@ -6,7 +6,7 @@ namespace LowPressureZone.Api.Services.Hosted;
 public class BroadcastDeletionService(AzuraCastClient client, ILogger<BroadcastDeletionService> logger)
     : IHostedService, IDisposable
 {
-    private const int RunHour = 1;
+    private const int RunHour = 5;
     private const int DaysToKeep = 14;
     private Timer? _timer;
     private static DateTime CutoffDate => DateTime.UtcNow.AddDays(-DaysToKeep);
@@ -22,6 +22,8 @@ public class BroadcastDeletionService(AzuraCastClient client, ILogger<BroadcastD
         var nextRun = DateTimeUtilities.GetNextHour(RunHour);
         var spanToNext = nextRun - DateTime.UtcNow;
         var spanPeriod = new TimeSpan(24, 0, 0);
+        logger.LogInformation("Broadcast deletion service started, first deletion in {Minutes} minutes",
+                              spanToNext.TotalMinutes);
         _timer = new Timer(RunDelete, null, spanToNext, spanPeriod);
         return Task.CompletedTask;
     }
@@ -36,6 +38,7 @@ public class BroadcastDeletionService(AzuraCastClient client, ILogger<BroadcastD
 
     private async Task DeleteOutOfDateBroadcasts()
     {
+        logger.LogInformation("Deleting broadcasts older than {Days} days", DaysToKeep);
         var broadcastResult = await client.GetBroadcastsAsync();
         if (!broadcastResult.IsSuccess)
         {
@@ -44,7 +47,11 @@ public class BroadcastDeletionService(AzuraCastClient client, ILogger<BroadcastD
             return;
         }
 
-        var outOfDateBroadcasts = broadcastResult.Value.Where(broadcast => broadcast.TimestampStart < CutoffDate);
+        var outOfDateBroadcasts = broadcastResult.Value
+                                                 .Where(broadcast => broadcast.TimestampStart < CutoffDate)
+                                                 .ToList();
+        logger.LogInformation("{OutOfDateBroadcasts} broadcasts out of date will be deleted",
+                              outOfDateBroadcasts.Count);
         foreach (var broadcast in outOfDateBroadcasts)
         {
             if (broadcast.Streamer?.Id == null)
@@ -64,5 +71,7 @@ public class BroadcastDeletionService(AzuraCastClient client, ILogger<BroadcastD
                             deleteResult.Error.StatusCode,
                             deleteResult.Error.ReasonPhrase);
         }
+
+        logger.LogInformation("Finished deleting broadcasts");
     }
 }
