@@ -126,4 +126,14 @@ public class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<Streamin
 
         return Result.Ok<HttpContent, HttpResponseMessage>(response.Content);
     }
+
+    public async Task<Result<HttpContent, HttpResponseMessage>> DeleteBroadcastAsync(int streamerId, int broadcastId)
+    {
+        var response = await _client.DeleteAsync(DownloadBroadcastEndpoint(streamerId, broadcastId));
+
+        if (!response.IsSuccessStatusCode)
+            return Result.Err<HttpContent, HttpResponseMessage>(response);
+
+        return Result.Ok<HttpContent, HttpResponseMessage>(response.Content);
+    }
 }
