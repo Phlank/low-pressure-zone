@@ -126,4 +126,17 @@ public class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<Streamin
 
         return Result.Ok<HttpContent, HttpResponseMessage>(response.Content);
     }
+
+    private string DeleteBroadcastEndpoint(int streamerId, int broadcastId) =>
+        $"/api/station/{_stationId}/streamer/{streamerId}/broadcast/{broadcastId}";
+
+    public async Task<Result<HttpContent, HttpResponseMessage>> DeleteBroadcastAsync(int streamerId, int broadcastId)
+    {
+        var response = await _client.DeleteAsync(DeleteBroadcastEndpoint(streamerId, broadcastId));
+
+        if (!response.IsSuccessStatusCode)
+            return Result.Err<HttpContent, HttpResponseMessage>(response);
+
+        return Result.Ok<HttpContent, HttpResponseMessage>(response.Content);
+    }
 }
