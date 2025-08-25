@@ -8,7 +8,7 @@
           field="start"
           header="Start">
           <template #body="{ data }: { data: TimeslotRow }">
-            {{ formatReadableTime(data.start) }}
+            <SlotTime :date="data.start" />
           </template>
         </Column>
         <Column
@@ -101,6 +101,7 @@ import timeslotsApi, {
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import { usePerformerStore } from '@/stores/performerStore.ts'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
+import SlotTime from '@/components/controls/SlotTime.vue'
 
 const toast = useToast()
 const props = defineProps<{

@@ -28,7 +28,7 @@
             field="start"
             header="Time">
             <template #body="{ data }">
-              {{ formatReadableTime(data.start) }}
+              <SlotTime :date="data.start" />
             </template>
           </Column>
           <Column
@@ -58,13 +58,14 @@
 </template>
 
 <script lang="ts" setup>
-import { formatReadableTime, getPreviousHour, hoursBetween, parseDate } from '@/utils/dateUtils'
+import { getPreviousHour, hoursBetween, parseDate } from '@/utils/dateUtils'
 import { Column, DataTable, Skeleton, useToast } from 'primevue'
 import { computed, type ComputedRef, inject, onMounted, ref, type Ref } from 'vue'
 import schedulesApi, { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import ListItem from '@/components/data/ListItem.vue'
 import ScheduleNavigator from '@/components/controls/ScheduleNavigator.vue'
+import SlotTime from '@/components/controls/SlotTime.vue'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const schedules: Ref<ScheduleResponse[]> = ref([])
