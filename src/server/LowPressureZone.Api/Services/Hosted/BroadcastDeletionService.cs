@@ -1,7 +1,7 @@
 using LowPressureZone.Api.Clients;
 using LowPressureZone.Api.Utilities;
 
-namespace LowPressureZone.Api.Services;
+namespace LowPressureZone.Api.Services.Hosted;
 
 public class BroadcastDeletionService(AzuraCastClient client, ILogger<BroadcastDeletionService> logger)
     : IHostedService, IDisposable

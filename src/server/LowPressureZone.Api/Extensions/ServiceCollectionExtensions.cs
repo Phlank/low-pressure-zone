@@ -15,6 +15,7 @@ using LowPressureZone.Api.Models.Options;
 using LowPressureZone.Api.Models.Stream;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services;
+using LowPressureZone.Api.Services.Hosted;
 using LowPressureZone.Api.Services.Stream;
 using LowPressureZone.Domain;
 using LowPressureZone.Identity;
@@ -123,21 +124,8 @@ public static class ServiceCollectionExtensions
 
     public static void AddApiServices(this IServiceCollection services)
     {
-        services.AddSingleton<CommunityMapper>();
-        services.AddSingleton<CommunityRelationshipMapper>();
-        services.AddSingleton<ScheduleMapper>();
-        services.AddSingleton<PerformerMapper>();
-        services.AddSingleton<TimeslotMapper>();
-        services.AddSingleton<InviteMapper>();
-        services.AddSingleton<IcecastStatusMapper>();
-        services.AddSingleton<BroadcastMapper>();
-
-        services.AddSingleton<CommunityRules>();
-        services.AddSingleton<CommunityRelationshipRules>();
-        services.AddSingleton<ScheduleRules>();
-        services.AddSingleton<PerformerRules>();
-        services.AddSingleton<TimeslotRules>();
-        services.AddSingleton<BroadcastRules>();
+        AddEndpointServices(services);
+        services.AddScoped<ConnectionInformationService>();
 
         services.AddSingleton<ISender>(serviceProvider =>
         {
@@ -181,6 +169,25 @@ public static class ServiceCollectionExtensions
             };
         });
 
-        services.AddScoped<ConnectionInformationService>();
+        services.AddHostedService<BroadcastDeletionService>();
+    }
+
+    private static void AddEndpointServices(IServiceCollection services)
+    {
+        services.AddSingleton<CommunityMapper>();
+        services.AddSingleton<CommunityRelationshipMapper>();
+        services.AddSingleton<ScheduleMapper>();
+        services.AddSingleton<PerformerMapper>();
+        services.AddSingleton<TimeslotMapper>();
+        services.AddSingleton<InviteMapper>();
+        services.AddSingleton<IcecastStatusMapper>();
+        services.AddSingleton<BroadcastMapper>();
+
+        services.AddSingleton<CommunityRules>();
+        services.AddSingleton<CommunityRelationshipRules>();
+        services.AddSingleton<ScheduleRules>();
+        services.AddSingleton<PerformerRules>();
+        services.AddSingleton<TimeslotRules>();
+        services.AddSingleton<BroadcastRules>();
     }
 }
