@@ -54,13 +54,13 @@ useResizeObserver(formAreaRef, (entries) => {
 
 const columnWidth = 80
 const columns = computed(() => {
-  if (width.value <= mobileWidth) {
+  if (width.value <= mobileWidth - 40) {
     return clamp(Math.floor(width.value / columnWidth), 1, 4)
   }
   return clamp(Math.floor(width.value / columnWidth), 1, 99)
 })
 const widthPx = computed(() => {
-  if (width.value <= mobileWidth) {
+  if (width.value <= mobileWidth - 40) {
     return width.value + 'px'
   }
   return width.value - (width.value % columnWidth) + 'px'
@@ -79,9 +79,33 @@ const actionColumnSpan = computed(() => `span ${columns.value <= 4 ? 1 : 2}`)
     display: grid;
     grid-template-columns: v-bind(gridColsStyle);
     column-gap: variables.$space-l;
+    column-width: v-bind(columnWidth);
+    direction: ltr;
+
+    .form-field {
+      &--xs {
+        grid-column: span min(2, v-bind(columns));
+      }
+
+      &--s {
+        grid-column: span min(3, v-bind(columns));
+      }
+
+      &--m {
+        grid-column: span min(4, v-bind(columns));
+      }
+
+      &--l {
+        grid-column: span min(6, v-bind(columns));
+      }
+
+      &--xl {
+        grid-column: span min(8, v-bind(columns));
+      }
+    }
 
     &--single-column {
-      .form-field {
+      div.form-field {
         grid-column: span 4;
       }
     }
@@ -93,6 +117,7 @@ const actionColumnSpan = computed(() => `span ${columns.value <= 4 ? 1 : 2}`)
     grid-template-columns: v-bind(gridColsStyle);
     direction: v-bind(actionColumnDirection);
     column-gap: variables.$space-l;
+    column-width: v-bind(columnWidth);
 
     &--single-column {
       display: flex;
