@@ -67,6 +67,7 @@ const widthPx = computed(() => {
 })
 const gridColsStyle = computed(() => `repeat(${columns.value}, 1fr)`)
 const actionColumnDirection = computed(() => (props.alignActions === 'left' ? 'ltr' : 'rtl'))
+const actionColumnSpan = computed(() => `span ${columns.value <= 4 ? 1 : 2}`)
 </script>
 
 <style lang="scss">
@@ -87,6 +88,7 @@ const actionColumnDirection = computed(() => (props.alignActions === 'left' ? 'l
   }
 
   &__actions {
+    width: min(v-bind(widthPx), 100%);
     display: grid;
     grid-template-columns: v-bind(gridColsStyle);
     direction: v-bind(actionColumnDirection);
@@ -96,6 +98,10 @@ const actionColumnDirection = computed(() => (props.alignActions === 'left' ? 'l
       display: flex;
       gap: variables.$space-m;
       flex-direction: column;
+    }
+
+    .p-button {
+      grid-column: v-bind(actionColumnSpan);
     }
   }
 }

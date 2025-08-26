@@ -38,17 +38,17 @@
       </ListItem>
     </div>
     <div class="community-grid__dialogs">
-      <FormDialog
-        :is-submitting="isSubmitting"
-        :visible="showEditDialog"
+      <Dialog
+        v-model:visible="showEditDialog"
+        :draggable="false"
         header="Edit Community"
-        @close="showEditDialog = false"
-        @save="handleSave">
+        modal>
         <CommunityForm
-          ref="editForm"
-          :disabled="isSubmitting"
-          :initial-state="editFormInitialState" />
-      </FormDialog>
+          :community-id="editingId"
+          :initial-state="editFormInitialState"
+          align-actions="right"
+          @after-submit="showEditDialog = false" />
+      </Dialog>
       <DeleteDialog
         :entity-name="deletingName"
         :is-submitting="isSubmitting"
@@ -63,11 +63,10 @@
 
 <script lang="ts" setup>
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
-import FormDialog from '@/components/dialogs/FormDialog.vue'
 import CommunityForm from '@/components/form/requestForms/CommunityForm.vue'
-import { showDeleteSuccessToast, showEditSuccessToast } from '@/utils/toastUtils'
-import { Column, DataTable, useToast } from 'primevue'
-import { inject, ref, type Ref, useTemplateRef } from 'vue'
+import { showDeleteSuccessToast } from '@/utils/toastUtils'
+import { Column, DataTable, Dialog, useToast } from 'primevue'
+import { inject, ref, type Ref } from 'vue'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import ListItem from '@/components/data/ListItem.vue'
 import communitiesApi, {
@@ -87,31 +86,13 @@ defineProps<{
 }>()
 
 const showEditDialog = ref(false)
-let editingId = ''
 const editFormInitialState: Ref<CommunityRequest> = ref({ name: '', url: '' })
-const editForm = useTemplateRef('editForm')
+const editingId = ref('')
 
 const handleEditActionClick = (community: CommunityResponse) => {
-  editingId = community.id
-  editFormInitialState.value.name = community.name
-  editFormInitialState.value.url = community.url
+  editingId.value = community.id
+  editFormInitialState.value = community
   showEditDialog.value = true
-}
-const handleSave = async () => {
-  if (!editForm.value) return
-
-  const isValid = editForm.value.validation.validate()
-  if (!isValid) return
-
-  isSubmitting.value = true
-  const response = await communitiesApi.put(editingId, editForm.value.formState)
-  isSubmitting.value = false
-
-  if (tryHandleUnsuccessfulResponse(response, toast, editForm.value.validation)) return
-
-  showEditSuccessToast(toast, 'community', editForm.value.formState.name)
-  showEditDialog.value = false
-  await communityStore.updateCommunityAsync(editingId)
 }
 
 const showDeleteDialog = ref(false)
