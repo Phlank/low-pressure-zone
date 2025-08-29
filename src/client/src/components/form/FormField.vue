@@ -19,7 +19,7 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue'
-import type { FieldSize } from '@/components/form/forms.ts'
+import type { FieldSize } from '@/components/form/fieldSize.ts'
 
 const props = withDefaults(
   defineProps<{
@@ -51,6 +51,10 @@ const computedClass = computed(() => `${baseClass} ${widthClass.value}`)
   margin-bottom: variables.$space-l;
 
   .p-inputwrapper {
+    width: 100%;
+  }
+
+  .p-textarea {
     width: 100%;
   }
 

@@ -18,7 +18,7 @@
 
 <script lang="ts" setup>
 import FormField from '@/components/form/FormField.vue'
-import type { FieldSize } from '@/components/form/forms.ts'
+import type { FieldSize } from '@/components/form/fieldSize.ts'
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { IftaLabel } from 'primevue'
 

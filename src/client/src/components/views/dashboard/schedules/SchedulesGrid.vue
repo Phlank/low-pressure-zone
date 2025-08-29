@@ -58,17 +58,19 @@
         </template>
       </DataTable>
     </div>
-    <FormDialog
+    <Dialog
+      v-model:visible="showEditScheduleDialog"
+      :draggable="false"
       :is-submitting="false"
-      :visible="showEditScheduleDialog"
       header="Edit Schedule"
-      @close="showEditScheduleDialog = false"
-      @save="handleEditScheduleSave">
+      modal>
       <ScheduleForm
-        ref="scheduleEditForm"
-        :communities="communityStore.communities"
-        :initial-state="editScheduleFormInitialState" />
-    </FormDialog>
+        :communities="communityStore.communities.filter((community) => community.isOrganizable)"
+        :initial-state="editingSchedule"
+        :schedule-id="editingId"
+        align-actions="right"
+        @after-submit="afterEditSubmit" />
+    </Dialog>
     <DeleteDialog
       :is-submitting="false"
       :visible="showDeleteScheduleDialog"
@@ -82,14 +84,15 @@
 <script lang="ts" setup>
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
-import FormDialog from '@/components/dialogs/FormDialog.vue'
 import ScheduleForm from '@/components/form/requestForms/ScheduleForm.vue'
 import { formatReadableTime, parseDate, parseTime } from '@/utils/dateUtils'
-import { showEditSuccessToast } from '@/utils/toastUtils'
-import { Column, DataTable, useToast } from 'primevue'
-import { computed, inject, reactive, ref, type Ref, useTemplateRef } from 'vue'
+import { Column, DataTable, Dialog, useToast } from 'primevue'
+import { computed, inject, ref, type Ref } from 'vue'
 import TimeslotsGrid from './TimeslotsGrid.vue'
-import schedulesApi, { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
+import schedulesApi, {
+  type ScheduleRequest,
+  type ScheduleResponse
+} from '@/api/resources/schedulesApi.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import { useCommunityStore } from '@/stores/communityStore.ts'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
@@ -98,7 +101,6 @@ const communityStore = useCommunityStore()
 const scheduleStore = useScheduleStore()
 const expandedRows = ref({})
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
-const isSubmitting = ref(false)
 const toast = useToast()
 
 const props = defineProps<{
@@ -112,43 +114,24 @@ const showActionColumn = computed(() =>
   )
 )
 
-const scheduleEditForm = useTemplateRef('scheduleEditForm')
 const showEditScheduleDialog = ref(false)
-let editingId = ''
-const editScheduleFormInitialState = reactive({
+const editingId = ref('')
+const editingSchedule: Ref<ScheduleRequest> = ref({
   communityId: '',
   startsAt: '',
   endsAt: '',
-  description: '',
-  startTime: new Date(),
-  endTime: new Date()
+  description: ''
 })
 
 const handleEditScheduleActionClick = (schedule: ScheduleResponse) => {
-  editingId = schedule.id
-  editScheduleFormInitialState.communityId = schedule.community.id
-  editScheduleFormInitialState.startsAt = schedule.startsAt
-  editScheduleFormInitialState.endsAt = schedule.endsAt
-  editScheduleFormInitialState.description = schedule.description
-  editScheduleFormInitialState.startTime = parseDate(schedule.startsAt)
-  editScheduleFormInitialState.endTime = parseDate(schedule.endsAt)
+  editingId.value = schedule.id
+  editingSchedule.value = schedulesApi.mapResponseToRequest(schedule)
   showEditScheduleDialog.value = true
 }
-const handleEditScheduleSave = async () => {
-  if (!scheduleEditForm.value) return
-  const isValid = scheduleEditForm.value.validation.validate()
-  if (!isValid) return
 
-  isSubmitting.value = true
-  const response = await schedulesApi.put(editingId, scheduleEditForm.value.formState)
-  isSubmitting.value = false
-
-  if (tryHandleUnsuccessfulResponse(response, toast, scheduleEditForm.value.validation)) return
-  showEditSuccessToast(toast, 'schedule')
+const afterEditSubmit = () => {
   showEditScheduleDialog.value = false
-
-  const newScheduleResponse = await schedulesApi.getById(editingId)
-  if (tryHandleUnsuccessfulResponse(newScheduleResponse, toast)) return
+  scheduleStore.reloadTimeslotsAsync(editingId.value)
 }
 
 let deletingId = ''
