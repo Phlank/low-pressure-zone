@@ -47,8 +47,6 @@ import { usePerformerStore } from '@/stores/performerStore.ts'
 const scheduleStore = useScheduleStore()
 const communityStore = useCommunityStore()
 const performerStore = usePerformerStore()
-const toast = useToast()
-const isSubmitting = ref(false)
 const isLoaded = ref(false)
 const tabValue: Ref<string | number> = ref('upcoming')
 
