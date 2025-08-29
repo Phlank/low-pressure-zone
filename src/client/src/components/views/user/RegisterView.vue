@@ -69,7 +69,6 @@
         <Button
           :disabled="isSubmitting"
           :loading="isSubmitting"
-          class="input"
           label="Register"
           @click="handleRegister" />
       </template>

@@ -14,7 +14,6 @@ class FormValidationImplementation<TForm extends object> implements FormValidati
     this.formState = formState
     this.propertyState = {} as FormValidationState<TForm>
     const formKeys = this.getKeys()
-    console.log(JSON.stringify(formKeys))
     formKeys.forEach((key) => {
       this.propertyState[key] = {
         rule: rules[key] ?? alwaysValid,

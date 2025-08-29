@@ -8,7 +8,7 @@
           field="start"
           header="Start">
           <template #body="{ data }: { data: TimeslotRow }">
-            {{ formatReadableTime(data.start) }}
+            <SlotTime :date="data.start" />
           </template>
         </Column>
         <Column
@@ -59,9 +59,9 @@
       </ListItem>
     </div>
     <Dialog
-      v-model:visible="showFormDialog"
+      v-model:visible="showTimeslotDialog"
       :draggable="false"
-      :header="formDialogTitle"
+      :header="timeslotDialogTitle"
       modal>
       <TimeslotForm
         ref="timeslotForm"
@@ -101,6 +101,7 @@ import timeslotsApi, {
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import { usePerformerStore } from '@/stores/performerStore.ts'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
+import SlotTime from '@/components/controls/SlotTime.vue'
 
 const toast = useToast()
 const props = defineProps<{
@@ -140,8 +141,8 @@ onMounted(() => {
 
 const rows: Ref<TimeslotRow[]> = ref([])
 
-const showFormDialog = ref(false)
-const formDialogTitle = ref('')
+const showTimeslotDialog = ref(false)
+const timeslotDialogTitle = ref('')
 const editingId = ref('')
 const formInitialValue: Ref<TimeslotRequest> = ref({
   startsAt: '',
@@ -153,12 +154,12 @@ const formInitialValue: Ref<TimeslotRequest> = ref({
 const timeslotForm = useTemplateRef('timeslotForm')
 const handleEditClicked = (row: TimeslotRow) => {
   if (row.timeslot === undefined) {
-    formDialogTitle.value = 'Create Timeslot'
+    timeslotDialogTitle.value = 'Create Timeslot'
   } else {
     editingId.value = row.timeslot.id
-    formDialogTitle.value = 'Edit Timeslot'
+    timeslotDialogTitle.value = 'Edit Timeslot'
   }
-  showFormDialog.value = true
+  showTimeslotDialog.value = true
   formInitialValue.value = {
     startsAt: row.start.toISOString(),
     endsAt: getNextHour(row.start).toISOString(),
@@ -168,8 +169,8 @@ const handleEditClicked = (row: TimeslotRow) => {
 }
 
 const onSubmitted = async () => {
-  showFormDialog.value = false
-  formDialogTitle.value = ''
+  showTimeslotDialog.value = false
+  timeslotDialogTitle.value = ''
   setupRows()
 }
 

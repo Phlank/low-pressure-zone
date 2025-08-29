@@ -14,7 +14,6 @@
     <template #footer>
       <div class="delete-dialog__footer">
         <Button
-          class="input"
           label="Delete"
           severity="danger"
           @click="emit('delete')" />

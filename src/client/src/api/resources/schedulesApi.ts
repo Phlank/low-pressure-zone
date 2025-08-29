@@ -12,7 +12,8 @@ export default {
     sendPost<ScheduleRequest>(route(), mapRequest(request)),
   put: <TSchedule extends ScheduleRequest>(id: string, request: TSchedule) =>
     sendPut<ScheduleRequest>(route(id), mapRequest(request)),
-  delete: (id: string) => sendDelete(route(id))
+  delete: (id: string) => sendDelete(route(id)),
+  mapResponseToRequest: (response: ScheduleResponse) => mapResponseToRequest(response)
 }
 
 export interface ScheduleRequest {
@@ -41,5 +42,14 @@ const mapRequest = <TSchedule extends ScheduleRequest>(schedule: TSchedule): Sch
     startsAt: schedule.startsAt,
     endsAt: schedule.endsAt,
     description: schedule.description
+  }
+}
+
+const mapResponseToRequest = (response: ScheduleResponse): ScheduleRequest => {
+  return {
+    communityId: response.community.id,
+    startsAt: response.startsAt,
+    endsAt: response.endsAt,
+    description: response.description
   }
 }

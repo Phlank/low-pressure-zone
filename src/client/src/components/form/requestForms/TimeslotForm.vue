@@ -21,7 +21,6 @@
           :disabled="isSubmitting || disabled"
           :invalid="!validation.isValid('performanceType')"
           :options="performanceTypes"
-          class="input__field"
           @change="() => validation.validateIfDirty('performanceType')" />
       </IftaFormField>
       <IftaFormField
@@ -141,12 +140,14 @@ const validation = createFormValidation(formState, {
 const isSubmitting = ref(false)
 const submit = async () => {
   if (!validation.validate()) return
-  let result
+  isSubmitting.value = true
+  let result: Result<null, null>
   if (props.timeslotId === '' || props.timeslotId === undefined) {
     result = await submitPost()
   } else {
     result = await submitPut()
   }
+  isSubmitting.value = false
   if (result.isSuccess) {
     await scheduleStore.reloadTimeslotsAsync(props.scheduleId)
     reset()

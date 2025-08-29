@@ -19,7 +19,7 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue'
-import type { FieldSize } from '@/components/form/forms.ts'
+import type { FieldSize } from '@/components/form/fieldSize.ts'
 
 const props = withDefaults(
   defineProps<{
@@ -54,24 +54,8 @@ const computedClass = computed(() => `${baseClass} ${widthClass.value}`)
     width: 100%;
   }
 
-  &--xs {
-    grid-column: span 2;
-  }
-
-  &--s {
-    grid-column: span 3;
-  }
-
-  &--m {
-    grid-column: span 4;
-  }
-
-  &--l {
-    grid-column: span 6;
-  }
-
-  &--xl {
-    grid-column: span 8;
+  .p-textarea {
+    width: 100%;
   }
 
   &__label {
