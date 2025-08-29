@@ -13,6 +13,13 @@
 
     <div :class="moreClass">
       <p>
+        <b>
+          To chat and participate, join the Discord server by clicking the Chat button at the top of
+          the page. If you want to DJ with us, join the Discord server and make a post in the
+          #i-want-to-stream-please channel.
+        </b>
+      </p>
+      <p>
         Background: around ~2013 or so some users took it upon themselves to set up weekly streaming
         events for community members to participate in (subreddit get-togethers, basically). This
         was called C9 (or Clouwdnine) and was run through a simple website. People would show up in
@@ -37,13 +44,6 @@
       <p>
         We'd like to hold similar events eventually, but for now we're focusing on hosting regular
         radio days as we get back into the swing of things.
-      </p>
-
-      <p>
-        <b>
-          If you would like to participate, join the Discord server by clicking the Chat button and
-          make a post in the "i-want-to-stream-please" thread.
-        </b>
       </p>
     </div>
 
