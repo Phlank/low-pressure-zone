@@ -21,7 +21,6 @@
           :disabled="isSubmitting || disabled"
           :invalid="!validation.isValid('performanceType')"
           :options="performanceTypes"
-          class="input__field"
           @change="() => validation.validateIfDirty('performanceType')" />
       </IftaFormField>
       <IftaFormField

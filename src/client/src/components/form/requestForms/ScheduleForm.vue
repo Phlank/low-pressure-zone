@@ -12,7 +12,6 @@
           :disabled="isSubmitting"
           :invalid="!validation.isValid('communityId')"
           :options="communities"
-          class="input__field"
           option-label="name"
           option-value="id"
           placeholder="Select an community"
@@ -31,7 +30,6 @@
           :invalid="!validation.isValid('startsAt')"
           :min-date="minimumDate(formState.startTime, minStartTime)"
           :model-value="formState.startTime"
-          class="input__field"
           fluid
           hourFormat="12"
           show-time
@@ -49,7 +47,6 @@
           :invalid="!validation.isValid('endsAt')"
           :max-date="new Date(formState.startTime.getTime() + maxDurationMinutes * MS_PER_MINUTE)"
           :min-date="formState.startTime"
-          class="input__field"
           fluid
           hourFormat="12"
           show-time

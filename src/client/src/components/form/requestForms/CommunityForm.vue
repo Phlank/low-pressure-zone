@@ -11,7 +11,6 @@
           v-model:model-value="formState.name"
           :disabled="disabled || isSubmitting"
           :invalid="!validation.isValid('name')"
-          class="input__field"
           @update:model-value="validation.validateIfDirty('name')" />
       </IftaFormField>
       <IftaFormField
@@ -24,7 +23,6 @@
           v-model:model-value="formState.url"
           :disabled="disabled || isSubmitting"
           :invalid="!validation.isValid('url')"
-          class="input__field"
           @update:model-value="validation.validateIfDirty('url')" />
       </IftaFormField>
       <template #actions>

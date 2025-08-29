@@ -55,7 +55,6 @@
         <Button
           :disabled="isSubmitting"
           :loading="isSubmitting"
-          class="input"
           label="Send Invite"
           @click="handleSubmit" />
       </template>
