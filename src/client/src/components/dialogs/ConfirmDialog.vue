@@ -15,7 +15,6 @@
         <Button
           :disabled="isSubmitting"
           :loading="isSubmitting"
-          class="input"
           label="Yes"
           severity="success"
           @click="emit('confirm')" />

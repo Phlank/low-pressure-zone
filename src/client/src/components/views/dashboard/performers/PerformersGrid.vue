@@ -45,17 +45,17 @@
         <Divider v-if="index !== performers.length - 1" />
       </div>
     </div>
-    <FormDialog
-      :is-submitting="isSubmitting"
-      :visible="showEditDialog"
+    <Dialog
+      v-model:visible="showEditDialog"
+      :draggable="false"
       header="Edit Performer"
-      @close="showEditDialog = false"
-      @save="handleSave">
+      modal>
       <PerformerForm
-        ref="editForm"
-        :disabled="isSubmitting"
-        :initial-state="editFormInitialState" />
-    </FormDialog>
+        :initial-state="editFormInitialState"
+        :performer-id="editingId"
+        align-actions="right"
+        @after-submit="showEditDialog = false" />
+    </Dialog>
     <DeleteDialog
       :entity-name="deletingName"
       :is-submitting="isSubmitting"
@@ -71,11 +71,10 @@
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import ListItem from '@/components/data/ListItem.vue'
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
-import FormDialog from '@/components/dialogs/FormDialog.vue'
 import PerformerForm from '@/components/form/requestForms/PerformerForm.vue'
-import { showDeleteSuccessToast, showEditSuccessToast } from '@/utils/toastUtils'
-import { Column, DataTable, Divider, useToast } from 'primevue'
-import { inject, ref, type Ref, useTemplateRef } from 'vue'
+import { showDeleteSuccessToast } from '@/utils/toastUtils'
+import { Column, DataTable, Dialog, Divider, useToast } from 'primevue'
+import { inject, ref, type Ref } from 'vue'
 import performersApi, {
   type PerformerRequest,
   type PerformerResponse
@@ -92,47 +91,18 @@ defineProps<{
   performers: PerformerResponse[]
 }>()
 
-const isSubmitting = ref(false)
-
-// EDITING PERFORMERS
-
 const showEditDialog = ref(false)
-let editingId = ''
+const editingId = ref('')
 const editFormInitialState: Ref<PerformerRequest> = ref({ name: '', url: '' })
-const editForm = useTemplateRef('editForm')
 
 const handleEditActionClick = async (performer: PerformerResponse) => {
-  editingId = performer.id
+  editingId.value = performer.id
   editFormInitialState.value.name = performer.name
   editFormInitialState.value.url = performer.url
   showEditDialog.value = true
 }
 
-const handleSave = async () => {
-  if (!editForm.value) return
-  const isValid = editForm.value.validation.validate()
-  if (!isValid) return
-
-  if (
-    editForm.value.formState.name === editFormInitialState.value.name &&
-    editForm.value.formState.url === editFormInitialState.value.url
-  ) {
-    showEditDialog.value = false
-    return
-  }
-
-  isSubmitting.value = true
-  const response = await performersApi.put(editingId, editForm.value.formState)
-  isSubmitting.value = false
-
-  if (tryHandleUnsuccessfulResponse(response, toast, editForm.value.validation)) return
-
-  showEditSuccessToast(toast, 'performer', editFormInitialState.value.name)
-  showEditDialog.value = false
-  await performerStore.updateAsync(editingId)
-}
-
-// DELETING PERFORMERS
+const isSubmitting = ref(false)
 const showDeleteDialog = ref(false)
 let deletingId = ''
 const deletingName = ref('')

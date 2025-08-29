@@ -86,7 +86,6 @@ onMounted(async () => {
   await scheduleStore.loadDefaultSchedulesAsync()
   isLoading.value = false
   if (scheduleStore.upcomingSchedules.length > 0) {
-    console.log('we got schedules')
     currentScheduleId.value = scheduleStore.upcomingSchedules[0].id
   }
 })

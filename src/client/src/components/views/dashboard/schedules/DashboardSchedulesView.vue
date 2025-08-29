@@ -26,11 +26,6 @@
           <ScheduleForm
             ref="createForm"
             :communities="communityStore.organizableCommunities" />
-          <Button
-            :disabled="isSubmitting"
-            class="input"
-            label="Create"
-            @click="handleCreateClick" />
         </TabPanel>
       </TabPanels>
       <Skeleton
@@ -41,13 +36,10 @@
 </template>
 
 <script lang="ts" setup>
-import { Button, Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs, useToast } from 'primevue'
+import { Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs } from 'primevue'
 import ScheduleForm from '@/components/form/requestForms/ScheduleForm.vue'
-import { showCreateSuccessToast } from '@/utils/toastUtils'
 import { onMounted, ref, type Ref, useTemplateRef } from 'vue'
 import SchedulesGrid from './SchedulesGrid.vue'
-import schedulesApi from '@/api/resources/schedulesApi.ts'
-import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import { useCommunityStore } from '@/stores/communityStore.ts'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
 import { usePerformerStore } from '@/stores/performerStore.ts'
@@ -55,8 +47,6 @@ import { usePerformerStore } from '@/stores/performerStore.ts'
 const scheduleStore = useScheduleStore()
 const communityStore = useCommunityStore()
 const performerStore = usePerformerStore()
-const toast = useToast()
-const isSubmitting = ref(false)
 const isLoaded = ref(false)
 const tabValue: Ref<string | number> = ref('upcoming')
 
@@ -77,29 +67,4 @@ const load = async () => {
 }
 
 const createForm = useTemplateRef('createForm')
-const handleCreateClick = async () => {
-  if (!createForm.value) return
-  const isInvalid = createForm.value.validation.validate()
-  if (!isInvalid) return
-
-  isSubmitting.value = true
-  const response = await schedulesApi.post(createForm.value.formState)
-  isSubmitting.value = false
-
-  if (tryHandleUnsuccessfulResponse(response, toast, createForm.value.validation)) return
-  showCreateSuccessToast(toast, 'schedule')
-  const community = communityStore.getCommunity(createForm.value.formState.communityId)!
-  scheduleStore.addSchedule({
-    id: response.getCreatedId() ?? '',
-    startsAt: createForm.value.formState.startsAt,
-    endsAt: createForm.value.formState.endsAt,
-    timeslots: [],
-    community: community,
-    description: createForm.value.formState.description,
-    isDeletable: true,
-    isEditable: true,
-    isTimeslotCreationAllowed: community.isPerformable
-  })
-  createForm.value.reset()
-}
 </script>

@@ -1,59 +1,108 @@
 <template>
   <div class="community-form">
-    <div>
-      <IftaLabel class="input input--medium">
+    <FormArea :align-actions="alignActions">
+      <IftaFormField
+        :message="validation.message('name')"
+        input-id="nameInput"
+        label="Name"
+        size="m">
         <InputText
           id="nameInput"
           v-model:model-value="formState.name"
-          :disabled="disabled"
+          :disabled="disabled || isSubmitting"
           :invalid="!validation.isValid('name')"
-          class="input__field"
           @update:model-value="validation.validateIfDirty('name')" />
-        <ValidationLabel
-          :message="validation.message('name')"
-          for="nameInput"
-          text="Name" />
-      </IftaLabel>
-      <IftaLabel class="input input--medium">
+      </IftaFormField>
+      <IftaFormField
+        :message="validation.message('url')"
+        input-id="urlInput"
+        label="URL"
+        size="m">
         <InputText
           id="urlInput"
           v-model:model-value="formState.url"
-          :disabled="disabled"
+          :disabled="disabled || isSubmitting"
           :invalid="!validation.isValid('url')"
-          class="input__field"
           @update:model-value="validation.validateIfDirty('url')" />
-        <ValidationLabel
-          :message="validation.message('url')"
-          for="urlInput"
-          text="URL" />
-      </IftaLabel>
-    </div>
+      </IftaFormField>
+      <template #actions>
+        <Button
+          :disabled="isSubmitting || disabled"
+          :loading="isSubmitting"
+          label="Save"
+          @click="submit" />
+      </template>
+    </FormArea>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { createFormValidation } from '@/validation/types/formValidation'
-import { IftaLabel, InputText } from 'primevue'
-import { onMounted, reactive } from 'vue'
-import ValidationLabel from '../ValidationLabel.vue'
+import { Button, InputText, useToast } from 'primevue'
+import { onMounted, type Ref, ref } from 'vue'
 import { communityRequestRules } from '@/validation/requestRules'
-import type { CommunityRequest } from '@/api/resources/communitiesApi.ts'
+import communitiesApi, { type CommunityRequest } from '@/api/resources/communitiesApi.ts'
+import IftaFormField from '@/components/form/IftaFormField.vue'
+import FormArea from '@/components/form/FormArea.vue'
+import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import { showSuccessToast } from '@/utils/toastUtils.ts'
+import { useCommunityStore } from '@/stores/communityStore.ts'
+import type { ApiResponse } from '@/api/apiResponse.ts'
 
-const formState: CommunityRequest = reactive({ name: '', url: '' })
+const toast = useToast()
+const communityStore = useCommunityStore()
+const formState: Ref<CommunityRequest> = ref({ name: '', url: '' })
 const validation = createFormValidation(formState, communityRequestRules)
+const isSubmitting = ref(false)
 
-const props = defineProps<{ initialState: CommunityRequest; disabled: boolean }>()
+const props = withDefaults(
+  defineProps<{
+    communityId?: string
+    initialState?: CommunityRequest
+    disabled?: boolean
+    alignActions?: 'left' | 'right'
+  }>(),
+  {
+    communityId: undefined,
+    initialState: undefined,
+    disabled: false,
+    alignActions: 'left'
+  }
+)
 
 onMounted(() => {
-  formState.name = props.initialState.name
-  formState.url = props.initialState.url
+  reset()
 })
 
 const reset = () => {
-  formState.name = props.initialState.name
-  formState.url = props.initialState.url
+  formState.value.name = props.initialState?.name ?? ''
+  formState.value.url = props.initialState?.url ?? ''
   validation.reset()
 }
 
-defineExpose({ formState, validation, reset })
+const submit = async () => {
+  if (!validation.validate()) return
+  isSubmitting.value = true
+  let result: ApiResponse<CommunityRequest, never>
+  if (props.communityId === '' || props.communityId === undefined) {
+    result = await communitiesApi.post(formState.value)
+  } else {
+    result = await communitiesApi.put(props.communityId, formState.value)
+  }
+  isSubmitting.value = false
+  if (tryHandleUnsuccessfulResponse(result, toast, validation)) return
+  showSuccessToast(
+    toast,
+    props.communityId ? 'Updated' : 'Created',
+    'Community',
+    formState.value.name
+  )
+  await communityStore.loadCommunitiesAsync()
+  emits('afterSubmit')
+  reset()
+}
+
+const emits = defineEmits<{
+  afterSubmit: []
+}>()
 </script>

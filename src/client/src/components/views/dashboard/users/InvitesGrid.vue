@@ -56,11 +56,11 @@
       </template>
     </DataView>
     <Dialog
-      :visible="showResendDialog"
+      v-model:visible="showResendDialog"
       closable
       header="Resend Invite"
       modal
-      @hide="handleHideShowResendDialog">
+      @hide="showResendDialog = false">
       <template #default> Resend invitation to {{ resendEmail }}?</template>
       <template #footer>
         <Button
@@ -115,10 +115,5 @@ const handleResendInvite = async () => {
   }
   showResendDialog.value = false
   isSending.value = false
-}
-
-const handleHideShowResendDialog = () => {
-  console.log('hide')
-  showResendDialog.value = false
 }
 </script>

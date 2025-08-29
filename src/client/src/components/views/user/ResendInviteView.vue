@@ -20,14 +20,12 @@
           v-model:model-value="formState.email"
           :disabled="isSubmitting"
           :invalid="!validation.isValid('email')"
-          class="input__field"
           @change="validation.validateIfDirty('email')" />
       </IftaFormField>
       <template #actions>
         <Button
           :disabled="isSubmitting"
           :loading="isSubmitting"
-          class="input"
           label="Resend Invite"
           @click="handleResendInviteClick" />
       </template>

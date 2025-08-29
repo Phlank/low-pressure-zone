@@ -43,22 +43,3 @@
     }
   }
 }
-
-.desktop-inline {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-
-  @include variables.mobile {
-    flex-direction: column;
-    align-items: start;
-    width: 100%;
-  }
-}
-
-.flex-split {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-}
