@@ -36,7 +36,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs, useToast } from 'primevue'
+import { Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs } from 'primevue'
 import ScheduleForm from '@/components/form/requestForms/ScheduleForm.vue'
 import { onMounted, ref, type Ref, useTemplateRef } from 'vue'
 import SchedulesGrid from './SchedulesGrid.vue'
