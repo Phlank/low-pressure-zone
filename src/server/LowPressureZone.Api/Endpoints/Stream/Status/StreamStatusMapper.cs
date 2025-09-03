@@ -3,7 +3,7 @@ using LowPressureZone.Api.Models.Stream;
 
 namespace LowPressureZone.Api.Endpoints.Stream.Status;
 
-public class StreamStatusMapper : IResponseMapper
+public sealed class StreamStatusMapper : IResponseMapper
 {
     public StreamStatusResponse FromEntity(StreamStatus status)
         => new()
@@ -14,6 +14,8 @@ public class StreamStatusMapper : IResponseMapper
             Name = status.Name,
             Type = status.Type,
             ListenUrl = status.ListenUrl,
-            ListenerCount = status.ListenerCount
+            ListenerCount = status.ListenerCount,
+            Elapsed = status.Elapsed,
+            Duration = status.Duration
         };
 }

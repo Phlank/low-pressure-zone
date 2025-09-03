@@ -68,7 +68,9 @@ public class AzuraCastStreamStatusService(
                     Name = GetStreamName(content),
                     Type = "AzuraCast",
                     ListenUrl = content.Station.ListenUrl,
-                    ListenerCount = content.Listeners.Current
+                    ListenerCount = content.Listeners.Current,
+                    Duration = content.NowPlaying?.Duration,
+                    Elapsed = content.NowPlaying?.Elapsed
                 };
             }
         }

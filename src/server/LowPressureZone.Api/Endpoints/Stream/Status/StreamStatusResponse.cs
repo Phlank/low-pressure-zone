@@ -9,4 +9,6 @@ public class StreamStatusResponse
     public string? Type { get; set; }
     public string? ListenUrl { get; set; }
     public int ListenerCount { get; set; }
+    public int? Elapsed { get; set; }
+    public int? Duration { get; set; }
 }
