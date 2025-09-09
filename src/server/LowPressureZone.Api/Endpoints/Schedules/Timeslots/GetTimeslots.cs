@@ -6,7 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
-public class GetTimeslots(DataContext dataContext) : EndpointWithoutRequest<IEnumerable<TimeslotResponse>, TimeslotMapper>
+public class GetTimeslots(DataContext dataContext)
+    : EndpointWithoutRequest<IEnumerable<TimeslotResponse>, TimeslotMapper>
 {
     public override void Configure()
     {
@@ -19,7 +20,7 @@ public class GetTimeslots(DataContext dataContext) : EndpointWithoutRequest<IEnu
         var scheduleId = Route<Guid>("scheduleId");
         if (!await dataContext.HasAsync<Schedule>(scheduleId, ct))
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
@@ -29,6 +30,6 @@ public class GetTimeslots(DataContext dataContext) : EndpointWithoutRequest<IEnu
                                          .Where(timeslot => timeslot.ScheduleId == scheduleId)
                                          .OrderBy(timeslot => timeslot.StartsAt)
                                          .ToListAsync(ct);
-        await SendOkAsync(timeslots.Select(Map.FromEntity), ct);
+        await Send.OkAsync(timeslots.Select(Map.FromEntity), ct);
     }
 }

@@ -22,7 +22,7 @@ public class PostTwoFactor(SignInManager<AppUser> signInManager) : Endpoint<TwoF
         var result = await signInManager.TwoFactorSignInAsync(TokenProviders.Email, req.Code, true, req.RememberClient);
         if (result.Succeeded)
         {
-            await SendNoContentAsync(ct);
+            await Send.NoContentAsync(ct);
             return;
         }
 

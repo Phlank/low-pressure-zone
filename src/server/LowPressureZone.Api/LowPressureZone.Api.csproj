@@ -10,12 +10,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FastEndpoints" Version="6.2.0"/>
-        <PackageReference Include="FastEndpoints.Security" Version="6.2.0"/>
-        <PackageReference Include="FastEndpoints.Swagger" Version="6.2.0"/>
+        <PackageReference Include="FastEndpoints" Version="7.0.1"/>
+        <PackageReference Include="FastEndpoints.Security" Version="7.0.1"/>
+        <PackageReference Include="FastEndpoints.Swagger" Version="7.0.1"/>
         <PackageReference Include="FluentEmail.Mailgun" Version="3.0.2"/>
-        <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="9.0.7"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.7">
+        <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="9.0.8"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

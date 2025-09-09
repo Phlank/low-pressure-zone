@@ -22,20 +22,22 @@ public class DeletePerformer(DataContext dataContext, PerformerRules rules) : En
 
         if (performer == null || performer.IsDeleted)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         if (!rules.IsDeleteAuthorized(performer))
         {
-            await SendUnauthorizedAsync(ct);
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 
         performer.IsDeleted = true;
         performer.LastModifiedDate = DateTime.UtcNow;
         await dataContext.SaveChangesAsync(ct);
-        await dataContext.Timeslots.Where(timeslot => timeslot.PerformerId == performer.Id && timeslot.StartsAt > DateTime.UtcNow).ExecuteDeleteAsync(ct);
-        await SendNoContentAsync(ct);
+        await dataContext.Timeslots
+                         .Where(timeslot => timeslot.PerformerId == performer.Id && timeslot.StartsAt > DateTime.UtcNow)
+                         .ExecuteDeleteAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }

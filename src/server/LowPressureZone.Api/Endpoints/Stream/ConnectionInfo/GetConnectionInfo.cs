@@ -26,6 +26,6 @@ public class GetConnectionInfo(ConnectionInformationService connectionInformatio
             Map.FromEntity(liveInfoResult.Value, "Live Stream"),
             Map.FromEntity(testInfoResult.Value, "Test Stream")
         ];
-        await SendOkAsync(responses, ct);
+        await Send.OkAsync(responses, ct);
     }
 }

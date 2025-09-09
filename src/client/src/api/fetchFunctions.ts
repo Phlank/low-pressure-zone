@@ -8,9 +8,15 @@ const sendRequest = async <TRequest extends object, TResponse = never>(
   route: string,
   request?: TRequest
 ) => {
+  let formedBody: FormData | string | undefined = undefined
+  if (request instanceof FormData) {
+    formedBody = request
+  } else if (request) {
+    formedBody = JSON.stringify(request)
+  }
   try {
     const response = await fetch(`${API_URL}${route}`, {
-      body: request ? JSON.stringify(request) : undefined,
+      body: formedBody,
       method: method,
       headers: request ? { 'Content-Type': 'application/json' } : undefined,
       credentials: 'include'
@@ -51,6 +57,10 @@ export const sendPost = async <TRequest extends object, TResponse = never>(
   request?: TRequest
 ) => {
   return await sendRequest<TRequest, TResponse>('POST', route, request)
+}
+
+export const sendPostForm = async (route: string, request: FormData) => {
+  return await sendRequest<FormData, never>('POST', route, request)
 }
 
 export const sendDelete = async (route: string) => {

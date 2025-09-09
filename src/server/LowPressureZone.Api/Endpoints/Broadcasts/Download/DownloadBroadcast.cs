@@ -21,7 +21,7 @@ public class DownloadBroadcast(AzuraCastClient client, UserManager<AppUser> user
             var user = await userManager.GetUserAsync(User);
             if (user?.StreamerId != req.StreamerId)
             {
-                await SendUnauthorizedAsync(ct);
+                await Send.UnauthorizedAsync(ct);
                 return;
             }
         }
@@ -49,21 +49,21 @@ public class DownloadBroadcast(AzuraCastClient client, UserManager<AppUser> user
                 AddError(new ValidationFailure(nameof(req.StreamerId), "Streamer broadcasts not found"));
             ThrowIfAnyErrors();
 
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         var broadcast = getBroadcastsResult.Value.FirstOrDefault(broadcast => broadcast.Id == req.BroadcastId);
         if (broadcast is null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             Logger.LogError($"{nameof(DownloadBroadcast)}: Broadcast not found");
             return;
         }
 
         if (string.IsNullOrEmpty(broadcast.Recording?.DownloadUrl))
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             Logger.LogError($"{nameof(DownloadBroadcast)}: Broadcast recording not available for download");
             return;
         }
@@ -74,13 +74,13 @@ public class DownloadBroadcast(AzuraCastClient client, UserManager<AppUser> user
         var downloadResult = await client.DownloadBroadcastAsync(req.StreamerId, req.BroadcastId);
         if (!downloadResult.IsSuccess)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             Logger.LogError($"{nameof(DownloadBroadcast)}: Broadcast download did not succeed");
             return;
         }
 
         var size = downloadResult.Value.Headers.ContentLength ?? 0;
         var stream = await downloadResult.Value.ReadAsStreamAsync(ct);
-        await SendStreamAsync(stream, fileName, cancellation: ct, fileLengthBytes: size);
+        await Send.StreamAsync(stream, fileName, cancellation: ct, fileLengthBytes: size);
     }
 }

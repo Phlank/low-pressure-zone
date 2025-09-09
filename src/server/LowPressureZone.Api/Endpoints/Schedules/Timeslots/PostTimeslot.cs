@@ -22,7 +22,10 @@ public class PostTimeslot(DataContext dataContext, PerformerRules performerRules
         var schedule = await dataContext.Schedules
                                         .Include(schedule => schedule.Timeslots)
                                         .Include(schedule => schedule.Community)
-                                        .ThenInclude(community => community.Relationships.Where(relationship => relationship.UserId == User.GetIdOrDefault()))
+                                        .ThenInclude(community =>
+                                                         community.Relationships.Where(relationship =>
+                                                                                           relationship.UserId ==
+                                                                                           User.GetIdOrDefault()))
                                         .Where(schedule => schedule.Id == scheduleId)
                                         .FirstAsync(ct);
 
@@ -31,7 +34,7 @@ public class PostTimeslot(DataContext dataContext, PerformerRules performerRules
         if (!scheduleRules.IsAddingTimeslotsAuthorized(schedule)
             || !performerRules.IsTimeslotLinkAuthorized(performer))
         {
-            await SendUnauthorizedAsync(ct);
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 
@@ -39,7 +42,7 @@ public class PostTimeslot(DataContext dataContext, PerformerRules performerRules
         dataContext.Timeslots.Add(timeslot);
         await dataContext.SaveChangesAsync(ct);
         HttpContext.ExposeLocation();
-        await SendCreatedAtAsync<GetScheduleById>(new
+        await Send.CreatedAtAsync<GetScheduleById>(new
         {
             id = scheduleId
         }, Response, cancellation: ct);

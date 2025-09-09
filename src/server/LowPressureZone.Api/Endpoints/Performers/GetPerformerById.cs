@@ -5,7 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Performers;
 
-public sealed class GetPerformerById(DataContext dataContext) : EndpointWithoutRequest<PerformerResponse, PerformerMapper>
+public sealed class GetPerformerById(DataContext dataContext)
+    : EndpointWithoutRequest<PerformerResponse, PerformerMapper>
 {
     public override void Configure()
     {
@@ -22,11 +23,11 @@ public sealed class GetPerformerById(DataContext dataContext) : EndpointWithoutR
                                          .FirstOrDefaultAsync(ct);
         if (performer == null || PerformerRules.IsHiddenFromApi(performer))
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         var response = Map.FromEntity(performer);
-        await SendOkAsync(response, ct);
+        await Send.OkAsync(response, ct);
     }
 }

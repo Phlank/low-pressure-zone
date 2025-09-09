@@ -43,6 +43,6 @@ public class PostLinkStreamers(AzuraCastClient client, UserManager<AppUser> user
 
         if (fails == usersWithoutStreamer.Count && fails != 0)
             ThrowError($"Failed to create or link streamer for {fails} of  {usersWithoutStreamer.Count} users. Check {nameof(PostLinkStreamers)} logs for more information.");
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }

@@ -23,22 +23,25 @@ public class DeleteSchedule(DataContext dataContext, ScheduleRules rules) : Endp
         var schedule = await dataContext.Schedules
                                         .AsNoTracking()
                                         .Include(schedule => schedule.Community)
-                                        .ThenInclude(community => community.Relationships.Where(relationship => relationship.UserId == User.GetIdOrDefault()))
+                                        .ThenInclude(community =>
+                                                         community.Relationships.Where(relationship =>
+                                                                                           relationship.UserId ==
+                                                                                           User.GetIdOrDefault()))
                                         .Where(schedule => schedule.Id == id)
                                         .FirstOrDefaultAsync(ct);
         if (schedule == null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         if (!rules.IsDeleteAuthorized(schedule))
         {
-            await SendUnauthorizedAsync(ct);
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 
         await dataContext.Schedules.Where(s => s.Id == id).ExecuteDeleteAsync(ct);
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }

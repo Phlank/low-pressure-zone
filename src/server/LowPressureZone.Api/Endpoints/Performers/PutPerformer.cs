@@ -24,17 +24,17 @@ public sealed class PutPerformer(DataContext dataContext, PerformerRules rules)
 
         if (performer == null || PerformerRules.IsHiddenFromApi(performer))
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         if (!rules.IsEditAuthorized(performer))
         {
-            await SendUnauthorizedAsync(ct);
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 
         await Map.UpdateEntityAsync(req, performer, ct);
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }

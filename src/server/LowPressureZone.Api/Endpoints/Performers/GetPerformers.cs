@@ -5,7 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Performers;
 
-public sealed class GetPerformers(DataContext dataContext) : EndpointWithoutRequest<IEnumerable<PerformerResponse>, PerformerMapper>
+public sealed class GetPerformers(DataContext dataContext)
+    : EndpointWithoutRequest<IEnumerable<PerformerResponse>, PerformerMapper>
 {
     public override void Configure() => Get("/performers");
 
@@ -17,6 +18,6 @@ public sealed class GetPerformers(DataContext dataContext) : EndpointWithoutRequ
                                           .ToListAsync(ct);
         performers.RemoveAll(PerformerRules.IsHiddenFromApi);
         var responses = performers.Select(Map.FromEntity);
-        await SendOkAsync(responses, ct);
+        await Send.OkAsync(responses, ct);
     }
 }

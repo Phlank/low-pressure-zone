@@ -6,7 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
-public class PutSchedule(DataContext dataContext, ScheduleRules rules) : EndpointWithMapper<ScheduleRequest, ScheduleMapper>
+public class PutSchedule(DataContext dataContext, ScheduleRules rules)
+    : EndpointWithMapper<ScheduleRequest, ScheduleMapper>
 {
     public override void Configure()
     {
@@ -27,17 +28,17 @@ public class PutSchedule(DataContext dataContext, ScheduleRules rules) : Endpoin
                                         .FirstOrDefaultAsync(ct);
         if (schedule == null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         if (!rules.IsEditAuthorized(schedule))
         {
-            await SendUnauthorizedAsync(ct);
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 
         await Map.UpdateEntityAsync(req, schedule, ct);
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }

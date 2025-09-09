@@ -3,7 +3,8 @@ using LowPressureZone.Api.Services.Stream;
 
 namespace LowPressureZone.Api.Endpoints.Stream.Status;
 
-public class GetStreamStatus(IStreamStatusService streamStatusService) : EndpointWithoutRequest<StreamStatusResponse, StreamStatusMapper>
+public class GetStreamStatus(IStreamStatusService streamStatusService)
+    : EndpointWithoutRequest<StreamStatusResponse, StreamStatusMapper>
 {
     public override void Configure()
     {
@@ -17,6 +18,6 @@ public class GetStreamStatus(IStreamStatusService streamStatusService) : Endpoin
         var status = streamStatusService.Status;
         ArgumentNullException.ThrowIfNull(status);
         var response = Map.FromEntity(status);
-        await SendOkAsync(response, ct);
+        await Send.OkAsync(response, ct);
     }
 }

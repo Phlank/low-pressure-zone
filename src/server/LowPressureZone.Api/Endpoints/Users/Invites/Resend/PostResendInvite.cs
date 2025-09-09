@@ -8,7 +8,10 @@ using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.Endpoints.Users.Invites.Resend;
 
-public class PostResendInvite(IdentityContext identityContext, UserManager<AppUser> userManager, EmailService emailService) : EndpointWithoutRequest
+public class PostResendInvite(
+    IdentityContext identityContext,
+    UserManager<AppUser> userManager,
+    EmailService emailService) : EndpointWithoutRequest
 {
     public override void Configure()
     {
@@ -22,20 +25,20 @@ public class PostResendInvite(IdentityContext identityContext, UserManager<AppUs
         var invite = identityContext.Invitations.FirstOrDefault(invitation => invitation.Id == id);
         if (invite == null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         var user = await userManager.FindByIdAsync(invite.UserId.ToString());
         if (user == null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         await userManager.SendWelcomeEmail(user, emailService);
         invite.LastSentDate = DateTime.UtcNow;
         await identityContext.SaveChangesAsync(ct);
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }

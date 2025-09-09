@@ -44,7 +44,7 @@ public sealed class PostLogin(
         {
             var token = await userManager.GenerateTwoFactorTokenAsync(user, TokenProviders.Email);
             await emailService.SendTwoFactorEmailAsync(user.Email, req.Username, token);
-            await SendOkAsync(new LoginResponse
+            await Send.OkAsync(new LoginResponse
             {
                 RequiresTwoFactor = true
             }, ct);
@@ -57,7 +57,7 @@ public sealed class PostLogin(
             return;
         }
 
-        await SendOkAsync(new LoginResponse
+        await Send.OkAsync(new LoginResponse
         {
             RequiresTwoFactor = false
         }, ct);

@@ -17,11 +17,11 @@ public class GetUserInfo : EndpointWithoutRequest<UserInfoResponse>
 
         if (id == null || username == null || email == null)
         {
-            await SendUnauthorizedAsync(ct);
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 
-        await SendOkAsync(new UserInfoResponse
+        await Send.OkAsync(new UserInfoResponse
         {
             Id = id,
             Username = username,

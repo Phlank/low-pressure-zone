@@ -1,12 +1,12 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain;
-using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
-public class PutTimeslot(DataContext dataContext, TimeslotRules rules) : EndpointWithMapper<TimeslotRequest, TimeslotMapper>
+public class PutTimeslot(DataContext dataContext, TimeslotRules rules)
+    : EndpointWithMapper<TimeslotRequest, TimeslotMapper>
 {
     public override void Configure()
     {
@@ -27,17 +27,17 @@ public class PutTimeslot(DataContext dataContext, TimeslotRules rules) : Endpoin
 
         if (timeslot == null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         if (!rules.IsEditAuthorized(timeslot))
         {
-            await SendUnauthorizedAsync(ct);
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 
         await Map.UpdateEntityAsync(req, timeslot, ct);
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }

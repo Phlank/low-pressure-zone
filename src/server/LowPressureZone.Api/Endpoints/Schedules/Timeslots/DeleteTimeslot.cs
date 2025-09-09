@@ -26,17 +26,17 @@ public class DeleteTimeslot(DataContext dataContext, TimeslotRules rules) : Endp
 
         if (timeslot == null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         if (!rules.IsDeleteAuthorized(timeslot))
         {
-            await SendUnauthorizedAsync(ct);
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 
         await dataContext.Timeslots.Where(t => t.Id == timeslotId).ExecuteDeleteAsync(ct);
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }

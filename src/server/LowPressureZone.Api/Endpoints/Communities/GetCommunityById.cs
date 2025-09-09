@@ -22,11 +22,11 @@ public sealed class GetCommunityById(DataContext dataContext)
                                          .FirstOrDefaultAsync(ct);
         if (community == null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         var response = Map.FromEntity(community);
-        await SendOkAsync(response, ct);
+        await Send.OkAsync(response, ct);
     }
 }
