@@ -35,3 +35,7 @@ coverage
 bin/
 obj/
 appsettings*json
+/.idea/.idea.LowPressureZone/.idea/copilot.data.migration.agent.xml
+/.idea/.idea.LowPressureZone/.idea/copilot.data.migration.ask.xml
+/.idea/.idea.LowPressureZone/.idea/copilot.data.migration.edit.xml
+/.idea/.idea.LowPressureZone/.idea/copilotDiffState.xml
