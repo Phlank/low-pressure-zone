@@ -1,5 +1,6 @@
-import { sendDelete, sendGet, sendPost, sendPut } from '../fetchFunctions'
+import { sendDelete, sendGet, sendPostForm, sendPutForm } from '../fetchFunctions'
 import type { PerformerResponse } from './performersApi.ts'
+import { objectToFormData } from '@/utils/formDataUtils.ts'
 
 const route = (scheduleId: string, timeslotId?: string) =>
   `/schedules/${scheduleId}/timeslots${timeslotId ? '/' + timeslotId : ''}`
@@ -12,9 +13,14 @@ export default {
     scheduleId: string,
     timeslotId: string,
     request: TRequest
-  ) => sendPut(route(scheduleId, timeslotId), mapRequest(request)),
-  post: <TRequest extends TimeslotRequest>(scheduleId: string, request: TRequest) =>
-    sendPost(route(scheduleId), mapRequest(request)),
+  ) => {
+    const formData = objectToFormData(mapRequest(request))
+    return sendPutForm(route(scheduleId, timeslotId), formData)
+  },
+  post: <TRequest extends TimeslotRequest>(scheduleId: string, request: TRequest) => {
+    const formData = objectToFormData(request)
+    return sendPostForm(route(scheduleId), formData)
+  },
   delete: (scheduleId: string, timeslotId: string) => sendDelete(route(scheduleId, timeslotId))
 }
 
@@ -23,6 +29,7 @@ export interface TimeslotRequest {
   performanceType: PerformanceType
   startsAt: string
   endsAt: string
+  file?: File
 }
 
 const mapRequest = <TRequest extends TimeslotRequest>(request: TRequest): TimeslotRequest => {
@@ -30,7 +37,8 @@ const mapRequest = <TRequest extends TimeslotRequest>(request: TRequest): Timesl
     performerId: request.performerId,
     performanceType: request.performanceType,
     startsAt: request.startsAt,
-    endsAt: request.endsAt
+    endsAt: request.endsAt,
+    file: undefined
   }
 }
 

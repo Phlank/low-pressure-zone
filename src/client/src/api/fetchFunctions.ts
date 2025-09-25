@@ -1,5 +1,6 @@
 import { ApiResponse, type ValidationProblemDetails } from '@/api/apiResponse'
 import { err, ok, type Result } from '@/types/result.ts'
+import { objectToFormData } from '@/utils/formDataUtils.ts'
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -14,11 +15,15 @@ const sendRequest = async <TRequest extends object, TResponse = never>(
   } else if (request) {
     formedBody = JSON.stringify(request)
   }
+
   try {
     const response = await fetch(`${API_URL}${route}`, {
       body: formedBody,
       method: method,
-      headers: request ? { 'Content-Type': 'application/json' } : undefined,
+      headers:
+        request && !(request instanceof FormData)
+          ? { 'Content-Type': 'application/json' }
+          : undefined, // Leave undefined for FormData
       credentials: 'include'
     })
 
@@ -48,20 +53,19 @@ export const sendGet = async <TResponse = never>(route: string, params?: QueryPa
   return await sendRequest<never, TResponse>('GET', route)
 }
 
-export const sendPut = async <TRequest extends object>(route: string, request: TRequest) => {
-  return await sendRequest<TRequest, never>('PUT', route, request)
-}
+export const sendPut = async <TRequest extends object>(route: string, request: TRequest) =>
+  await sendRequest<TRequest, never>('PUT', route, request)
 
 export const sendPost = async <TRequest extends object, TResponse = never>(
   route: string,
   request?: TRequest
-) => {
-  return await sendRequest<TRequest, TResponse>('POST', route, request)
-}
+) => await sendRequest<TRequest, TResponse>('POST', route, request)
 
-export const sendPostForm = async (route: string, request: FormData) => {
-  return await sendRequest<FormData, never>('POST', route, request)
-}
+export const sendPostForm = async <TRequest extends object>(route: string, request: TRequest) =>
+  await sendRequest<FormData, never>('POST', route, objectToFormData(request))
+
+export const sendPutForm = async <TRequest extends object>(route: string, request: TRequest) =>
+  await sendRequest<FormData, never>('PUT', route, objectToFormData(request))
 
 export const sendDelete = async (route: string) => {
   return await sendRequest<never, never>('DELETE', route)

@@ -3,6 +3,7 @@ using LowPressureZone.Api.Models.Options;
 using LowPressureZone.Api.Models.Stream;
 using LowPressureZone.Api.Models.Stream.AzuraCast;
 using LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
+using LowPressureZone.Api.Utilities;
 using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Api.Clients;
@@ -134,6 +135,23 @@ public class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<Streamin
     {
         var response = await _client.DeleteAsync(DeleteBroadcastEndpoint(streamerId, broadcastId));
 
+        if (!response.IsSuccessStatusCode)
+            return Result.Err<HttpContent, HttpResponseMessage>(response);
+
+        return Result.Ok<HttpContent, HttpResponseMessage>(response.Content);
+    }
+
+    private string PostFileEndpoint() => $"/api/station/{_stationId}/files";
+
+    public async Task<Result<HttpContent, HttpResponseMessage>> UploadMediaAsync(string filePath, IFormFile file)
+    {
+        FileUpload request = new()
+        {
+            Path = filePath,
+            File = await file.ToBase64EncodedString()
+        };
+
+        var response = await _client.PostAsync(PostFileEndpoint(), JsonContent.Create(request));
         if (!response.IsSuccessStatusCode)
             return Result.Err<HttpContent, HttpResponseMessage>(response);
 

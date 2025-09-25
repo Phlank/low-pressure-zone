@@ -23,6 +23,15 @@
           :options="performanceTypes"
           @change="() => validation.validateIfDirty('performanceType')" />
       </IftaFormField>
+      <FormField
+        v-if="formState.performanceType === 'Prerecorded DJ Set'"
+        input-id="fileInput"
+        label="File"
+        size="m">
+        <FileUpload
+          id="fileInput"
+          @select="onFileSelect" />
+      </FormField>
       <IftaFormField
         v-if="performerStore.performers.length > 0"
         :message="validation.message('performerId')"
@@ -80,7 +89,14 @@
 import { formatReadableTime, parseDate } from '@/utils/dateUtils'
 import { performerRequestRules, timeslotRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
-import { Button, InputText, Select, useToast } from 'primevue'
+import {
+  Button,
+  FileUpload,
+  type FileUploadSelectEvent,
+  InputText,
+  Select,
+  useToast
+} from 'primevue'
 import { computed, onMounted, type Ref, ref } from 'vue'
 import timeslotsApi, {
   PerformanceType,
@@ -100,6 +116,7 @@ import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.t
 import { err, ok, type Result } from '@/types/result.ts'
 import { showSuccessToast } from '@/utils/toastUtils.ts'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
+import FormField from '@/components/form/FormField.vue'
 
 const toast = useToast()
 const performerStore = usePerformerStore()
@@ -124,8 +141,14 @@ const formState: Ref<TimeslotRequest & PerformerRequest> = ref({
   performerId: '',
   performanceType: PerformanceType.Live,
   name: '',
+  file: undefined,
   url: ''
 })
+
+const onFileSelect = (event: FileUploadSelectEvent) => {
+  formState.value.file = event.files[0]
+}
+
 const timeslotRules = timeslotRequestRules(formState.value)
 const performerRules = performerRequestRules
 const validation = createFormValidation(formState, {
