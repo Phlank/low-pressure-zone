@@ -10,7 +10,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Dropbox.Api" Version="7.0.0" />
         <PackageReference Include="FastEndpoints" Version="7.0.1"/>
         <PackageReference Include="FastEndpoints.Security" Version="7.0.1"/>
         <PackageReference Include="FastEndpoints.Swagger" Version="7.0.1"/>
@@ -22,6 +21,7 @@
         </PackageReference>
         <PackageReference Include="Minerals.StringCases" Version="0.2.2"/>
         <PackageReference Include="Shouldly" Version="4.3.0"/>
+        <PackageReference Include="SSH.NET" Version="2025.0.0"/>
     </ItemGroup>
 
     <ItemGroup>

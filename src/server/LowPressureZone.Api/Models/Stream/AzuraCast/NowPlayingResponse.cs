@@ -13,7 +13,7 @@ public record NowPlayingResponse
 
     [JsonPropertyName("playing_next")] public StationQueue? PlayingNext { get; set; }
 
-    [JsonPropertyName("song_history")] public SongHistory[] SongHistory { get; set; } = [];
+    [JsonPropertyName("song_history")] public ICollection<SongHistory> SongHistory { get; set; } = [];
 
     [JsonPropertyName("is_online")] public bool IsOnline { get; set; }
 

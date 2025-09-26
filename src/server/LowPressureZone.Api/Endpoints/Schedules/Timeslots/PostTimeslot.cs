@@ -51,6 +51,8 @@ public class PostTimeslot(
         if (timeslot.Type == PerformanceTypes.Prerecorded && request.File is not null)
         {
             var uploadResult = await client.UploadMediaAsync(request.File.FileName, request.File);
+            if (!uploadResult.IsSuccess)
+                ThrowError(uploadResult.Error);
         }
 
         await dataContext.SaveChangesAsync(ct);

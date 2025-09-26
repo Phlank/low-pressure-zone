@@ -3,14 +3,25 @@ using LowPressureZone.Api.Models.Options;
 using LowPressureZone.Api.Models.Stream;
 using LowPressureZone.Api.Models.Stream.AzuraCast;
 using LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
-using LowPressureZone.Api.Utilities;
+using LowPressureZone.Domain.Entities;
 using Microsoft.Extensions.Options;
+using Renci.SshNet;
+using Renci.SshNet.Common;
 
 namespace LowPressureZone.Api.Clients;
 
-public class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<StreamingOptions> options)
+public class AzuraCastClient(
+    IHttpClientFactory clientFactory,
+    IOptions<StreamingOptions> options,
+    ISftpClient sftpClient,
+    ILogger<AzuraCastClient> logger)
 {
     private readonly HttpClient _client = clientFactory.CreateClient(nameof(StreamServerType.AzuraCast));
+
+    private readonly string _mediaDirectory = options.Value
+                                                     .Streams
+                                                     .First(stream => stream.Server == StreamServerType.AzuraCast)
+                                                     .AzuraCast!.MediaDirectory;
 
     private readonly string _stationId = options.Value
                                                 .Streams
@@ -141,20 +152,45 @@ public class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<Streamin
         return Result.Ok<HttpContent, HttpResponseMessage>(response.Content);
     }
 
-    private string PostFileEndpoint() => $"/api/station/{_stationId}/files";
-
-    public async Task<Result<HttpContent, HttpResponseMessage>> UploadMediaAsync(string filePath, IFormFile file)
+    public async Task<Result<string, string>> UploadMediaAsync(string filePath, IFormFile file)
     {
-        FileUpload request = new()
+        if (!sftpClient.IsConnected)
+            sftpClient.Connect();
+
+        if (await sftpClient.ExistsAsync(filePath)) return Result.Err<string, string>("File already exists");
+
+        try
         {
-            Path = filePath,
-            File = await file.ToBase64EncodedStringAsync()
-        };
+            await using (var stream = file.OpenReadStream())
+            {
+                sftpClient.UploadFile(stream, filePath);
+            }
 
-        var response = await _client.PostAsync(PostFileEndpoint(), JsonContent.Create(request));
-        if (!response.IsSuccessStatusCode)
-            return Result.Err<HttpContent, HttpResponseMessage>(response);
-
-        return Result.Ok<HttpContent, HttpResponseMessage>(response.Content);
+            return Result.Ok<string, string>(filePath);
+        }
+        catch (SftpPermissionDeniedException ex)
+        {
+            logger.LogError(ex, "Permission denied when uploading file to AzuraCast");
+            return Result.Err<string, string>(ex.Message);
+        }
+        catch (SshConnectionException ex)
+        {
+            logger.LogError(ex, "SSH connection error when uploading file to AzuraCast");
+            return Result.Err<string, string>(ex.Message);
+        }
+        catch (SshException ex)
+        {
+            logger.LogError(ex, "SSH error when uploading file to AzuraCast");
+            return Result.Err<string, string>(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unexpected error when uploading file to AzuraCast");
+            return Result.Err<string, string>(ex.Message);
+        }
     }
+
+    public async Task<Result<HttpContent, HttpResponseMessage>> AddPrerecordedScheduledPlaylist(
+        int streamerId, Timeslot timeslot, IFormFile file) =>
+        throw new NotImplementedException();
 }

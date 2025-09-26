@@ -9,7 +9,6 @@ export function objectToFormData<T extends object>(
     const fieldKey = parentKey ? `${parentKey}[${key}]` : key
 
     if (value instanceof Blob || value instanceof File) {
-      debugger
       formData.append(fieldKey, value)
       return
     }

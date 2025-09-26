@@ -27,6 +27,7 @@ builder.AddDatabases();
 builder.Services.ConfigureIdentity(builder.Environment);
 builder.Services.ConfigureWebApi();
 builder.Services.AddApiServices();
+builder.Services.AddWebClients();
 
 builder.WebHost.ConfigureKestrel(serverOptions => { serverOptions.Limits.MaxRequestBodySize = 300_000_000; });
 

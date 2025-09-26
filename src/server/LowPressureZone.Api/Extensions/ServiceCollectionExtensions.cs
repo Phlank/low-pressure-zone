@@ -26,6 +26,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Renci.SshNet;
 
 namespace LowPressureZone.Api.Extensions;
 
@@ -134,6 +135,27 @@ public static class ServiceCollectionExtensions
         });
         services.AddSingleton<EmailService>();
         services.AddSingleton<UriService>();
+
+        services.AddSingleton<AzuraCastStreamStatusService>();
+        services.AddSingleton<IcecastStatusService>();
+        services.AddSingleton<IStreamStatusService>(serviceProvider =>
+        {
+            var options = serviceProvider.GetRequiredService<IOptions<StreamingOptions>>().Value;
+            var live = options.Streams.FirstOrDefault(stream => stream.Use == options.Primary);
+            if (live is null) throw new InvalidOperationException("No live stream configured");
+            return live.Server switch
+            {
+                StreamServerType.AzuraCast => serviceProvider.GetRequiredService<AzuraCastStreamStatusService>(),
+                StreamServerType.Icecast => serviceProvider.GetRequiredService<IcecastStatusService>(),
+                _ => throw new InvalidOperationException("Unknown streaming server type")
+            };
+        });
+
+        services.AddHostedService<BroadcastDeletionService>();
+    }
+
+    public static void AddWebClients(this IServiceCollection services)
+    {
         services.AddHttpClient("Icecast", (serviceProvider, httpClient) =>
         {
             var config = serviceProvider.GetRequiredService<IOptions<StreamingOptions>>();
@@ -154,22 +176,17 @@ public static class ServiceCollectionExtensions
             httpClient.Timeout = TimeSpan.FromSeconds(10);
         });
         services.AddSingleton<AzuraCastClient>();
-        services.AddSingleton<AzuraCastStreamStatusService>();
-        services.AddSingleton<IcecastStatusService>();
-        services.AddSingleton<IStreamStatusService>(serviceProvider =>
+        services.AddSingleton<ISftpClient>(provider =>
         {
-            var options = serviceProvider.GetRequiredService<IOptions<StreamingOptions>>().Value;
-            var live = options.Streams.FirstOrDefault(stream => stream.Use == options.Primary);
-            if (live is null) throw new InvalidOperationException("No live stream configured");
-            return live.Server switch
-            {
-                StreamServerType.AzuraCast => serviceProvider.GetRequiredService<AzuraCastStreamStatusService>(),
-                StreamServerType.Icecast => serviceProvider.GetRequiredService<IcecastStatusService>(),
-                _ => throw new InvalidOperationException("Unknown streaming server type")
-            };
+            var config = provider.GetRequiredService<IOptions<StreamingOptions>>().Value;
+            var azuracast = config.Streams.First(stream => stream.Server == StreamServerType.AzuraCast).AzuraCast;
+            if (azuracast is null)
+                throw new InvalidOperationException("No AzuraCast configuration found for SFTP client");
+            return new SftpClient(azuracast.SftpUrl,
+                                  azuracast.SftpPort,
+                                  azuracast.SftpUsername,
+                                  azuracast.SftpPassword);
         });
-
-        services.AddHostedService<BroadcastDeletionService>();
     }
 
     private static void AddEndpointServices(IServiceCollection services)

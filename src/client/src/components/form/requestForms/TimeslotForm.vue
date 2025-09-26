@@ -141,7 +141,6 @@ const formState: Ref<TimeslotRequest & PerformerRequest> = ref({
 
 const onFileSelect = (e: Event) => {
   formState.value.file = (e.target as HTMLInputElement).files?.[0]
-  debugger
 }
 
 const performerRules = performerRequestRules
