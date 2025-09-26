@@ -11,6 +11,7 @@ public class PutTimeslot(DataContext dataContext, TimeslotRules rules)
     public override void Configure()
     {
         Put("/schedules/{scheduleId}/timeslots/{timeslotId}");
+        AllowFormData();
         Description(builder => builder.Produces(204)
                                       .Produces(404));
     }

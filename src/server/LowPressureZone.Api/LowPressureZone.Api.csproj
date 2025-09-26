@@ -10,6 +10,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Dropbox.Api" Version="7.0.0" />
         <PackageReference Include="FastEndpoints" Version="7.0.1"/>
         <PackageReference Include="FastEndpoints.Security" Version="7.0.1"/>
         <PackageReference Include="FastEndpoints.Swagger" Version="7.0.1"/>

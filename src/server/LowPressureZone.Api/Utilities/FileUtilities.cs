@@ -2,9 +2,9 @@ namespace LowPressureZone.Api.Utilities;
 
 public static class FileUtilities
 {
-    public static async Task<string> ToBase64EncodedString(this IFormFile file)
+    public static async Task<string> ToBase64EncodedStringAsync(this IFormFile file)
     {
-        using var input = file.OpenReadStream();
+        await using var input = file.OpenReadStream();
         using var ms = new MemoryStream((int)Math.Min(input.Length, int.MaxValue));
 
         var buffer = new byte[81920]; // 80 KB

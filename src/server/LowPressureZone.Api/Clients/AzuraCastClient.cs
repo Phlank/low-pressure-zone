@@ -148,7 +148,7 @@ public class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<Streamin
         FileUpload request = new()
         {
             Path = filePath,
-            File = await file.ToBase64EncodedString()
+            File = await file.ToBase64EncodedStringAsync()
         };
 
         var response = await _client.PostAsync(PostFileEndpoint(), JsonContent.Create(request));

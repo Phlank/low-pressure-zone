@@ -61,11 +61,19 @@ export const sendPost = async <TRequest extends object, TResponse = never>(
   request?: TRequest
 ) => await sendRequest<TRequest, TResponse>('POST', route, request)
 
-export const sendPostForm = async <TRequest extends object>(route: string, request: TRequest) =>
-  await sendRequest<FormData, never>('POST', route, objectToFormData(request))
+export const sendPostForm = <TRequest extends object>(route: string, request: TRequest) => {
+  console.log(JSON.stringify(request))
+  return sendRequest<FormData, never>('POST', route, objectToFormData(request)) as Promise<
+    ApiResponse<TRequest, never>
+  >
+}
 
-export const sendPutForm = async <TRequest extends object>(route: string, request: TRequest) =>
-  await sendRequest<FormData, never>('PUT', route, objectToFormData(request))
+export const sendPutForm = <TRequest extends object>(route: string, request: TRequest) => {
+  console.log(JSON.stringify(request))
+  return sendRequest<FormData, never>('PUT', route, objectToFormData(request)) as Promise<
+    ApiResponse<TRequest, never>
+  >
+}
 
 export const sendDelete = async (route: string) => {
   return await sendRequest<never, never>('DELETE', route)

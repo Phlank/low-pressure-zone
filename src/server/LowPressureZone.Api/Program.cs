@@ -4,6 +4,7 @@ using FastEndpoints;
 using FastEndpoints.Swagger;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Models.Options;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Minerals.StringCases;
@@ -27,6 +28,10 @@ builder.Services.ConfigureIdentity(builder.Environment);
 builder.Services.ConfigureWebApi();
 builder.Services.AddApiServices();
 
+builder.WebHost.ConfigureKestrel(serverOptions => { serverOptions.Limits.MaxRequestBodySize = 300_000_000; });
+
+builder.Services.Configure<FormOptions>(options => { options.MultipartBodyLengthLimit = 300_000_000; });
+
 var app = builder.Build();
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
@@ -37,15 +42,25 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseFastEndpoints(config =>
 {
+    config.Binding.ValueParserFor<DateTime>(values =>
+    {
+        if (values.FirstOrDefault() == null)
+            return new ParseResult(true, null);
+
+        if (DateTime.TryParse(values.FirstOrDefault(), out var date))
+            return new ParseResult(true, date.ToUniversalTime());
+
+        return new ParseResult(false, null);
+    });
     config.Endpoints.RoutePrefix = "api";
     config.Errors.ResponseBuilder = (failures, ctx, statusCode) =>
     {
         return new ValidationProblemDetails(failures.GroupBy(failure => (failure.PropertyName ?? "none").ToCamelCase())
-                                                .ToDictionary(failureGrouping => failureGrouping.Key,
-                                                              failureGrouping =>
-                                                                  failureGrouping
-                                                                      .Select(failure => failure.ErrorMessage)
-                                                                      .ToArray()))
+                                                    .ToDictionary(failureGrouping => failureGrouping.Key,
+                                                                  failureGrouping =>
+                                                                      failureGrouping
+                                                                          .Select(failure => failure.ErrorMessage)
+                                                                          .ToArray()))
         {
             Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
             Title = "One or more validation errors occurred.",

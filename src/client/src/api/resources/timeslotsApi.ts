@@ -1,6 +1,5 @@
 import { sendDelete, sendGet, sendPostForm, sendPutForm } from '../fetchFunctions'
 import type { PerformerResponse } from './performersApi.ts'
-import { objectToFormData } from '@/utils/formDataUtils.ts'
 
 const route = (scheduleId: string, timeslotId?: string) =>
   `/schedules/${scheduleId}/timeslots${timeslotId ? '/' + timeslotId : ''}`
@@ -13,14 +12,9 @@ export default {
     scheduleId: string,
     timeslotId: string,
     request: TRequest
-  ) => {
-    const formData = objectToFormData(mapRequest(request))
-    return sendPutForm(route(scheduleId, timeslotId), formData)
-  },
-  post: <TRequest extends TimeslotRequest>(scheduleId: string, request: TRequest) => {
-    const formData = objectToFormData(request)
-    return sendPostForm(route(scheduleId), formData)
-  },
+  ) => sendPutForm(route(scheduleId, timeslotId), mapRequest(request)),
+  post: <TRequest extends TimeslotRequest>(scheduleId: string, request: TRequest) =>
+    sendPostForm(route(scheduleId), mapRequest(request)),
   delete: (scheduleId: string, timeslotId: string) => sendDelete(route(scheduleId, timeslotId))
 }
 
@@ -38,7 +32,7 @@ const mapRequest = <TRequest extends TimeslotRequest>(request: TRequest): Timesl
     performanceType: request.performanceType,
     startsAt: request.startsAt,
     endsAt: request.endsAt,
-    file: undefined
+    file: request.file
   }
 }
 
