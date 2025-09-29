@@ -22,7 +22,7 @@ import type { InviteRequest } from '@/api/resources/invitesApi.ts'
 import type { StreamerRequest } from '@/api/resources/usersApi.ts'
 
 export const communityRequestRules: PropertyRules<CommunityRequest> = {
-  performerName: combineRules(required(), maximumLength(64)),
+  name: combineRules(required(), maximumLength(64)),
   url: combineRules(required(), url(), maximumLength(256))
 }
 
@@ -57,7 +57,8 @@ export const timeslotRequestRules = (
       required(),
       hourOnly(),
       withinRangeOf(() => formState.startsAt, 60, 180, '1 - 3h allowed')
-    )
+    ),
+    name: maximumLength(64)
   }
 }
 

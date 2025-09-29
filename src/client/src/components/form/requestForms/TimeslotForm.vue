@@ -54,15 +54,15 @@
       </IftaFormField>
       <IftaFormField
         v-if="performerStore.performers.length === 0"
-        :message="validation.message('name')"
+        :message="validation.message('performerName')"
         input-id="performerNameInput"
         label="Performer Name"
         size="m">
         <InputText
           id="performerNameInput"
-          v-model:model-value="formState.performerName"
+          v-model:model-value="formState.name"
           :disabled="isSubmitting || disabled"
-          :invalid="!validation.isValid('name')"
+          :invalid="!validation.isValid('performerName')"
           autofocus />
       </IftaFormField>
       <IftaFormField
@@ -106,7 +106,6 @@ import performersApi, {
 import FormArea from '@/components/form/FormArea.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import { usePerformerStore } from '@/stores/performerStore.ts'
-import { maximumLength, required } from '@/validation/rules/stringRules.ts'
 import { applyRuleIf } from '@/validation/rules/untypedRules.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import { err, ok, type Result } from '@/types/result.ts'
@@ -146,8 +145,8 @@ const validation = createFormValidation(formState, {
   startsAt: timeslotRules.startsAt,
   endsAt: timeslotRules.endsAt,
   performerId: applyRuleIf(timeslotRules.performerId, () => performerStore.performers.length > 0),
-  performanceType: required(),
-  name: maximumLength(64),
+  performanceType: timeslotRules.performanceType,
+  name: timeslotRules.name,
   performerName: applyRuleIf(performerRules.name, () => performerStore.performers.length === 0),
   performerUrl: applyRuleIf(performerRules.url, () => performerStore.performers.length === 0)
 })
@@ -184,7 +183,7 @@ const submitPost = async (): Promise<Result<null, null>> => {
 
 const createPerformer = async (): Promise<Result<string, null>> => {
   const request: PerformerRequest = {
-    name: formState.value.performerName,
+    name: formState.value.name,
     url: formState.value.performerUrl
   }
   const response = await performersApi.post(request)
@@ -200,7 +199,7 @@ const createPerformer = async (): Promise<Result<string, null>> => {
   }
   performerStore.add({
     id: response.getCreatedId(),
-    name: formState.value.performerName,
+    name: formState.value.name,
     url: formState.value.performerUrl,
     isDeletable: true,
     isEditable: true,
@@ -229,7 +228,7 @@ const reset = () => {
   formState.value.performerId = defaultStartPerformerId.value ?? props.initialState.performerId
   formState.value.performanceType = props.initialState.performanceType
   formState.value.name = props.initialState.name
-  formState.value.performerName = ''
+  formState.value.name = ''
   formState.value.performerUrl = ''
 }
 

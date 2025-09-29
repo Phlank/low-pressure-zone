@@ -86,7 +86,7 @@ defineProps<{
 }>()
 
 const showEditDialog = ref(false)
-const editFormInitialState: Ref<CommunityRequest> = ref({ performerName: '', url: '' })
+const editFormInitialState: Ref<CommunityRequest> = ref({ name: '', url: '' })
 const editingId = ref('')
 
 const handleEditActionClick = (community: CommunityResponse) => {
