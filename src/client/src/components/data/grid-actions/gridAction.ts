@@ -16,37 +16,37 @@ export interface GridAction {
 
 export const gridActions = {
   create: {
-    name: 'Create',
+    performerName: 'Create',
     icon: 'pi pi-plus',
     severity: 'success',
     emit: 'create'
   } as GridAction,
   download: {
-    name: 'Download',
+    performerName: 'Download',
     icon: 'pi pi-download',
     severity: 'info',
     emit: 'download'
   } as GridAction,
   edit: {
-    name: 'Edit',
+    performerName: 'Edit',
     icon: 'pi pi-pencil',
     severity: 'secondary',
     emit: 'edit'
   } as GridAction,
   delete: {
-    name: 'Delete',
+    performerName: 'Delete',
     icon: 'pi pi-trash',
     severity: 'danger',
     emit: 'delete'
   } as GridAction,
   info: {
-    name: 'Info',
+    performerName: 'Info',
     icon: 'pi pi-info',
     severity: 'info',
     emit: 'info'
   } as GridAction,
   resend: {
-    name: 'Resend',
+    performerName: 'Resend',
     icon: 'pi pi-envelope',
     severity: 'secondary',
     emit: 'resend'

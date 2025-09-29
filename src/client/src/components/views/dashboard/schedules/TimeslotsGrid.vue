@@ -149,7 +149,7 @@ const formInitialValue: Ref<TimeslotRequest> = ref({
   endsAt: '',
   performerId: '',
   performanceType: PerformanceType.Live,
-  name: ''
+  performerName: ''
 })
 const timeslotForm = useTemplateRef('timeslotForm')
 const handleEditClicked = (row: TimeslotRow) => {

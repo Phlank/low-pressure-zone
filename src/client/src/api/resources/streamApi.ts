@@ -22,7 +22,7 @@ export const defaultStreamStatus: StreamStatusResponse = {
   isOnline: false,
   isLive: false,
   isStatusStale: false,
-  name: null,
+  performerName: null,
   type: null,
   listenUrl: null,
   listenerCount: 0

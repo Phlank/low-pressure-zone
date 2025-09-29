@@ -36,37 +36,37 @@ const router = createRouter({
       children: [
         {
           path: '',
-          name: 'Schedules',
+          performerName: 'Schedules',
           component: () =>
             import('@/components/views/dashboard/schedules/DashboardSchedulesView.vue')
         },
         {
           path: 'communities',
-          name: 'Communities',
+          performerName: 'Communities',
           component: () =>
             import('@/components/views/dashboard/communities/DashboardCommunitiesView.vue')
         },
         {
           path: 'performers',
-          name: 'Performers',
+          performerName: 'Performers',
           component: () =>
             import('@/components/views/dashboard/performers/DashboardPerformersView.vue')
         },
         {
           path: 'broadcasts',
-          name: 'Broadcasts',
+          performerName: 'Broadcasts',
           component: () =>
             import('@/components/views/dashboard/broadcasts/DashboardBroadcastsView.vue')
         },
         {
           path: 'streaming',
-          name: 'Streaming',
+          performerName: 'Streaming',
           component: () =>
             import('@/components/views/dashboard/streaming/DashboardStreamingView.vue')
         },
         {
           path: 'users',
-          name: 'Users',
+          performerName: 'Users',
           component: () => import('@/components/views/dashboard/users/DashboardUsersView.vue'),
           meta: { auth: true, roles: [roles.admin, roles.organizer] }
         }

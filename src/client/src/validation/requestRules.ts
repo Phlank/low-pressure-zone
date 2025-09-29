@@ -22,7 +22,7 @@ import type { InviteRequest } from '@/api/resources/invitesApi.ts'
 import type { StreamerRequest } from '@/api/resources/usersApi.ts'
 
 export const communityRequestRules: PropertyRules<CommunityRequest> = {
-  name: combineRules(required(), maximumLength(64)),
+  performerName: combineRules(required(), maximumLength(64)),
   url: combineRules(required(), url(), maximumLength(256))
 }
 

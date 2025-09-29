@@ -51,7 +51,7 @@ import type { ApiResponse } from '@/api/apiResponse.ts'
 
 const toast = useToast()
 const communityStore = useCommunityStore()
-const formState: Ref<CommunityRequest> = ref({ name: '', url: '' })
+const formState: Ref<CommunityRequest> = ref({ performerName: '', url: '' })
 const validation = createFormValidation(formState, communityRequestRules)
 const isSubmitting = ref(false)
 
