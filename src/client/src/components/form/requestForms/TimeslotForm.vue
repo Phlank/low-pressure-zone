@@ -24,6 +24,18 @@
           @change="() => validation.validateIfDirty('performanceType')" />
       </IftaFormField>
       <IftaFormField
+        :message="validation.message('name')"
+        input-id="nameInput"
+        label="Subtitle"
+        optional
+        size="m">
+        <InputText
+          id="nameInput"
+          v-model:model-value="formState.name"
+          :disabled="isSubmitting || disabled"
+          :invalid="!validation.isValid('name')" />
+      </IftaFormField>
+      <IftaFormField
         v-if="performerStore.performers.length > 0"
         :message="validation.message('performerId')"
         input-id="performerInput"
@@ -42,7 +54,7 @@
       </IftaFormField>
       <IftaFormField
         v-if="performerStore.performers.length === 0"
-        :message="validation.message('name')"
+        :message="validation.message('performerName')"
         input-id="performerNameInput"
         label="Performer Name"
         size="m">
@@ -50,20 +62,20 @@
           id="performerNameInput"
           v-model:model-value="formState.name"
           :disabled="isSubmitting || disabled"
-          :invalid="!validation.isValid('name')"
+          :invalid="!validation.isValid('performerName')"
           autofocus />
       </IftaFormField>
       <IftaFormField
         v-if="performerStore.performers.length === 0"
-        :message="validation.message('url')"
+        :message="validation.message('performerUrl')"
         input-id="performerUrlInput"
         label="Performer URL"
         size="m">
         <InputText
           id="performerUrlInput"
-          v-model:model-value="formState.url"
+          v-model:model-value="formState.performerUrl"
           :disabled="isSubmitting || disabled"
-          :invalid="!validation.isValid('url')" />
+          :invalid="!validation.isValid('performerUrl')" />
       </IftaFormField>
       <template #actions>
         <Button
@@ -81,7 +93,7 @@ import { formatReadableTime, parseDate } from '@/utils/dateUtils'
 import { performerRequestRules, timeslotRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { Button, InputText, Select, useToast } from 'primevue'
-import { computed, onMounted, type Ref, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import timeslotsApi, {
   PerformanceType,
   performanceTypes,
@@ -94,12 +106,12 @@ import performersApi, {
 import FormArea from '@/components/form/FormArea.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import { usePerformerStore } from '@/stores/performerStore.ts'
-import { required } from '@/validation/rules/stringRules.ts'
 import { applyRuleIf } from '@/validation/rules/untypedRules.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import { err, ok, type Result } from '@/types/result.ts'
 import { showSuccessToast } from '@/utils/toastUtils.ts'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
+import type { ValidationProblemDetails } from '@/api/apiResponse.ts'
 
 const toast = useToast()
 const performerStore = usePerformerStore()
@@ -118,13 +130,14 @@ const defaultStartPerformerId = computed(() => {
   return undefined
 })
 
-const formState: Ref<TimeslotRequest & PerformerRequest> = ref({
+const formState = ref({
   startsAt: '',
   endsAt: '',
   performerId: '',
   performanceType: PerformanceType.Live,
   name: '',
-  url: ''
+  performerName: '',
+  performerUrl: ''
 })
 const timeslotRules = timeslotRequestRules(formState.value)
 const performerRules = performerRequestRules
@@ -132,9 +145,10 @@ const validation = createFormValidation(formState, {
   startsAt: timeslotRules.startsAt,
   endsAt: timeslotRules.endsAt,
   performerId: applyRuleIf(timeslotRules.performerId, () => performerStore.performers.length > 0),
-  performanceType: required(),
-  name: applyRuleIf(performerRules.name, () => performerStore.performers.length === 0),
-  url: applyRuleIf(performerRules.url, () => performerStore.performers.length === 0)
+  performanceType: timeslotRules.performanceType,
+  name: timeslotRules.name,
+  performerName: applyRuleIf(performerRules.name, () => performerStore.performers.length === 0),
+  performerUrl: applyRuleIf(performerRules.url, () => performerStore.performers.length === 0)
 })
 
 const isSubmitting = ref(false)
@@ -168,12 +182,25 @@ const submitPost = async (): Promise<Result<null, null>> => {
 }
 
 const createPerformer = async (): Promise<Result<string, null>> => {
-  const response = await performersApi.post(formState.value)
-  if (tryHandleUnsuccessfulResponse(response, toast, validation)) return err(null)
+  const request: PerformerRequest = {
+    name: formState.value.name,
+    url: formState.value.performerUrl
+  }
+  const response = await performersApi.post(request)
+  if (!response.isSuccess()) {
+    if (response.isInvalid()) {
+      const details = response.error as ValidationProblemDetails<PerformerRequest>
+      if (details.errors.name)
+        validation.setValidity('performerName', { isValid: false, message: details.errors.name[0] })
+      if (details.errors.url)
+        validation.setValidity('performerUrl', { isValid: false, message: details.errors.url[0] })
+    } else tryHandleUnsuccessfulResponse(response, toast)
+    return err(null)
+  }
   performerStore.add({
     id: response.getCreatedId(),
     name: formState.value.name,
-    url: formState.value.url,
+    url: formState.value.performerUrl,
     isDeletable: true,
     isEditable: true,
     isLinkableToTimeslot: true
@@ -200,8 +227,9 @@ const reset = () => {
   formState.value.endsAt = props.initialState.endsAt
   formState.value.performerId = defaultStartPerformerId.value ?? props.initialState.performerId
   formState.value.performanceType = props.initialState.performanceType
+  formState.value.name = props.initialState.name
   formState.value.name = ''
-  formState.value.url = ''
+  formState.value.performerUrl = ''
 }
 
 const emits = defineEmits<{

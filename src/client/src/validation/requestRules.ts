@@ -57,7 +57,8 @@ export const timeslotRequestRules = (
       required(),
       hourOnly(),
       withinRangeOf(() => formState.startsAt, 60, 180, '1 - 3h allowed')
-    )
+    ),
+    name: maximumLength(64)
   }
 }
 
