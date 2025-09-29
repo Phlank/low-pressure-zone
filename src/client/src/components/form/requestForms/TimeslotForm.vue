@@ -228,6 +228,7 @@ const reset = () => {
   formState.value.endsAt = props.initialState.endsAt
   formState.value.performerId = defaultStartPerformerId.value ?? props.initialState.performerId
   formState.value.performanceType = props.initialState.performanceType
+  formState.value.name = props.initialState.name
   formState.value.performerName = ''
   formState.value.performerUrl = ''
 }

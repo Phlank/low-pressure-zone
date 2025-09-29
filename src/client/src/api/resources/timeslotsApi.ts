@@ -32,7 +32,7 @@ const mapRequest = <TRequest extends TimeslotRequest>(request: TRequest): Timesl
     performanceType: request.performanceType,
     startsAt: request.startsAt,
     endsAt: request.endsAt,
-    performerName: request.name
+    name: request.name
   }
 }
 
