@@ -1,4 +1,5 @@
-﻿using LowPressureZone.Api.Models;
+﻿using System.Text.Json;
+using LowPressureZone.Api.Models;
 using LowPressureZone.Api.Models.Options;
 using LowPressureZone.Api.Models.Stream;
 using LowPressureZone.Api.Models.Stream.AzuraCast;
@@ -157,7 +158,7 @@ public class AzuraCastClient(
         if (!sftpClient.IsConnected)
             sftpClient.Connect();
 
-        if (await sftpClient.ExistsAsync(filePath)) return Result.Err<string, string>("File already exists");
+        if (await sftpClient.ExistsAsync(filePath)) filePath = $"{filePath}_{DateTime.UtcNow.Ticks}";
 
         try
         {
@@ -190,7 +191,72 @@ public class AzuraCastClient(
         }
     }
 
-    public async Task<Result<HttpContent, HttpResponseMessage>> AddPrerecordedScheduledPlaylist(
-        int streamerId, Timeslot timeslot, IFormFile file) =>
+    public async Task<Result<HttpContent, HttpResponseMessage>> CreatePrerecordedItemAsync(
+        int streamerId, Timeslot timeslot, IFormFile file)
+    {
+
+        var playlist = CreatePlaylistForFile(file, streamerId);
+
+        var createPlaylistResult = await _client.PostAsJsonAsync($"/api/station/{_stationId}/playlists", playlist);
+        if (!createPlaylistResult.IsSuccessStatusCode)
+        {
+            logger.LogError("Failed to create playlist; {Reason}", createPlaylistResult.ReasonPhrase);
+            logger.LogError("Content: {Content}", await createPlaylistResult.Content.ReadAsStringAsync());
+            logger.LogError("Playlist being posted: {Playlist}", JsonSerializer.Serialize(playlist));
+            return Result.Err<HttpContent, HttpResponseMessage>(createPlaylistResult);
+        }
+
+        var uploadResult = await UploadMediaAsync(file.FileName, file);
+        if (!uploadResult.IsSuccess)
+        {
+            logger.LogError("Failed to upload media; {Reason}", uploadResult.Error);
+            var deletePlaylistResult = await _client.DeleteAsync($"/api/station/{_stationId}/playlists");
+        }
+
         throw new NotImplementedException();
+    }
+
+    private async Task<Result<StationPlaylist, string>> CreatePlaylistForFileAsync(IFormFile file, int streamerId)
+    {
+        var streamerResult = await GetStreamerAsync(streamerId);
+        if (!streamerResult.IsSuccess)
+            return Result.Err<StationPlaylist, string>(streamerResult.Error.ReasonPhrase);
+        StationPlaylist playlist = new()
+        {
+            Name = streamerResult.Value.DisplayName!,
+            Order = PlaylistOrders.Sequential,
+            Source = PlaylistSources.Songs,
+            Types = PlaylistTypes.Default,
+            AvoidDuplicates = false,
+            BackendOptions =
+            [
+                PlaylistBackendOptionTypes.Interrupt,
+                PlaylistBackendOptionTypes.LoopOnce,
+                PlaylistBackendOptionTypes.Merge
+            ],
+            IncludeInOnDemand = false,
+            IncludeInRequests = false,
+            IsEnabled = true,
+            IsJingle = false,
+            PlayPerHourMinute = 0,
+            PlayPerMinutes = 0,
+            PlayPerSongs = 0,
+            RemoteBuffer = 0,
+            Weight = 1
+        };
+        if (timeslot.StartsAt.Date < DateTime.UtcNow.Date.AddDays(-6))
+        {
+            List<int> days =
+            [
+                (int)timeslot.StartsAt.DayOfWeek,
+                (int)timeslot.EndsAt.DayOfWeek
+            ];
+            playlist.ScheduleItems = new StationSchedule
+            {
+                Days = days.Distinct(),
+                StartTime = timeslot.StartsAt.Hour * 100 + timeslot.StartsAt.Minute,
+                EndTime = timeslot.EndsAt.Hour * 100 + timeslot.EndsAt.Minute
+            };
+        }
+    }
 }

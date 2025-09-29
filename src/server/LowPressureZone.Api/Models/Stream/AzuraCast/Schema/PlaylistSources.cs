@@ -5,6 +5,8 @@ namespace LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum PlaylistSources
 {
-    [JsonPropertyName("songs")] Songs,
-    [JsonPropertyName("remote_url")] RemoteUrl
+    [JsonStringEnumMemberName("songs")] Songs,
+
+    [JsonStringEnumMemberName("remote_url")]
+    RemoteUrl
 }

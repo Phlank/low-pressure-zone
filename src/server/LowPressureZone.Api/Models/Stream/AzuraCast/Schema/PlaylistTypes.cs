@@ -5,11 +5,15 @@ namespace LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum PlaylistTypes
 {
-    [JsonPropertyName("default")] Default,
-    [JsonPropertyName("once_per_x_songs")] OncePerXSongs,
+    [JsonStringEnumMemberName("default")] Default,
 
-    [JsonPropertyName("once_per_x_minutes")]
+    [JsonStringEnumMemberName("once_per_x_songs")]
+    OncePerXSongs,
+
+    [JsonStringEnumMemberName("once_per_x_minutes")]
     OncePerXMinutes,
-    [JsonPropertyName("once_per_hour")] OncePerHour,
-    [JsonPropertyName("custom")] Custom
+
+    [JsonStringEnumMemberName("once_per_hour")]
+    OncePerHour,
+    [JsonStringEnumMemberName("custom")] Custom
 }

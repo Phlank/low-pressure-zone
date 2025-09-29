@@ -4,7 +4,9 @@ using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain;
+using LowPressureZone.Identity.Entities;
 using LowPressureZone.Identity.Extensions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
@@ -13,7 +15,8 @@ public class PostTimeslot(
     DataContext dataContext,
     PerformerRules performerRules,
     ScheduleRules scheduleRules,
-    AzuraCastClient client)
+    AzuraCastClient client,
+    UserManager<AppUser> userManager)
     : EndpointWithMapper<TimeslotRequest, TimeslotMapper>
 {
     public override void Configure()
@@ -37,8 +40,9 @@ public class PostTimeslot(
                                         .FirstAsync(ct);
 
         var performer = await dataContext.Performers.FirstAsync(p => p.Id == request.PerformerId, ct);
-
-        if (!scheduleRules.IsAddingTimeslotsAuthorized(schedule)
+        var user = await userManager.GetUserAsync(User);
+        if (user?.StreamerId is null
+            || !scheduleRules.IsAddingTimeslotsAuthorized(schedule)
             || !performerRules.IsTimeslotLinkAuthorized(performer))
         {
             await Send.UnauthorizedAsync(ct);
@@ -50,9 +54,11 @@ public class PostTimeslot(
 
         if (timeslot.Type == PerformanceTypes.Prerecorded && request.File is not null)
         {
-            var uploadResult = await client.UploadMediaAsync(request.File.FileName, request.File);
-            if (!uploadResult.IsSuccess)
-                ThrowError(uploadResult.Error);
+            var createPrerecordedItemResult =
+                await client.CreatePrerecordedItemAsync(user.StreamerId.Value, timeslot, request.File);
+            if (!createPrerecordedItemResult.IsSuccess)
+                ThrowError(createPrerecordedItemResult.Error.ReasonPhrase ??
+                           "Error creating items in azuracast for timeslot");
         }
 
         await dataContext.SaveChangesAsync(ct);
