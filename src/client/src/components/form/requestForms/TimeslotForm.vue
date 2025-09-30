@@ -199,7 +199,7 @@ const createPerformer = async (): Promise<Result<string, null>> => {
   }
   performerStore.add({
     id: response.getCreatedId(),
-    name: formState.value.name,
+    name: formState.value.performerName,
     url: formState.value.performerUrl,
     isDeletable: true,
     isEditable: true,
