@@ -54,12 +54,13 @@ export const requireAnyOtherCharacter =
     return invalid(msg)
   }
 
-export const minimumLength = (length: number, msg?: string) => (arg: string) => {
+export const minimumLength = (length: number, msg?: string) => (arg?: string) => {
+  if (!arg) return valid
   if (arg.length < length) return invalid(msg ?? `Minimum ${length} characters`)
   return valid
 }
 
-export const maximumLength = (length: number, msg?: string) => (arg: string | null) => {
+export const maximumLength = (length: number, msg?: string) => (arg?: string) => {
   if (!arg || arg.length <= length) return valid
   return invalid(msg ?? `Maximum ${length} characters`)
 }

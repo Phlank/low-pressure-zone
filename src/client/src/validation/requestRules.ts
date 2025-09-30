@@ -57,7 +57,8 @@ export const timeslotRequestRules = (
       hourOnly(),
       withinRangeOf(() => formState.startsAt, 60, 180, '1 - 3h allowed')
     ),
-    file: applyRuleIf(required(), () => formState.performanceType === 'Prerecorded DJ Set')
+    file: applyRuleIf(required(), () => formState.performanceType === 'Prerecorded DJ Set'),
+    name: maximumLength(64)
   }
 }
 

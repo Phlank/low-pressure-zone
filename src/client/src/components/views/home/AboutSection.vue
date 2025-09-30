@@ -10,15 +10,14 @@
       subreddit community. Just a bunch of music enthusiasts chatting and streaming (mostly deep
       dubstep) for fun.
     </p>
-
+    <p>
+      <b>
+        To chat and participate, join the Discord server by clicking the Chat button at the top of
+        the page. If you want to DJ with us, join the Discord server and make a post in the
+        #i-want-to-stream-please channel.
+      </b>
+    </p>
     <div :class="moreClass">
-      <p>
-        <b>
-          To chat and participate, join the Discord server by clicking the Chat button at the top of
-          the page. If you want to DJ with us, join the Discord server and make a post in the
-          #i-want-to-stream-please channel.
-        </b>
-      </p>
       <p>
         Background: around ~2013 or so some users took it upon themselves to set up weekly streaming
         events for community members to participate in (subreddit get-togethers, basically). This

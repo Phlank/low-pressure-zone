@@ -89,7 +89,7 @@ class FormValidationImplementation<TForm extends object> implements FormValidati
     })
   }
 
-  private setValidity(key: keyof TForm, value: ValidationResult): void {
+  public setValidity(key: keyof TForm, value: ValidationResult): void {
     const state = this.propertyState[key]
     state.isValid.value = value.isValid
     state.message.value = value.message
@@ -121,6 +121,7 @@ export interface FormValidation<TForm extends object> {
   mapApiValidationErrors: <TRequest extends object>(
     errors: ErrorMessageDictionary<TRequest>
   ) => void
+  setValidity: (key: keyof TForm, value: ValidationResult) => void
 }
 
 export const createFormValidation = <TForm extends object>(

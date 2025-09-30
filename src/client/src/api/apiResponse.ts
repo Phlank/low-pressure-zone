@@ -5,7 +5,7 @@ interface ApiResponseParameters<TRequest, TResponse> {
   readonly headers?: Headers
   readonly data?: TResponse
   readonly validationProblem?: ValidationProblemDetails<TRequest>
-  readonly error?: unknown
+  readonly error?: ValidationProblemDetails<TRequest> | unknown
 }
 
 export class ApiResponse<TRequest, TResponse> {
@@ -13,7 +13,7 @@ export class ApiResponse<TRequest, TResponse> {
   readonly headers?: Headers
   readonly body?: TResponse
   readonly validationProblem?: ValidationProblemDetails<TRequest>
-  readonly error?: unknown
+  readonly error?: ValidationProblemDetails<TRequest> | unknown
 
   constructor(parameters: ApiResponseParameters<TRequest, TResponse>) {
     this.status = parameters.status

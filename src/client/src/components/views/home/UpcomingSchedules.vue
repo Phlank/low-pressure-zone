@@ -36,7 +36,11 @@
             header="Performer">
             <template #body="{ data }: { data: TimeslotData }">
               <ListItem>
-                <template #left>{{ data.performer }}</template>
+                <template #left>
+                  <TwoLineData
+                    :bottom="data.name"
+                    :top="data.performer" />
+                </template>
                 <template #right>
                   <a
                     v-if="data.performerUrl !== ''"
@@ -66,6 +70,7 @@ import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.t
 import ListItem from '@/components/data/ListItem.vue'
 import ScheduleNavigator from '@/components/controls/ScheduleNavigator.vue'
 import SlotTime from '@/components/controls/SlotTime.vue'
+import TwoLineData from '@/components/layout/TwoLineData.vue'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const schedules: Ref<ScheduleResponse[]> = ref([])
@@ -85,6 +90,7 @@ interface TimeslotData {
   start: Date
   performer: string
   performerUrl: string
+  name: string
   type: string
 }
 
@@ -127,6 +133,7 @@ const mapTimeslotDisplayData = (schedule: ScheduleResponse) => {
       start: hour,
       performer: slot?.performer.name ?? '',
       performerUrl: slot?.performer.url ?? '',
+      name: slot?.name ?? '',
       type: slot?.performanceType ?? ''
     })
   })
