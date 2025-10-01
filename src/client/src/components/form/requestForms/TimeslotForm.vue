@@ -70,6 +70,7 @@
         :message="validation.message('performerUrl')"
         input-id="performerUrlInput"
         label="Performer URL"
+        optional
         size="m">
         <InputText
           id="performerUrlInput"
@@ -89,29 +90,22 @@
 </template>
 
 <script lang="ts" setup>
-import { formatReadableTime, parseDate } from '@/utils/dateUtils'
-import { performerRequestRules, timeslotRequestRules } from '@/validation/requestRules'
-import { createFormValidation } from '@/validation/types/formValidation'
-import { Button, InputText, Select, useToast } from 'primevue'
-import { computed, onMounted, ref } from 'vue'
-import timeslotsApi, {
-  PerformanceType,
-  performanceTypes,
-  type TimeslotRequest
-} from '@/api/resources/timeslotsApi.ts'
-import performersApi, {
-  type PerformerRequest,
-  type PerformerResponse
-} from '@/api/resources/performersApi.ts'
+import {formatReadableTime, parseDate} from '@/utils/dateUtils'
+import {performerRequestRules, timeslotRequestRules} from '@/validation/requestRules'
+import {createFormValidation} from '@/validation/types/formValidation'
+import {Button, InputText, Select, useToast} from 'primevue'
+import {computed, onMounted, ref} from 'vue'
+import timeslotsApi, {PerformanceType, performanceTypes, type TimeslotRequest} from '@/api/resources/timeslotsApi.ts'
+import performersApi, {type PerformerRequest, type PerformerResponse} from '@/api/resources/performersApi.ts'
 import FormArea from '@/components/form/FormArea.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
-import { usePerformerStore } from '@/stores/performerStore.ts'
-import { applyRuleIf } from '@/validation/rules/untypedRules.ts'
+import {usePerformerStore} from '@/stores/performerStore.ts'
+import {applyRuleIf} from '@/validation/rules/untypedRules.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
-import { err, ok, type Result } from '@/types/result.ts'
-import { showSuccessToast } from '@/utils/toastUtils.ts'
-import { useScheduleStore } from '@/stores/scheduleStore.ts'
-import type { ValidationProblemDetails } from '@/api/apiResponse.ts'
+import {err, ok, type Result} from '@/types/result.ts'
+import {showSuccessToast} from '@/utils/toastUtils.ts'
+import {useScheduleStore} from '@/stores/scheduleStore.ts'
+import type {ValidationProblemDetails} from '@/api/apiResponse.ts'
 
 const toast = useToast()
 const performerStore = usePerformerStore()
