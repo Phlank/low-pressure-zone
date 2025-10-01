@@ -37,9 +37,9 @@
             <template #body="{ data }: { data: TimeslotData }">
               <ListItem>
                 <template #left>
-                  <TwoLineData
-                    :bottom="data.name"
-                    :top="data.performer" />
+                  <SlotName
+                    :name="data.name"
+                    :performer="data.performer" />
                 </template>
                 <template #right>
                   <a
@@ -70,7 +70,7 @@ import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.t
 import ListItem from '@/components/data/ListItem.vue'
 import ScheduleNavigator from '@/components/controls/ScheduleNavigator.vue'
 import SlotTime from '@/components/controls/SlotTime.vue'
-import TwoLineData from '@/components/layout/TwoLineData.vue'
+import SlotName from '@/components/controls/SlotName.vue'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const schedules: Ref<ScheduleResponse[]> = ref([])
