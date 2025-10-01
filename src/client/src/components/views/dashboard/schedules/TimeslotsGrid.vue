@@ -13,7 +13,13 @@
         </Column>
         <Column
           field="timeslot.performer.name"
-          header="Performer" />
+          header="Performer">
+          <template #body="{ data }: { data: TimeslotRow }">
+            <SlotName
+              :name="data.timeslot?.name ?? ''"
+              :performer="data.timeslot?.performer.name ?? ''" />
+          </template>
+        </Column>
         <Column
           field="timeslot.performanceType"
           header="Type" />
@@ -102,6 +108,7 @@ import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.t
 import { usePerformerStore } from '@/stores/performerStore.ts'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
 import SlotTime from '@/components/controls/SlotTime.vue'
+import SlotName from '@/components/controls/SlotName.vue'
 
 const toast = useToast()
 const props = defineProps<{
