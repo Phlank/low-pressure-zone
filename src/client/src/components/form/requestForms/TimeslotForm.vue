@@ -60,7 +60,7 @@
         size="m">
         <InputText
           id="performerNameInput"
-          v-model:model-value="formState.name"
+          v-model:model-value="formState.performerName"
           :disabled="isSubmitting || disabled"
           :invalid="!validation.isValid('performerName')"
           autofocus />
