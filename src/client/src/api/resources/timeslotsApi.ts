@@ -23,6 +23,7 @@ export interface TimeslotRequest {
   performanceType: PerformanceType
   startsAt: string
   endsAt: string
+  name: string
 }
 
 const mapRequest = <TRequest extends TimeslotRequest>(request: TRequest): TimeslotRequest => {
@@ -30,7 +31,8 @@ const mapRequest = <TRequest extends TimeslotRequest>(request: TRequest): Timesl
     performerId: request.performerId,
     performanceType: request.performanceType,
     startsAt: request.startsAt,
-    endsAt: request.endsAt
+    endsAt: request.endsAt,
+    name: request.name
   }
 }
 

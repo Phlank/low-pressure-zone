@@ -35,3 +35,6 @@ coverage
 bin/
 obj/
 appsettings*json
+
+# Local environment files
+*copilot*
