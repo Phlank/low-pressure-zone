@@ -10,7 +10,7 @@
     ports:
       - "5432:5432"
     volumes:
-      - lpz:/var/lib/postgresql/data
+      - lpz:/var/lib/postgresql
       - ./:/docker-entrypoint-initdb.d
     healthcheck:
       test: [
@@ -33,7 +33,77 @@
       - "5433:5433"
     volumes:
       - pgadmin-data:/var/lib/pgadmin
+  
+  azuracast-web:
+    container_name: azuracast
+    image: "ghcr.io/azuracast/azuracast:0.23.1"
+    labels:
+      - "com.centurylinklabs.watchtower.scope=azuracast"
+    # Want to customize the HTTP/S ports? Follow the instructions here:
+    # https://docs.azuracast.com/en/administration/docker#using-non-standard-ports
+    ports:
+      - '8147:80'
+      - '8148:443'
+      - '8149:2022'
+      # This default mapping is the outgoing and incoming ports for the first 50 stations.
+      # You can override this port mapping in your own docker-compose.override.yml file.
+      # For instructions, see:
+      # https://docs.azuracast.com/en/administration/docker#expanding-the-station-port-range
+      - '8005:8005'
+      - '8025:8025'
+    environment:
+      LANG: en_US.UTF-8
+      AZURACAST_DC_REVISION: 14
+      AZURACAST_VERSION: latest
+      AZURACAST_SFTP_PORT: 2022
+      MARIADB_RANDOM_ROOT_PASSWORD: 1
+      NGINX_TIMEOUT: 1800
+      #LETSENCRYPT_HOST: ${LETSENCRYPT_HOST:-}
+      #LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:-}
+      PUID: 1000
+      PGID: 1000
+    volumes:
+      - www_uploads:/var/azuracast/uploads
+      - station_data:/var/azuracast/stations
+      - shoutcast2_install:/var/azuracast/servers/shoutcast2
+      - stereo_tool_install:/var/azuracast/servers/stereo_tool
+      - geolite_install:/var/azuracast/geoip
+      - sftpgo_data:/var/azuracast/sftpgo/persist
+      - backups:/var/azuracast/backups
+      - acme:/var/azuracast/acme
+      - db_data:/var/lib/mysql
+    restart: unless-stopped
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    logging:
+      options:
+        max-size: "1m"
+        max-file: "5"
 
-volumes: #stores database locally so it persists between restarts. Can be removed with 'docker-compose down -v' command
+  azuracast-updater:
+    container_name: azuracast_updater
+    image: ghcr.io/azuracast/updater:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    logging:
+      options:
+        max-size: "1m"
+        max-file: "5"
+
+volumes:
+  # LPZ app items
   lpz:
   pgadmin-data:
+  db_data:
+  # AzuraCast app items
+  acme:
+  shoutcast2_install:
+  stereo_tool_install:
+  geolite_install:
+  sftpgo_data:
+  station_data:
+  www_uploads:
+  backups:
+  www_vendor:
