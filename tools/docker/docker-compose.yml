@@ -39,16 +39,10 @@
     image: "ghcr.io/azuracast/azuracast:0.23.1"
     labels:
       - "com.centurylinklabs.watchtower.scope=azuracast"
-    # Want to customize the HTTP/S ports? Follow the instructions here:
-    # https://docs.azuracast.com/en/administration/docker#using-non-standard-ports
     ports:
       - '8147:80'
       - '8148:443'
       - '8149:2022'
-      # This default mapping is the outgoing and incoming ports for the first 50 stations.
-      # You can override this port mapping in your own docker-compose.override.yml file.
-      # For instructions, see:
-      # https://docs.azuracast.com/en/administration/docker#expanding-the-station-port-range
       - '8005:8005'
       - '8025:8025'
     environment:
@@ -91,6 +85,16 @@
       options:
         max-size: "1m"
         max-file: "5"
+        
+  icecast:
+    container_name: icecast
+    image: deepcomp/icecast2:2.4.4
+    ports:
+      - '8000:8000'
+    volumes:
+      - ./volumes/icecast2/icecast.xml:/etc/icecast2/icecast.xml
+      - ./volumes/icecast2/log:/var/log/icecast2
+      - ./volumes/icecast2/mime.types:/etc/mime.types
 
 volumes:
   # LPZ app items

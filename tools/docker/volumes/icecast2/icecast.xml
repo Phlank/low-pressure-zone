@@ -1,5 +1,6 @@
 <icecast>
-    <location>Earth</location>
+    <hostname>http://localhost</hostname>
+    <location>Universe</location>
     <admin>https://github.com/phlank</admin>
 
     <limits>
@@ -33,8 +34,6 @@
         <admin-password>hackme</admin-password>
     </authentication>
 
-    <hostname>localhost</hostname>
-
     <!-- You may have multiple <listen-socket> elements -->
     <listen-socket>
         <port>8000</port>
@@ -62,12 +61,12 @@
     <mount type="default">
         <public>0</public>
     </mount>
-
+    
     <mount type="normal">
         <public>0</public>
-        <mount-name>/live</mount-name>
-        <stream-description>Live DJing performance.</stream-description>
-        <stream-url>https://lowpressurezone.com:8443/live</stream-url>
+        <mount-name>/test</mount-name>
+        <stream-description>Test</stream-description>
+        <stream-url>http://localhost:7005</stream-url>
     </mount>
 
     <!-- Normal mounts -->
