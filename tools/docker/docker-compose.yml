@@ -57,14 +57,7 @@
       PUID: 1000
       PGID: 1000
     volumes:
-      - www_uploads:/var/azuracast/uploads
-      - station_data:/var/azuracast/stations
-      - shoutcast2_install:/var/azuracast/servers/shoutcast2
-      - stereo_tool_install:/var/azuracast/servers/stereo_tool
-      - geolite_install:/var/azuracast/geoip
-      - sftpgo_data:/var/azuracast/sftpgo/persist
-      - backups:/var/azuracast/backups
-      - acme:/var/azuracast/acme
+      - azuracast-files:/var/azuracast
       - db_data:/var/lib/mysql
     restart: unless-stopped
     ulimits:
@@ -100,14 +93,6 @@ volumes:
   # LPZ app items
   lpz:
   pgadmin-data:
-  db_data:
   # AzuraCast app items
-  acme:
-  shoutcast2_install:
-  stereo_tool_install:
-  geolite_install:
-  sftpgo_data:
-  station_data:
-  www_uploads:
-  backups:
-  www_vendor:
+  azuracast-files:
+  db_data:
