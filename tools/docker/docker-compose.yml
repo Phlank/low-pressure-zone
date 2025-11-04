@@ -10,7 +10,7 @@
     ports:
       - "5432:5432"
     volumes:
-      - lpz:/var/lib/postgresql
+      - lpz:/var/lib/postgresql/data
       - ./:/docker-entrypoint-initdb.d
     healthcheck:
       test: [
