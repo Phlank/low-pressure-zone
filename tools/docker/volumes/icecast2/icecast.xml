@@ -1,5 +1,5 @@
 <icecast>
-    <hostname>http://localhost</hostname>
+    <hostname>localhost</hostname>
     <location>Universe</location>
     <admin>https://github.com/phlank</admin>
 
