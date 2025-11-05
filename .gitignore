@@ -37,4 +37,4 @@ obj/
 appsettings*json
 
 # Local environment files
-*copilot*
+.idea/.idea.LowPressureZone/.idea/copilot**
