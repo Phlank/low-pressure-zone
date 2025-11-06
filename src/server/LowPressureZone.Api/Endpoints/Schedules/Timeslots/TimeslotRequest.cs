@@ -2,7 +2,7 @@
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
-public class TimeslotRequest : IDateTimeRange
+public sealed class TimeslotRequest : IDateTimeRange
 {
     public required Guid PerformerId { get; set; }
     public required string PerformanceType { get; set; }

@@ -35,6 +35,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 if (app.Environment.IsDevelopment()) app.UseCors("Development");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseStaticFiles();
 app.UseFastEndpoints(config =>
 {
     config.Endpoints.RoutePrefix = "api";
@@ -61,5 +62,8 @@ app.UseFastEndpoints(config =>
     };
     config.Endpoints.Configurator = endpoints => { endpoints.Throttle(60, 60); };
     config.Errors.ProducesMetadataType = typeof(ValidationProblemDetails);
-}).UseSwaggerGen();
+}).UseSwaggerGen(uiConfig: (uiSettings) =>
+{
+    uiSettings.CustomStylesheetPath = "/swagger-ui/swagger-dark.css";
+});
 app.Run();
