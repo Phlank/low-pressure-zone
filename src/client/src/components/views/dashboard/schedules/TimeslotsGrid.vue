@@ -94,7 +94,7 @@ import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import ListItem from '@/components/data/ListItem.vue'
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
 import TimeslotForm from '@/components/form/requestForms/TimeslotForm.vue'
-import { formatReadableTime, getNextHour, hoursBetween, parseDate, parseTime} from '@/utils/dateUtils'
+import { formatReadableTime, getNextHour, hoursBetween, isDateInTimeslot, parseDate, parseTime} from '@/utils/dateUtils'
 import { showDeleteSuccessToast } from '@/utils/toastUtils'
 import { Column, DataTable, Dialog, useToast } from 'primevue'
 import { computed, inject, onMounted, ref, type Ref, useTemplateRef } from 'vue'
@@ -134,7 +134,7 @@ const setupRows = () => {
   const newRows: TimeslotRow[] = []
   const hours = hoursBetween(startDate.value, endDate.value)
   hours.forEach((hour) => {
-    const timeslot = timeslots.value.find((timeslot) => parseTime(timeslot.startsAt) <= hour.getTime() && parseTime(timeslot.endsAt) > hour.getTime())
+    const timeslot = timeslots.value.find((timeslot) => isDateInTimeslot(hour, timeslot))
     newRows.push({
       start: hour,
       isEditing: false,
