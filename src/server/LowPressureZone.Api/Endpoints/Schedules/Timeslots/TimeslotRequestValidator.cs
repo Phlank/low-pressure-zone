@@ -37,7 +37,7 @@ public class TimeslotRequestValidator : Validator<TimeslotRequest>
                 context.AddFailure(nameof(request.PerformerId), Errors.DoesNotExist);
             if (schedule is null)
             {
-                context.AddFailure("Schedule does not exist");
+                context.AddFailure(nameof(scheduleId), Errors.DoesNotExist);
                 return;
             }
 

@@ -2,6 +2,19 @@
   <div class="timeslot-form">
     <FormArea align-actions="right">
       <IftaFormField
+        :message="validation.message('performanceType')"
+        input-id="typeInput"
+        label="Type"
+        size="m">
+        <Select
+          id="typeInput"
+          v-model:model-value="formState.performanceType"
+          :disabled="isSubmitting || disabled"
+          :invalid="!validation.isValid('performanceType')"
+          :options="performanceTypes"
+          @change="() => validation.validateIfDirty('performanceType')" />
+      </IftaFormField>
+      <IftaFormField
         input-id="startInput"
         label="Start"
         size="xs">
@@ -11,17 +24,16 @@
           disabled />
       </IftaFormField>
       <IftaFormField
-        :message="validation.message('performanceType')"
-        input-id="typeInput"
-        label="Type"
+        label="Duration"
+        input-id="durationInput"
         size="xs">
         <Select
-          id="typeInput"
-          v-model:model-value="formState.performanceType"
-          :disabled="isSubmitting || disabled"
-          :invalid="!validation.isValid('performanceType')"
-          :options="performanceTypes"
-          @change="() => validation.validateIfDirty('performanceType')" />
+          id="durationInput"
+          :options="durationOptions"
+          option-label="label"
+          option-value="value"
+          v-model:model-value="formState.duration">
+        </Select>
       </IftaFormField>
       <IftaFormField
         :message="validation.message('name')"
@@ -90,22 +102,29 @@
 </template>
 
 <script lang="ts" setup>
-import {formatReadableTime, parseDate} from '@/utils/dateUtils'
-import {performerRequestRules, timeslotRequestRules} from '@/validation/requestRules'
-import {createFormValidation} from '@/validation/types/formValidation'
-import {Button, InputText, Select, useToast} from 'primevue'
-import {computed, onMounted, ref} from 'vue'
-import timeslotsApi, {PerformanceType, performanceTypes, type TimeslotRequest} from '@/api/resources/timeslotsApi.ts'
-import performersApi, {type PerformerRequest, type PerformerResponse} from '@/api/resources/performersApi.ts'
+import { formatDurationOption, formatReadableTime, parseDate, parseTime } from '@/utils/dateUtils'
+import { performerRequestRules, timeslotRequestRules } from '@/validation/requestRules'
+import { createFormValidation } from '@/validation/types/formValidation'
+import { Button, InputText, Select, useToast } from 'primevue'
+import { computed, onMounted, ref, watch } from 'vue'
+import timeslotsApi, {
+  PerformanceType,
+  performanceTypes,
+  type TimeslotRequest
+} from '@/api/resources/timeslotsApi.ts'
+import performersApi, {
+  type PerformerRequest,
+  type PerformerResponse
+} from '@/api/resources/performersApi.ts'
 import FormArea from '@/components/form/FormArea.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
-import {usePerformerStore} from '@/stores/performerStore.ts'
-import {applyRuleIf} from '@/validation/rules/untypedRules.ts'
+import { usePerformerStore } from '@/stores/performerStore.ts'
+import { alwaysValid, applyRuleIf } from '@/validation/rules/untypedRules.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
-import {err, ok, type Result} from '@/types/result.ts'
-import {showSuccessToast} from '@/utils/toastUtils.ts'
-import {useScheduleStore} from '@/stores/scheduleStore.ts'
-import type {ValidationProblemDetails} from '@/api/apiResponse.ts'
+import { err, ok, type Result } from '@/types/result.ts'
+import { showSuccessToast } from '@/utils/toastUtils.ts'
+import { useScheduleStore } from '@/stores/scheduleStore.ts'
+import type { ValidationProblemDetails } from '@/api/apiResponse.ts'
 
 const toast = useToast()
 const performerStore = usePerformerStore()
@@ -126,6 +145,7 @@ const defaultStartPerformerId = computed(() => {
 
 const formState = ref({
   startsAt: '',
+  duration: 60,
   endsAt: '',
   performerId: '',
   performanceType: PerformanceType.Live,
@@ -137,6 +157,7 @@ const timeslotRules = timeslotRequestRules(formState.value)
 const performerRules = performerRequestRules
 const validation = createFormValidation(formState, {
   startsAt: timeslotRules.startsAt,
+  duration: alwaysValid(),
   endsAt: timeslotRules.endsAt,
   performerId: applyRuleIf(timeslotRules.performerId, () => performerStore.performers.length > 0),
   performanceType: timeslotRules.performanceType,
@@ -177,7 +198,7 @@ const submitPost = async (): Promise<Result<null, null>> => {
 
 const createPerformer = async (): Promise<Result<string, null>> => {
   const request: PerformerRequest = {
-    name: formState.value.name,
+    name: formState.value.performerName,
     url: formState.value.performerUrl
   }
   const response = await performersApi.post(request)
@@ -219,12 +240,57 @@ onMounted(async () => {
 const reset = () => {
   formState.value.startsAt = props.initialState.startsAt
   formState.value.endsAt = props.initialState.endsAt
+  formState.value.duration = Math.round(
+    (parseDate(formState.value.endsAt).getTime() - parseDate(formState.value.startsAt).getTime()) /
+      60000
+  )
   formState.value.performerId = defaultStartPerformerId.value ?? props.initialState.performerId
   formState.value.performanceType = props.initialState.performanceType
   formState.value.name = props.initialState.name
-  formState.value.name = ''
+  formState.value.performerName = ''
   formState.value.performerUrl = ''
 }
+
+const durationOptions = computed((): { label: string, value: number }[] => {
+  const options: { label: string, value: number }[] = []
+  const schedule = scheduleStore.schedules.find((schedule) => schedule.id === props.scheduleId)
+  if (!schedule)
+    return []
+
+  const endOfSchedule = parseTime(schedule.endsAt)
+
+  const timeslots = schedule.timeslots
+  const timeslotsFollowingCurrent = timeslots.filter((timeslot) => parseTime(timeslot.startsAt) > parseTime(formState.value.startsAt)).sort((a, b) => parseTime(a.startsAt) - parseTime(b.startsAt))
+  const nextBoundaryTime = timeslotsFollowingCurrent.length > 0 ? parseTime(timeslotsFollowingCurrent[0].startsAt) : endOfSchedule
+
+  const maxDurationMinutes = Math.floor((nextBoundaryTime - parseTime(formState.value.startsAt)) / 60000)
+  if (maxDurationMinutes >= 60)
+    options.push({
+      label: formatDurationOption(60),
+      value: 60
+    })
+  if (maxDurationMinutes >= 120)
+    options.push({
+      label: formatDurationOption(120),
+      value: 120
+    })
+  if (maxDurationMinutes >= 180)
+    options.push({
+      label: formatDurationOption(180),
+      value: 180
+    })
+
+  return options
+})
+
+watch(
+  () => formState.value.duration,
+  (newDuration) => {
+    const startDate = parseDate(formState.value.startsAt)
+    const endDate = new Date(startDate.getTime() + newDuration * 60000)
+    formState.value.endsAt = endDate.toISOString()
+  }
+)
 
 const emits = defineEmits<{
   afterSubmit: []
