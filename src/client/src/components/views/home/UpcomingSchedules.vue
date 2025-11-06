@@ -62,7 +62,7 @@
 </template>
 
 <script lang="ts" setup>
-import { getPreviousHour, hoursBetween, parseDate } from '@/utils/dateUtils'
+import { getPreviousHour, hoursBetween, isDateInTimeslot, parseDate } from '@/utils/dateUtils'
 import { Column, DataTable, Skeleton, useToast } from 'primevue'
 import { computed, type ComputedRef, inject, onMounted, ref, type Ref } from 'vue'
 import schedulesApi, { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
@@ -128,7 +128,7 @@ const mapTimeslotDisplayData = (schedule: ScheduleResponse) => {
   }
 
   hours.forEach((hour) => {
-    const slot = timeslots.find((t) => Date.parse(t.startsAt) === hour.getTime())
+    const slot = timeslots.find((timeslot) => isDateInTimeslot(hour, timeslot))
     timeslotData.push({
       start: hour,
       performer: slot?.performer.name ?? '',
