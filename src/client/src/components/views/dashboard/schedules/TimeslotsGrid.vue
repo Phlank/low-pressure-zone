@@ -34,7 +34,7 @@
               "
               :show-delete="data.timeslot?.isDeletable && data.isFirstRowOfTimeslot"
               :show-edit="data.timeslot?.isEditable && data.isFirstRowOfTimeslot"
-              @create="handleEditClicked(data)"
+              @create="handleCreateClicked(data)"
               @delete="handleDeleteClicked(data)"
               @edit="handleEditClicked(data)" />
           </template>
@@ -59,7 +59,7 @@
             "
             :show-delete="row.timeslot?.isDeletable && row.isFirstRowOfTimeslot"
             :show-edit="row.timeslot?.isEditable && row.isFirstRowOfTimeslot"
-            @create="handleEditClicked(row)"
+            @create="handleCreateClicked(row)"
             @delete="handleDeleteClicked(row)"
             @edit="handleEditClicked(row)" />
         </template>
@@ -95,7 +95,14 @@ import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import ListItem from '@/components/data/ListItem.vue'
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
 import TimeslotForm from '@/components/form/requestForms/TimeslotForm.vue'
-import { formatReadableTime, getNextHour, hoursBetween, isDateInTimeslot, parseDate, parseTime} from '@/utils/dateUtils'
+import {
+  formatReadableTime,
+  getNextHour,
+  hoursBetween,
+  isDateInTimeslot,
+  parseDate,
+  parseTime
+} from '@/utils/dateUtils'
 import { showDeleteSuccessToast } from '@/utils/toastUtils'
 import { Column, DataTable, Dialog, useToast } from 'primevue'
 import { computed, inject, onMounted, ref, type Ref, useTemplateRef } from 'vue'
@@ -126,7 +133,6 @@ const isSubmitting = ref(false)
 
 interface TimeslotRow {
   start: Date
-  isEditing: boolean
   isFirstRowOfTimeslot: boolean
   timeslot?: TimeslotResponse
 }
@@ -138,7 +144,6 @@ const setupRows = () => {
     const timeslot = timeslots.value.find((timeslot) => isDateInTimeslot(hour, timeslot))
     newRows.push({
       start: hour,
-      isEditing: false,
       isFirstRowOfTimeslot: timeslot ? parseTime(timeslot.startsAt) === hour.getTime() : false,
       timeslot: timeslot
     })
@@ -164,26 +169,38 @@ const formInitialValue: Ref<TimeslotRequest> = ref({
   performerName: ''
 })
 const timeslotForm = useTemplateRef('timeslotForm')
-const handleEditClicked = (row: TimeslotRow) => {
-  if (row.timeslot === undefined) {
-    timeslotDialogTitle.value = 'Create Timeslot'
-  } else {
-    editingId.value = row.timeslot.id
-    timeslotDialogTitle.value = 'Edit Timeslot'
-  }
-  showTimeslotDialog.value = true
+
+const handleCreateClicked = (row: TimeslotRow) => {
+  if (row.timeslot !== undefined) return
+  timeslotDialogTitle.value = 'Create Timeslot'
   formInitialValue.value = {
     startsAt: row.start.toISOString(),
     endsAt: getNextHour(row.start).toISOString(),
+    name: '',
+    performerId: '',
+    performanceType: PerformanceType.Live
+  }
+  showTimeslotDialog.value = true
+}
+
+const handleEditClicked = (row: TimeslotRow) => {
+  if (row.timeslot === undefined) return
+  editingId.value = row.timeslot.id
+  timeslotDialogTitle.value = 'Edit Timeslot'
+  formInitialValue.value = {
+    startsAt: row.start.toISOString(),
+    endsAt: row.timeslot.endsAt,
     name: row.timeslot?.name ?? '',
     performerId: row.timeslot?.performer.id ?? '',
     performanceType: row.timeslot?.performanceType ?? PerformanceType.Live
   }
+  showTimeslotDialog.value = true
 }
 
 const onSubmitted = async () => {
   showTimeslotDialog.value = false
   timeslotDialogTitle.value = ''
+  editingId.value = ''
   setupRows()
 }
 

@@ -167,31 +167,41 @@ const validation = createFormValidation(formState, {
 })
 
 const isSubmitting = ref(false)
+
 const submit = async () => {
   if (!validation.validate()) return
   isSubmitting.value = true
-  let result: Result<null, null>
+
+  let result: Result<null, string>
   if (props.timeslotId === '' || props.timeslotId === undefined) {
     result = await submitPost()
   } else {
     result = await submitPut()
   }
   isSubmitting.value = false
-  if (result.isSuccess) {
-    await scheduleStore.reloadTimeslotsAsync(props.scheduleId)
-    reset()
-    emits('afterSubmit')
-  }
+
+  if (!result.isSuccess) return
+
+  await scheduleStore.reloadTimeslotsAsync(props.scheduleId)
+  reset()
+  emits('afterSubmit')
 }
 
-const submitPost = async (): Promise<Result<null, null>> => {
+const submitPost = async (): Promise<Result<null, string>> => {
+  if (props.timeslotId !== '' && props.timeslotId !== undefined)
+    return err('Cannot POST when timeslotId is provided')
+
   if (formState.value.performerId === '') {
     const createPerformerResult = await createPerformer()
-    if (!createPerformerResult.isSuccess) return err(null)
+    if (!createPerformerResult.isSuccess) return err('Failed to create performer')
+
     formState.value.performerId = createPerformerResult.value!
   }
+
   const createTimeslotResponse = await timeslotsApi.post(props.scheduleId, formState.value)
-  if (tryHandleUnsuccessfulResponse(createTimeslotResponse, toast, validation)) return err(null)
+  if (tryHandleUnsuccessfulResponse(createTimeslotResponse, toast, validation))
+    return err('API failure when creating timeslot')
+
   showSuccessToast(toast, 'Created', 'Timeslot', formatReadableTime(formState.value.startsAt))
   return ok(null)
 }
@@ -223,11 +233,14 @@ const createPerformer = async (): Promise<Result<string, null>> => {
   return ok(response.getCreatedId())
 }
 
-const submitPut = async (): Promise<Result<null, null>> => {
-  if (props.timeslotId === '' || props.timeslotId === undefined) return err(null)
-  console.log(props.timeslotId)
+const submitPut = async (): Promise<Result<null, string>> => {
+  if (props.timeslotId === '' || props.timeslotId === undefined)
+    return err('Cannot PUT when timeslotId is not provided')
+
   const response = await timeslotsApi.put(props.scheduleId, props.timeslotId, formState.value)
-  if (tryHandleUnsuccessfulResponse(response, toast, validation)) err(null)
+  if (tryHandleUnsuccessfulResponse(response, toast, validation))
+    err('API failure when updating timeslot')
+
   showSuccessToast(toast, 'Updated', 'Timeslot', formatReadableTime(formState.value.startsAt))
   return ok(null)
 }
@@ -241,8 +254,7 @@ const reset = () => {
   formState.value.startsAt = props.initialState.startsAt
   formState.value.endsAt = props.initialState.endsAt
   formState.value.duration = Math.round(
-    (parseDate(formState.value.endsAt).getTime() - parseDate(formState.value.startsAt).getTime()) /
-      60000
+    (parseTime(props.initialState.endsAt) - parseTime(props.initialState.startsAt)) / 60000
   )
   formState.value.performerId = defaultStartPerformerId.value ?? props.initialState.performerId
   formState.value.performanceType = props.initialState.performanceType
@@ -251,19 +263,25 @@ const reset = () => {
   formState.value.performerUrl = ''
 }
 
-const durationOptions = computed((): { label: string, value: number }[] => {
-  const options: { label: string, value: number }[] = []
+const durationOptions = computed((): { label: string; value: number }[] => {
+  const options: { label: string; value: number }[] = []
   const schedule = scheduleStore.schedules.find((schedule) => schedule.id === props.scheduleId)
-  if (!schedule)
-    return []
+  if (!schedule) return []
 
   const endOfSchedule = parseTime(schedule.endsAt)
 
   const timeslots = schedule.timeslots
-  const timeslotsFollowingCurrent = timeslots.filter((timeslot) => parseTime(timeslot.startsAt) > parseTime(formState.value.startsAt)).sort((a, b) => parseTime(a.startsAt) - parseTime(b.startsAt))
-  const nextBoundaryTime = timeslotsFollowingCurrent.length > 0 ? parseTime(timeslotsFollowingCurrent[0].startsAt) : endOfSchedule
+  const timeslotsFollowingCurrent = timeslots
+    .filter((timeslot) => parseTime(timeslot.startsAt) > parseTime(formState.value.startsAt))
+    .sort((a, b) => parseTime(a.startsAt) - parseTime(b.startsAt))
+  const nextBoundaryTime =
+    timeslotsFollowingCurrent.length > 0
+      ? parseTime(timeslotsFollowingCurrent[0].startsAt)
+      : endOfSchedule
 
-  const maxDurationMinutes = Math.floor((nextBoundaryTime - parseTime(formState.value.startsAt)) / 60000)
+  const maxDurationMinutes = Math.floor(
+    (nextBoundaryTime - parseTime(formState.value.startsAt)) / 60000
+  )
   if (maxDurationMinutes >= 60)
     options.push({
       label: formatDurationOption(60),
