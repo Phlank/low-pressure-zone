@@ -1,12 +1,12 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Api.Clients;
 using LowPressureZone.Api.Models.Stream;
-using LowPressureZone.Api.Models.Stream.AzuraCast;
 
 namespace LowPressureZone.Api.Services.Stream;
 
-public class AzuraCastStreamStatusService(
+public sealed class AzuraCastStreamStatusService(
     AzuraCastClient client,
     ILogger<IcecastStatusService> logger)
     : IStreamStatusService, IDisposable
@@ -93,15 +93,21 @@ public class AzuraCastStreamStatusService(
         }
     }
 
-    private static string GetStreamName(NowPlayingResponse nowPlaying)
+    /// <summary>
+    /// Stream name is either the streamer name (if live) or "Artist - Title".
+    /// </summary>
+    /// <param name="nowPlaying"></param>
+    /// <returns></returns>
+    private static string GetStreamName(NowPlaying nowPlaying)
     {
-        var streamerName = nowPlaying.NowPlaying?.Streamer;
+        var streamerName = nowPlaying.CurrentSong?.Streamer;
         if (!string.IsNullOrEmpty(streamerName))
             return streamerName;
 
-        var songArtist = nowPlaying.NowPlaying?.Song.Artist ?? "Unknown";
-        var songTitle = nowPlaying.NowPlaying?.Song.Title;
-        if (songTitle is null or "" or "Live") return $"{songArtist}".Trim('-', ' ');
+        var songArtist = nowPlaying.CurrentSong?.Song.Artist ?? "Unknown";
+        var songTitle = nowPlaying.CurrentSong?.Song.Title;
+        if (songTitle is null or "" or "Live")
+            return $"{songArtist}".Trim('-', ' ');
 
         return $"{songArtist} - {songTitle}".Trim('-', ' ');
     }

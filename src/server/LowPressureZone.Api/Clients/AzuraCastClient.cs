@@ -1,13 +1,12 @@
-﻿using LowPressureZone.Api.Models;
+﻿using LowPressureZone.Adapter.AzuraCast.ApiSchema;
+using LowPressureZone.Api.Models;
 using LowPressureZone.Api.Models.Options;
 using LowPressureZone.Api.Models.Stream;
-using LowPressureZone.Api.Models.Stream.AzuraCast;
-using LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
 using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Api.Clients;
 
-public class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<StreamingOptions> options)
+public sealed class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<StreamingOptions> options)
 {
     private readonly HttpClient _client = clientFactory.CreateClient(nameof(StreamServerType.AzuraCast));
 
@@ -18,53 +17,53 @@ public class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<Streamin
 
     private string NowPlayingEndpoint() => $"/api/nowplaying/{_stationId}";
 
-    public async Task<Result<NowPlayingResponse, HttpResponseMessage>> GetNowPlayingAsync()
+    public async Task<Result<NowPlaying, HttpResponseMessage>> GetNowPlayingAsync()
     {
         var response = await _client.GetAsync(NowPlayingEndpoint());
         if (!response.IsSuccessStatusCode)
-            return Result.Err<NowPlayingResponse, HttpResponseMessage>(response);
+            return Result.Err<NowPlaying, HttpResponseMessage>(response);
 
-        var content = await response.Content.ReadFromJsonAsync<NowPlayingResponse>();
+        var content = await response.Content.ReadFromJsonAsync<NowPlaying>();
         if (content is null)
-            return Result.Err<NowPlayingResponse, HttpResponseMessage>(response);
+            return Result.Err<NowPlaying, HttpResponseMessage>(response);
 
-        return Result.Ok<NowPlayingResponse, HttpResponseMessage>(content);
+        return Result.Ok<NowPlaying, HttpResponseMessage>(content);
     }
 
     private string StreamersEndpoint() => $"/api/station/{_stationId}/streamers";
 
-    public async Task<Result<IReadOnlyCollection<Streamer>, HttpResponseMessage>> GetStreamersAsync()
+    public async Task<Result<IReadOnlyCollection<StationStreamer>, HttpResponseMessage>> GetStreamersAsync()
     {
         var response = await _client.GetAsync(StreamersEndpoint());
         if (!response.IsSuccessStatusCode)
-            return Result.Err<IReadOnlyCollection<Streamer>, HttpResponseMessage>(response);
+            return Result.Err<IReadOnlyCollection<StationStreamer>, HttpResponseMessage>(response);
 
-        var content = await response.Content.ReadFromJsonAsync<IReadOnlyCollection<Streamer>>();
+        var content = await response.Content.ReadFromJsonAsync<IReadOnlyCollection<StationStreamer>>();
         if (content is null)
-            return Result.Err<IReadOnlyCollection<Streamer>, HttpResponseMessage>(response);
+            return Result.Err<IReadOnlyCollection<StationStreamer>, HttpResponseMessage>(response);
 
-        return Result.Ok<IReadOnlyCollection<Streamer>, HttpResponseMessage>(content);
+        return Result.Ok<IReadOnlyCollection<StationStreamer>, HttpResponseMessage>(content);
     }
 
     private string StreamerEndpoint(int streamerId) => $"/api/station/{_stationId}/streamer/{streamerId}";
 
-    public async Task<Result<Streamer, HttpResponseMessage>> GetStreamerAsync(int streamerId)
+    public async Task<Result<StationStreamer, HttpResponseMessage>> GetStreamerAsync(int streamerId)
     {
         var response = await _client.GetAsync(StreamerEndpoint(streamerId));
         if (!response.IsSuccessStatusCode)
-            return Result.Err<Streamer, HttpResponseMessage>(response);
+            return Result.Err<StationStreamer, HttpResponseMessage>(response);
 
-        var content = await response.Content.ReadFromJsonAsync<Streamer>();
+        var content = await response.Content.ReadFromJsonAsync<StationStreamer>();
         if (content is null)
-            return Result.Err<Streamer, HttpResponseMessage>(response);
+            return Result.Err<StationStreamer, HttpResponseMessage>(response);
 
-        return Result.Ok<Streamer, HttpResponseMessage>(content);
+        return Result.Ok<StationStreamer, HttpResponseMessage>(content);
     }
 
     public async Task<Result<int, HttpResponseMessage>> CreateStreamerAsync(
         string username, string password, string displayName)
     {
-        Streamer body = new()
+        StationStreamer body = new()
         {
             Id = 0,
             StreamerUsername = username,
@@ -87,7 +86,7 @@ public class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<Streamin
         return Result.Ok<int, HttpResponseMessage>(streamerId.Value);
     }
 
-    public async Task<Result<bool, HttpResponseMessage>> UpdateStreamerAsync(Streamer streamer)
+    public async Task<Result<bool, HttpResponseMessage>> UpdateStreamerAsync(StationStreamer streamer)
     {
         var result = await _client.PutAsJsonAsync(StreamerEndpoint(streamer.Id), streamer);
         return !result.IsSuccessStatusCode
@@ -99,18 +98,18 @@ public class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<Streamin
                                                               ? $"/api/station/{_stationId}/streamers/broadcasts"
                                                               : $"/api/station/{_stationId}/streamer/{streamerId}/broadcasts";
 
-    public async Task<Result<IReadOnlyCollection<Broadcast>, HttpResponseMessage>> GetBroadcastsAsync(
+    public async Task<Result<IReadOnlyCollection<StationStreamerBroadcast>, HttpResponseMessage>> GetBroadcastsAsync(
         int? streamerId = null)
     {
         var response = await _client.GetAsync(BroadcastsEndpoint(streamerId));
         if (!response.IsSuccessStatusCode)
-            return Result.Err<IReadOnlyCollection<Broadcast>, HttpResponseMessage>(response);
+            return Result.Err<IReadOnlyCollection<StationStreamerBroadcast>, HttpResponseMessage>(response);
 
-        var content = await response.Content.ReadFromJsonAsync<Broadcast[]>();
+        var content = await response.Content.ReadFromJsonAsync<StationStreamerBroadcast[]>();
         if (content is null)
-            return Result.Err<IReadOnlyCollection<Broadcast>, HttpResponseMessage>(response);
+            return Result.Err<IReadOnlyCollection<StationStreamerBroadcast>, HttpResponseMessage>(response);
 
-        return Result.Ok<IReadOnlyCollection<Broadcast>, HttpResponseMessage>(content);
+        return Result.Ok<IReadOnlyCollection<StationStreamerBroadcast>, HttpResponseMessage>(content);
     }
 
     private string DownloadBroadcastEndpoint(int streamerId, int broadcastId) =>

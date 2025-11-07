@@ -1,6 +1,6 @@
-﻿namespace LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
+﻿namespace LowPressureZone.Adapter.AzuraCast.ApiSchema;
 
-public class BroadcastRecording
+public class StationStreamerBroadcastRecording
 {
     public string Path { get; set; } = string.Empty;
     public string DownloadUrl { get; set; } = string.Empty;

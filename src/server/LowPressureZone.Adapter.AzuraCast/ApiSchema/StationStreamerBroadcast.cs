@@ -1,10 +1,10 @@
-﻿namespace LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
+﻿namespace LowPressureZone.Adapter.AzuraCast.ApiSchema;
 
-public class Broadcast
+public class StationStreamerBroadcast
 {
     public int Id { get; set; }
     public DateTime TimestampStart { get; set; }
     public DateTime? TimestampEnd { get; set; }
     public BroadcastStreamer? Streamer { get; set; }
-    public BroadcastRecording? Recording { get; set; }
+    public StationStreamerBroadcastRecording? Recording { get; set; }
 }

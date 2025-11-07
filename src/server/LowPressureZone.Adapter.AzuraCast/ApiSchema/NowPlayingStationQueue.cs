@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
-namespace LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
+namespace LowPressureZone.Adapter.AzuraCast.ApiSchema;
 
 [SuppressMessage("Naming", "CA1711:Identifiers should not have incorrect suffix")]
-public record StationQueue
+public record NowPlayingStationQueue
 {
     [JsonPropertyName("cued_at")]
     public int CuedAt { get; set; }

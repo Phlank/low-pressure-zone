@@ -1,6 +1,6 @@
-﻿namespace LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
+﻿namespace LowPressureZone.Adapter.AzuraCast.ApiSchema;
 
-public record Listeners
+public record NowPlayingListeners
 {
     public int Total { get; set; }
     public int Unique { get; set; }

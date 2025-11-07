@@ -1,11 +1,11 @@
-﻿namespace LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
+﻿namespace LowPressureZone.Adapter.AzuraCast.ApiSchema;
 
-public record Remote
+public record NowPlayingStationRemote
 {
     public int Id { get; set; }
     public required string Name { get; set; }
     public required string Url { get; set; }
     public int? Bitrate { get; set; }
     public string? Format { get; set; }
-    public required Listeners Listeners { get; set; }
+    public required NowPlayingListeners Listeners { get; set; }
 }

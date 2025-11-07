@@ -1,13 +1,13 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
+namespace LowPressureZone.Adapter.AzuraCast.ApiSchema;
 
-public class Streamer
+public sealed record StationStreamer
 {
     public int Id { get; set; }
 
     [JsonPropertyName("streamer_username")]
-    public string StreamerUsername { get; set; } = string.Empty;
+    public required string StreamerUsername { get; set; }
 
     [JsonPropertyName("streamer_password")]
     public string StreamerPassword { get; set; } = string.Empty;

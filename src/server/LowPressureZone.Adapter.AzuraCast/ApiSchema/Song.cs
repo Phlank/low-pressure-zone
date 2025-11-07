@@ -1,4 +1,4 @@
-﻿namespace LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
+﻿namespace LowPressureZone.Adapter.AzuraCast.ApiSchema;
 
 public record Song
 {

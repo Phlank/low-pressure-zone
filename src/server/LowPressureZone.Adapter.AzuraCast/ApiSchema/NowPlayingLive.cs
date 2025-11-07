@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
+namespace LowPressureZone.Adapter.AzuraCast.ApiSchema;
 
-public record LiveInfo
+public record NowPlayingLive
 {
     [JsonPropertyName("is_live")]
     public bool IsLive { get; set; }

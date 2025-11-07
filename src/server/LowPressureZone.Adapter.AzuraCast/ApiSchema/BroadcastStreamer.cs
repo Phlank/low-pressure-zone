@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
+namespace LowPressureZone.Adapter.AzuraCast.ApiSchema;
 
-public class BroadcastStreamer
+public sealed class BroadcastStreamer
 {
     public int Id { get; set; }
 

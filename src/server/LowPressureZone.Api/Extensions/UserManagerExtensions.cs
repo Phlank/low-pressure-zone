@@ -1,7 +1,7 @@
-﻿using LowPressureZone.Api.Clients;
+﻿using LowPressureZone.Adapter.AzuraCast.ApiSchema;
+using LowPressureZone.Api.Clients;
 using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Models;
-using LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Api.Utilities;
 using LowPressureZone.Identity;
@@ -81,17 +81,17 @@ public static class UserManagerExtensions
             Result.Err<string, string>($"Unable to save streamer password: {updateStreamerResult.Error.ReasonPhrase}");
     }
 
-    public static async Task<Result<Streamer, string>> GetStreamerAsync(this UserManager<AppUser> userManager,
+    public static async Task<Result<StationStreamer, string>> GetStreamerAsync(this UserManager<AppUser> userManager,
                                                                         AppUser user,
                                                                         AzuraCastClient client)
     {
         if (!user.StreamerId.HasValue)
-            return Result.Err<Streamer, string>("User is not linked to streamer");
+            return Result.Err<StationStreamer, string>("User is not linked to streamer");
 
         var getStreamerResult = await client.GetStreamerAsync(user.StreamerId.Value);
         if (!getStreamerResult.IsSuccess)
-            return Result.Err<Streamer, string>($"Unable to get streamer: {getStreamerResult.Error.ReasonPhrase}");
+            return Result.Err<StationStreamer, string>($"Unable to get streamer: {getStreamerResult.Error.ReasonPhrase}");
 
-        return Result.Ok<Streamer, string>(getStreamerResult.Value);
+        return Result.Ok<StationStreamer, string>(getStreamerResult.Value);
     }
 }

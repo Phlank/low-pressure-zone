@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
+namespace LowPressureZone.Adapter.AzuraCast.ApiSchema;
 
-public record Station
+public record NowPlayingStation
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
@@ -29,8 +29,8 @@ public record Station
     [JsonPropertyName("is_public")]
     public bool? IsPublic { get; set; }
 
-    public Mount[] Mounts { get; set; } = [];
-    public Remote[] Remotes { get; set; } = [];
+    public NowPlayingStationMount[] Mounts { get; set; } = [];
+    public NowPlayingStationRemote[] Remotes { get; set; } = [];
 
     [JsonPropertyName("hls_is_default")]
     public bool? HlsIsDefault { get; set; }

@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
+namespace LowPressureZone.Adapter.AzuraCast.ApiSchema;
 
-public record SongHistory
+public record NowPlayingSongHistory
 {
     [JsonPropertyName("sh_id")]
     public required int ShId { get; set; }
