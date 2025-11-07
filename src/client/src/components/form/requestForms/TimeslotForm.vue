@@ -239,7 +239,7 @@ const submitPut = async (): Promise<Result<null, string>> => {
 
   const response = await timeslotsApi.put(props.scheduleId, props.timeslotId, formState.value)
   if (tryHandleUnsuccessfulResponse(response, toast, validation))
-    err('API failure when updating timeslot')
+    return err('API failure when updating timeslot')
 
   showSuccessToast(toast, 'Updated', 'Timeslot', formatReadableTime(formState.value.startsAt))
   return ok(null)
