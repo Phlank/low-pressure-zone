@@ -1,5 +1,6 @@
 <template>
   <div class="timeslots-grid">
+    <p class="timeslots-grid__schedule-description">{{ schedule.description }}</p>
     <div v-if="!isMobile">
       <DataTable
         :value="rows"
@@ -217,6 +218,10 @@ const handleDelete = async () => {
 .timeslots-grid {
   &__item {
     padding: variables.$space-m 0;
+  }
+
+  &__schedule-description {
+    font-size: medium;
   }
 }
 </style>
