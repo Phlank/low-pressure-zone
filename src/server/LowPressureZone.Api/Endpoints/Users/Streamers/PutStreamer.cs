@@ -1,5 +1,6 @@
 using FastEndpoints;
-using LowPressureZone.Api.Clients;
+using LowPressureZone.Adapter.AzuraCast;
+using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -28,7 +29,7 @@ public class PutStreamer(UserManager<AppUser> userManager, AzuraCastClient clien
 
         var streamerRequest = streamerResult.Value;
         streamerRequest.DisplayName = req.DisplayName;
-        var updateResult = await client.UpdateStreamerAsync(streamerRequest);
+        var updateResult = await client.PutStreamerAsync(streamerRequest);
         if (!updateResult.IsSuccess) ThrowError("Could not update broadcast information");
 
         await SendNoContentAsync(ct);

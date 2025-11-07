@@ -2,7 +2,7 @@
 
 namespace LowPressureZone.Adapter.AzuraCast.ApiSchema;
 
-public sealed class BroadcastStreamer
+public sealed class StationStreamerBroadcastStreamer
 {
     public int Id { get; set; }
 

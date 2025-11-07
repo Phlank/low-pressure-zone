@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using LowPressureZone.Adapter.AzuraCast;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
-using LowPressureZone.Api.Clients;
+using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Models.Stream;
 
 namespace LowPressureZone.Api.Services.Stream;

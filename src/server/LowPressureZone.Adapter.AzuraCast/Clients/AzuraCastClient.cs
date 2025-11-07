@@ -1,20 +1,25 @@
-﻿using LowPressureZone.Adapter.AzuraCast.ApiSchema;
-using LowPressureZone.Api.Models;
-using LowPressureZone.Api.Models.Options;
-using LowPressureZone.Api.Models.Stream;
+﻿using System.Net.Http.Json;
+using LowPressureZone.Adapter.AzuraCast.ApiSchema;
+using LowPressureZone.Adapter.AzuraCast.Options;
+using LowPressureZone.Core;
 using Microsoft.Extensions.Options;
 
-namespace LowPressureZone.Api.Clients;
+namespace LowPressureZone.Adapter.AzuraCast.Clients;
 
-public sealed class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<StreamingOptions> options)
+public sealed class AzuraCastClient : IDisposable, IAzuraCastClient
 {
-    private readonly HttpClient _client = clientFactory.CreateClient(nameof(StreamServerType.AzuraCast));
+    private readonly string _stationId;
+    private readonly HttpClient _client = new();
 
-    private readonly string _stationId = options.Value
-                                                .Streams
-                                                .First(stream => stream.Server == StreamServerType.AzuraCast)
-                                                .AzuraCast!.StationId;
-
+    public AzuraCastClient(IOptions<AzuraCastOptions> options)
+    {
+        _stationId = options.Value.StationId;
+        _client.BaseAddress = options.Value.ApiUrl;
+        _client.DefaultRequestHeaders.Add("X-API-Key", options.Value.ApiKey);
+    }
+    
+    public void Dispose() => _client.Dispose();
+    
     private string NowPlayingEndpoint() => $"/api/nowplaying/{_stationId}";
 
     public async Task<Result<NowPlaying, HttpResponseMessage>> GetNowPlayingAsync()
@@ -60,7 +65,7 @@ public sealed class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<S
         return Result.Ok<StationStreamer, HttpResponseMessage>(content);
     }
 
-    public async Task<Result<int, HttpResponseMessage>> CreateStreamerAsync(
+    public async Task<Result<int, HttpResponseMessage>> PostStreamerAsync(
         string username, string password, string displayName)
     {
         StationStreamer body = new()
@@ -86,7 +91,7 @@ public sealed class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<S
         return Result.Ok<int, HttpResponseMessage>(streamerId.Value);
     }
 
-    public async Task<Result<bool, HttpResponseMessage>> UpdateStreamerAsync(StationStreamer streamer)
+    public async Task<Result<bool, HttpResponseMessage>> PutStreamerAsync(StationStreamer streamer)
     {
         var result = await _client.PutAsJsonAsync(StreamerEndpoint(streamer.Id), streamer);
         return !result.IsSuccessStatusCode
@@ -112,10 +117,10 @@ public sealed class AzuraCastClient(IHttpClientFactory clientFactory, IOptions<S
         return Result.Ok<IReadOnlyCollection<StationStreamerBroadcast>, HttpResponseMessage>(content);
     }
 
-    private string DownloadBroadcastEndpoint(int streamerId, int broadcastId) =>
+    public string DownloadBroadcastEndpoint(int streamerId, int broadcastId) =>
         $"/api/station/{_stationId}/streamer/{streamerId}/broadcast/{broadcastId}/download";
 
-    public async Task<Result<HttpContent, HttpResponseMessage>> DownloadBroadcastAsync(int streamerId, int broadcastId)
+    public async Task<Result<HttpContent, HttpResponseMessage>> DownloadBroadcastFileAsync(int streamerId, int broadcastId)
     {
         var response =
             await _client.GetAsync(DownloadBroadcastEndpoint(streamerId, broadcastId),

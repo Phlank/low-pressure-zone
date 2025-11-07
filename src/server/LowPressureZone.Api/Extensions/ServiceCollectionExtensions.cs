@@ -2,8 +2,9 @@
 using FastEndpoints.Swagger;
 using FluentEmail.Core.Interfaces;
 using FluentEmail.Mailgun;
+using LowPressureZone.Adapter.AzuraCast;
+using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Authentication;
-using LowPressureZone.Api.Clients;
 using LowPressureZone.Api.Endpoints.Broadcasts;
 using LowPressureZone.Api.Endpoints.Communities;
 using LowPressureZone.Api.Endpoints.Communities.Relationships;

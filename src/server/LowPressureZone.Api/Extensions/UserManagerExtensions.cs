@@ -1,9 +1,10 @@
-﻿using LowPressureZone.Adapter.AzuraCast.ApiSchema;
-using LowPressureZone.Api.Clients;
+﻿using LowPressureZone.Adapter.AzuraCast;
+using LowPressureZone.Adapter.AzuraCast.ApiSchema;
+using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Constants;
-using LowPressureZone.Api.Models;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Api.Utilities;
+using LowPressureZone.Core;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -37,7 +38,7 @@ public static class UserManagerExtensions
 
         if (user.StreamerId != null) return Result.Err<string, string>("User already linked to streamer");
 
-        var createResult = await client.CreateStreamerAsync(username!, password, displayName);
+        var createResult = await client.PostStreamerAsync(username!, password, displayName);
         if (!createResult.IsSuccess)
             return
                 Result.Err<string, string>($"Unable to create streamer for user: ${createResult.Error?.ReasonPhrase ?? "No reason given by AzuraCast"}");
@@ -74,7 +75,7 @@ public static class UserManagerExtensions
 
         var streamer = getStreamerResult.Value;
         streamer.StreamerPassword = NewStreamerPassword;
-        var updateStreamerResult = await client.UpdateStreamerAsync(streamer);
+        var updateStreamerResult = await client.PutStreamerAsync(streamer);
         if (updateStreamerResult.IsSuccess) return Result.Ok<string, string>(streamer.StreamerPassword);
 
         return

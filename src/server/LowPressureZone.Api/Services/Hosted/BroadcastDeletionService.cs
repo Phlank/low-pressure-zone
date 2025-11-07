@@ -1,4 +1,5 @@
-using LowPressureZone.Api.Clients;
+using LowPressureZone.Adapter.AzuraCast;
+using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Utilities;
 
 namespace LowPressureZone.Api.Services.Hosted;

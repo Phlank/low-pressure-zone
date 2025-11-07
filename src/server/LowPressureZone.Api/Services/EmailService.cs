@@ -4,6 +4,7 @@ using FluentEmail.Core.Interfaces;
 using FluentEmail.Core.Models;
 using LowPressureZone.Api.Models;
 using LowPressureZone.Api.Models.Options;
+using LowPressureZone.Core;
 using LowPressureZone.Identity;
 using Microsoft.Extensions.Options;
 

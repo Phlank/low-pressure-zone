@@ -2,7 +2,8 @@
 using FastEndpoints;
 using FluentEmail.Core;
 using FluentValidation.Results;
-using LowPressureZone.Api.Clients;
+using LowPressureZone.Adapter.AzuraCast;
+using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Services;

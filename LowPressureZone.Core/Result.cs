@@ -1,6 +1,6 @@
-﻿namespace LowPressureZone.Api.Models;
+﻿namespace LowPressureZone.Core;
 
-public class Result<T, TErr>(T? value, TErr? error)
+public sealed class Result<T, TErr>(T? value, TErr? error)
 {
     public T Value =>
         value ?? throw new InvalidOperationException("Cannot access the value of an unsuccessful result");

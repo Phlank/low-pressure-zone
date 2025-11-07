@@ -2,7 +2,8 @@
 using System.Net;
 using FastEndpoints;
 using FluentValidation.Results;
-using LowPressureZone.Api.Clients;
+using LowPressureZone.Adapter.AzuraCast;
+using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -71,7 +72,7 @@ public class DownloadBroadcast(AzuraCastClient client, UserManager<AppUser> user
         var fileName =
             $"{getStreamerResult.Value?.DisplayName ?? getStreamerResult.Value?.StreamerUsername ?? "Unknown DJ"} {broadcast.TimestampStart.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture)}.mp3";
 
-        var downloadResult = await client.DownloadBroadcastAsync(req.StreamerId, req.BroadcastId);
+        var downloadResult = await client.DownloadBroadcastFileAsync(req.StreamerId, req.BroadcastId);
         if (!downloadResult.IsSuccess)
         {
             await SendNotFoundAsync(ct);
