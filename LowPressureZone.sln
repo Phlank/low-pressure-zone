@@ -29,7 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2. Adapters", "2. Adapters"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3. Core", "3. Core", "{C8CE0E2B-370A-43AB-888A-65BF960BA18B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LowPressureZone.Core", "LowPressureZone.Core\LowPressureZone.Core.csproj", "{6F15A668-3BE3-469D-9983-87CD9936BF61}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LowPressureZone.Core", "src\server\LowPressureZone.Core\LowPressureZone.Core.csproj", "{6F15A668-3BE3-469D-9983-87CD9936BF61}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

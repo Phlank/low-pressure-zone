@@ -17,9 +17,9 @@ public sealed class AzuraCastClient : IDisposable, IAzuraCastClient
         _client.BaseAddress = options.Value.ApiUrl;
         _client.DefaultRequestHeaders.Add("X-API-Key", options.Value.ApiKey);
     }
-    
+
     public void Dispose() => _client.Dispose();
-    
+
     private string NowPlayingEndpoint() => $"/api/nowplaying/{_stationId}";
 
     public async Task<Result<NowPlaying, HttpResponseMessage>> GetNowPlayingAsync()
@@ -66,7 +66,9 @@ public sealed class AzuraCastClient : IDisposable, IAzuraCastClient
     }
 
     public async Task<Result<int, HttpResponseMessage>> PostStreamerAsync(
-        string username, string password, string displayName)
+        string username,
+        string password,
+        string displayName)
     {
         StationStreamer body = new()
         {
@@ -117,10 +119,12 @@ public sealed class AzuraCastClient : IDisposable, IAzuraCastClient
         return Result.Ok<IReadOnlyCollection<StationStreamerBroadcast>, HttpResponseMessage>(content);
     }
 
-    public string DownloadBroadcastEndpoint(int streamerId, int broadcastId) =>
+    private string DownloadBroadcastEndpoint(int streamerId, int broadcastId) =>
         $"/api/station/{_stationId}/streamer/{streamerId}/broadcast/{broadcastId}/download";
 
-    public async Task<Result<HttpContent, HttpResponseMessage>> DownloadBroadcastFileAsync(int streamerId, int broadcastId)
+    public async Task<Result<HttpContent, HttpResponseMessage>> DownloadBroadcastFileAsync(
+        int streamerId,
+        int broadcastId)
     {
         var response =
             await _client.GetAsync(DownloadBroadcastEndpoint(streamerId, broadcastId),

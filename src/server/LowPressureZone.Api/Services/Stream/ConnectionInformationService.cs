@@ -12,7 +12,7 @@ using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Api.Services.Stream;
 
-public class ConnectionInformationService(
+public sealed class ConnectionInformationService(
     IOptions<StreamingOptions> streamOptions,
     IHttpContextAccessor httpContextAccessor,
     UserManager<AppUser> userManager,

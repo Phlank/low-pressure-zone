@@ -2,7 +2,6 @@
 using FastEndpoints.Swagger;
 using FluentEmail.Core.Interfaces;
 using FluentEmail.Mailgun;
-using LowPressureZone.Adapter.AzuraCast;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Authentication;
 using LowPressureZone.Api.Endpoints.Broadcasts;
@@ -32,13 +31,6 @@ namespace LowPressureZone.Api.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    private static readonly Action<CookieAuthenticationOptions> ConfigureDevCookieOptions = options =>
-    {
-        options.Cookie.SameSite = SameSiteMode.None;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.HttpOnly = true;
-    };
-
     public static void AddDatabases(this WebApplicationBuilder builder)
     {
         var identityConnectionString = builder.Configuration.GetConnectionString("Identity");
@@ -70,10 +62,10 @@ public static class ServiceCollectionExtensions
         if (environment.IsDevelopment())
         {
             // Also configure Auth cookies separately, so SameSite works cross-domain locally in Chromium
-            services.Configure(IdentityConstants.TwoFactorUserIdScheme, ConfigureDevCookieOptions);
-            services.Configure(IdentityConstants.TwoFactorRememberMeScheme, ConfigureDevCookieOptions);
-            services.Configure(IdentityConstants.ExternalScheme, ConfigureDevCookieOptions);
-            services.ConfigureApplicationCookie(ConfigureDevCookieOptions);
+            services.Configure(IdentityConstants.TwoFactorUserIdScheme, ConfigureDevelopmentCookieOptions);
+            services.Configure(IdentityConstants.TwoFactorRememberMeScheme, ConfigureDevelopmentCookieOptions);
+            services.Configure(IdentityConstants.ExternalScheme, ConfigureDevelopmentCookieOptions);
+            services.ConfigureApplicationCookie(ConfigureDevelopmentCookieOptions);
         }
         else
         {
@@ -99,6 +91,13 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IClaimsTransformation, AppUserClaimsTransformation>();
     }
 
+    private static readonly Action<CookieAuthenticationOptions> ConfigureDevelopmentCookieOptions = options =>
+    {
+        options.Cookie.SameSite = SameSiteMode.None;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.HttpOnly = true;
+    };
+    
     public static void ConfigureWebApi(this IServiceCollection services)
     {
         services.AddFastEndpoints();
@@ -143,18 +142,7 @@ public static class ServiceCollectionExtensions
             httpClient.BaseAddress = icecastOptions!.IcecastUrl;
             httpClient.Timeout = TimeSpan.FromSeconds(10);
         });
-        services.AddHttpClient("AzuraCast", (serviceProvider, httpClient) =>
-        {
-            var config = serviceProvider.GetRequiredService<IOptions<StreamingOptions>>();
-            var azuraCastOptions = config.Value
-                                         .Streams
-                                         .First(stream => stream.Server == StreamServerType.AzuraCast)
-                                         .AzuraCast;
-            httpClient.BaseAddress = azuraCastOptions!.ApiUrl;
-            httpClient.DefaultRequestHeaders.Add("X-API-Key", azuraCastOptions.ApiKey);
-            httpClient.Timeout = TimeSpan.FromSeconds(10);
-        });
-        services.AddSingleton<AzuraCastClient>();
+        services.AddSingleton<IAzuraCastClient, AzuraCastClient>();
         services.AddSingleton<AzuraCastStreamStatusService>();
         services.AddSingleton<IcecastStatusService>();
         services.AddSingleton<IStreamStatusService>(serviceProvider =>
