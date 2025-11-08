@@ -29,7 +29,7 @@ public class GetStreamerPassword(UserManager<AppUser> userManager, AzuraCastClie
         }
 
         var generateResult = await userManager.GenerateStreamerPassword(user, client);
-        if (!generateResult.IsSuccess) ThrowError(generateResult.Error ?? "Unable to generate new password");
+        if (!generateResult.IsSuccess) ThrowError(generateResult.Error);
 
         StreamerPasswordResponse response = new()
         {

@@ -2,7 +2,7 @@
 
 namespace LowPressureZone.Api.Models.Stream.Icecast;
 
-public class IcecastStatusRootRaw
+public sealed class IcecastStatusRootRaw
 {
-    [JsonPropertyName("icestats")] public required IcecastStatusRaw Stats { get; set; }
+    [JsonPropertyName("icestats")] public required IcecastStatusRaw Stats { get; init; }
 }

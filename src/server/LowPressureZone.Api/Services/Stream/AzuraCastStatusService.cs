@@ -7,7 +7,7 @@ using LowPressureZone.Api.Models.Stream;
 
 namespace LowPressureZone.Api.Services.Stream;
 
-public sealed class AzuraCastStreamStatusService(
+public sealed class AzuraCastStatusService(
     AzuraCastClient client,
     ILogger<IcecastStatusService> logger)
     : IStreamStatusService, IDisposable
@@ -15,12 +15,8 @@ public sealed class AzuraCastStreamStatusService(
     private readonly Lock _statusLock = new();
     private readonly PeriodicTimer _timer = new(TimeSpan.FromSeconds(5));
 
-    public void Dispose()
-    {
-        _timer.Dispose();
-        GC.SuppressFinalize(this);
-    }
-
+    public void Dispose() => _timer.Dispose();
+    
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         if (IsStarted) return;
@@ -54,7 +50,7 @@ public sealed class AzuraCastStreamStatusService(
             var result = await client.GetNowPlayingAsync();
             if (!result.IsSuccess)
             {
-                logger.LogError($"{nameof(AzuraCastStreamStatusService)}: Unable to retrieve status from AzuraCast");
+                logger.LogError($"{nameof(AzuraCastStatusService)}: Unable to retrieve status from AzuraCast");
                 return;
             }
 

@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using FastEndpoints;
 using FastEndpoints.Swagger;
+using LowPressureZone.Adapter.AzuraCast.Options;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Models.Options;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -23,9 +24,9 @@ builder.Services.Configure<EmailServiceOptions>(builder.Configuration.GetSection
 builder.Services.Configure<UrlOptions>(builder.Configuration.GetSection(UrlOptions.Name));
 
 builder.AddDatabases();
-builder.Services.ConfigureIdentity(builder.Environment);
-builder.Services.ConfigureWebApi();
-builder.Services.AddApiServices();
+builder.ConfigureIdentity();
+builder.ConfigureWebApi();
+builder.AddApiServices();
 
 var app = builder.Build();
 app.UseForwardedHeaders(new ForwardedHeadersOptions

@@ -1,8 +1,11 @@
-﻿using FastEndpoints;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using FastEndpoints;
 using FastEndpoints.Swagger;
 using FluentEmail.Core.Interfaces;
 using FluentEmail.Mailgun;
 using LowPressureZone.Adapter.AzuraCast.Clients;
+using LowPressureZone.Adapter.AzuraCast.Options;
 using LowPressureZone.Api.Authentication;
 using LowPressureZone.Api.Endpoints.Broadcasts;
 using LowPressureZone.Api.Endpoints.Communities;
@@ -12,11 +15,11 @@ using LowPressureZone.Api.Endpoints.Schedules;
 using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 using LowPressureZone.Api.Endpoints.Users.Invites;
 using LowPressureZone.Api.Models.Options;
-using LowPressureZone.Api.Models.Stream;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Api.Services.Hosted;
 using LowPressureZone.Api.Services.Stream;
+using LowPressureZone.Api.Services.StreamingInfo;
 using LowPressureZone.Domain;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;
@@ -24,13 +27,21 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Api.Extensions;
 
-public static class ServiceCollectionExtensions
+public static class WebApplicationBuilderExtensions
 {
+    private static readonly Action<CookieAuthenticationOptions> ConfigureDevelopmentCookieOptions = options =>
+    {
+        options.Cookie.SameSite = SameSiteMode.None;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.HttpOnly = true;
+    };
+
     public static void AddDatabases(this WebApplicationBuilder builder)
     {
         var identityConnectionString = builder.Configuration.GetConnectionString("Identity");
@@ -48,8 +59,11 @@ public static class ServiceCollectionExtensions
         });
     }
 
-    public static void ConfigureIdentity(this IServiceCollection services, IWebHostEnvironment environment)
+    public static void ConfigureIdentity(this WebApplicationBuilder builder)
     {
+        var services = builder.Services;
+        var environment = builder.Environment;
+
         services.AddIdentity<AppUser, AppRole>(options =>
         {
             options.Password.RequireNonAlphanumeric = true;
@@ -91,41 +105,46 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IClaimsTransformation, AppUserClaimsTransformation>();
     }
 
-    private static readonly Action<CookieAuthenticationOptions> ConfigureDevelopmentCookieOptions = options =>
+    public static void ConfigureWebApi(this WebApplicationBuilder builder)
     {
-        options.Cookie.SameSite = SameSiteMode.None;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.HttpOnly = true;
-    };
-    
-    public static void ConfigureWebApi(this IServiceCollection services)
-    {
+        var services = builder.Services;
+        var configuration = builder.Configuration;
+
+        services.Configure<JsonOptions>(options =>
+        {
+            options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
+
+        services.Configure<AzuraCastOptions>(builder.Configuration.GetSection(AzuraCastOptions.Name));
+        services.Configure<IcecastOptions>(builder.Configuration.GetSection(IcecastOptions.Name));
+        services.Configure<StreamingOptions>(builder.Configuration.GetSection(StreamingOptions.Name));
+        services.Configure<EmailServiceOptions>(builder.Configuration.GetSection(EmailServiceOptions.Name));
+        services.Configure<UrlOptions>(builder.Configuration.GetSection(UrlOptions.Name));
+
         services.AddFastEndpoints();
         services.AddHttpContextAccessor();
         services.SwaggerDocument();
         services.AddCors(options =>
         {
-            options.AddPolicy("Development", builder =>
-            {
-                builder.WithOrigins("http://localhost:4001")
-                       .AllowAnyHeader()
-                       .WithMethods("GET", "PUT", "POST", "DELETE")
-                       .AllowCredentials();
-            });
-            options.AddPolicy("Production", builder =>
-            {
-                builder.WithOrigins("https://lowpressurezone.com")
-                       .AllowAnyHeader()
-                       .WithMethods("GET", "PUT", "POST", "DELETE")
-                       .AllowCredentials();
-            });
+            options.AddPolicy("Frontend",
+                              policyBuilder =>
+                              {
+                                  policyBuilder
+                                      .WithOrigins(configuration.GetRequiredSection(UrlOptions.Name)["SiteUrl"]!)
+                                      .AllowAnyHeader()
+                                      .WithMethods("GET", "PUT", "POST", "DELETE")
+                                      .AllowCredentials();
+                              });
         });
     }
 
-    public static void AddApiServices(this IServiceCollection services)
+    public static void AddApiServices(this WebApplicationBuilder builder)
     {
+        var services = builder.Services;
+
         AddEndpointServices(services);
-        services.AddScoped<ConnectionInformationService>();
+        services.AddScoped<StreamingInfoService>();
 
         services.AddSingleton<ISender>(serviceProvider =>
         {
@@ -134,29 +153,10 @@ public static class ServiceCollectionExtensions
         });
         services.AddSingleton<EmailService>();
         services.AddSingleton<UriService>();
-        services.AddHttpClient("Icecast", (serviceProvider, httpClient) =>
-        {
-            var config = serviceProvider.GetRequiredService<IOptions<StreamingOptions>>();
-            var icecastOptions =
-                config.Value.Streams.First(stream => stream.Server == StreamServerType.Icecast).Icecast;
-            httpClient.BaseAddress = icecastOptions!.IcecastUrl;
-            httpClient.Timeout = TimeSpan.FromSeconds(10);
-        });
         services.AddSingleton<IAzuraCastClient, AzuraCastClient>();
-        services.AddSingleton<AzuraCastStreamStatusService>();
+        services.AddSingleton<AzuraCastStatusService>();
         services.AddSingleton<IcecastStatusService>();
-        services.AddSingleton<IStreamStatusService>(serviceProvider =>
-        {
-            var options = serviceProvider.GetRequiredService<IOptions<StreamingOptions>>().Value;
-            var live = options.Streams.FirstOrDefault(stream => stream.Use == options.Primary);
-            if (live is null) throw new InvalidOperationException("No live stream configured");
-            return live.Server switch
-            {
-                StreamServerType.AzuraCast => serviceProvider.GetRequiredService<AzuraCastStreamStatusService>(),
-                StreamServerType.Icecast => serviceProvider.GetRequiredService<IcecastStatusService>(),
-                _ => throw new InvalidOperationException("Unknown streaming server type")
-            };
-        });
+        services.AddSingleton<IStreamStatusService, AzuraCastStatusService>();
 
         services.AddHostedService<BroadcastDeletionService>();
     }
