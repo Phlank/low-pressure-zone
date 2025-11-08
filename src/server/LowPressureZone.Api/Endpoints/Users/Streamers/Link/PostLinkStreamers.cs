@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Users.Streamers.Link;
 
-public class PostLinkStreamers(AzuraCastClient client, UserManager<AppUser> userManager)
+public partial class PostLinkStreamers(AzuraCastClient client, UserManager<AppUser> userManager)
     : EndpointWithoutRequest<EmptyResponse>
 {
     public override void Configure()
@@ -31,13 +31,11 @@ public class PostLinkStreamers(AzuraCastClient client, UserManager<AppUser> user
         {
             var createResult = await userManager.LinkToNewStreamer(user, client);
             if (createResult.IsSuccess) continue;
-            Logger.LogWarning("{Controller}: Failed to create new streamer for {UserName}: {CreateResultError}",
-                              nameof(PostLinkStreamers), user.UserName, createResult.Error);
+            LogFailedToCreateNewStreamer(Logger, nameof(PostLinkStreamers), user.UserName!, createResult.Error);
 
             var linkResult = await userManager.LinkToExistingStreamer(user, client);
             if (linkResult.IsSuccess) continue;
-            Logger.LogWarning("{Controller}: Failed to link existing streamer to {UserName}: {LinkResultError}",
-                              nameof(PostLinkStreamers), user.UserName, linkResult.Error);
+            LogFailedToLinkExistingStreamerToUser(Logger, nameof(PostLinkStreamers), user.UserName!, linkResult.Error);
 
             fails++;
         }
@@ -46,4 +44,10 @@ public class PostLinkStreamers(AzuraCastClient client, UserManager<AppUser> user
             ThrowError($"Failed to create or link streamer for {fails} of  {usersWithoutStreamer.Count} users. Check {nameof(PostLinkStreamers)} logs for more information.");
         await SendNoContentAsync(ct);
     }
+
+    [LoggerMessage(LogLevel.Warning, "{source}: Failed to create new streamer for {userName}: {createResultError}")]
+    static partial void LogFailedToCreateNewStreamer(ILogger logger, string source, string userName, string createResultError);
+
+    [LoggerMessage(LogLevel.Warning, "{source}: Failed to link existing streamer to {userName}: {linkResultError}")]
+    static partial void LogFailedToLinkExistingStreamerToUser(ILogger logger, string source, string userName, string linkResultError);
 }

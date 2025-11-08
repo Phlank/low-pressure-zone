@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Users.Register;
 
-public class PostRegister(UserManager<AppUser> userManager, IdentityContext identityContext, AzuraCastClient radioClient, EmailService emailService) : Endpoint<RegisterRequest>
+public partial class PostRegister(UserManager<AppUser> userManager, IdentityContext identityContext, AzuraCastClient radioClient, EmailService emailService) : Endpoint<RegisterRequest>
 {
     private readonly DateTime _requestTime = DateTime.UtcNow;
 
@@ -91,7 +91,6 @@ public class PostRegister(UserManager<AppUser> userManager, IdentityContext iden
         var createStreamerResult = await userManager.LinkToNewStreamer(user, radioClient);
         if (!createStreamerResult.IsSuccess)
         {
-            Logger.LogWarning("Error when creating streamer for new user");
             _ = await emailService.SendAdminMessage($"Failure to create streamer for new user: {createStreamerResult.Error}", "Streamer creation failed");
         }
 

@@ -1,10 +1,11 @@
+using System.Net;
 using LowPressureZone.Adapter.AzuraCast;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Utilities;
 
 namespace LowPressureZone.Api.Services.Hosted;
 
-public class BroadcastDeletionService(AzuraCastClient client, ILogger<BroadcastDeletionService> logger)
+public partial class BroadcastDeletionService(AzuraCastClient client, ILogger<BroadcastDeletionService> logger)
     : IHostedService, IDisposable
 {
     private const int RunHour = 5;
@@ -23,8 +24,7 @@ public class BroadcastDeletionService(AzuraCastClient client, ILogger<BroadcastD
         var nextRun = DateTimeUtilities.GetNextHour(RunHour);
         var spanToNext = nextRun - DateTime.UtcNow;
         var spanPeriod = new TimeSpan(24, 0, 0);
-        logger.LogInformation("Broadcast deletion service started, first deletion in {Minutes} minutes",
-                              spanToNext.TotalMinutes);
+        LogBroadcastDeletionServiceStartedFirstDeletionInMinutesMinutes(logger, spanToNext.TotalMinutes);
         _timer = new Timer(RunDelete, null, spanToNext, spanPeriod);
         return Task.CompletedTask;
     }
@@ -39,26 +39,23 @@ public class BroadcastDeletionService(AzuraCastClient client, ILogger<BroadcastD
 
     private async Task DeleteOutOfDateBroadcasts()
     {
-        logger.LogInformation("Deleting broadcasts older than {Days} days", DaysToKeep);
+        LogDeletingBroadcastsOlderThanDaysDays(logger, DaysToKeep);
         var broadcastResult = await client.GetBroadcastsAsync();
         if (!broadcastResult.IsSuccess)
         {
-            logger.LogError("Failed to delete broadcasts: {Reason}",
-                            broadcastResult.Error.ReasonPhrase);
+            LogFailedToDeleteBroadcastsReason(logger, broadcastResult.Error.ReasonPhrase ?? "Unknown reason");
             return;
         }
 
         var outOfDateBroadcasts = broadcastResult.Value
                                                  .Where(broadcast => broadcast.TimestampStart < CutoffDate)
                                                  .ToList();
-        logger.LogInformation("{OutOfDateBroadcasts} broadcasts out of date will be deleted",
-                              outOfDateBroadcasts.Count);
+        LogBroadcastsOutOfDateWillBeDeleted(logger, outOfDateBroadcasts.Count);
         foreach (var broadcast in outOfDateBroadcasts)
         {
             if (broadcast.Streamer?.Id == null)
             {
-                logger.LogWarning("Cannot delete broadcast {Id} because no streamer was returned",
-                                  broadcast.Id);
+                LogCannotDeleteBroadcastBecauseNoStreamerWasReturned(logger, broadcast.Id);
                 continue;
             }
 
@@ -67,12 +64,30 @@ public class BroadcastDeletionService(AzuraCastClient client, ILogger<BroadcastD
             if (deleteResult.IsSuccess)
                 continue;
 
-            logger.LogError("Error when deleting broadcast {Id}: {Status}, {Reason}",
-                            broadcast.Id,
-                            deleteResult.Error.StatusCode,
-                            deleteResult.Error.ReasonPhrase);
+            LogErrorWhenDeletingBroadcastStatusReason(logger, broadcast.Id, deleteResult.Error.StatusCode, deleteResult.Error.ReasonPhrase ?? "Unknown reason");
         }
 
-        logger.LogInformation("Finished deleting broadcasts");
+        LogFinishedDeletingBroadcasts(logger);
     }
+
+    [LoggerMessage(LogLevel.Information, "Broadcast deletion service started, first deletion in {minutes} minutes")]
+    static partial void LogBroadcastDeletionServiceStartedFirstDeletionInMinutesMinutes(ILogger<BroadcastDeletionService> logger, double minutes);
+
+    [LoggerMessage(LogLevel.Information, "Deleting broadcasts older than {days} days")]
+    static partial void LogDeletingBroadcastsOlderThanDaysDays(ILogger<BroadcastDeletionService> logger, int days);
+
+    [LoggerMessage(LogLevel.Error, "Failed to delete broadcasts: {reason}")]
+    static partial void LogFailedToDeleteBroadcastsReason(ILogger<BroadcastDeletionService> logger, string reason);
+
+    [LoggerMessage(LogLevel.Information, "{outOfDateBroadcasts} broadcasts out of date will be deleted")]
+    static partial void LogBroadcastsOutOfDateWillBeDeleted(ILogger<BroadcastDeletionService> logger, int outOfDateBroadcasts);
+
+    [LoggerMessage(LogLevel.Warning, "Cannot delete broadcast {id} because no streamer was returned")]
+    static partial void LogCannotDeleteBroadcastBecauseNoStreamerWasReturned(ILogger<BroadcastDeletionService> logger, int id);
+
+    [LoggerMessage(LogLevel.Error, "Error when deleting broadcast {id}: {status}, {reason}")]
+    static partial void LogErrorWhenDeletingBroadcastStatusReason(ILogger<BroadcastDeletionService> logger, int id, HttpStatusCode status, string reason);
+
+    [LoggerMessage(LogLevel.Information, "Finished deleting broadcasts")]
+    static partial void LogFinishedDeletingBroadcasts(ILogger<BroadcastDeletionService> logger);
 }

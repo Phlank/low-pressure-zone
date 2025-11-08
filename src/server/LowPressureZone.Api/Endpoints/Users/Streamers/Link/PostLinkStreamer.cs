@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.Endpoints.Users.Streamers.Link;
 
-public class PostLinkStreamer(AzuraCastClient client, UserManager<AppUser> userManager)
+public partial class PostLinkStreamer(AzuraCastClient client, UserManager<AppUser> userManager)
     : EndpointWithoutRequest<EmptyResponse>
 {
     public override void Configure()
@@ -34,8 +34,7 @@ public class PostLinkStreamer(AzuraCastClient client, UserManager<AppUser> userM
             return;
         }
 
-        Logger.LogWarning("{Controller}: Failed to create new streamer for {UserName}: {CreateResultError}",
-                          nameof(PostLinkStreamers), user.UserName, createResult.Error);
+        FailedToCreateNewStreamer(Logger, nameof(PostLinkStreamers), user.UserName ?? "null", createResult.Error);
 
         var linkResult = await userManager.LinkToExistingStreamer(user, client);
         if (linkResult.IsSuccess)
@@ -44,9 +43,14 @@ public class PostLinkStreamer(AzuraCastClient client, UserManager<AppUser> userM
             return;
         }
 
-        Logger.LogWarning("{Controller}: Failed to link existing streamer to {UserName}: {LinkResultError}",
-                          nameof(PostLinkStreamers), user.UserName, linkResult.Error);
+        LogFailedToLinkExistingStreamer(Logger, nameof(PostLinkStreamers), user.UserName ?? "null", linkResult.Error);
 
         ThrowError($"Failed to create or link streamer for user. Check {nameof(PostLinkStreamer)} logs for more information.");
     }
+
+    [LoggerMessage(LogLevel.Warning, "{source}: Failed to create new streamer for {userName}: {createResultError}")]
+    static partial void FailedToCreateNewStreamer(ILogger logger, string source, string userName, string createResultError);
+
+    [LoggerMessage(LogLevel.Warning, "{source}: Failed to link existing streamer to {userName}: {linkResultError}")]
+    static partial void LogFailedToLinkExistingStreamer(ILogger logger, string source, string userName, string linkResultError);
 }
