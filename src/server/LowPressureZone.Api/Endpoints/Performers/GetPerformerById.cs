@@ -5,7 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Performers;
 
-public sealed class GetPerformerById(DataContext dataContext) : EndpointWithoutRequest<PerformerResponse, PerformerMapper>
+public sealed class GetPerformerById(DataContext dataContext)
+    : EndpointWithoutRequest<PerformerResponse, PerformerMapper>
 {
     public override void Configure()
     {

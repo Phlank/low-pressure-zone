@@ -6,7 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Users.Invites;
 
-public class GetInvites(IdentityContext identityContext, DataContext dataContext) : EndpointWithoutRequest<IEnumerable<InviteResponse>, InviteMapper>
+public class GetInvites(IdentityContext identityContext, DataContext dataContext)
+    : EndpointWithoutRequest<IEnumerable<InviteResponse>, InviteMapper>
 {
     public override void Configure()
     {
@@ -28,7 +29,8 @@ public class GetInvites(IdentityContext identityContext, DataContext dataContext
         var userCommunities = await dataContext.CommunityRelationships
                                                .AsNoTracking()
                                                .Where(relationship => userIds.Contains(relationship.UserId))
-                                               .ToDictionaryAsync(relationship => relationship.UserId, relationship => relationship.CommunityId, ct);
+                                               .ToDictionaryAsync(relationship => relationship.UserId,
+                                                                  relationship => relationship.CommunityId, ct);
 
         var responses = invites.Where(invitation => userCommunities.ContainsKey(invitation.UserId))
                                .Select(invitation => Map.FromEntity(invitation, userCommunities[invitation.UserId]));

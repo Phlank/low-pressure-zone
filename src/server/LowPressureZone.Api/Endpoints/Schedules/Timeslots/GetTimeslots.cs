@@ -6,7 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
-public class GetTimeslots(DataContext dataContext) : EndpointWithoutRequest<IEnumerable<TimeslotResponse>, TimeslotMapper>
+public class GetTimeslots(DataContext dataContext)
+    : EndpointWithoutRequest<IEnumerable<TimeslotResponse>, TimeslotMapper>
 {
     public override void Configure()
     {

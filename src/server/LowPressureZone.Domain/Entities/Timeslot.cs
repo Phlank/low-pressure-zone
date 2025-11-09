@@ -5,11 +5,9 @@ namespace LowPressureZone.Domain.Entities;
 
 public sealed class Timeslot : BaseEntity, IDateTimeRange
 {
-    [MaxLength(64)]
-    public string? Name { get; set; }
+    [MaxLength(64)] public string? Name { get; set; }
 
-    [MaxLength(64)]
-    public required string Type { get; set; }
+    [MaxLength(64)] public required string Type { get; set; }
 
     public required Guid PerformerId { get; set; }
     public Performer Performer { get; set; } = null!;

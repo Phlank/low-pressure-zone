@@ -13,12 +13,12 @@ public class TimeslotRequestValidator : Validator<TimeslotRequest>
     public TimeslotRequestValidator(IHttpContextAccessor contextAccessor)
     {
         RuleFor(request => request.PerformanceType).Must(type => PerformanceTypes.All.Contains(type))
-            .WithMessage("Invalid type");
+                                                   .WithMessage("Invalid type");
         RuleFor(request => request.StartsAt).GreaterThan(DateTime.UtcNow).WithMessage(Errors.TimeInPast);
         RuleFor(request => request.EndsAt).GreaterThan(request => request.StartsAt);
 
         RuleFor(request => request.Name).MaximumLength(64)
-            .WithMessage(Errors.MaxLength(64));
+                                        .WithMessage(Errors.MaxLength(64));
 
         RuleFor(t => t).CustomAsync(async (request, context, ct) =>
         {
@@ -26,12 +26,12 @@ public class TimeslotRequestValidator : Validator<TimeslotRequest>
             var timeslotId = contextAccessor.GetGuidRouteParameterOrDefault("timeslotId");
             var dataContext = Resolve<DataContext>();
             var schedule = await dataContext.Schedules
-                .Include(schedule => schedule.Timeslots)
-                .Where(schedule => schedule.Id == scheduleId)
-                .FirstOrDefaultAsync(ct);
+                                            .Include(schedule => schedule.Timeslots)
+                                            .Where(schedule => schedule.Id == scheduleId)
+                                            .FirstOrDefaultAsync(ct);
             var performer = await dataContext.Performers
-                .Where(performer => performer.Id == request.PerformerId)
-                .FirstOrDefaultAsync(ct);
+                                             .Where(performer => performer.Id == request.PerformerId)
+                                             .FirstOrDefaultAsync(ct);
 
             if (performer is null)
                 context.AddFailure(nameof(request.PerformerId), Errors.DoesNotExist);

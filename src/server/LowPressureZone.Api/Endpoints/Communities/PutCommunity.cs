@@ -18,7 +18,7 @@ public sealed class PutCommunity(DataContext dataContext) : EndpointWithMapper<C
     {
         var id = Route<Guid>("id");
         var community = await dataContext.Communities.FirstOrDefaultAsync(community => community.Id == id, ct);
-        if (community == null || community.IsDeleted && !User.IsInRole(RoleNames.Admin))
+        if (community == null || (community.IsDeleted && !User.IsInRole(RoleNames.Admin)))
         {
             await SendNotFoundAsync(ct);
             return;

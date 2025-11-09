@@ -7,7 +7,7 @@ namespace LowPressureZone.Api.Endpoints.Users.Invites;
 public class InviteMapper : IRequestMapper, IResponseMapper
 {
     public Invitation<Guid, AppUser> ToEntity(InviteRequest request)
-        => new Invitation<Guid, AppUser>()
+        => new()
         {
             UserId = Guid.NewGuid(),
             InvitationDate = DateTime.UtcNow,

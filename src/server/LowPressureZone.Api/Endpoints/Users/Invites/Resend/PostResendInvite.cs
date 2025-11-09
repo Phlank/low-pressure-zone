@@ -8,7 +8,10 @@ using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.Endpoints.Users.Invites.Resend;
 
-public class PostResendInvite(IdentityContext identityContext, UserManager<AppUser> userManager, EmailService emailService) : EndpointWithoutRequest
+public class PostResendInvite(
+    IdentityContext identityContext,
+    UserManager<AppUser> userManager,
+    EmailService emailService) : EndpointWithoutRequest
 {
     public override void Configure()
     {

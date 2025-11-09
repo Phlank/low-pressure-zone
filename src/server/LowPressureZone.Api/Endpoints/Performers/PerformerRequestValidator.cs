@@ -2,9 +2,6 @@
 using FluentValidation;
 using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Domain;
-using LowPressureZone.Domain.Extensions;
-using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Performers;
 
