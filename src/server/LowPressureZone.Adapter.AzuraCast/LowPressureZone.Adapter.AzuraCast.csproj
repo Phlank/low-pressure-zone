@@ -11,7 +11,6 @@
     </ItemGroup>
     
     <ItemGroup>
-      <ProjectReference Include="..\..\..\LowPressureZone.Core\LowPressureZone.Core.csproj" />
       <ProjectReference Include="..\LowPressureZone.Core\LowPressureZone.Core.csproj" />
     </ItemGroup>
 
