@@ -7,10 +7,9 @@ import {
   minimumLength,
   requireAnyCharacter,
   requireAnyOtherCharacter,
-  required,
   url
 } from './rules/stringRules'
-import { alwaysValid } from './rules/untypedRules'
+import { alwaysValid, applyRuleIf, required } from './rules/untypedRules'
 import type { PropertyRules } from './types/propertyRules'
 import { combineRules } from './types/validationRule'
 import type { CommunityRequest } from '@/api/resources/communitiesApi.ts'
@@ -58,7 +57,8 @@ export const timeslotRequestRules = (
       hourOnly(),
       withinRangeOf(() => formState.startsAt, 60, 180, '1 - 3h allowed')
     ),
-    name: maximumLength(64)
+    name: maximumLength(64),
+    file: applyRuleIf(required(), () => formState.performanceType === 'Prerecorded DJ Set')
   }
 }
 

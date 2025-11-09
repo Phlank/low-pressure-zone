@@ -48,6 +48,15 @@
           :invalid="!validation.isValid('name')" />
       </IftaFormField>
       <IftaFormField
+        v-if="formState.performanceType === 'Prerecorded DJ Set'"
+        label="File"
+        input-id="fileInput"
+        size="m">
+        <input
+          type="file"
+          @change="onFileSelect" />
+      </IftaFormField>
+      <IftaFormField
         v-if="performerStore.performers.length > 0"
         :message="validation.message('performerId')"
         input-id="performerInput"
@@ -143,16 +152,24 @@ const defaultStartPerformerId = computed(() => {
   return undefined
 })
 
-const formState = ref({
+type TimeslotFormState = TimeslotRequest & {
+  duration: number
+  performerName: string
+  performerUrl: string
+}
+
+const formState = ref<TimeslotFormState>({
   startsAt: '',
   duration: 60,
   endsAt: '',
   performerId: '',
   performanceType: PerformanceType.Live,
   name: '',
+  file: undefined,
   performerName: '',
   performerUrl: ''
 })
+
 const timeslotRules = timeslotRequestRules(formState.value)
 const performerRules = performerRequestRules
 const validation = createFormValidation(formState, {
@@ -162,9 +179,15 @@ const validation = createFormValidation(formState, {
   performerId: applyRuleIf(timeslotRules.performerId, () => performerStore.performers.length > 0),
   performanceType: timeslotRules.performanceType,
   name: timeslotRules.name,
+  file: timeslotRules.file,
   performerName: applyRuleIf(performerRules.name, () => performerStore.performers.length === 0),
   performerUrl: applyRuleIf(performerRules.url, () => performerStore.performers.length === 0)
 })
+
+const onFileSelect = (e: Event) => {
+  const target = e.target as HTMLInputElement
+  formState.value.file = target.files?.[0]
+}
 
 const isSubmitting = ref(false)
 
