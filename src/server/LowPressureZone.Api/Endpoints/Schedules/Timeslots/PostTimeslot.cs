@@ -22,7 +22,10 @@ public class PostTimeslot(DataContext dataContext, PerformerRules performerRules
         var schedule = await dataContext.Schedules
                                         .Include(schedule => schedule.Timeslots)
                                         .Include(schedule => schedule.Community)
-                                        .ThenInclude(community => community.Relationships.Where(relationship => relationship.UserId == User.GetIdOrDefault()))
+                                        .ThenInclude(community =>
+                                                         community.Relationships.Where(relationship =>
+                                                                                           relationship.UserId ==
+                                                                                           User.GetIdOrDefault()))
                                         .Where(schedule => schedule.Id == scheduleId)
                                         .FirstAsync(ct);
 

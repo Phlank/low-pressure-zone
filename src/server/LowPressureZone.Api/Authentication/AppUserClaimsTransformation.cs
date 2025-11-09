@@ -22,7 +22,8 @@ public class AppUserClaimsTransformation(DataContext dataContext) : IClaimsTrans
         var identity = new ClaimsIdentity();
         var isOrganizer = await dataContext.CommunityRelationships
                                            .AnyAsync(relationship => relationship.IsOrganizer
-                                                                     && relationship.UserId == principal.GetIdOrDefault());
+                                                                     && relationship.UserId ==
+                                                                     principal.GetIdOrDefault());
         identity.AddClaim(new Claim(AdditionalClaimsCheckedClaimType, "true"));
         if (isOrganizer)
             identity.AddClaim(new Claim(ClaimTypes.Role, RoleNames.Organizer));

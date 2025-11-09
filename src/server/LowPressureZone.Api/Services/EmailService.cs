@@ -2,7 +2,6 @@
 using FluentEmail.Core;
 using FluentEmail.Core.Interfaces;
 using FluentEmail.Core.Models;
-using LowPressureZone.Api.Models;
 using LowPressureZone.Api.Models.Configuration;
 using LowPressureZone.Core;
 using LowPressureZone.Identity;
@@ -23,9 +22,9 @@ public class EmailService(
     private async Task<Result<SendResponse, SendResponse>> SendAsync(string toAddress, string subject, string body)
     {
         var email = Email.From(options.Value.FromAddress)
-            .To(toAddress)
-            .Subject(subject)
-            .Body(body);
+                         .To(toAddress)
+                         .Subject(subject)
+                         .Body(body);
         var sendResponse = await sender.SendAsync(email);
         if (sendResponse.Successful)
             return Result.Ok<SendResponse, SendResponse>(sendResponse);

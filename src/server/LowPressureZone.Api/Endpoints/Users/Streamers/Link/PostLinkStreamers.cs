@@ -1,5 +1,4 @@
 ﻿using FastEndpoints;
-using LowPressureZone.Adapter.AzuraCast;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Identity.Constants;
@@ -46,8 +45,16 @@ public partial class PostLinkStreamers(AzuraCastClient client, UserManager<AppUs
     }
 
     [LoggerMessage(LogLevel.Warning, "{source}: Failed to create new streamer for {userName}: {createResultError}")]
-    static partial void LogFailedToCreateNewStreamer(ILogger logger, string source, string userName, string createResultError);
+    static partial void LogFailedToCreateNewStreamer(
+        ILogger logger,
+        string source,
+        string userName,
+        string createResultError);
 
     [LoggerMessage(LogLevel.Warning, "{source}: Failed to link existing streamer to {userName}: {linkResultError}")]
-    static partial void LogFailedToLinkExistingStreamerToUser(ILogger logger, string source, string userName, string linkResultError);
+    static partial void LogFailedToLinkExistingStreamerToUser(
+        ILogger logger,
+        string source,
+        string userName,
+        string linkResultError);
 }

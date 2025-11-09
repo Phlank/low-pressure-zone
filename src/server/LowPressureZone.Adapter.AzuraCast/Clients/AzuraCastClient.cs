@@ -1,6 +1,6 @@
 ﻿using System.Net.Http.Json;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
-using LowPressureZone.Adapter.AzuraCast.Options;
+using LowPressureZone.Adapter.AzuraCast.Configuration;
 using LowPressureZone.Core;
 using Microsoft.Extensions.Options;
 
@@ -8,19 +8,15 @@ namespace LowPressureZone.Adapter.AzuraCast.Clients;
 
 public sealed class AzuraCastClient : IDisposable, IAzuraCastClient
 {
-    private readonly string _stationId;
     private readonly HttpClient _client = new();
+    private readonly string _stationId;
 
-    public AzuraCastClient(IOptions<AzuraCastConfiguration> options)
+    public AzuraCastClient(IOptions<AzuraCastClientConfiguration> options)
     {
         _stationId = options.Value.StationId;
         _client.BaseAddress = options.Value.ApiUrl;
         _client.DefaultRequestHeaders.Add("X-API-Key", options.Value.ApiKey);
     }
-
-    public void Dispose() => _client.Dispose();
-
-    private string NowPlayingEndpoint() => $"/api/nowplaying/{_stationId}";
 
     public async Task<Result<NowPlaying, HttpResponseMessage>> GetNowPlayingAsync()
     {
@@ -35,8 +31,6 @@ public sealed class AzuraCastClient : IDisposable, IAzuraCastClient
         return Result.Ok<NowPlaying, HttpResponseMessage>(content);
     }
 
-    private string StreamersEndpoint() => $"/api/station/{_stationId}/streamers";
-
     public async Task<Result<IReadOnlyCollection<StationStreamer>, HttpResponseMessage>> GetStreamersAsync()
     {
         var response = await _client.GetAsync(StreamersEndpoint());
@@ -49,8 +43,6 @@ public sealed class AzuraCastClient : IDisposable, IAzuraCastClient
 
         return Result.Ok<IReadOnlyCollection<StationStreamer>, HttpResponseMessage>(content);
     }
-
-    private string StreamerEndpoint(int streamerId) => $"/api/station/{_stationId}/streamer/{streamerId}";
 
     public async Task<Result<StationStreamer, HttpResponseMessage>> GetStreamerAsync(int streamerId)
     {
@@ -101,10 +93,6 @@ public sealed class AzuraCastClient : IDisposable, IAzuraCastClient
                    : Result.Ok<bool, HttpResponseMessage>(true);
     }
 
-    private string BroadcastsEndpoint(int? streamerId) => streamerId is null
-                                                              ? $"/api/station/{_stationId}/streamers/broadcasts"
-                                                              : $"/api/station/{_stationId}/streamer/{streamerId}/broadcasts";
-
     public async Task<Result<IReadOnlyCollection<StationStreamerBroadcast>, HttpResponseMessage>> GetBroadcastsAsync(
         int? streamerId = null)
     {
@@ -119,9 +107,6 @@ public sealed class AzuraCastClient : IDisposable, IAzuraCastClient
         return Result.Ok<IReadOnlyCollection<StationStreamerBroadcast>, HttpResponseMessage>(content);
     }
 
-    private string DownloadBroadcastEndpoint(int streamerId, int broadcastId) =>
-        $"/api/station/{_stationId}/streamer/{streamerId}/broadcast/{broadcastId}/download";
-
     public async Task<Result<HttpContent, HttpResponseMessage>> DownloadBroadcastFileAsync(
         int streamerId,
         int broadcastId)
@@ -135,9 +120,6 @@ public sealed class AzuraCastClient : IDisposable, IAzuraCastClient
         return Result.Ok<HttpContent, HttpResponseMessage>(response.Content);
     }
 
-    private string DeleteBroadcastEndpoint(int streamerId, int broadcastId) =>
-        $"/api/station/{_stationId}/streamer/{streamerId}/broadcast/{broadcastId}";
-
     public async Task<Result<HttpContent, HttpResponseMessage>> DeleteBroadcastAsync(int streamerId, int broadcastId)
     {
         var response = await _client.DeleteAsync(DeleteBroadcastEndpoint(streamerId, broadcastId));
@@ -147,4 +129,22 @@ public sealed class AzuraCastClient : IDisposable, IAzuraCastClient
 
         return Result.Ok<HttpContent, HttpResponseMessage>(response.Content);
     }
+
+    public void Dispose() => _client.Dispose();
+
+    private string NowPlayingEndpoint() => $"/api/nowplaying/{_stationId}";
+
+    private string StreamersEndpoint() => $"/api/station/{_stationId}/streamers";
+
+    private string StreamerEndpoint(int streamerId) => $"/api/station/{_stationId}/streamer/{streamerId}";
+
+    private string BroadcastsEndpoint(int? streamerId) => streamerId is null
+                                                              ? $"/api/station/{_stationId}/streamers/broadcasts"
+                                                              : $"/api/station/{_stationId}/streamer/{streamerId}/broadcasts";
+
+    private string DownloadBroadcastEndpoint(int streamerId, int broadcastId) =>
+        $"/api/station/{_stationId}/streamer/{streamerId}/broadcast/{broadcastId}/download";
+
+    private string DeleteBroadcastEndpoint(int streamerId, int broadcastId) =>
+        $"/api/station/{_stationId}/streamer/{streamerId}/broadcast/{broadcastId}";
 }

@@ -2,10 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using FastEndpoints;
 using FastEndpoints.Swagger;
-using LowPressureZone.Adapter.AzuraCast.Options;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Api.Models.Configuration;
-using LowPressureZone.Api.Models.Configuration.Streaming;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Minerals.StringCases;
@@ -38,11 +35,11 @@ app.UseFastEndpoints(config =>
     config.Errors.ResponseBuilder = (failures, ctx, statusCode) =>
     {
         return new ValidationProblemDetails(failures.GroupBy(failure => (failure.PropertyName ?? "none").ToCamelCase())
-                                                .ToDictionary(failureGrouping => failureGrouping.Key,
-                                                              failureGrouping =>
-                                                                  failureGrouping
-                                                                      .Select(failure => failure.ErrorMessage)
-                                                                      .ToArray()))
+                                                    .ToDictionary(failureGrouping => failureGrouping.Key,
+                                                                  failureGrouping =>
+                                                                      failureGrouping
+                                                                          .Select(failure => failure.ErrorMessage)
+                                                                          .ToArray()))
         {
             Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
             Title = "One or more validation errors occurred.",
@@ -58,8 +55,5 @@ app.UseFastEndpoints(config =>
     };
     config.Endpoints.Configurator = endpoints => { endpoints.Throttle(60, 60); };
     config.Errors.ProducesMetadataType = typeof(ValidationProblemDetails);
-}).UseSwaggerGen(uiConfig: (uiSettings) =>
-{
-    uiSettings.CustomStylesheetPath = "/swagger-ui/swagger-dark.css";
-});
+}).UseSwaggerGen(uiConfig: uiSettings => { uiSettings.CustomStylesheetPath = "/swagger-ui/swagger-dark.css"; });
 app.Run();

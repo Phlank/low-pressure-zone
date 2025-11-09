@@ -5,7 +5,7 @@ using FastEndpoints.Swagger;
 using FluentEmail.Core.Interfaces;
 using FluentEmail.Mailgun;
 using LowPressureZone.Adapter.AzuraCast.Clients;
-using LowPressureZone.Adapter.AzuraCast.Options;
+using LowPressureZone.Adapter.AzuraCast.Configuration;
 using LowPressureZone.Api.Authentication;
 using LowPressureZone.Api.Endpoints.Broadcasts;
 using LowPressureZone.Api.Endpoints.Communities;
@@ -115,8 +115,9 @@ public static class WebApplicationBuilderExtensions
             options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
-        
-        services.Configure<AzuraCastConfiguration>(builder.Configuration.GetSection(AzuraCastConfiguration.Name));
+
+        services.Configure<AzuraCastClientConfiguration>(builder.Configuration.GetSection(AzuraCastClientConfiguration
+                                                                                              .Name));
         services.Configure<IcecastConfiguration>(builder.Configuration.GetSection(IcecastConfiguration.Name));
         services.Configure<StreamingConfiguration>(builder.Configuration.GetSection(StreamingConfiguration.Name));
         services.Configure<EmailServiceConfiguration>(builder.Configuration.GetSection(EmailServiceConfiguration.Name));

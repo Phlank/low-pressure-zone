@@ -7,7 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
-public class PostSchedule(DataContext dataContext, CommunityRules communityRules) : EndpointWithMapper<ScheduleRequest, ScheduleMapper>
+public class PostSchedule(DataContext dataContext, CommunityRules communityRules)
+    : EndpointWithMapper<ScheduleRequest, ScheduleMapper>
 {
     public required DataContext DataContext { get; set; }
 

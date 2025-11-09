@@ -1,12 +1,12 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain;
-using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
-public class PutTimeslot(DataContext dataContext, TimeslotRules rules) : EndpointWithMapper<TimeslotRequest, TimeslotMapper>
+public class PutTimeslot(DataContext dataContext, TimeslotRules rules)
+    : EndpointWithMapper<TimeslotRequest, TimeslotMapper>
 {
     public override void Configure()
     {

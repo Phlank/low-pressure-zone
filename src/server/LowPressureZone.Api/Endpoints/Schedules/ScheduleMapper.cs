@@ -26,8 +26,10 @@ public class ScheduleMapper(
             EndsAt = req.EndsAt.ToUniversalTime()
         };
 
-    public async Task UpdateEntityAsync(ScheduleRequest req, Schedule schedule,
-                                        CancellationToken ct = default)
+    public async Task UpdateEntityAsync(
+        ScheduleRequest req,
+        Schedule schedule,
+        CancellationToken ct = default)
     {
         var dataContext = accessor.Resolve<DataContext>();
         schedule.StartsAt = req.StartsAt;

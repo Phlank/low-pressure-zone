@@ -7,7 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
-public class GetSchedules(DataContext dataContext, ScheduleRules rules) : Endpoint<GetSchedulesRequest, IEnumerable<ScheduleResponse>, ScheduleMapper>
+public class GetSchedules(DataContext dataContext, ScheduleRules rules)
+    : Endpoint<GetSchedulesRequest, IEnumerable<ScheduleResponse>, ScheduleMapper>
 {
     public override void Configure()
     {
@@ -22,8 +23,15 @@ public class GetSchedules(DataContext dataContext, ScheduleRules rules) : Endpoi
                                                         .AsSplitQuery()
                                                         .OrderBy(schedule => schedule.StartsAt)
                                                         .Include(schedule => schedule.Community)
-                                                        .ThenInclude(community => community.Relationships.Where(relationship => relationship.UserId == User.GetIdOrDefault()))
-                                                        .Include(schedule => schedule.Timeslots.OrderBy(timeslot => timeslot.StartsAt))
+                                                        .ThenInclude(community =>
+                                                                         community.Relationships.Where(relationship =>
+                                                                                                           relationship
+                                                                                                               .UserId ==
+                                                                                                           User
+                                                                                                               .GetIdOrDefault()))
+                                                        .Include(schedule =>
+                                                                     schedule.Timeslots.OrderBy(timeslot => timeslot
+                                                                                                    .StartsAt))
                                                         .ThenInclude(timeslot => timeslot.Performer);
 
         if (req.Before.HasValue)

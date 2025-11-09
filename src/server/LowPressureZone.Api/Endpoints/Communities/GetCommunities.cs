@@ -15,7 +15,10 @@ public sealed class GetCommunities(DataContext dataContext, CommunityRules rules
     {
         var communities = await dataContext.Communities
                                            .AsNoTracking()
-                                           .Include(community => community.Relationships.Where(relationship => relationship.UserId == User.GetIdOrDefault()))
+                                           .Include(community =>
+                                                        community.Relationships.Where(relationship =>
+                                                                                          relationship.UserId ==
+                                                                                          User.GetIdOrDefault()))
                                            .OrderBy(community => community.Name)
                                            .ToListAsync(ct);
 

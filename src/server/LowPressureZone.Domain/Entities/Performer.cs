@@ -4,11 +4,9 @@ namespace LowPressureZone.Domain.Entities;
 
 public sealed class Performer : BaseEntity
 {
-    [MaxLength(64)]
-    public required string Name { get; set; }
+    [MaxLength(64)] public required string Name { get; set; }
 
-    [MaxLength(256)]
-    public required string? Url { get; set; }
+    [MaxLength(256)] public required string? Url { get; set; }
 
     public required ICollection<Guid> LinkedUserIds { get; set; } = [];
 

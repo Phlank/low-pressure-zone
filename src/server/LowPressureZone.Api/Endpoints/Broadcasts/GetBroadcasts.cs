@@ -1,5 +1,4 @@
 ﻿using FastEndpoints;
-using LowPressureZone.Adapter.AzuraCast;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Identity.Constants;

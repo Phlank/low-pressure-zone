@@ -5,7 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
-public class GetScheduleById(DataContext dataContext, ScheduleRules rules) : EndpointWithoutRequest<ScheduleResponse, ScheduleMapper>
+public class GetScheduleById(DataContext dataContext, ScheduleRules rules)
+    : EndpointWithoutRequest<ScheduleResponse, ScheduleMapper>
 {
     public override void Configure()
     {
@@ -30,6 +31,7 @@ public class GetScheduleById(DataContext dataContext, ScheduleRules rules) : End
             await SendNotFoundAsync(ct);
             return;
         }
+
         await SendOkAsync(Map.FromEntity(schedule), ct);
     }
 }

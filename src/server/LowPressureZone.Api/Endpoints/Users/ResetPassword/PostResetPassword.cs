@@ -43,7 +43,9 @@ public class PostResetPassword(UserManager<AppUser> userManager) : Endpoint<Post
             return;
         }
 
-        var isTokenVerified = await userManager.VerifyUserTokenAsync(user, TokenProviders.Default, TokenPurposes.ResetPassword, tokenContext.Token);
+        var isTokenVerified =
+            await userManager.VerifyUserTokenAsync(user, TokenProviders.Default, TokenPurposes.ResetPassword,
+                                                   tokenContext.Token);
         if (!isTokenVerified)
         {
             await this.SendDelayedForbiddenAsync(_start, ct);

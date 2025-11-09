@@ -59,7 +59,8 @@ public sealed partial class BroadcastDeletionService(AzuraCastClient client, ILo
             if (deleteResult.IsSuccess)
                 continue;
 
-            LogFailedToDeleteBroadcast(logger, broadcast.Id, deleteResult.Error.StatusCode, deleteResult.Error.ReasonPhrase ?? "Unknown reason");
+            LogFailedToDeleteBroadcast(logger, broadcast.Id, deleteResult.Error.StatusCode,
+                                       deleteResult.Error.ReasonPhrase ?? "Unknown reason");
         }
 
         LogFinishedDeletingBroadcasts(logger);
@@ -75,13 +76,19 @@ public sealed partial class BroadcastDeletionService(AzuraCastClient client, ILo
     static partial void LogFailedToDeleteBroadcastsReason(ILogger<BroadcastDeletionService> logger, string reason);
 
     [LoggerMessage(LogLevel.Information, "{outOfDateBroadcasts} broadcasts out of date will be deleted")]
-    static partial void LogBroadcastsOutOfDateWillBeDeleted(ILogger<BroadcastDeletionService> logger, int outOfDateBroadcasts);
+    static partial void LogBroadcastsOutOfDateWillBeDeleted(
+        ILogger<BroadcastDeletionService> logger,
+        int outOfDateBroadcasts);
 
     [LoggerMessage(LogLevel.Warning, "Cannot delete broadcast {id} because no streamer was returned")]
     static partial void LogBroadcastDeleteFailedNoStreamer(ILogger<BroadcastDeletionService> logger, int id);
 
     [LoggerMessage(LogLevel.Error, "Error when deleting broadcast {id}: {status}, {reason}")]
-    static partial void LogFailedToDeleteBroadcast(ILogger<BroadcastDeletionService> logger, int id, HttpStatusCode status, string reason);
+    static partial void LogFailedToDeleteBroadcast(
+        ILogger<BroadcastDeletionService> logger,
+        int id,
+        HttpStatusCode status,
+        string reason);
 
     [LoggerMessage(LogLevel.Information, "Finished deleting broadcasts")]
     static partial void LogFinishedDeletingBroadcasts(ILogger<BroadcastDeletionService> logger);

@@ -3,14 +3,12 @@ using System.Globalization;
 using System.Net;
 using FastEndpoints;
 using FluentValidation.Results;
-using LowPressureZone.Adapter.AzuraCast;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.Endpoints.Broadcasts.Download;
-
 
 public class DownloadBroadcast(AzuraCastClient client, UserManager<AppUser> userManager)
     : Endpoint<DownloadBroadcastRequest, IFormFile>

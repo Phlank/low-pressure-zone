@@ -1,6 +1,6 @@
-﻿namespace LowPressureZone.Adapter.AzuraCast.Options;
+﻿namespace LowPressureZone.Adapter.AzuraCast.Configuration;
 
-public sealed class AzuraCastConfiguration
+public sealed class AzuraCastClientConfiguration
 {
     public const string Name = "AzuraCast";
 

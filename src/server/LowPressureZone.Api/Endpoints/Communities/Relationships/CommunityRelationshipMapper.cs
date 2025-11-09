@@ -22,8 +22,10 @@ public class CommunityRelationshipMapper(IHttpContextAccessor contextAccessor, C
         };
     }
 
-    public async Task UpdateEntityAsync(CommunityRelationshipRequest request, CommunityRelationship relationship,
-                                        CancellationToken ct = default)
+    public async Task UpdateEntityAsync(
+        CommunityRelationshipRequest request,
+        CommunityRelationship relationship,
+        CancellationToken ct = default)
     {
         var dataContext = contextAccessor.Resolve<DataContext>();
         relationship.IsPerformer = request.IsPerformer;
@@ -33,8 +35,10 @@ public class CommunityRelationshipMapper(IHttpContextAccessor contextAccessor, C
         await dataContext.SaveChangesAsync(ct);
     }
 
-    public CommunityRelationshipResponse FromEntity(CommunityRelationship relationship, string displayName,
-                                                    CommunityRelationship? userRelationship)
+    public CommunityRelationshipResponse FromEntity(
+        CommunityRelationship relationship,
+        string displayName,
+        CommunityRelationship? userRelationship)
     {
         var communityId = contextAccessor.GetGuidRouteParameterOrDefault("communityId");
         return new CommunityRelationshipResponse
