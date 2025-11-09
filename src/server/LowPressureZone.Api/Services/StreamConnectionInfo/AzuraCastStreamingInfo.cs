@@ -1,4 +1,4 @@
-namespace LowPressureZone.Api.Services.StreamingInfo;
+namespace LowPressureZone.Api.Services.StreamConnectionInfo;
 
 public sealed class AzuraCastStreamingInfo
 {

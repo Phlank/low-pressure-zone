@@ -1,6 +1,6 @@
-﻿namespace LowPressureZone.Api.Models.Options;
+﻿namespace LowPressureZone.Api.Models.Configuration;
 
-public sealed class UrlOptions
+public sealed class UrlConfiguration
 {
     public const string Name = "Urls";
     

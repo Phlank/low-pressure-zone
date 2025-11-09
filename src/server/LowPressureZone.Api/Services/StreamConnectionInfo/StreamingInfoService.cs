@@ -1,40 +1,41 @@
 ﻿using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Api.Models.Options;
+using LowPressureZone.Api.Models.Configuration.Streaming;
 using LowPressureZone.Core;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
-namespace LowPressureZone.Api.Services.StreamingInfo;
+namespace LowPressureZone.Api.Services.StreamConnectionInfo;
 
 public sealed class StreamingInfoService(
-    IOptions<StreamingOptions> streamOptions,
+    IOptions<StreamingConfiguration> streamOptions,
     IHttpContextAccessor httpContextAccessor,
     UserManager<AppUser> userManager,
     AzuraCastClient azuraCastClient)
 {
-    private readonly StreamConnection _liveInfo =
+    private readonly AzuraCastStreamConfiguration _liveConfiguration =
         streamOptions.Value.Live;
 
-    private readonly StreamConnection _testInfo =
+    private readonly IcecastStreamConfiguration _testConfiguration =
         streamOptions.Value.Test;
 
-    public async Task<Result<Services.StreamingInfo.StreamingInfo, string>> GetInfoAsync()
+    public async Task<Result<StreamingInfo, string>> GetInfoAsync()
     {
-        var liveResult = await GetAzuracastInfoAsync(_liveInfo);
+        var liveResult = await GetAzuracastInfoAsync(_liveConfiguration);
         if (!liveResult.IsSuccess)
-            return Result.Err<Services.StreamingInfo.StreamingInfo, string>(liveResult.Error);
-        
-        var test = GetIcecastInfo(_testInfo);
-        return Result.Ok<Services.StreamingInfo.StreamingInfo, string>(new()
+            return Result.Err<StreamingInfo, string>(liveResult.Error);
+
+        var test = GetIcecastInfo(_testConfiguration);
+        return Result.Ok<StreamingInfo, string>(new StreamingInfo
         {
-            Test = test,
-            Live = liveResult.Value
+            Live = liveResult.Value,
+            Test = test
         });
     }
 
-    private async Task<Result<AzuraCastStreamingInfo, string>> GetAzuracastInfoAsync(StreamConnection connection)
+    private async Task<Result<AzuraCastStreamingInfo, string>> GetAzuracastInfoAsync(
+        AzuraCastStreamConfiguration configuration)
     {
         var claimsPrincipal = httpContextAccessor.GetAuthenticatedUserOrDefault();
         if (claimsPrincipal is null) return Result.Err<AzuraCastStreamingInfo, string>("User not logged in");
@@ -48,21 +49,21 @@ public sealed class StreamingInfoService(
         var streamer = streamerResult.Value;
         return Result.Ok<AzuraCastStreamingInfo, string>(new AzuraCastStreamingInfo
         {
-            Host = connection.Host,
-            Port = connection.Port,
-            Mount = connection.Mount,
+            Host = configuration.Host,
+            Port = configuration.Port,
+            Mount = configuration.Mount,
             Username = streamer.StreamerUsername,
             DisplayName = streamer.DisplayName ?? streamer.StreamerUsername
         });
     }
 
-    private static IcecastStreamingInfo GetIcecastInfo(StreamConnection connection) =>
+    private static IcecastStreamingInfo GetIcecastInfo(IcecastStreamConfiguration configuration) =>
         new()
         {
-            Host = connection.Host,
-            Port = connection.Port,
-            Mount = connection.Mount,
-            Username = connection.Credentials?.Username,
-            Password = connection.Credentials?.Password,
+            Host = configuration.Host,
+            Port = configuration.Port,
+            Mount = configuration.Mount,
+            Username = configuration.Username,
+            Password = configuration.Password
         };
 }

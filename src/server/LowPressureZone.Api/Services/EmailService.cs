@@ -3,7 +3,7 @@ using FluentEmail.Core;
 using FluentEmail.Core.Interfaces;
 using FluentEmail.Core.Models;
 using LowPressureZone.Api.Models;
-using LowPressureZone.Api.Models.Options;
+using LowPressureZone.Api.Models.Configuration;
 using LowPressureZone.Core;
 using LowPressureZone.Identity;
 using Microsoft.Extensions.Options;
@@ -11,7 +11,7 @@ using Microsoft.Extensions.Options;
 namespace LowPressureZone.Api.Services;
 
 public class EmailService(
-    IOptions<EmailServiceOptions> options,
+    IOptions<EmailServiceConfiguration> options,
     UriService uriService,
     ISender sender,
     ILogger<EmailService> logger)

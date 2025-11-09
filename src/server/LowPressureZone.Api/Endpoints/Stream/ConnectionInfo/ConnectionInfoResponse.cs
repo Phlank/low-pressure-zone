@@ -10,5 +10,5 @@ public class ConnectionInfoResponse
     public string? Password { get; set; }
     public required string Type { get; set; }
     public string? DisplayName { get; set; }
-    public bool IsDisplayNameEditable => Type == "Live Stream";
+    public bool IsDisplayNameEditable { get; set; }
 }

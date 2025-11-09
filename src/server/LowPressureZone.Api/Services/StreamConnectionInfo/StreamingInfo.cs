@@ -1,4 +1,6 @@
-﻿namespace LowPressureZone.Api.Services.StreamingInfo;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace LowPressureZone.Api.Services.StreamConnectionInfo;
 
 public sealed class StreamingInfo
 {

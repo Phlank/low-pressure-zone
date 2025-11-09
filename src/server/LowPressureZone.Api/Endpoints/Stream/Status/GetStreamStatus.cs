@@ -1,5 +1,5 @@
 ﻿using FastEndpoints;
-using LowPressureZone.Api.Services.Stream;
+using LowPressureZone.Api.Services.StreamStatus;
 
 namespace LowPressureZone.Api.Endpoints.Stream.Status;
 

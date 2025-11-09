@@ -11,7 +11,7 @@ public sealed class AzuraCastClient : IDisposable, IAzuraCastClient
     private readonly string _stationId;
     private readonly HttpClient _client = new();
 
-    public AzuraCastClient(IOptions<AzuraCastOptions> options)
+    public AzuraCastClient(IOptions<AzuraCastConfiguration> options)
     {
         _stationId = options.Value.StationId;
         _client.BaseAddress = options.Value.ApiUrl;

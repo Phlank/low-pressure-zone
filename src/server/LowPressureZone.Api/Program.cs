@@ -4,7 +4,8 @@ using FastEndpoints;
 using FastEndpoints.Swagger;
 using LowPressureZone.Adapter.AzuraCast.Options;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Api.Models.Options;
+using LowPressureZone.Api.Models.Configuration;
+using LowPressureZone.Api.Models.Configuration.Streaming;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Minerals.StringCases;
@@ -16,12 +17,6 @@ builder.Services.Configure<JsonOptions>(options =>
     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
-
-builder.Services.Configure<AzuraCastOptions>(builder.Configuration.GetSection(AzuraCastOptions.Name));
-builder.Services.Configure<IcecastOptions>(builder.Configuration.GetSection(IcecastOptions.Name));
-builder.Services.Configure<StreamingOptions>(builder.Configuration.GetSection(StreamingOptions.Name));
-builder.Services.Configure<EmailServiceOptions>(builder.Configuration.GetSection(EmailServiceOptions.Name));
-builder.Services.Configure<UrlOptions>(builder.Configuration.GetSection(UrlOptions.Name));
 
 builder.AddDatabases();
 builder.ConfigureIdentity();

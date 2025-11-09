@@ -1,22 +1,20 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
-using LowPressureZone.Adapter.AzuraCast;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Clients;
-using LowPressureZone.Api.Models.Stream;
 
-namespace LowPressureZone.Api.Services.Stream;
+namespace LowPressureZone.Api.Services.StreamStatus;
 
 public sealed class AzuraCastStatusService(
     AzuraCastClient client,
-    ILogger<IcecastStatusService> logger)
+    ILogger<AzuraCastStatusService> logger)
     : IStreamStatusService, IDisposable
 {
     private readonly Lock _statusLock = new();
     private readonly PeriodicTimer _timer = new(TimeSpan.FromSeconds(5));
 
     public void Dispose() => _timer.Dispose();
-    
+
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         if (IsStarted) return;
@@ -31,7 +29,7 @@ public sealed class AzuraCastStatusService(
         return Task.CompletedTask;
     }
 
-    public StreamStatus? Status { get; private set; }
+    public Models.Stream.StreamStatus? Status { get; private set; }
 
     public bool IsStarted { get; private set; }
 
@@ -57,7 +55,7 @@ public sealed class AzuraCastStatusService(
             var content = result.Value;
             lock (_statusLock)
             {
-                Status = new StreamStatus
+                Status = new Models.Stream.StreamStatus
                 {
                     IsOnline = content.IsOnline,
                     IsLive = content.Live.IsLive,
@@ -91,7 +89,7 @@ public sealed class AzuraCastStatusService(
     }
 
     /// <summary>
-    /// Stream name is either the streamer name (if live) or "Artist - Title".
+    ///     Stream name is either the streamer name (if live) or "Artist - Title".
     /// </summary>
     /// <param name="nowPlaying"></param>
     /// <returns></returns>

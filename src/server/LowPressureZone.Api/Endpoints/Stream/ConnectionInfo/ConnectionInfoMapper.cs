@@ -1,5 +1,5 @@
 ﻿using FastEndpoints;
-using LowPressureZone.Api.Services.StreamingInfo;
+using LowPressureZone.Api.Services.StreamConnectionInfo;
 
 namespace LowPressureZone.Api.Endpoints.Stream.ConnectionInfo;
 
@@ -14,7 +14,8 @@ public sealed class ConnectionInfoMapper : IResponseMapper
         Username = info.Username,
         Password = null,
         DisplayName = info.DisplayName,
-        Type = "AzuraCast"
+        Type = "AzuraCast",
+        IsDisplayNameEditable = true
     };
 
     public ConnectionInfoResponse FromEntity(IcecastStreamingInfo info) => new()
@@ -26,6 +27,7 @@ public sealed class ConnectionInfoMapper : IResponseMapper
         Username = info.Username,
         Password = info.Password,
         DisplayName = null,
-        Type = "Icecast"
+        Type = "Icecast",
+        IsDisplayNameEditable = false
     };
 }

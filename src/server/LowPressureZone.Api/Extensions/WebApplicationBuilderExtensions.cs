@@ -14,12 +14,12 @@ using LowPressureZone.Api.Endpoints.Performers;
 using LowPressureZone.Api.Endpoints.Schedules;
 using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 using LowPressureZone.Api.Endpoints.Users.Invites;
-using LowPressureZone.Api.Models.Options;
+using LowPressureZone.Api.Models.Configuration;
+using LowPressureZone.Api.Models.Configuration.Streaming;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services;
-using LowPressureZone.Api.Services.Hosted;
-using LowPressureZone.Api.Services.Stream;
-using LowPressureZone.Api.Services.StreamingInfo;
+using LowPressureZone.Api.Services.StreamConnectionInfo;
+using LowPressureZone.Api.Services.StreamStatus;
 using LowPressureZone.Domain;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;
@@ -115,12 +115,12 @@ public static class WebApplicationBuilderExtensions
             options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
-
-        services.Configure<AzuraCastOptions>(builder.Configuration.GetSection(AzuraCastOptions.Name));
-        services.Configure<IcecastOptions>(builder.Configuration.GetSection(IcecastOptions.Name));
-        services.Configure<StreamingOptions>(builder.Configuration.GetSection(StreamingOptions.Name));
-        services.Configure<EmailServiceOptions>(builder.Configuration.GetSection(EmailServiceOptions.Name));
-        services.Configure<UrlOptions>(builder.Configuration.GetSection(UrlOptions.Name));
+        
+        services.Configure<AzuraCastConfiguration>(builder.Configuration.GetSection(AzuraCastConfiguration.Name));
+        services.Configure<IcecastConfiguration>(builder.Configuration.GetSection(IcecastConfiguration.Name));
+        services.Configure<StreamingConfiguration>(builder.Configuration.GetSection(StreamingConfiguration.Name));
+        services.Configure<EmailServiceConfiguration>(builder.Configuration.GetSection(EmailServiceConfiguration.Name));
+        services.Configure<UrlConfiguration>(builder.Configuration.GetSection(UrlConfiguration.Name));
 
         services.AddFastEndpoints();
         services.AddHttpContextAccessor();
@@ -131,7 +131,7 @@ public static class WebApplicationBuilderExtensions
                               policyBuilder =>
                               {
                                   policyBuilder
-                                      .WithOrigins(configuration.GetRequiredSection(UrlOptions.Name)["SiteUrl"]!)
+                                      .WithOrigins(configuration.GetRequiredSection(UrlConfiguration.Name)["SiteUrl"]!)
                                       .AllowAnyHeader()
                                       .WithMethods("GET", "PUT", "POST", "DELETE")
                                       .AllowCredentials();
@@ -148,14 +148,12 @@ public static class WebApplicationBuilderExtensions
 
         services.AddSingleton<ISender>(serviceProvider =>
         {
-            var options = serviceProvider.GetRequiredService<IOptions<EmailServiceOptions>>();
+            var options = serviceProvider.GetRequiredService<IOptions<EmailServiceConfiguration>>();
             return new MailgunSender(options.Value.MailgunDomain, options.Value.MailgunApiKey);
         });
         services.AddSingleton<EmailService>();
         services.AddSingleton<UriService>();
         services.AddSingleton<IAzuraCastClient, AzuraCastClient>();
-        services.AddSingleton<AzuraCastStatusService>();
-        services.AddSingleton<IcecastStatusService>();
         services.AddSingleton<IStreamStatusService, AzuraCastStatusService>();
 
         services.AddHostedService<BroadcastDeletionService>();
@@ -169,7 +167,6 @@ public static class WebApplicationBuilderExtensions
         services.AddSingleton<PerformerMapper>();
         services.AddSingleton<TimeslotMapper>();
         services.AddSingleton<InviteMapper>();
-        services.AddSingleton<IcecastStatusMapper>();
         services.AddSingleton<BroadcastMapper>();
 
         services.AddSingleton<CommunityRules>();

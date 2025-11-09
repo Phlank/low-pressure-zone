@@ -1,6 +1,5 @@
 ﻿using FastEndpoints;
-using LowPressureZone.Api.Services.Stream;
-using LowPressureZone.Api.Services.StreamingInfo;
+using LowPressureZone.Api.Services.StreamConnectionInfo;
 
 namespace LowPressureZone.Api.Endpoints.Stream.ConnectionInfo;
 

@@ -1,6 +1,6 @@
-﻿namespace LowPressureZone.Api.Models.Options;
+﻿namespace LowPressureZone.Api.Models.Configuration;
 
-public class EmailServiceOptions
+public sealed class EmailServiceConfiguration
 {
     public const string Name = "Email";
 

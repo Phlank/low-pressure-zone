@@ -1,6 +1,6 @@
-﻿namespace LowPressureZone.Api.Models.Options;
+﻿namespace LowPressureZone.Api.Models.Configuration;
 
-public class IcecastOptions
+public sealed class IcecastConfiguration
 {
     public const string Name = "Icecast";
     public required Uri IcecastUrl { get; set; }
