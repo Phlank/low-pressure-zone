@@ -128,53 +128,61 @@ public static class WebApplicationBuilderExtensions
         services.SwaggerDocument();
         services.AddCors(options =>
         {
-            options.AddPolicy("Frontend",
-                              policyBuilder =>
-                              {
-                                  policyBuilder
-                                      .WithOrigins(configuration.GetRequiredSection(UrlConfiguration.Name)["SiteUrl"]!)
-                                      .AllowAnyHeader()
-                                      .WithMethods("GET", "PUT", "POST", "DELETE")
-                                      .AllowCredentials();
-                              });
+            options.AddPolicy("Frontend", policyBuilder =>
+            {
+                var siteUrl = builder.Configuration.GetValue<string>("Url:SiteUrl");
+                policyBuilder.WithOrigins(siteUrl!)
+                             .AllowAnyHeader()
+                             .WithMethods("GET", "PUT", "POST", "DELETE")
+                             .AllowCredentials();
+            });
         });
     }
 
     public static void AddApiServices(this WebApplicationBuilder builder)
     {
-        var services = builder.Services;
+        builder.AddEndpointServices();
 
-        AddEndpointServices(services);
-        services.AddScoped<StreamingInfoService>();
-
-        services.AddSingleton<ISender>(serviceProvider =>
-        {
-            var options = serviceProvider.GetRequiredService<IOptions<EmailServiceConfiguration>>();
-            return new MailgunSender(options.Value.MailgunDomain, options.Value.MailgunApiKey);
-        });
-        services.AddSingleton<EmailService>();
-        services.AddSingleton<UriService>();
-        services.AddSingleton<IAzuraCastClient, AzuraCastClient>();
-        services.AddSingleton<IStreamStatusService, AzuraCastStatusService>();
-
-        services.AddHostedService<BroadcastDeletionService>();
+        builder.Services.AddSingleton<EmailService>();
+        builder.Services.AddSingleton<UriService>();
+        builder.Services.AddHttpClient<AzuraCastClient>(ConfigureAzuraCastHttpClient);
+        builder.Services.AddSingleton<IAzuraCastClient, AzuraCastClient>();
+        builder.Services.AddSingleton<IStreamStatusService, AzuraCastStatusService>();
+        builder.Services.AddScoped<StreamingInfoService>();
+        builder.Services.AddSingleton<ISender, MailgunSender>(serviceProvider => serviceProvider.CreateMailgunSender());
+        builder.Services.AddHostedService<BroadcastDeletionService>();
     }
 
-    private static void AddEndpointServices(IServiceCollection services)
+    private static void AddEndpointServices(this WebApplicationBuilder builder)
     {
-        services.AddSingleton<CommunityMapper>();
-        services.AddSingleton<CommunityRelationshipMapper>();
-        services.AddSingleton<ScheduleMapper>();
-        services.AddSingleton<PerformerMapper>();
-        services.AddSingleton<TimeslotMapper>();
-        services.AddSingleton<InviteMapper>();
-        services.AddSingleton<BroadcastMapper>();
+        builder.Services.AddSingleton<CommunityMapper>();
+        builder.Services.AddSingleton<CommunityRelationshipMapper>();
+        builder.Services.AddSingleton<ScheduleMapper>();
+        builder.Services.AddSingleton<PerformerMapper>();
+        builder.Services.AddSingleton<TimeslotMapper>();
+        builder.Services.AddSingleton<InviteMapper>();
+        builder.Services.AddSingleton<BroadcastMapper>();
 
-        services.AddSingleton<CommunityRules>();
-        services.AddSingleton<CommunityRelationshipRules>();
-        services.AddSingleton<ScheduleRules>();
-        services.AddSingleton<PerformerRules>();
-        services.AddSingleton<TimeslotRules>();
-        services.AddSingleton<BroadcastRules>();
+        builder.Services.AddSingleton<CommunityRules>();
+        builder.Services.AddSingleton<CommunityRelationshipRules>();
+        builder.Services.AddSingleton<ScheduleRules>();
+        builder.Services.AddSingleton<PerformerRules>();
+        builder.Services.AddSingleton<TimeslotRules>();
+        builder.Services.AddSingleton<BroadcastRules>();
     }
+
+    private static MailgunSender CreateMailgunSender(this IServiceProvider services)
+    {
+        var options = services.GetRequiredService<IOptions<EmailServiceConfiguration>>();
+        return new MailgunSender(options.Value.MailgunDomain, options.Value.MailgunApiKey);
+    }
+
+    private static readonly Action<IServiceProvider, HttpClient> ConfigureAzuraCastHttpClient =
+        (services, client) =>
+        {
+            var configuration = services.GetRequiredService<IOptions<AzuraCastClientConfiguration>>()
+                                        .Value;
+            client.BaseAddress = configuration.ApiUrl;
+            client.DefaultRequestHeaders.Add("X-API-Key", configuration.ApiKey);
+        };
 }

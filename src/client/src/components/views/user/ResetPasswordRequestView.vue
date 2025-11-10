@@ -23,7 +23,7 @@
 
 <script lang="ts" setup>
 import { KeyName } from '@/constants/keys'
-import { emailAddress, required } from '@/validation/rules/stringRules'
+import { emailAddress } from '@/validation/rules/stringRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { combineRules } from '@/validation/types/validationRule'
 import { onKeyDown } from '@vueuse/core'
@@ -34,6 +34,7 @@ import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.t
 import SinglePanelViewWrapper from '@/components/layout/SinglePanelViewWrapper.vue'
 import FormArea from '@/components/form/FormArea.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
+import { required } from '@/validation/rules/untypedRules.ts'
 
 const isSubmitting = ref(false)
 const toast = useToast()

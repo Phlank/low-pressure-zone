@@ -28,12 +28,15 @@ export interface TimeslotRequest {
 }
 
 const mapRequest = <TRequest extends TimeslotRequest>(request: TRequest): TimeslotRequest => {
+  console.log(request.startsAt)
+  console.log(request.endsAt)
   return {
     performerId: request.performerId,
     performanceType: request.performanceType,
     startsAt: request.startsAt,
     endsAt: request.endsAt,
-    name: request.name
+    name: request.name,
+    file: request.file
   }
 }
 

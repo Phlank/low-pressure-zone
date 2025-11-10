@@ -2,7 +2,7 @@
 
 public sealed class UrlConfiguration
 {
-    public const string Name = "Urls";
+    public const string Name = "Url";
 
     public required Uri SiteUrl { get; init; }
     public required Uri RegisterUrl { get; init; }

@@ -48,15 +48,6 @@
           :invalid="!validation.isValid('name')" />
       </IftaFormField>
       <IftaFormField
-        v-if="formState.performanceType === 'Prerecorded DJ Set'"
-        label="File"
-        input-id="fileInput"
-        size="m">
-        <input
-          type="file"
-          @change="onFileSelect" />
-      </IftaFormField>
-      <IftaFormField
         v-if="performerStore.performers.length > 0"
         :message="validation.message('performerId')"
         input-id="performerInput"
@@ -72,6 +63,15 @@
           option-label="name"
           option-value="id"
           @change="() => validation.validateIfDirty('performerId')" />
+      </IftaFormField>
+      <IftaFormField
+        v-if="formState.performanceType === 'Prerecorded DJ Set'"
+        label="File"
+        input-id="fileInput"
+        size="m">
+        <input
+          type="file"
+          @change="onFileSelect" />
       </IftaFormField>
       <IftaFormField
         v-if="performerStore.performers.length === 0"

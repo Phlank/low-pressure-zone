@@ -14,6 +14,6 @@ public sealed class Timeslot : BaseEntity, IDateTimeRange
     public required Guid ScheduleId { get; set; }
 
     public Schedule Schedule { get; set; } = null!;
-    public required DateTime StartsAt { get; set; }
-    public required DateTime EndsAt { get; set; }
+    public required DateTimeOffset StartsAt { get; set; }
+    public required DateTimeOffset EndsAt { get; set; }
 }
