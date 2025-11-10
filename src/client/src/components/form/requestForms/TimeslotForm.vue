@@ -64,15 +64,17 @@
           option-value="id"
           @change="() => validation.validateIfDirty('performerId')" />
       </IftaFormField>
-      <IftaFormField
+      <FormField
         v-if="formState.performanceType === 'Prerecorded DJ Set'"
-        label="File"
         input-id="fileInput"
+        label="Upload File"
         size="m">
-        <input
-          type="file"
-          @change="onFileSelect" />
-      </IftaFormField>
+        <FileUpload
+          mode="basic"
+          accept="media/*,audio/*"
+          @select="onFileSelect"
+          @remove="onFileRemove" />
+      </FormField>
       <IftaFormField
         v-if="performerStore.performers.length === 0"
         :message="validation.message('performerName')"
@@ -114,7 +116,15 @@
 import { formatDurationOption, formatReadableTime, parseDate, parseTime } from '@/utils/dateUtils'
 import { performerRequestRules, timeslotRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
-import { Button, InputText, Select, useToast } from 'primevue'
+import {
+  Button,
+  InputText,
+  Select,
+  useToast,
+  FileUpload,
+  type FileUploadSelectEvent,
+  type FileUploadRemoveEvent
+} from 'primevue'
 import { computed, onMounted, ref, watch } from 'vue'
 import timeslotsApi, {
   PerformanceType,
@@ -134,6 +144,7 @@ import { err, ok, type Result } from '@/types/result.ts'
 import { showSuccessToast } from '@/utils/toastUtils.ts'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
 import type { ValidationProblemDetails } from '@/api/apiResponse.ts'
+import FormField from '@/components/form/FormField.vue'
 
 const toast = useToast()
 const performerStore = usePerformerStore()
@@ -184,9 +195,13 @@ const validation = createFormValidation(formState, {
   performerUrl: applyRuleIf(performerRules.url, () => performerStore.performers.length === 0)
 })
 
-const onFileSelect = (e: Event) => {
-  const target = e.target as HTMLInputElement
-  formState.value.file = target.files?.[0]
+const onFileSelect = (e: FileUploadSelectEvent) => {
+  formState.value.file = e.files.length > 0 ? (e.files[0] as File) : undefined
+}
+
+const onFileRemove = (e: FileUploadRemoveEvent) => {
+  if (e.files.length === 0)
+    formState.value.file = undefined
 }
 
 const isSubmitting = ref(false)
