@@ -64,6 +64,17 @@
           option-value="id"
           @change="() => validation.validateIfDirty('performerId')" />
       </IftaFormField>
+      <FormField
+        v-if="formState.performanceType === 'Prerecorded DJ Set'"
+        input-id="fileInput"
+        label="Upload File"
+        size="m">
+        <FileUpload
+          mode="basic"
+          accept="media/*,audio/*"
+          @select="onFileSelect"
+          @remove="onFileRemove" />
+      </FormField>
       <IftaFormField
         v-if="performerStore.performers.length === 0"
         :message="validation.message('performerName')"
@@ -105,7 +116,15 @@
 import { formatDurationOption, formatReadableTime, parseDate, parseTime } from '@/utils/dateUtils'
 import { performerRequestRules, timeslotRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
-import { Button, InputText, Select, useToast } from 'primevue'
+import {
+  Button,
+  InputText,
+  Select,
+  useToast,
+  FileUpload,
+  type FileUploadSelectEvent,
+  type FileUploadRemoveEvent
+} from 'primevue'
 import { computed, onMounted, ref, watch } from 'vue'
 import timeslotsApi, {
   PerformanceType,
@@ -125,6 +144,7 @@ import { err, ok, type Result } from '@/types/result.ts'
 import { showSuccessToast } from '@/utils/toastUtils.ts'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
 import type { ValidationProblemDetails } from '@/api/apiResponse.ts'
+import FormField from '@/components/form/FormField.vue'
 
 const toast = useToast()
 const performerStore = usePerformerStore()
@@ -143,16 +163,24 @@ const defaultStartPerformerId = computed(() => {
   return undefined
 })
 
-const formState = ref({
+type TimeslotFormState = TimeslotRequest & {
+  duration: number
+  performerName: string
+  performerUrl: string
+}
+
+const formState = ref<TimeslotFormState>({
   startsAt: '',
   duration: 60,
   endsAt: '',
   performerId: '',
   performanceType: PerformanceType.Live,
   name: '',
+  file: undefined,
   performerName: '',
   performerUrl: ''
 })
+
 const timeslotRules = timeslotRequestRules(formState.value)
 const performerRules = performerRequestRules
 const validation = createFormValidation(formState, {
@@ -162,9 +190,19 @@ const validation = createFormValidation(formState, {
   performerId: applyRuleIf(timeslotRules.performerId, () => performerStore.performers.length > 0),
   performanceType: timeslotRules.performanceType,
   name: timeslotRules.name,
+  file: timeslotRules.file,
   performerName: applyRuleIf(performerRules.name, () => performerStore.performers.length === 0),
   performerUrl: applyRuleIf(performerRules.url, () => performerStore.performers.length === 0)
 })
+
+const onFileSelect = (e: FileUploadSelectEvent) => {
+  formState.value.file = e.files.length > 0 ? (e.files[0] as File) : undefined
+}
+
+const onFileRemove = (e: FileUploadRemoveEvent) => {
+  if (e.files.length === 0)
+    formState.value.file = undefined
+}
 
 const isSubmitting = ref(false)
 

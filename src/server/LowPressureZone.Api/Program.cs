@@ -25,7 +25,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
-if (app.Environment.IsDevelopment()) app.UseCors("Development");
+app.UseCors("Frontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseStaticFiles();

@@ -2,25 +2,19 @@
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Configuration;
 using LowPressureZone.Core;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Adapter.AzuraCast.Clients;
 
-public sealed class AzuraCastClient : IDisposable, IAzuraCastClient
+public sealed class AzuraCastClient(HttpClient httpClient, IOptions<AzuraCastClientConfiguration> options) 
+    : IAzuraCastClient
 {
-    private readonly HttpClient _client = new();
-    private readonly string _stationId;
-
-    public AzuraCastClient(IOptions<AzuraCastClientConfiguration> options)
-    {
-        _stationId = options.Value.StationId;
-        _client.BaseAddress = options.Value.ApiUrl;
-        _client.DefaultRequestHeaders.Add("X-API-Key", options.Value.ApiKey);
-    }
+    private readonly string _stationId = options.Value.StationId;
 
     public async Task<Result<NowPlaying, HttpResponseMessage>> GetNowPlayingAsync()
     {
-        var response = await _client.GetAsync(NowPlayingEndpoint());
+        var response = await httpClient.GetAsync(NowPlayingEndpoint());
         if (!response.IsSuccessStatusCode)
             return Result.Err<NowPlaying, HttpResponseMessage>(response);
 
@@ -33,7 +27,7 @@ public sealed class AzuraCastClient : IDisposable, IAzuraCastClient
 
     public async Task<Result<IReadOnlyCollection<StationStreamer>, HttpResponseMessage>> GetStreamersAsync()
     {
-        var response = await _client.GetAsync(StreamersEndpoint());
+        var response = await httpClient.GetAsync(StreamersEndpoint());
         if (!response.IsSuccessStatusCode)
             return Result.Err<IReadOnlyCollection<StationStreamer>, HttpResponseMessage>(response);
 
@@ -46,7 +40,7 @@ public sealed class AzuraCastClient : IDisposable, IAzuraCastClient
 
     public async Task<Result<StationStreamer, HttpResponseMessage>> GetStreamerAsync(int streamerId)
     {
-        var response = await _client.GetAsync(StreamerEndpoint(streamerId));
+        var response = await httpClient.GetAsync(StreamerEndpoint(streamerId));
         if (!response.IsSuccessStatusCode)
             return Result.Err<StationStreamer, HttpResponseMessage>(response);
 
@@ -73,7 +67,7 @@ public sealed class AzuraCastClient : IDisposable, IAzuraCastClient
             EnforceSchedule = false,
             ReactivateAt = null
         };
-        var result = await _client.PostAsJsonAsync(StreamersEndpoint(), body);
+        var result = await httpClient.PostAsJsonAsync(StreamersEndpoint(), body);
         if (!result.IsSuccessStatusCode)
             return Result.Err<int, HttpResponseMessage>(result);
 
@@ -87,7 +81,7 @@ public sealed class AzuraCastClient : IDisposable, IAzuraCastClient
 
     public async Task<Result<bool, HttpResponseMessage>> PutStreamerAsync(StationStreamer streamer)
     {
-        var result = await _client.PutAsJsonAsync(StreamerEndpoint(streamer.Id), streamer);
+        var result = await httpClient.PutAsJsonAsync(StreamerEndpoint(streamer.Id), streamer);
         return !result.IsSuccessStatusCode
                    ? Result.Err<bool, HttpResponseMessage>(result)
                    : Result.Ok<bool, HttpResponseMessage>(true);
@@ -96,7 +90,7 @@ public sealed class AzuraCastClient : IDisposable, IAzuraCastClient
     public async Task<Result<IReadOnlyCollection<StationStreamerBroadcast>, HttpResponseMessage>> GetBroadcastsAsync(
         int? streamerId = null)
     {
-        var response = await _client.GetAsync(BroadcastsEndpoint(streamerId));
+        var response = await httpClient.GetAsync(BroadcastsEndpoint(streamerId));
         if (!response.IsSuccessStatusCode)
             return Result.Err<IReadOnlyCollection<StationStreamerBroadcast>, HttpResponseMessage>(response);
 
@@ -112,7 +106,7 @@ public sealed class AzuraCastClient : IDisposable, IAzuraCastClient
         int broadcastId)
     {
         var response =
-            await _client.GetAsync(DownloadBroadcastEndpoint(streamerId, broadcastId),
+            await httpClient.GetAsync(DownloadBroadcastEndpoint(streamerId, broadcastId),
                                    HttpCompletionOption.ResponseHeadersRead);
         if (!response.IsSuccessStatusCode)
             return Result.Err<HttpContent, HttpResponseMessage>(response);
@@ -122,15 +116,13 @@ public sealed class AzuraCastClient : IDisposable, IAzuraCastClient
 
     public async Task<Result<HttpContent, HttpResponseMessage>> DeleteBroadcastAsync(int streamerId, int broadcastId)
     {
-        var response = await _client.DeleteAsync(DeleteBroadcastEndpoint(streamerId, broadcastId));
+        var response = await httpClient.DeleteAsync(DeleteBroadcastEndpoint(streamerId, broadcastId));
 
         if (!response.IsSuccessStatusCode)
             return Result.Err<HttpContent, HttpResponseMessage>(response);
 
         return Result.Ok<HttpContent, HttpResponseMessage>(response.Content);
     }
-
-    public void Dispose() => _client.Dispose();
 
     private string NowPlayingEndpoint() => $"/api/nowplaying/{_stationId}";
 

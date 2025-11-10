@@ -12,6 +12,8 @@ public class PostTimeslot(DataContext dataContext, PerformerRules performerRules
 {
     public override void Configure()
     {
+        AllowFormData();
+        AllowFileUploads();
         Post("/schedules/{scheduleId}/timeslots");
         Description(builder => builder.Produces(201));
     }

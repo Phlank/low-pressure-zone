@@ -41,7 +41,7 @@ public class TimeslotRequestValidator : Validator<TimeslotRequest>
                 return;
             }
 
-            if (request.StartsAt < schedule.StartsAt || request.EndsAt > schedule.EndsAt)
+            if (request.StartsAt < schedule.StartsAt || request.StartsAt > schedule.EndsAt)
                 context.AddFailure(nameof(request.StartsAt), Errors.OutOfScheduleRange);
             if (request.EndsAt < schedule.StartsAt || request.EndsAt > schedule.EndsAt)
                 context.AddFailure(nameof(request.EndsAt), Errors.OutOfScheduleRange);
