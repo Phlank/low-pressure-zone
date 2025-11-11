@@ -105,6 +105,12 @@ public static class WebApplicationBuilderExtensions
         services.AddTransient<IClaimsTransformation, AppUserClaimsTransformation>();
     }
 
+    public static void ConfigureKestrel(this WebApplicationBuilder builder) =>
+        builder.WebHost.ConfigureKestrel(options =>
+        {
+            options.Limits.MaxRequestBodySize = 1024 * 1024 * 1024;
+        });
+
     public static void ConfigureWebApi(this WebApplicationBuilder builder)
     {
         var services = builder.Services;
@@ -151,6 +157,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddScoped<StreamingInfoService>();
         builder.Services.AddSingleton<ISender, MailgunSender>(serviceProvider => serviceProvider.CreateMailgunSender());
         builder.Services.AddHostedService<BroadcastDeletionService>();
+        builder.Services.AddSingleton<Utilities.MultipartFormBinder>();
     }
 
     private static void AddEndpointServices(this WebApplicationBuilder builder)
