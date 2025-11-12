@@ -1,18 +1,21 @@
 ﻿using FastEndpoints;
+using FFMpegCore;
 using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services;
-using LowPressureZone.Core;
 using LowPressureZone.Domain;
-using LowPressureZone.Domain.Migrations;
+using LowPressureZone.Domain.Extensions;
 using LowPressureZone.Identity.Extensions;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
-public class PostTimeslot(DataContext dataContext, FormFileSaver fileSaver, PerformerRules performerRules, ScheduleRules scheduleRules)
+public class PostTimeslot(
+    DataContext dataContext,
+    FormFileSaver fileSaver,
+    PerformerRules performerRules,
+    ScheduleRules scheduleRules)
     : EndpointWithMapper<TimeslotRequest, TimeslotMapper>
 {
     public override void Configure()
@@ -47,6 +50,26 @@ public class PostTimeslot(DataContext dataContext, FormFileSaver fileSaver, Perf
         if (request is { PerformanceType: PerformanceTypes.Prerecorded, File: not null })
         {
             var saveFileResult = await fileSaver.SaveFormFileAsync(request.File, ct);
+            if (!saveFileResult.IsSuccess)
+                ThrowError(nameof(request.File));
+
+            IMediaAnalysis analysis;
+            try
+            {
+                analysis = await FFProbe.AnalyseAsync(saveFileResult.Value, null, ct);
+            }
+            catch (Exception ex)
+            {
+                ThrowError(nameof(request.File), "Media file could not be analyzed.");
+                return;
+            }
+            
+            if (analysis.Duration < request.Duration() - TimeSpan.FromMinutes(2) || 
+                analysis.Duration > request.Duration() + TimeSpan.FromMinutes(2))
+            {
+                ThrowError(nameof(request.File), "Media file duration does not match the specified timeslot duration.");
+            }
+
         }
 
         var timeslot = Map.ToEntity(request);
