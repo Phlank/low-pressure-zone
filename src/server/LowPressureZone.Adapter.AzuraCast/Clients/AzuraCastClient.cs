@@ -72,6 +72,8 @@ public sealed class AzuraCastClient(HttpClient httpClient, IOptions<AzuraCastCli
             return Result.Err<int, HttpResponseMessage>(result);
 
         var streamersResult = await GetStreamersAsync();
+        if (streamersResult.IsError)
+            return Result.Err<int, HttpResponseMessage>(streamersResult.Error);
         var streamerId = streamersResult.Value.FirstOrDefault(streamer => streamer.StreamerUsername == username)?.Id;
         if (streamerId is null)
             return Result.Err<int, HttpResponseMessage>(streamersResult.Error);

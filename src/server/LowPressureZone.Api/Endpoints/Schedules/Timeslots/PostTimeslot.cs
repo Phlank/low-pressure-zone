@@ -11,9 +11,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
-public class PostTimeslot(
+public partial class PostTimeslot(
     DataContext dataContext,
     FormFileSaver fileSaver,
+    MediaAnalyzer mediaAnalyzer,
     PerformerRules performerRules,
     ScheduleRules scheduleRules)
     : EndpointWithMapper<TimeslotRequest, TimeslotMapper>
@@ -39,37 +40,27 @@ public class PostTimeslot(
                                         .Where(schedule => schedule.Id == scheduleId)
                                         .FirstAsync(ct);
         var performer = await dataContext.Performers.FirstAsync(p => p.Id == request.PerformerId, ct);
-        
+
         if (!scheduleRules.IsAddingTimeslotsAuthorized(schedule)
             || !performerRules.IsTimeslotLinkAuthorized(performer))
         {
             await SendUnauthorizedAsync(ct);
             return;
         }
-        
-        if (request is { PerformanceType: PerformanceTypes.Prerecorded, File: not null })
+
+        if (request.PerformanceType == PerformanceTypes.Prerecorded
+            && request.File is not null)
         {
-            var saveFileResult = await fileSaver.SaveFormFileAsync(request.File, ct);
-            if (!saveFileResult.IsSuccess)
-                ThrowError(nameof(request.File));
+            var saveResult = await fileSaver.SaveFormFileAsync(request.File, ct);
+            if (saveResult.IsError)
+                ThrowError(nameof(request.File), "Unable to save file for analysis.");
 
-            IMediaAnalysis analysis;
-            try
-            {
-                analysis = await FFProbe.AnalyseAsync(saveFileResult.Value, null, ct);
-            }
-            catch (Exception ex)
-            {
-                ThrowError(nameof(request.File), "Media file could not be analyzed.");
-                return;
-            }
-            
-            if (analysis.Duration < request.Duration() - TimeSpan.FromMinutes(2) || 
-                analysis.Duration > request.Duration() + TimeSpan.FromMinutes(2))
-            {
-                ThrowError(nameof(request.File), "Media file duration does not match the specified timeslot duration.");
-            }
+            var analysisResult = await mediaAnalyzer.AnalyzeAsync(saveResult.Value, ct);
+            if (analysisResult.IsError)
+                ThrowError(nameof(request.File), "Unable to analyze media file: " + analysisResult.Error);
 
+            ValidationFailures.AddRange(TimeslotRequestValidator.ValidateMediaAnalysis(request, analysisResult.Value));
+            ThrowIfAnyErrors();
         }
 
         var timeslot = Map.ToEntity(request);
@@ -81,4 +72,7 @@ public class PostTimeslot(
             id = scheduleId
         }, Response, cancellation: ct);
     }
+
+    [LoggerMessage(LogLevel.Error, "Unable to save file for analysis: {error}")]
+    static partial void LogUnableToSaveFileError(ILogger logger, string error);
 }
