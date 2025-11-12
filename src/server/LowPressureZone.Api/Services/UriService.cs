@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Api.Services;
 
-public class UriService(IOptions<UrlConfiguration> options)
+public sealed class UriService(IOptions<UrlConfiguration> options)
 {
     public Uri GetInviteUrl(TokenContext context)
     {

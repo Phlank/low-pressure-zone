@@ -38,3 +38,4 @@ appsettings*json
 
 # Local environment files
 .idea/.idea.LowPressureZone/.idea/copilot**
+temporaryFiles

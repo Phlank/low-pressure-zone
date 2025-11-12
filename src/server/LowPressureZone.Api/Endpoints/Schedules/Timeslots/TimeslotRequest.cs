@@ -9,4 +9,6 @@ public sealed class TimeslotRequest : IDateTimeRange
     public string? Name { get; set; }
     public required DateTimeOffset StartsAt { get; set; }
     public required DateTimeOffset EndsAt { get; set; }
+    public bool? ReplaceMedia { get; set; }
+    public IFormFile? File { get; set; }
 }

@@ -5,6 +5,7 @@ namespace LowPressureZone.Api.Constants;
 internal static class Errors
 {
     public const string Required = "Required";
+    public const string Prohibited = "Prohibited";
 
     // Mapper errors
     public const string NoAuthorizedUserForMap = "Cannot map request to domain entity without an authorized user";

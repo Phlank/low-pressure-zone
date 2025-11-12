@@ -20,16 +20,19 @@ using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Api.Services.StreamConnectionInfo;
 using LowPressureZone.Api.Services.StreamStatus;
+using LowPressureZone.Api.Utilities;
 using LowPressureZone.Domain;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using FormFileSaver = LowPressureZone.Api.Services.FormFileSaver;
 
 namespace LowPressureZone.Api.Extensions;
 
@@ -105,6 +108,12 @@ public static class WebApplicationBuilderExtensions
         services.AddTransient<IClaimsTransformation, AppUserClaimsTransformation>();
     }
 
+    public static void ConfigureKestrel(this WebApplicationBuilder builder)
+    {
+        builder.WebHost.ConfigureKestrel(options => { options.Limits.MaxRequestBodySize = 1024 * 1024 * 1024; });
+        builder.Services.Configure<FormOptions>(options => { options.MultipartBodyLengthLimit = 1024 * 1024 * 1024; });
+    }
+
     public static void ConfigureWebApi(this WebApplicationBuilder builder)
     {
         var services = builder.Services;
@@ -122,6 +131,7 @@ public static class WebApplicationBuilderExtensions
         services.Configure<StreamingConfiguration>(builder.Configuration.GetSection(StreamingConfiguration.Name));
         services.Configure<EmailServiceConfiguration>(builder.Configuration.GetSection(EmailServiceConfiguration.Name));
         services.Configure<UrlConfiguration>(builder.Configuration.GetSection(UrlConfiguration.Name));
+        services.Configure<FileConfiguration>(builder.Configuration.GetSection(FileConfiguration.Name));
 
         services.AddFastEndpoints();
         services.AddHttpContextAccessor();
@@ -143,6 +153,7 @@ public static class WebApplicationBuilderExtensions
     {
         builder.AddEndpointServices();
 
+        builder.Services.AddSingleton<FormFileSaver>();
         builder.Services.AddSingleton<EmailService>();
         builder.Services.AddSingleton<UriService>();
         builder.Services.AddHttpClient<AzuraCastClient>(ConfigureAzuraCastHttpClient);
@@ -185,4 +196,18 @@ public static class WebApplicationBuilderExtensions
             client.BaseAddress = configuration.ApiUrl;
             client.DefaultRequestHeaders.Add("X-API-Key", configuration.ApiKey);
         };
+
+    public static void CreateFileLocations(this WebApplicationBuilder builder)
+    {
+        const string tempLocationKey = $"{FileConfiguration.Name}:{nameof(FileConfiguration.TemporaryLocation)}";
+        var temporaryFilePath = builder.Configuration.GetValue<string>(tempLocationKey);
+
+        if (temporaryFilePath is null)
+            throw new InvalidOperationException("Temporary file path is not configured.");
+
+        if (!Directory.Exists(temporaryFilePath))
+        {
+            Directory.CreateDirectory(temporaryFilePath);
+        }
+    }
 }
