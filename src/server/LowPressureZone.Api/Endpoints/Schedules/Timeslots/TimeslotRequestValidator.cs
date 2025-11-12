@@ -24,6 +24,35 @@ public class TimeslotRequestValidator : Validator<TimeslotRequest>
         {
             var scheduleId = contextAccessor.GetGuidRouteParameterOrDefault("scheduleId");
             var timeslotId = contextAccessor.GetGuidRouteParameterOrDefault("timeslotId");
+
+            if (request.PerformanceType == PerformanceTypes.Prerecorded
+                && request.ReplaceMedia is null
+                && timeslotId == Guid.Empty)
+            {
+                context.AddFailure(nameof(request.File), Errors.Required);
+                return;
+            }
+
+            if (request is { PerformanceType: PerformanceTypes.Prerecorded, ReplaceMedia: not null, File: not null }
+                && request.ReplaceMedia.Value)
+            {
+                context.AddFailure(nameof(request.File), Errors.Required);
+                return;
+            }
+
+            if (request is { PerformanceType: PerformanceTypes.Prerecorded, ReplaceMedia: false, File: not null })
+            {
+                context.AddFailure(nameof(request.File), Errors.Prohibited);
+                return;
+            }
+
+            if (request.PerformanceType != PerformanceTypes.Prerecorded
+                && request.File is not null)
+            {
+                context.AddFailure(nameof(request.File), Errors.Prohibited);
+                return;
+            }
+
             var dataContext = Resolve<DataContext>();
             var schedule = await dataContext.Schedules
                                             .Include(schedule => schedule.Timeslots)

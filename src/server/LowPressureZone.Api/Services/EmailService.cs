@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Api.Services;
 
-public class EmailService(
+public sealed class EmailService(
     IOptions<EmailServiceConfiguration> options,
     UriService uriService,
     ISender sender,

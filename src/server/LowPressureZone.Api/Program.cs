@@ -20,6 +20,7 @@ builder.ConfigureIdentity();
 builder.ConfigureKestrel();
 builder.ConfigureWebApi();
 builder.AddApiServices();
+builder.CreateFileLocations();
 
 var app = builder.Build();
 app.UseForwardedHeaders(new ForwardedHeadersOptions
