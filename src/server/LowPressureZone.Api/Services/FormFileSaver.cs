@@ -14,7 +14,6 @@ public sealed partial class FormFileSaver(IOptions<FileConfiguration> fileConfig
 
         try
         {
-            Path.GetRandomFileName();
             if (File.Exists(path))
             {
                 File.Delete(path);
