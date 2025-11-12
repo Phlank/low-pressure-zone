@@ -18,8 +18,14 @@ public static class AudioQualityValidator
 
         if (failures.Count > 0)
             return failures;
-
+        
         var stream = analysis.AudioStreams[0];
+        if (!AudioCodecs.Allowed.Contains(stream.CodecName))
+            failures.Add(new(propertyName,
+                             $"Audio codec '{stream.CodecName}' is not supported. Supported codecs are: {string.Join(", ", AudioCodecs.AllowedCodecFormats)}."));
+        if (failures.Count > 0)
+            return failures;
+        
         if (stream.Channels != 2)
             failures.Add(new(propertyName,
                              "Audio stream must be stereo (2 channels)."));
@@ -27,10 +33,6 @@ public static class AudioQualityValidator
         if (stream.SampleRateHz < 44100)
             failures.Add(new(propertyName,
                              "Audio sample rate must be at least 44.1 kHz."));
-
-        if (!AudioCodecs.Allowed.Contains(stream.CodecName))
-            failures.Add(new(propertyName,
-                             $"Audio codec '{stream.CodecName}' is not supported. Supported codecs are: {string.Join(", ", AudioCodecs.Allowed)}."));
 
         if (AudioCodecs.Lossy.Contains(stream.CodecName))
         {

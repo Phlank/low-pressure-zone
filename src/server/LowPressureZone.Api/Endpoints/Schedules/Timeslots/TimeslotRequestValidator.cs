@@ -94,8 +94,8 @@ public class TimeslotRequestValidator : Validator<TimeslotRequest>
     {
         List<ValidationFailure> failures = [];
         var timeslotDuration = request.EndsAt - request.StartsAt;
-        if (TimeSpan.FromMinutes(timeslotDuration.TotalMinutes - PrerecordedDurationMinutesTolerance) < analysis.Duration
-            || TimeSpan.FromMinutes(timeslotDuration.TotalMinutes + PrerecordedDurationMinutesTolerance) > analysis.Duration)
+        if (TimeSpan.FromMinutes(timeslotDuration.TotalMinutes - PrerecordedDurationMinutesTolerance) > analysis.Duration
+            || TimeSpan.FromMinutes(timeslotDuration.TotalMinutes + PrerecordedDurationMinutesTolerance) < analysis.Duration)
         {
             failures.Add(new ValidationFailure(nameof(request.File),
                                                "Media file duration does not match the specified timeslot duration. Ensure it is +/- 2 minutes from the timeslot duration."));

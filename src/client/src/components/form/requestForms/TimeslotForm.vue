@@ -64,17 +64,6 @@
           option-value="id"
           @change="() => validation.validateIfDirty('performerId')" />
       </IftaFormField>
-      <FormField
-        v-if="formState.performanceType === 'Prerecorded DJ Set'"
-        input-id="fileInput"
-        label="Upload File"
-        size="m">
-        <FileUpload
-          mode="basic"
-          accept="media/*,audio/*"
-          @select="onFileSelect"
-          @remove="onFileRemove" />
-      </FormField>
       <IftaFormField
         v-if="performerStore.performers.length === 0"
         :message="validation.message('performerName')"
@@ -101,6 +90,18 @@
           :disabled="isSubmitting || disabled"
           :invalid="!validation.isValid('performerUrl')" />
       </IftaFormField>
+      <FormField
+        v-if="formState.performanceType === 'Prerecorded DJ Set'"
+        input-id="fileInput"
+        label="Upload File"
+        :message="validation.message('file')"
+        size="m">
+        <FileUpload
+          mode="basic"
+          accept="media/*,audio/*"
+          @select="onFileSelect"
+          @remove="onFileRemove" />
+      </FormField>
       <template #actions>
         <Button
           :disabled="isSubmitting || disabled"
