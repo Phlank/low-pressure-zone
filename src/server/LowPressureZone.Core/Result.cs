@@ -14,7 +14,7 @@ public class Result<T, TErr>(T? value, TErr? error)
 public static class Result
 {
     public static Result<T, string> Ok<T>(T value) => new(value, null);
-    public static Result<T, string> Err<T>(string error) => new(default, error);
     public static Result<T, TErr> Ok<T, TErr>(T data) => new(data, default);
+    public static Result<T, string> Err<T>(string error) => new(default, error);
     public static Result<T, TErr> Err<T, TErr>(TErr error) => new(default, error);
 }
