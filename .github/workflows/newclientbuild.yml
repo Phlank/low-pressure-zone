@@ -26,7 +26,8 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'yarn'
         cache-dependency-path: src/client/yarn.lock
-    - run: corepack enable
+        check-latest: true
+        corepack: true
     - run: yarn
       working-directory: src/client
     - run: yarn build
