@@ -93,12 +93,11 @@
       <FormField
         v-if="formState.performanceType === 'Prerecorded DJ Set'"
         input-id="fileInput"
-        label="Upload File"
+        label="Upload Mix"
         :message="validation.message('file')"
         size="m">
         <FileUpload
           mode="basic"
-          accept="media/*,audio/*"
           @select="onFileSelect"
           @remove="onFileRemove" />
       </FormField>
@@ -177,7 +176,7 @@ const formState = ref<TimeslotFormState>({
   performerId: '',
   performanceType: PerformanceType.Live,
   name: '',
-  file: undefined,
+  file: null,
   performerName: '',
   performerUrl: ''
 })
@@ -197,12 +196,12 @@ const validation = createFormValidation(formState, {
 })
 
 const onFileSelect = (e: FileUploadSelectEvent) => {
-  formState.value.file = e.files.length > 0 ? (e.files[0] as File) : undefined
+  formState.value.file = e.files.length > 0 ? (e.files[0] as File) : null
 }
 
 const onFileRemove = (e: FileUploadRemoveEvent) => {
   if (e.files.length === 0)
-    formState.value.file = undefined
+    formState.value.file = null
 }
 
 const isSubmitting = ref(false)

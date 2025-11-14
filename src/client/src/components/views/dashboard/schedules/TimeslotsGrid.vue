@@ -105,7 +105,7 @@ import {
 } from '@/utils/dateUtils'
 import { showDeleteSuccessToast } from '@/utils/toastUtils'
 import { Column, DataTable, Dialog, useToast } from 'primevue'
-import { computed, inject, onMounted, ref, type Ref, useTemplateRef } from 'vue'
+import { computed, inject, onMounted, ref, type Ref } from 'vue'
 import type { ScheduleResponse } from '@/api/resources/schedulesApi.ts'
 import timeslotsApi, {
   PerformanceType,
@@ -166,9 +166,9 @@ const formInitialValue: Ref<TimeslotRequest> = ref({
   performerId: '',
   name: '',
   performanceType: PerformanceType.Live,
-  performerName: ''
+  performerName: '',
+  file: null
 })
-const timeslotForm = useTemplateRef('timeslotForm')
 
 const handleCreateClicked = (row: TimeslotRow) => {
   if (row.timeslot !== undefined) return
@@ -178,7 +178,8 @@ const handleCreateClicked = (row: TimeslotRow) => {
     endsAt: getNextHour(row.start).toISOString(),
     name: '',
     performerId: '',
-    performanceType: PerformanceType.Live
+    performanceType: PerformanceType.Live,
+    file: null
   }
   showTimeslotDialog.value = true
 }
@@ -192,7 +193,8 @@ const handleEditClicked = (row: TimeslotRow) => {
     endsAt: row.timeslot.endsAt,
     name: row.timeslot?.name ?? '',
     performerId: row.timeslot?.performer.id ?? '',
-    performanceType: row.timeslot?.performanceType ?? PerformanceType.Live
+    performanceType: row.timeslot?.performanceType ?? PerformanceType.Live,
+    file: null
   }
   showTimeslotDialog.value = true
 }
