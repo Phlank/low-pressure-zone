@@ -101,9 +101,14 @@
           @select="onFileSelect"
           @remove="onFileRemove" />
       </FormField>
-      <Message v-if="formState.performanceType == 'Prerecorded DJ Set'">
-        Uploading prerecorded sets is a new feature. Please let Phlank know if you have any issues!
-      </Message>
+      <FormField
+        v-if="formState.performanceType === 'Prerecorded DJ Set'"
+        size="m">
+        <Message v-if="formState.performanceType == 'Prerecorded DJ Set'">
+          Uploading prerecorded sets is a new feature, and there may be some issues to work out
+          still. Please let Phlank know if you have any issues!
+        </Message>
+      </FormField>
       <template #actions>
         <Button
           :disabled="isSubmitting || disabled"
@@ -204,8 +209,7 @@ const onFileSelect = (e: FileUploadSelectEvent) => {
 }
 
 const onFileRemove = (e: FileUploadRemoveEvent) => {
-  if (e.files.length === 0)
-    formState.value.file = null
+  if (e.files.length === 0) formState.value.file = null
 }
 
 const isSubmitting = ref(false)
