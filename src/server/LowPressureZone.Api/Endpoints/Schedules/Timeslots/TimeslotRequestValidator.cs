@@ -61,6 +61,12 @@ public class TimeslotRequestValidator : Validator<TimeslotRequest>
                 return;
             }
 
+            if (request.File is not null
+                && request.File.ContentType.StartsWithAny(MimeTypes.AudioMimeTypes))
+            {
+                
+            }
+
             var dataContext = Resolve<DataContext>();
             var schedule = await dataContext.Schedules
                                             .Include(schedule => schedule.Timeslots)

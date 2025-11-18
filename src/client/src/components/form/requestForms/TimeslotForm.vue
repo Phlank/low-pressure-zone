@@ -101,6 +101,9 @@
           @select="onFileSelect"
           @remove="onFileRemove" />
       </FormField>
+      <Message v-if="formState.performanceType == 'Prerecorded DJ Set'">
+        Uploading prerecorded sets is a new feature. Please let Phlank know if you have any issues!
+      </Message>
       <template #actions>
         <Button
           :disabled="isSubmitting || disabled"
@@ -122,6 +125,7 @@ import {
   Select,
   useToast,
   FileUpload,
+  Message,
   type FileUploadSelectEvent,
   type FileUploadRemoveEvent
 } from 'primevue'
