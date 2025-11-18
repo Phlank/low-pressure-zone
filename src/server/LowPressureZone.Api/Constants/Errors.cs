@@ -47,6 +47,9 @@ internal static class Errors
     // Time errors
     public static string MinDuration(int hours) => $"Minimum duration is {hours}h";
     public static string MaxDuration(int hours) => $"Maximum duration is {hours}h";
+    
+    // File errors
+    public const string InvalidFileType = "Invalid file type";
 
     public static string UsernameInvalidCharacters(IEnumerable<string> characters) =>
         $"Invalid characters: {string.Join(' ', characters)}";

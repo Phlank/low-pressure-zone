@@ -12,5 +12,5 @@ public static class StringExtensions
 
     public static IEnumerable<ValidationFailure> ToValidationFailures(
         this string error,
-        string propertyName) => [new(propertyName, error)];
+        string? propertyName) => [new(propertyName, error)];
 }

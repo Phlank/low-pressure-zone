@@ -8,10 +8,11 @@ using LowPressureZone.Api.Utilities;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Shouldly;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
-public class TimeslotRequestValidator : Validator<TimeslotRequest>
+public sealed class TimeslotRequestValidator : Validator<TimeslotRequest>
 {
     private const int PrerecordedDurationMinutesTolerance = 2;
 
@@ -62,9 +63,10 @@ public class TimeslotRequestValidator : Validator<TimeslotRequest>
             }
 
             if (request.File is not null
-                && request.File.ContentType.StartsWithAny(MimeTypes.AudioMimeTypes))
+                && !request.File.ContentType.StartsWithAny(MimeTypes.AudioMimeTypes))
             {
-                
+                context.AddFailure(nameof(request.File), Errors.InvalidFileType);
+                return;
             }
 
             var dataContext = Resolve<DataContext>();
@@ -98,6 +100,7 @@ public class TimeslotRequestValidator : Validator<TimeslotRequest>
 
     public static ICollection<ValidationFailure> ValidateMediaAnalysis(TimeslotRequest request, IMediaAnalysis analysis)
     {
+        request.File.ShouldNotBeNull();
         List<ValidationFailure> failures = [];
         var timeslotDuration = request.EndsAt - request.StartsAt;
         if (TimeSpan.FromMinutes(timeslotDuration.TotalMinutes - PrerecordedDurationMinutesTolerance) > analysis.Duration
@@ -107,7 +110,7 @@ public class TimeslotRequestValidator : Validator<TimeslotRequest>
                                                "Media file duration does not match the specified timeslot duration. Ensure it is +/- 2 minutes from the timeslot duration."));
         }
 
-        failures.AddRange(AudioQualityValidator.ValidateAudioQuality(analysis, nameof(request.File)));
+        failures.AddRange(AudioQualityValidator.ValidateAudioQuality(analysis, request.File.Length, nameof(request.File)));
         return failures;
     }
 }
