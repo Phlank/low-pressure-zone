@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
-public class PutTimeslot(DataContext dataContext, FormFileSaver fileSaver, TimeslotRules rules)
+public class PutTimeslot(DataContext dataContext, TimeslotFileProcessor fileProcessor, TimeslotRules rules)
     : EndpointWithMapper<TimeslotRequest, TimeslotMapper>
 {
     public override void Configure()
@@ -25,8 +25,9 @@ public class PutTimeslot(DataContext dataContext, FormFileSaver fileSaver, Times
         var timeslotId = Route<Guid>("timeslotId");
 
         var timeslot = await dataContext.Timeslots
-                                        .Include(t => t.Performer)
-                                        .Where(t => t.Id == timeslotId && t.ScheduleId == scheduleId)
+                                        .Include(timeslot => timeslot.Performer)
+                                        .Where(timeslot => timeslot.Id == timeslotId
+                                                           && timeslot.ScheduleId == scheduleId)
                                         .FirstOrDefaultAsync(ct);
 
         if (timeslot == null)
@@ -40,10 +41,16 @@ public class PutTimeslot(DataContext dataContext, FormFileSaver fileSaver, Times
             await SendUnauthorizedAsync(ct);
             return;
         }
-        
-        if (request is { PerformanceType: PerformanceTypes.Prerecorded, File: not null })
+
+        if (request.PerformanceType == PerformanceTypes.Prerecorded
+            && request.File is not null)
         {
-            var saveFileResult = await fileSaver.SaveFormFileAsync(request.File, ct);
+            var processResult = await fileProcessor.ProcessUploadedMediaFileAsync(request, ct);
+            if (processResult.IsError)
+            {
+                ValidationFailures.AddRange(processResult.Error);
+                ThrowIfAnyErrors();
+            }
         }
 
         await Map.UpdateEntityAsync(request, timeslot, ct);

@@ -6,4 +6,10 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Reference Include="FluentValidation">
+        <HintPath>..\..\..\..\..\..\.nuget\packages\fluentvalidation\12.0.0\lib\net8.0\FluentValidation.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

@@ -96,7 +96,7 @@ public class TimeslotRequestValidator : Validator<TimeslotRequest>
         });
     }
 
-    public static IEnumerable<ValidationFailure> ValidateMediaAnalysis(TimeslotRequest request, IMediaAnalysis analysis)
+    public static ICollection<ValidationFailure> ValidateMediaAnalysis(TimeslotRequest request, IMediaAnalysis analysis)
     {
         List<ValidationFailure> failures = [];
         var timeslotDuration = request.EndsAt - request.StartsAt;

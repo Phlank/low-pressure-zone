@@ -1,3 +1,5 @@
+using FluentValidation.Results;
+
 namespace LowPressureZone.Api.Extensions;
 
 public static class StringExtensions
@@ -7,4 +9,8 @@ public static class StringExtensions
         IEnumerable<string> itemsToCompare,
         StringComparison comparison = StringComparison.InvariantCulture) =>
         itemsToCompare.Any((item) => value.StartsWith(item, comparison));
+
+    public static IEnumerable<ValidationFailure> ToValidationFailures(
+        this string error,
+        string propertyName) => [new(propertyName, error)];
 }

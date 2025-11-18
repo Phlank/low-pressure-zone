@@ -153,6 +153,7 @@ public static class WebApplicationBuilderExtensions
 
         builder.Services.AddSingleton<FormFileSaver>();
         builder.Services.AddSingleton<MediaAnalyzer>();
+        builder.Services.AddSingleton<TimeslotFileProcessor>();
         builder.Services.AddSingleton<EmailService>();
         builder.Services.AddSingleton<UriService>();
         builder.Services.AddHttpClient<AzuraCastClient>(ConfigureAzuraCastHttpClient);

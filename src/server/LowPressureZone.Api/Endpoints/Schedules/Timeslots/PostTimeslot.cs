@@ -1,11 +1,9 @@
 ﻿using FastEndpoints;
-using FFMpegCore;
 using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Domain;
-using LowPressureZone.Domain.Extensions;
 using LowPressureZone.Identity.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,8 +11,7 @@ namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
 public partial class PostTimeslot(
     DataContext dataContext,
-    FormFileSaver fileSaver,
-    MediaAnalyzer mediaAnalyzer,
+    TimeslotFileProcessor fileProcessor,
     PerformerRules performerRules,
     ScheduleRules scheduleRules)
     : EndpointWithMapper<TimeslotRequest, TimeslotMapper>
@@ -51,16 +48,12 @@ public partial class PostTimeslot(
         if (request.PerformanceType == PerformanceTypes.Prerecorded
             && request.File is not null)
         {
-            var saveResult = await fileSaver.SaveFormFileAsync(request.File, ct);
-            if (saveResult.IsError)
-                ThrowError(nameof(request.File), "Unable to save file for analysis.");
-
-            var analysisResult = await mediaAnalyzer.AnalyzeAsync(saveResult.Value, ct);
-            if (analysisResult.IsError)
-                ThrowError(nameof(request.File), "Unable to analyze media file: " + analysisResult.Error);
-
-            ValidationFailures.AddRange(TimeslotRequestValidator.ValidateMediaAnalysis(request, analysisResult.Value));
-            ThrowIfAnyErrors();
+            var processResult = await fileProcessor.ProcessUploadedMediaFileAsync(request, ct);
+            if (processResult.IsError)
+            {
+                ValidationFailures.AddRange(processResult.Error);
+                ThrowIfAnyErrors();
+            }
         }
 
         var timeslot = Map.ToEntity(request);
