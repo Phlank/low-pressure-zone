@@ -17,7 +17,7 @@
         <Column header="Duration">
           <template #body="{ data }: { data: BroadcastResponse }">
             <div v-if="data.end">
-              {{ formatDurationTimestamp(getDuration(data.end, data.start)) }}
+              {{ formatDurationTimestamp(getDuration(data.start, data.end!)) }}
             </div>
           </template>
         </Column>

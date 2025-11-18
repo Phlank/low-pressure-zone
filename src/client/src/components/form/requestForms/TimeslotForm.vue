@@ -168,7 +168,7 @@ const props = defineProps<{
 }>()
 
 const defaultStartPerformerId = computed(() => {
-  if (props.performers.length === 1) return props.performers[0].id
+  if (props.performers.length === 1) return props.performers[0]!.id
   return undefined
 })
 
@@ -262,9 +262,9 @@ const createPerformer = async (): Promise<Result<string, null>> => {
     if (response.isInvalid()) {
       const details = response.error as ValidationProblemDetails<PerformerRequest>
       if (details.errors.name)
-        validation.setValidity('performerName', { isValid: false, message: details.errors.name[0] })
+        validation.setValidity('performerName', { isValid: false, message: details.errors.name[0] ?? '' })
       if (details.errors.url)
-        validation.setValidity('performerUrl', { isValid: false, message: details.errors.url[0] })
+        validation.setValidity('performerUrl', { isValid: false, message: details.errors.url[0] ?? '' })
     } else tryHandleUnsuccessfulResponse(response, toast)
     return err(null)
   }
@@ -322,7 +322,7 @@ const durationOptions = computed((): { label: string; value: number }[] => {
     .sort((a, b) => parseTime(a.startsAt) - parseTime(b.startsAt))
   const nextBoundaryTime =
     timeslotsFollowingCurrent.length > 0
-      ? parseTime(timeslotsFollowingCurrent[0].startsAt)
+      ? parseTime(timeslotsFollowingCurrent[0]!.startsAt)
       : endOfSchedule
 
   const maxDurationMinutes = Math.floor(

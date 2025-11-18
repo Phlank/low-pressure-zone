@@ -38,7 +38,7 @@
 <script lang="ts" setup>
 import { Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs } from 'primevue'
 import ScheduleForm from '@/components/form/requestForms/ScheduleForm.vue'
-import { onMounted, ref, type Ref, useTemplateRef } from 'vue'
+import { onMounted, ref, type Ref } from 'vue'
 import SchedulesGrid from './SchedulesGrid.vue'
 import { useCommunityStore } from '@/stores/communityStore.ts'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
@@ -65,6 +65,4 @@ const load = async () => {
     loadingPromises.push(performerStore.loadPerformersAsync())
   await Promise.all(loadingPromises)
 }
-
-const createForm = useTemplateRef('createForm')
 </script>

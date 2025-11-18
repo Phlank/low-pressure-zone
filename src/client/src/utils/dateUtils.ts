@@ -50,9 +50,10 @@ export const hoursBetween = (start: Date, end: Date) => {
 }
 
 export const minimumDate = (...dates: Date[]) => {
-  let minimum = dates[0].getTime()
+  if (dates.length === 0) return undefined
+  let minimum = dates[0]!.getTime()
   for (let i = 1; i < dates.length; i++) {
-    const currentTime = dates[i].getTime()
+    const currentTime = dates[i]!.getTime()
     if (currentTime < minimum) {
       minimum = currentTime
     }
