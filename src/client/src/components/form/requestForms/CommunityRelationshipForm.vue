@@ -101,7 +101,7 @@ onMounted(async () => {
 })
 
 const reset = () => {
-  formState.value.userId = props.initialState?.userId ?? props.availableUsers[0].id
+  formState.value.userId = props.initialState?.userId ?? props.availableUsers[0]!.id
   formState.value.isPerformer = props.initialState?.isPerformer ?? false
   formState.value.isOrganizer = props.initialState?.isOrganizer ?? false
 }

@@ -20,7 +20,6 @@ using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Api.Services.StreamConnectionInfo;
 using LowPressureZone.Api.Services.StreamStatus;
-using LowPressureZone.Api.Utilities;
 using LowPressureZone.Domain;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;
@@ -33,6 +32,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using FormFileSaver = LowPressureZone.Api.Services.FormFileSaver;
+using MediaAnalyzer = LowPressureZone.Api.Services.MediaAnalyzer;
 
 namespace LowPressureZone.Api.Extensions;
 
@@ -117,7 +117,6 @@ public static class WebApplicationBuilderExtensions
     public static void ConfigureWebApi(this WebApplicationBuilder builder)
     {
         var services = builder.Services;
-        var configuration = builder.Configuration;
 
         services.Configure<JsonOptions>(options =>
         {
@@ -125,8 +124,7 @@ public static class WebApplicationBuilderExtensions
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
 
-        services.Configure<AzuraCastClientConfiguration>(builder.Configuration.GetSection(AzuraCastClientConfiguration
-                                                                                              .Name));
+        services.Configure<AzuraCastClientConfiguration>(builder.Configuration.GetSection(AzuraCastClientConfiguration.Name));
         services.Configure<IcecastConfiguration>(builder.Configuration.GetSection(IcecastConfiguration.Name));
         services.Configure<StreamingConfiguration>(builder.Configuration.GetSection(StreamingConfiguration.Name));
         services.Configure<EmailServiceConfiguration>(builder.Configuration.GetSection(EmailServiceConfiguration.Name));
@@ -154,6 +152,8 @@ public static class WebApplicationBuilderExtensions
         builder.AddEndpointServices();
 
         builder.Services.AddSingleton<FormFileSaver>();
+        builder.Services.AddSingleton<MediaAnalyzer>();
+        builder.Services.AddSingleton<TimeslotFileProcessor>();
         builder.Services.AddSingleton<EmailService>();
         builder.Services.AddSingleton<UriService>();
         builder.Services.AddHttpClient<AzuraCastClient>(ConfigureAzuraCastHttpClient);

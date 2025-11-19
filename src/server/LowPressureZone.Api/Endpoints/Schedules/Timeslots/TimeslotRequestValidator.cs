@@ -1,16 +1,22 @@
 ﻿using FastEndpoints;
+using FFMpegCore;
 using FluentValidation;
+using FluentValidation.Results;
 using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Extensions;
+using LowPressureZone.Api.Utilities;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Shouldly;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
-public class TimeslotRequestValidator : Validator<TimeslotRequest>
+public sealed class TimeslotRequestValidator : Validator<TimeslotRequest>
 {
-    public TimeslotRequestValidator(IHttpContextAccessor contextAccessor)
+    private const int PrerecordedDurationMinutesTolerance = 2;
+
+    public TimeslotRequestValidator(IHttpContextAccessor contextAccessor, ILogger<TimeslotRequestValidator> logger)
     {
         RuleFor(request => request.PerformanceType).Must(type => PerformanceTypes.All.Contains(type))
                                                    .WithMessage("Invalid type");
@@ -26,21 +32,24 @@ public class TimeslotRequestValidator : Validator<TimeslotRequest>
             var timeslotId = contextAccessor.GetGuidRouteParameterOrDefault("timeslotId");
 
             if (request.PerformanceType == PerformanceTypes.Prerecorded
-                && request.ReplaceMedia is null
-                && timeslotId == Guid.Empty)
+                && timeslotId == Guid.Empty
+                && request.File is null)
             {
                 context.AddFailure(nameof(request.File), Errors.Required);
                 return;
             }
 
-            if (request is { PerformanceType: PerformanceTypes.Prerecorded, ReplaceMedia: not null, File: not null }
-                && request.ReplaceMedia.Value)
+            if (request.PerformanceType == PerformanceTypes.Prerecorded
+                && request.ReplaceMedia == true
+                && request.File is null)
             {
                 context.AddFailure(nameof(request.File), Errors.Required);
                 return;
             }
 
-            if (request is { PerformanceType: PerformanceTypes.Prerecorded, ReplaceMedia: false, File: not null })
+            if (request.PerformanceType == PerformanceTypes.Prerecorded
+                && request.ReplaceMedia == false
+                && request.File is not null)
             {
                 context.AddFailure(nameof(request.File), Errors.Prohibited);
                 return;
@@ -50,6 +59,13 @@ public class TimeslotRequestValidator : Validator<TimeslotRequest>
                 && request.File is not null)
             {
                 context.AddFailure(nameof(request.File), Errors.Prohibited);
+                return;
+            }
+
+            if (request.File is not null
+                && !request.File.ContentType.StartsWithAny(MimeTypes.AudioMimeTypes))
+            {
+                context.AddFailure(nameof(request.File), Errors.InvalidFileType);
                 return;
             }
 
@@ -80,5 +96,21 @@ public class TimeslotRequestValidator : Validator<TimeslotRequest>
                 context.AddFailure(nameof(request.EndsAt), Errors.OverlapsOtherTimeslot);
             }
         });
+    }
+
+    public static ICollection<ValidationFailure> ValidateMediaAnalysis(TimeslotRequest request, IMediaAnalysis analysis)
+    {
+        request.File.ShouldNotBeNull();
+        List<ValidationFailure> failures = [];
+        var timeslotDuration = request.EndsAt - request.StartsAt;
+        if (TimeSpan.FromMinutes(timeslotDuration.TotalMinutes - PrerecordedDurationMinutesTolerance) > analysis.Duration
+            || TimeSpan.FromMinutes(timeslotDuration.TotalMinutes + PrerecordedDurationMinutesTolerance) < analysis.Duration)
+        {
+            failures.Add(new ValidationFailure(nameof(request.File),
+                                               "Media file duration does not match the specified timeslot duration. Ensure it is +/- 2 minutes from the timeslot duration."));
+        }
+
+        failures.AddRange(AudioQualityValidator.ValidateAudioQuality(analysis, request.File.Length, nameof(request.File)));
+        return failures;
     }
 }

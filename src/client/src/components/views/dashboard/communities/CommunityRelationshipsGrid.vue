@@ -19,14 +19,14 @@
         <Column
           field="isPerformer"
           header="Performer">
-          <template #body="{ data }">
+          <template #body="{ data }: { data: CommunityRelationshipResponse }">
             {{ data.isPerformer ? 'Yes' : '' }}
           </template>
         </Column>
         <Column
           field="isOrganizer"
           header="Organizer">
-          <template #body="{ data }">
+          <template #body="{ data }: { data: CommunityRelationshipResponse }">
             {{ data.isOrganizer ? 'Yes' : '' }}
           </template>
         </Column>
@@ -97,7 +97,7 @@
       header="Update Relationship"
       modal>
       <CommunityRelationshipForm
-        :available-users="[userStore.getUser(updatingUserId)]"
+        :available-users="[userStore.getUser(updatingUserId)!]"
         :community-id="community.id"
         :initial-state="updatingRelationship"
         align-actions="right"

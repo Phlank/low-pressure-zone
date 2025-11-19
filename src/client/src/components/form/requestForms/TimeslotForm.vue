@@ -64,17 +64,6 @@
           option-value="id"
           @change="() => validation.validateIfDirty('performerId')" />
       </IftaFormField>
-      <FormField
-        v-if="formState.performanceType === 'Prerecorded DJ Set'"
-        input-id="fileInput"
-        label="Upload File"
-        size="m">
-        <FileUpload
-          mode="basic"
-          accept="media/*,audio/*"
-          @select="onFileSelect"
-          @remove="onFileRemove" />
-      </FormField>
       <IftaFormField
         v-if="performerStore.performers.length === 0"
         :message="validation.message('performerName')"
@@ -101,6 +90,25 @@
           :disabled="isSubmitting || disabled"
           :invalid="!validation.isValid('performerUrl')" />
       </IftaFormField>
+      <FormField
+        v-if="formState.performanceType === 'Prerecorded DJ Set'"
+        input-id="fileInput"
+        label="Upload Mix"
+        :message="validation.message('file')"
+        size="m">
+        <FileUpload
+          mode="basic"
+          @select="onFileSelect"
+          @remove="onFileRemove" />
+      </FormField>
+      <FormField
+        v-if="formState.performanceType === 'Prerecorded DJ Set'"
+        size="m">
+        <Message v-if="formState.performanceType == 'Prerecorded DJ Set'">
+          Uploading prerecorded sets is a new feature, and there may be some issues to work out
+          still. Please let Phlank know if you have any issues!
+        </Message>
+      </FormField>
       <template #actions>
         <Button
           :disabled="isSubmitting || disabled"
@@ -122,6 +130,7 @@ import {
   Select,
   useToast,
   FileUpload,
+  Message,
   type FileUploadSelectEvent,
   type FileUploadRemoveEvent
 } from 'primevue'
@@ -159,7 +168,7 @@ const props = defineProps<{
 }>()
 
 const defaultStartPerformerId = computed(() => {
-  if (props.performers.length === 1) return props.performers[0].id
+  if (props.performers.length === 1) return props.performers[0]!.id
   return undefined
 })
 
@@ -176,7 +185,7 @@ const formState = ref<TimeslotFormState>({
   performerId: '',
   performanceType: PerformanceType.Live,
   name: '',
-  file: undefined,
+  file: null,
   performerName: '',
   performerUrl: ''
 })
@@ -196,12 +205,11 @@ const validation = createFormValidation(formState, {
 })
 
 const onFileSelect = (e: FileUploadSelectEvent) => {
-  formState.value.file = e.files.length > 0 ? (e.files[0] as File) : undefined
+  formState.value.file = e.files.length > 0 ? (e.files[0] as File) : null
 }
 
 const onFileRemove = (e: FileUploadRemoveEvent) => {
-  if (e.files.length === 0)
-    formState.value.file = undefined
+  if (e.files.length === 0) formState.value.file = null
 }
 
 const isSubmitting = ref(false)
@@ -254,9 +262,9 @@ const createPerformer = async (): Promise<Result<string, null>> => {
     if (response.isInvalid()) {
       const details = response.error as ValidationProblemDetails<PerformerRequest>
       if (details.errors.name)
-        validation.setValidity('performerName', { isValid: false, message: details.errors.name[0] })
+        validation.setValidity('performerName', { isValid: false, message: details.errors.name[0] ?? '' })
       if (details.errors.url)
-        validation.setValidity('performerUrl', { isValid: false, message: details.errors.url[0] })
+        validation.setValidity('performerUrl', { isValid: false, message: details.errors.url[0] ?? '' })
     } else tryHandleUnsuccessfulResponse(response, toast)
     return err(null)
   }
@@ -314,7 +322,7 @@ const durationOptions = computed((): { label: string; value: number }[] => {
     .sort((a, b) => parseTime(a.startsAt) - parseTime(b.startsAt))
   const nextBoundaryTime =
     timeslotsFollowingCurrent.length > 0
-      ? parseTime(timeslotsFollowingCurrent[0].startsAt)
+      ? parseTime(timeslotsFollowingCurrent[0]!.startsAt)
       : endOfSchedule
 
   const maxDurationMinutes = Math.floor(

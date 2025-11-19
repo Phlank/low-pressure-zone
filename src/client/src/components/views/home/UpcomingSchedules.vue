@@ -102,7 +102,7 @@ const handleChangeSchedule = (newId: string) => {
 
 const scheduleData: ComputedRef<ScheduleData | undefined> = computed(() => {
   if (schedules.value.length === 0) return undefined
-  const schedule = schedules.value[scheduleIndex.value]
+  const schedule = schedules.value[scheduleIndex.value]!
   return {
     id: schedule.id,
     start: parseDate(schedule.startsAt),
@@ -117,8 +117,8 @@ const mapTimeslotDisplayData = (schedule: ScheduleResponse) => {
   const timeslotData: TimeslotData[] = []
   if (timeslots.length === 0) return timeslotData
 
-  const startFirst = parseDate(timeslots[0].startsAt)
-  const endLast = parseDate(timeslots[timeslots.length - 1].endsAt)
+  const startFirst = parseDate(timeslots[0]!.startsAt)
+  const endLast = parseDate(timeslots[timeslots.length - 1]!.endsAt)
   const hours = hoursBetween(startFirst, endLast)
   if (startFirst > parseDate(schedule.startsAt)) {
     hours.unshift(getPreviousHour(startFirst))

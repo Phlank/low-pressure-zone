@@ -3,16 +3,17 @@ using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services;
-using LowPressureZone.Core;
 using LowPressureZone.Domain;
-using LowPressureZone.Domain.Migrations;
 using LowPressureZone.Identity.Extensions;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
-public class PostTimeslot(DataContext dataContext, FormFileSaver fileSaver, PerformerRules performerRules, ScheduleRules scheduleRules)
+public partial class PostTimeslot(
+    DataContext dataContext,
+    TimeslotFileProcessor fileProcessor,
+    PerformerRules performerRules,
+    ScheduleRules scheduleRules)
     : EndpointWithMapper<TimeslotRequest, TimeslotMapper>
 {
     public override void Configure()
@@ -36,17 +37,23 @@ public class PostTimeslot(DataContext dataContext, FormFileSaver fileSaver, Perf
                                         .Where(schedule => schedule.Id == scheduleId)
                                         .FirstAsync(ct);
         var performer = await dataContext.Performers.FirstAsync(p => p.Id == request.PerformerId, ct);
-        
+
         if (!scheduleRules.IsAddingTimeslotsAuthorized(schedule)
             || !performerRules.IsTimeslotLinkAuthorized(performer))
         {
             await SendUnauthorizedAsync(ct);
             return;
         }
-        
-        if (request is { PerformanceType: PerformanceTypes.Prerecorded, File: not null })
+
+        if (request.PerformanceType == PerformanceTypes.Prerecorded
+            && request.File is not null)
         {
-            var saveFileResult = await fileSaver.SaveFormFileAsync(request.File, ct);
+            var processResult = await fileProcessor.ProcessUploadedMediaFileAsync(request, ct);
+            if (processResult.IsError)
+            {
+                ValidationFailures.AddRange(processResult.Error);
+                ThrowIfAnyErrors();
+            }
         }
 
         var timeslot = Map.ToEntity(request);
@@ -58,4 +65,7 @@ public class PostTimeslot(DataContext dataContext, FormFileSaver fileSaver, Perf
             id = scheduleId
         }, Response, cancellation: ct);
     }
+
+    [LoggerMessage(LogLevel.Error, "Unable to save file for analysis: {error}")]
+    static partial void LogUnableToSaveFileError(ILogger logger, string error);
 }

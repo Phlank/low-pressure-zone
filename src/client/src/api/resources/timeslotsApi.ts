@@ -24,7 +24,7 @@ export interface TimeslotRequest {
   startsAt: string
   endsAt: string
   name: string
-  file?: File
+  file: File | null
 }
 
 const mapRequest = <TRequest extends TimeslotRequest>(request: TRequest): TimeslotRequest => {
