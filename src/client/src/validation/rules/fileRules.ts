@@ -4,7 +4,6 @@ export const mimeType =
   (allowedTypes: string[], msg?: string) =>
   (file: File | null): ValidationResult => {
     if (!file) return valid
-    console.log(`Validating ${file.type}`)
     if (allowedTypes.includes(file.type)) return valid
     return invalid(msg ?? `Invalid file type. Allowed types: ${allowedTypes.join(', ')}`)
   }
