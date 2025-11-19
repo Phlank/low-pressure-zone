@@ -56,7 +56,6 @@ public static class AudioQualityValidator
             else
                 bitrate = stream.BitRate;
             
-            Console.WriteLine($"Bitrate: {bitrate}");
             
             if (bitrate < 256000)
                 failures.Add(new ValidationFailure(propertyName, "Minimum bitrate is 256 kbps"));
