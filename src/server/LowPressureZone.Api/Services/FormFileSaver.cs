@@ -36,7 +36,7 @@ public sealed partial class FormFileSaver(
         return Result.Ok(path);
     }
 
-    public async Task<Result<string, string>> DeleteSavedFormFileAsync(string path, CancellationToken ct = default)
+    public async Task<Result<string, string>> DeleteSavedFormFileAsync(string path)
     {
         try
         {
