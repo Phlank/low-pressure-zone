@@ -20,7 +20,7 @@ public sealed class TimeslotFileProcessor(FormFileSaver fileSaver, MediaAnalyzer
         var analysisResult = await mediaAnalyzer.AnalyzeAsync(saveResult.Value, ct);
         if (analysisResult.IsError)
         {
-            _ = await fileSaver.DeleteSavedFormFileAsync(saveResult.Value, ct);
+            _ = await fileSaver.DeleteSavedFormFileAsync(saveResult.Value);
             return Result.Err<string>(analysisResult.Error.ToValidationFailures(nameof(request.File)));
         }
 
@@ -28,7 +28,7 @@ public sealed class TimeslotFileProcessor(FormFileSaver fileSaver, MediaAnalyzer
         var analysisValidationFailures = TimeslotRequestValidator.ValidateMediaAnalysis(request, analysis);
         if (analysisValidationFailures.Count != 0)
         {
-            _ = await fileSaver.DeleteSavedFormFileAsync(saveResult.Value, ct);
+            _ = await fileSaver.DeleteSavedFormFileAsync(saveResult.Value);
             return Result.Err<string>(analysisValidationFailures);
         }
 
