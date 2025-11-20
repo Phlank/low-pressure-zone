@@ -1,7 +1,7 @@
 using FFMpegCore;
 using FluentValidation.Results;
 
-namespace LowPressureZone.Api.Utilities;
+namespace LowPressureZone.Api.Services.Audio;
 
 public static class AudioQualityValidator
 {

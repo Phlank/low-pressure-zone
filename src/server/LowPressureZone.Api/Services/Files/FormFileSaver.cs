@@ -2,7 +2,7 @@ using LowPressureZone.Api.Models.Configuration;
 using LowPressureZone.Core;
 using Microsoft.Extensions.Options;
 
-namespace LowPressureZone.Api.Services;
+namespace LowPressureZone.Api.Services.Files;
 
 public sealed partial class FormFileSaver(
     IOptions<FileConfiguration> fileConfig,
@@ -57,7 +57,7 @@ public sealed partial class FormFileSaver(
             return Result.Err<string, string>($"Failed to delete saved file at {path}: {ex.Message}");
         }
     }
-
+    
     [LoggerMessage(LogLevel.Error, "Failed to save uploaded file: {errorMessage}")]
     static partial void LogSaveFailure(ILogger<FormFileSaver> logger, string errorMessage);
 
