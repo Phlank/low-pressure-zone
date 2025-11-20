@@ -18,6 +18,8 @@ using LowPressureZone.Api.Models.Configuration;
 using LowPressureZone.Api.Models.Configuration.Streaming;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services;
+using LowPressureZone.Api.Services.Audio;
+using LowPressureZone.Api.Services.Files;
 using LowPressureZone.Api.Services.StreamConnectionInfo;
 using LowPressureZone.Api.Services.StreamStatus;
 using LowPressureZone.Domain;
@@ -31,8 +33,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using FormFileSaver = LowPressureZone.Api.Services.FormFileSaver;
-using MediaAnalyzer = LowPressureZone.Api.Services.MediaAnalyzer;
 
 namespace LowPressureZone.Api.Extensions;
 
@@ -153,13 +153,14 @@ public static class WebApplicationBuilderExtensions
 
         builder.Services.AddSingleton<FormFileSaver>();
         builder.Services.AddSingleton<MediaAnalyzer>();
-        builder.Services.AddSingleton<TimeslotFileProcessor>();
+        builder.Services.AddSingleton<Mp3Processor>();
         builder.Services.AddSingleton<EmailService>();
         builder.Services.AddSingleton<UriService>();
         builder.Services.AddHttpClient<AzuraCastClient>(ConfigureAzuraCastHttpClient);
         builder.Services.AddSingleton<IAzuraCastClient, AzuraCastClient>();
         builder.Services.AddSingleton<IStreamStatusService, AzuraCastStatusService>();
         builder.Services.AddScoped<StreamingInfoService>();
+        builder.Services.AddScoped<TimeslotFileProcessor>();
         builder.Services.AddSingleton<ISender, MailgunSender>(serviceProvider => serviceProvider.CreateMailgunSender());
         builder.Services.AddHostedService<BroadcastDeletionService>();
     }

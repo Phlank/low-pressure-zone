@@ -2,7 +2,7 @@ using FFMpegCore;
 using FFMpegCore.Exceptions;
 using LowPressureZone.Core;
 
-namespace LowPressureZone.Api.Services;
+namespace LowPressureZone.Api.Services.Audio;
 
 public sealed partial class MediaAnalyzer(ILogger<MediaAnalyzer> logger)
 {
