@@ -2,7 +2,7 @@ namespace LowPressureZone.Adapter.AzuraCast.ApiSchema;
 
 public class StationPlaylist
 {
-    public int? Id { get; set; }
+    public int Id { get; set; }
     public required string Name { get; set; }
     public string Description { get; set; } = "";
     public required StationPlaylistType Type { get; set; }

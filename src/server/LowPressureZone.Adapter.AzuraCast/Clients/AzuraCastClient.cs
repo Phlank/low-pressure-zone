@@ -177,7 +177,7 @@ public sealed class AzuraCastClient(
         if (content?.Id is null)
             return Result.Err<int, HttpResponseMessage>(result);
         
-        return Result.Ok<int, HttpResponseMessage>(content.Id.Value);
+        return Result.Ok<int, HttpResponseMessage>(content.Id);
     }
 
     public async Task<Result<bool, HttpResponseMessage>> PutMediaIntoPlaylist(int playlistId, int mediaId)
