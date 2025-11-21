@@ -2,16 +2,18 @@
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Configuration;
 using LowPressureZone.Core;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Renci.SshNet;
+using Renci.SshNet.Common;
 
 namespace LowPressureZone.Adapter.AzuraCast.Clients;
 
 public sealed class AzuraCastClient(
     HttpClient httpClient,
     IOptions<AzuraCastClientConfiguration> options,
-    ISftpClient sftpClient)
+    ISftpClient sftpClient,
+    ILogger<AzuraCastClient> logger)
     : IAzuraCastClient
 {
     private readonly string _stationId = options.Value.StationId;
@@ -128,6 +130,41 @@ public sealed class AzuraCastClient(
             return Result.Err<HttpContent, HttpResponseMessage>(response);
 
         return Result.Ok<HttpContent, HttpResponseMessage>(response.Content);
+    }
+
+    public async Task<Result<string, string>> UploadMediaAsync(string filePath, FileStream fileStream)
+    {
+        if (!sftpClient.IsConnected)
+            sftpClient.Connect();
+
+        if (await sftpClient.ExistsAsync(filePath))
+            filePath = $"{filePath}_{DateTime.UtcNow.Ticks}";
+
+        try
+        {
+            await sftpClient.UploadFileAsync(fileStream, filePath);
+            return Result.Ok(filePath);
+        }
+        catch (SftpPermissionDeniedException ex)
+        {
+            logger.LogError(ex, "Permission denied when uploading file to AzuraCast");
+            return Result.Err<string, string>(ex.Message);
+        }
+        catch (SshConnectionException ex)
+        {
+            logger.LogError(ex, "SSH connection error when uploading file to AzuraCast");
+            return Result.Err<string, string>(ex.Message);
+        }
+        catch (SshException ex)
+        {
+            logger.LogError(ex, "SSH error when uploading file to AzuraCast");
+            return Result.Err<string, string>(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unexpected error when uploading file to AzuraCast");
+            return Result.Err<string, string>(ex.Message);
+        }
     }
 
     private string NowPlayingEndpoint() => $"/api/nowplaying/{_stationId}";

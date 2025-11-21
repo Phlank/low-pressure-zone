@@ -1,6 +1,7 @@
 using System.Globalization;
 using FFMpegCore;
 using FluentValidation.Results;
+using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Models;
@@ -19,6 +20,7 @@ public sealed class TimeslotFileProcessor(
     MediaAnalyzer mediaAnalyzer,
     Mp3Processor mp3Processor,
     DataContext dataContext,
+    AzuraCastClient azuraCastClient,
     IOptions<FileConfiguration> fileOptions)
 {
     private readonly string _tempLocation = fileOptions.Value.TemporaryLocation;
@@ -35,7 +37,7 @@ public sealed class TimeslotFileProcessor(
         var analysisResult = await mediaAnalyzer.AnalyzeAsync(saveResult.Value, ct);
         if (analysisResult.IsError)
         {
-            _ = await fileSaver.DeleteSavedFormFileAsync(saveResult.Value);
+            _ = await fileSaver.DeleteFileAsync(saveResult.Value);
             return Result.Err<string>(analysisResult.Error.ToValidationFailures(nameof(request.File)));
         }
 
@@ -43,21 +45,37 @@ public sealed class TimeslotFileProcessor(
         var analysisValidationFailures = TimeslotRequestValidator.ValidateMediaAnalysis(request, analysis);
         if (analysisValidationFailures.Count != 0)
         {
-            _ = await fileSaver.DeleteSavedFormFileAsync(saveResult.Value);
+            _ = await fileSaver.DeleteFileAsync(saveResult.Value);
             return Result.Err<string>(analysisValidationFailures);
         }
 
         var newMetadata = await GetAudioMetadataAsync(request, ct);
-        var outputFilePath = Path.Combine(_tempLocation,
-                                          GetUploadFileName(newMetadata.Artist, newMetadata.Title, request.StartsAt));
+        var fileName = GetUploadFileName(newMetadata.Artist, newMetadata.Title, request.StartsAt);
+        var outputFilePath = Path.Combine(_tempLocation, fileName);
 
         var processResult = await ProcessToNewFile(analysis, saveResult.Value, outputFilePath);
-        _ = await fileSaver.DeleteSavedFormFileAsync(saveResult.Value);
+        _ = await fileSaver.DeleteFileAsync(saveResult.Value);
+
+        await using (var fileStream = File.OpenRead(outputFilePath))
+        {
+            var uploadMediaResult = await azuraCastClient.UploadMediaAsync(fileName, fileStream);
+            if (uploadMediaResult.IsError)
+            {
+                return Result.Err<string>([
+                    new ValidationFailure(nameof(request.File), "Failed to upload media to AzuraCast.")
+                ]);
+            }
+        }
+
+        _ = await fileSaver.DeleteFileAsync(outputFilePath);
 
         return processResult;
     }
 
-    private async Task<Result<string, IEnumerable<ValidationFailure>>> ProcessToNewFile(IMediaAnalysis analysis, string inputFilePath, string outputFilePath)
+    private async Task<Result<string, IEnumerable<ValidationFailure>>> ProcessToNewFile(
+        IMediaAnalysis analysis,
+        string inputFilePath,
+        string outputFilePath)
     {
         if (analysis.AudioStreams[0].CodecName == "mp3")
         {
@@ -71,6 +89,7 @@ public sealed class TimeslotFileProcessor(
             if (conversionResult.IsError)
                 return Result.Err<string>(conversionResult.Error.ToValidationFailures(nameof(TimeslotRequest.File)));
         }
+
         return Result.Ok<string, IEnumerable<ValidationFailure>>(outputFilePath);
     }
 
