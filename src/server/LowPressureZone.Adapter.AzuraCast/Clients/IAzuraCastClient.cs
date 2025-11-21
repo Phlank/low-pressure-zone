@@ -18,4 +18,5 @@ public interface IAzuraCastClient
 
     Task<Result<HttpContent, HttpResponseMessage>> DownloadBroadcastFileAsync(int streamerId, int broadcastId);
     Task<Result<HttpContent, HttpResponseMessage>> DeleteBroadcastAsync(int streamerId, int broadcastId);
+    Task<Result<string, string>> UploadMediaAsync(string targetFilePath, FileStream fileStream);
 }
