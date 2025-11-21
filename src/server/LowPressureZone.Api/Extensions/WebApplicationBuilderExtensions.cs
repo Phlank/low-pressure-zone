@@ -167,7 +167,7 @@ public static class WebApplicationBuilderExtensions
                                   configuration.SftpPassword);
         });
         builder.Services.AddHttpClient<AzuraCastClient>(ConfigureAzuraCastHttpClient);
-        builder.Services.AddSingleton<IAzuraCastClient, AzuraCastClient>();
+        builder.Services.AddScoped<IAzuraCastClient, AzuraCastClient>();
         builder.Services.AddSingleton<IStreamStatusService, AzuraCastStatusService>();
         builder.Services.AddScoped<StreamingInfoService>();
         builder.Services.AddScoped<TimeslotFileProcessor>();
