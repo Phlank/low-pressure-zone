@@ -132,18 +132,18 @@ public sealed class AzuraCastClient(
         return Result.Ok<HttpContent, HttpResponseMessage>(response.Content);
     }
 
-    public async Task<Result<string, string>> UploadMediaAsync(string filePath, FileStream fileStream)
+    public async Task<Result<string, string>> UploadMediaAsync(string targetFilePath, FileStream fileStream)
     {
         if (!sftpClient.IsConnected)
             sftpClient.Connect();
 
-        if (await sftpClient.ExistsAsync(filePath))
-            filePath = $"{filePath}_{DateTime.UtcNow.Ticks}";
+        if (await sftpClient.ExistsAsync(targetFilePath))
+            targetFilePath = $"{targetFilePath}_{DateTime.UtcNow.Ticks}";
 
         try
         {
-            await sftpClient.UploadFileAsync(fileStream, filePath);
-            return Result.Ok(filePath);
+            await sftpClient.UploadFileAsync(fileStream, targetFilePath);
+            return Result.Ok(targetFilePath);
         }
         catch (SftpPermissionDeniedException ex)
         {
