@@ -33,6 +33,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Renci.SshNet;
 
 namespace LowPressureZone.Api.Extensions;
 
@@ -124,7 +125,8 @@ public static class WebApplicationBuilderExtensions
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
 
-        services.Configure<AzuraCastClientConfiguration>(builder.Configuration.GetSection(AzuraCastClientConfiguration.Name));
+        services.Configure<AzuraCastClientConfiguration>(builder.Configuration.GetSection(AzuraCastClientConfiguration
+                                                                                              .Name));
         services.Configure<IcecastConfiguration>(builder.Configuration.GetSection(IcecastConfiguration.Name));
         services.Configure<StreamingConfiguration>(builder.Configuration.GetSection(StreamingConfiguration.Name));
         services.Configure<EmailServiceConfiguration>(builder.Configuration.GetSection(EmailServiceConfiguration.Name));
@@ -156,6 +158,14 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton<Mp3Processor>();
         builder.Services.AddSingleton<EmailService>();
         builder.Services.AddSingleton<UriService>();
+        builder.Services.AddSingleton<ISftpClient>(provider =>
+        {
+            var configuration = provider.GetRequiredService<IOptions<AzuraCastClientConfiguration>>().Value;
+            return new SftpClient(configuration.SftpHost, 
+                                  configuration.SftpPort, 
+                                  configuration.SftpUser,
+                                  configuration.SftpPassword);
+        });
         builder.Services.AddHttpClient<AzuraCastClient>(ConfigureAzuraCastHttpClient);
         builder.Services.AddSingleton<IAzuraCastClient, AzuraCastClient>();
         builder.Services.AddSingleton<IStreamStatusService, AzuraCastStatusService>();

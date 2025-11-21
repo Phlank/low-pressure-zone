@@ -4,10 +4,14 @@ using LowPressureZone.Adapter.AzuraCast.Configuration;
 using LowPressureZone.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Renci.SshNet;
 
 namespace LowPressureZone.Adapter.AzuraCast.Clients;
 
-public sealed class AzuraCastClient(HttpClient httpClient, IOptions<AzuraCastClientConfiguration> options) 
+public sealed class AzuraCastClient(
+    HttpClient httpClient,
+    IOptions<AzuraCastClientConfiguration> options,
+    ISftpClient sftpClient)
     : IAzuraCastClient
 {
     private readonly string _stationId = options.Value.StationId;
@@ -109,7 +113,7 @@ public sealed class AzuraCastClient(HttpClient httpClient, IOptions<AzuraCastCli
     {
         var response =
             await httpClient.GetAsync(DownloadBroadcastEndpoint(streamerId, broadcastId),
-                                   HttpCompletionOption.ResponseHeadersRead);
+                                      HttpCompletionOption.ResponseHeadersRead);
         if (!response.IsSuccessStatusCode)
             return Result.Err<HttpContent, HttpResponseMessage>(response);
 

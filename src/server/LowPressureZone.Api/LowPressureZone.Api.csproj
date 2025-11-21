@@ -22,6 +22,7 @@
         </PackageReference>
         <PackageReference Include="Minerals.StringCases" Version="0.2.2"/>
         <PackageReference Include="Shouldly" Version="4.3.0"/>
+        <PackageReference Include="SSH.NET" Version="2025.1.0" />
     </ItemGroup>
 
     <ItemGroup>
