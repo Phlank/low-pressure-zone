@@ -167,6 +167,24 @@ public sealed class AzuraCastClient(
         }
     }
 
+    public async Task<Result<int, HttpResponseMessage>> PostPlaylist(StationPlaylist playlist)
+    {
+        var result = await httpClient.PostAsJsonAsync(PlaylistsEndpoint(), playlist);
+        if (!result.IsSuccessStatusCode)
+            return Result.Err<int, HttpResponseMessage>(result);
+        
+        var content = await result.Content.ReadFromJsonAsync<StationPlaylist>();
+        if (content?.Id is null)
+            return Result.Err<int, HttpResponseMessage>(result);
+        
+        return Result.Ok<int, HttpResponseMessage>(content.Id.Value);
+    }
+
+    public async Task<Result<bool, HttpResponseMessage>> PutMediaIntoPlaylist(int playlistId, int mediaId)
+    {
+        throw new NotImplementedException();
+    }
+
     private string NowPlayingEndpoint() => $"/api/nowplaying/{_stationId}";
 
     private string StreamersEndpoint() => $"/api/station/{_stationId}/streamers";
@@ -182,4 +200,5 @@ public sealed class AzuraCastClient(
 
     private string DeleteBroadcastEndpoint(int streamerId, int broadcastId) =>
         $"/api/station/{_stationId}/streamer/{streamerId}/broadcast/{broadcastId}";
+    private string PlaylistsEndpoint() => $"/api/station/{_stationId}/playlists";
 }

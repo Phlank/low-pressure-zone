@@ -19,4 +19,6 @@ public interface IAzuraCastClient
     Task<Result<HttpContent, HttpResponseMessage>> DownloadBroadcastFileAsync(int streamerId, int broadcastId);
     Task<Result<HttpContent, HttpResponseMessage>> DeleteBroadcastAsync(int streamerId, int broadcastId);
     Task<Result<string, string>> UploadMediaAsync(string targetFilePath, FileStream fileStream);
+    Task<Result<int, HttpResponseMessage>> PostPlaylist(StationPlaylist playlist);
+    Task<Result<bool, HttpResponseMessage>> PutMediaIntoPlaylist(int playlistId, int mediaId);
 }
