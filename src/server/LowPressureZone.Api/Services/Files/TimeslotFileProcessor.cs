@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text.Json;
 using FFMpegCore;
 using FluentValidation.Results;
 using LowPressureZone.Adapter.AzuraCast.Clients;
@@ -57,11 +56,14 @@ public sealed class TimeslotFileProcessor(
 
         var processResult = await ProcessToNewFile(analysis, saveResult.Value, outputFilePath);
         _ = await fileSaver.DeleteFileAsync(saveResult.Value);
+        
+        if (processResult.IsError)
+            return Result.Err<string>(processResult.Error);
 
-        string azuraCastFilePath;
+        string azuraCastFilePath = $"{_prerecordedSetLocation}/{fileName}";
         await using (var fileStream = File.OpenRead(outputFilePath))
         {
-            var uploadMediaResult = await azuraCastClient.UploadMediaAsync(fileName, fileStream);
+            var uploadMediaResult = await azuraCastClient.UploadMediaAsync(azuraCastFilePath, fileStream);
             _ = await fileSaver.DeleteFileAsync(outputFilePath);
             if (uploadMediaResult.IsError)
             {
@@ -77,11 +79,6 @@ public sealed class TimeslotFileProcessor(
         if (prerecordListResult.IsError)
             return Result.Err<string>("Failed to retrieve files from AzuraCast"
                                           .ToValidationFailures(nameof(request.File)));
-        
-        Console.WriteLine(JsonSerializer.Serialize(prerecordListResult.Value), new JsonSerializerOptions()
-        {
-            WriteIndented = true
-        });
 
         var uploadedFile = prerecordListResult.Value.FirstOrDefault(file => file.Path == azuraCastFilePath);
         if (uploadedFile is null)

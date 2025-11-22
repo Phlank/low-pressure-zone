@@ -7,6 +7,7 @@ public class StationFileListItem
 {
     public Dictionary<string, string> Links { get; set; } = new();
     public required string Path { get; set; }
+    [JsonPropertyName("path_short")]
     public required string PathShort { get; set; }
     public required string Text { get; set; }
 

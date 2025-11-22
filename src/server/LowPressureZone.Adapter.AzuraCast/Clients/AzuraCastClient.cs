@@ -20,7 +20,7 @@ public sealed class AzuraCastClient(
 {
     private readonly string _stationId = options.Value.StationId;
 
-    private HttpClient Client => clientFactory.CreateClient("AzuraCastHttpClient");  
+    private HttpClient Client => clientFactory.CreateClient("AzuraCastHttpClient");
 
     public async Task<Result<NowPlaying, HttpResponseMessage>> GetNowPlayingAsync()
     {
@@ -50,7 +50,7 @@ public sealed class AzuraCastClient(
 
     public async Task<Result<StationStreamer, HttpResponseMessage>> GetStreamerAsync(int streamerId)
     {
-                var response = await Client.GetAsync(StreamerEndpoint(streamerId));
+        var response = await Client.GetAsync(StreamerEndpoint(streamerId));
         if (!response.IsSuccessStatusCode)
             return Result.Err<StationStreamer, HttpResponseMessage>(response);
 
@@ -77,7 +77,7 @@ public sealed class AzuraCastClient(
             EnforceSchedule = false,
             ReactivateAt = null
         };
-                var result = await Client.PostAsJsonAsync(StreamersEndpoint(), body);
+        var result = await Client.PostAsJsonAsync(StreamersEndpoint(), body);
         if (!result.IsSuccessStatusCode)
             return Result.Err<int, HttpResponseMessage>(result);
 
@@ -93,7 +93,7 @@ public sealed class AzuraCastClient(
 
     public async Task<Result<bool, HttpResponseMessage>> PutStreamerAsync(StationStreamer streamer)
     {
-                var result = await Client.PutAsJsonAsync(StreamerEndpoint(streamer.Id), streamer);
+        var result = await Client.PutAsJsonAsync(StreamerEndpoint(streamer.Id), streamer);
         return !result.IsSuccessStatusCode
                    ? Result.Err<bool, HttpResponseMessage>(result)
                    : Result.Ok<bool, HttpResponseMessage>(true);
@@ -102,7 +102,7 @@ public sealed class AzuraCastClient(
     public async Task<Result<IReadOnlyCollection<StationStreamerBroadcast>, HttpResponseMessage>> GetBroadcastsAsync(
         int? streamerId = null)
     {
-                var response = await Client.GetAsync(BroadcastsEndpoint(streamerId));
+        var response = await Client.GetAsync(BroadcastsEndpoint(streamerId));
         if (!response.IsSuccessStatusCode)
             return Result.Err<IReadOnlyCollection<StationStreamerBroadcast>, HttpResponseMessage>(response);
 
@@ -117,9 +117,8 @@ public sealed class AzuraCastClient(
         int streamerId,
         int broadcastId)
     {
-                var response =
-            await Client.GetAsync(DownloadBroadcastEndpoint(streamerId, broadcastId),
-                                      HttpCompletionOption.ResponseHeadersRead);
+        var response = await Client.GetAsync(DownloadBroadcastEndpoint(streamerId, broadcastId),
+                                             HttpCompletionOption.ResponseHeadersRead);
         if (!response.IsSuccessStatusCode)
             return Result.Err<HttpContent, HttpResponseMessage>(response);
 
@@ -128,7 +127,7 @@ public sealed class AzuraCastClient(
 
     public async Task<Result<HttpContent, HttpResponseMessage>> DeleteBroadcastAsync(int streamerId, int broadcastId)
     {
-                var response = await Client.DeleteAsync(DeleteBroadcastEndpoint(streamerId, broadcastId));
+        var response = await Client.DeleteAsync(DeleteBroadcastEndpoint(streamerId, broadcastId));
 
         if (!response.IsSuccessStatusCode)
             return Result.Err<HttpContent, HttpResponseMessage>(response);
@@ -176,17 +175,17 @@ public sealed class AzuraCastClient(
         bool flushCache = false,
         string? searchPhrase = null)
     {
-                var queryParameters = new StringBuilder($"currentDirectory={HttpUtility.UrlEncode(directory)}")
-            .Append($"&flushCache={(flushCache ? "1" : "0")}");
+        var queryParameters = new StringBuilder($"currentDirectory={HttpUtility.UrlEncode(directory)}")
+            .Append($"&flushCache={flushCache}");
         if (!string.IsNullOrWhiteSpace(searchPhrase))
             queryParameters.Append($"&searchPhrase={HttpUtility.UrlEncode(searchPhrase)}");
-        
+
         var response = await Client.GetAsync($"{FilesEndpoint()}/list?{queryParameters}");
         if (!response.IsSuccessStatusCode)
             return Result.Err<IEnumerable<StationFileListItem>, HttpResponseMessage>(response);
 
         var content = await response.Content.ReadFromJsonAsync<IEnumerable<StationFileListItem>>();
-        if (content is null)
+        if (content == null)
             return Result.Err<IEnumerable<StationFileListItem>, HttpResponseMessage>(response);
 
         return Result.Ok<IEnumerable<StationFileListItem>, HttpResponseMessage>(content);
@@ -194,7 +193,7 @@ public sealed class AzuraCastClient(
 
     public async Task<Result<int, HttpResponseMessage>> PostPlaylist(StationPlaylist playlist)
     {
-                var result = await Client.PostAsJsonAsync(PlaylistsEndpoint(), playlist);
+        var result = await Client.PostAsJsonAsync(PlaylistsEndpoint(), playlist);
         if (!result.IsSuccessStatusCode)
             return Result.Err<int, HttpResponseMessage>(result);
 

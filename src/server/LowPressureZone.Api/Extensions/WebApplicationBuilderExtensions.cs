@@ -211,7 +211,6 @@ public static class WebApplicationBuilderExtensions
         {
             var configuration = services.GetRequiredService<IOptions<AzuraCastClientConfiguration>>()
                                         .Value;
-            Console.WriteLine(configuration.ApiUrl);
             client.BaseAddress = configuration.ApiUrl;
             client.DefaultRequestHeaders.Add("X-API-Key", configuration.ApiKey);
         };
