@@ -31,7 +31,7 @@ public static class UserManagerExtensions
     public static async Task<Result<string, string>> LinkToNewStreamer(
         this UserManager<AppUser> userManager,
         AppUser user,
-        AzuraCastClient client)
+        IAzuraCastClient client)
     {
         var displayName = user.DisplayName;
         var username = user.UserName;
@@ -42,7 +42,7 @@ public static class UserManagerExtensions
         var createResult = await client.PostStreamerAsync(username!, password, displayName);
         if (!createResult.IsSuccess)
             return
-                Result.Err<string, string>($"Unable to create streamer for user: ${createResult.Error?.ReasonPhrase ?? "No reason given by AzuraCast"}");
+                Result.Err<string, string>($"Unable to create streamer for user: ${createResult.Error.ReasonPhrase ?? "No reason given by AzuraCast"}");
 
         user.StreamerId = createResult.Value;
         await userManager.UpdateAsync(user);
@@ -52,7 +52,7 @@ public static class UserManagerExtensions
     public static async Task<Result<bool, string>> LinkToExistingStreamer(
         this UserManager<AppUser> userManager,
         AppUser user,
-        AzuraCastClient client)
+        IAzuraCastClient client)
     {
         var streamersResult = await client.GetStreamersAsync();
         if (!streamersResult.IsSuccess) return Result.Err<bool, string>("Unable to get streamers");
@@ -68,7 +68,7 @@ public static class UserManagerExtensions
     public static async Task<Result<string, string>> GenerateStreamerPassword(
         this UserManager<AppUser> userManager,
         AppUser user,
-        AzuraCastClient client)
+        IAzuraCastClient client)
     {
         if (user.StreamerId is null) return Result.Err<string, string>("User does not have linked streamer");
 
@@ -88,7 +88,7 @@ public static class UserManagerExtensions
     public static async Task<Result<StationStreamer, string>> GetStreamerAsync(
         this UserManager<AppUser> userManager,
         AppUser user,
-        AzuraCastClient client)
+        IAzuraCastClient client)
     {
         if (!user.StreamerId.HasValue)
             return Result.Err<StationStreamer, string>("User is not linked to streamer");

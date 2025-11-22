@@ -15,5 +15,9 @@
     <ItemGroup>
         <ProjectReference Include="..\LowPressureZone.Core\LowPressureZone.Core.csproj"/>
     </ItemGroup>
+    
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
 
 </Project>

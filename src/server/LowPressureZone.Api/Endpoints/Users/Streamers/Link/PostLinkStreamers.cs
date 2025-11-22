@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Users.Streamers.Link;
 
-public partial class PostLinkStreamers(AzuraCastClient client, UserManager<AppUser> userManager)
+public partial class PostLinkStreamers(IAzuraCastClient client, UserManager<AppUser> userManager)
     : EndpointWithoutRequest<EmptyResponse>
 {
     public override void Configure()

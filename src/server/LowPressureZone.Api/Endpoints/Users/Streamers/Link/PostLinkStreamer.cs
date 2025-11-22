@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.Endpoints.Users.Streamers.Link;
 
-public partial class PostLinkStreamer(AzuraCastClient client, UserManager<AppUser> userManager)
+public partial class PostLinkStreamer(IAzuraCastClient client, UserManager<AppUser> userManager)
     : EndpointWithoutRequest<EmptyResponse>
 {
     public override void Configure()

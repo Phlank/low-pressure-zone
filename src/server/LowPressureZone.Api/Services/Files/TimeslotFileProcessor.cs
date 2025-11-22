@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.Json;
 using FFMpegCore;
 using FluentValidation.Results;
 using LowPressureZone.Adapter.AzuraCast.Clients;
@@ -20,10 +21,11 @@ public sealed class TimeslotFileProcessor(
     MediaAnalyzer mediaAnalyzer,
     Mp3Processor mp3Processor,
     DataContext dataContext,
-    AzuraCastClient azuraCastClient,
+    IAzuraCastClient azuraCastClient,
     IOptions<FileConfiguration> fileOptions)
 {
     private readonly string _tempLocation = fileOptions.Value.TemporaryLocation;
+    private readonly string _prerecordedSetLocation = fileOptions.Value.AzuraCastPrerecordedSetLocation;
 
     public async Task<Result<string, IEnumerable<ValidationFailure>>> ProcessUploadedMediaFileAsync(
         TimeslotRequest request,
@@ -56,20 +58,37 @@ public sealed class TimeslotFileProcessor(
         var processResult = await ProcessToNewFile(analysis, saveResult.Value, outputFilePath);
         _ = await fileSaver.DeleteFileAsync(saveResult.Value);
 
+        string azuraCastFilePath;
         await using (var fileStream = File.OpenRead(outputFilePath))
         {
             var uploadMediaResult = await azuraCastClient.UploadMediaAsync(fileName, fileStream);
+            _ = await fileSaver.DeleteFileAsync(outputFilePath);
             if (uploadMediaResult.IsError)
             {
-                return Result.Err<string>([
-                    new ValidationFailure(nameof(request.File), "Failed to upload media to AzuraCast.")
-                ]);
+                return Result.Err<string>("Failed to upload media to AzuraCast"
+                                              .ToValidationFailures(nameof(request.File)));
             }
+
+            azuraCastFilePath = uploadMediaResult.Value;
         }
 
-        _ = await fileSaver.DeleteFileAsync(outputFilePath);
+        var prerecordListResult = await azuraCastClient.GetStationFilesInDirectoryAsync(_prerecordedSetLocation,
+                                                                                        flushCache: true);
+        if (prerecordListResult.IsError)
+            return Result.Err<string>("Failed to retrieve files from AzuraCast"
+                                          .ToValidationFailures(nameof(request.File)));
+        
+        Console.WriteLine(JsonSerializer.Serialize(prerecordListResult.Value), new JsonSerializerOptions()
+        {
+            WriteIndented = true
+        });
 
-        return processResult;
+        var uploadedFile = prerecordListResult.Value.FirstOrDefault(file => file.Path == azuraCastFilePath);
+        if (uploadedFile is null)
+            return Result.Err<string>("Uploaded file not found in AzuraCast prerecorded set directory"
+                                          .ToValidationFailures(nameof(request.File)));
+
+        return Result.Ok<string, IEnumerable<ValidationFailure>>(azuraCastFilePath);
     }
 
     private async Task<Result<string, IEnumerable<ValidationFailure>>> ProcessToNewFile(

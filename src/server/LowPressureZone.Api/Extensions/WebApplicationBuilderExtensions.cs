@@ -151,14 +151,29 @@ public static class WebApplicationBuilderExtensions
 
     public static void AddApiServices(this WebApplicationBuilder builder)
     {
+        // Ordered by dependency graph. Items grouped lower have dependencies in groups above them.
+        // This is picky and opinionated, but it makes it easy to understand the dependency graph at a glance.
+        // Singletons should precede any scoped services, which should precede any transient services.
         builder.AddEndpointServices();
-
-        builder.Services.AddSingleton<FormFileSaver>();
+        builder.Services.AddSftpClient();
+        builder.Services.AddSingleton<ISender, MailgunSender>(serviceProvider => serviceProvider.CreateMailgunSender());
+        builder.Services.AddHttpClient("AzuraCastHttpClient", ConfigureAzuraCastHttpClient);
         builder.Services.AddSingleton<MediaAnalyzer>();
         builder.Services.AddSingleton<Mp3Processor>();
-        builder.Services.AddSingleton<EmailService>();
         builder.Services.AddSingleton<UriService>();
-        builder.Services.AddSingleton<ISftpClient>(provider =>
+        
+        builder.Services.AddSingleton<EmailService>();
+        builder.Services.AddSingleton<FormFileSaver>();
+        builder.Services.AddSingleton<IAzuraCastClient, AzuraCastClient>();
+        
+        builder.Services.AddSingleton<IStreamStatusService, AzuraCastStatusService>();
+        builder.Services.AddHostedService<BroadcastDeletionService>();
+        builder.Services.AddScoped<StreamingInfoService>();
+        builder.Services.AddScoped<TimeslotFileProcessor>();
+    }
+
+    private static void AddSftpClient(this IServiceCollection services) =>
+        services.AddSingleton<ISftpClient>(provider =>
         {
             var configuration = provider.GetRequiredService<IOptions<AzuraCastClientConfiguration>>().Value;
             return new SftpClient(configuration.SftpHost, 
@@ -166,14 +181,6 @@ public static class WebApplicationBuilderExtensions
                                   configuration.SftpUser,
                                   configuration.SftpPassword);
         });
-        builder.Services.AddHttpClient<AzuraCastClient>(ConfigureAzuraCastHttpClient);
-        builder.Services.AddScoped<IAzuraCastClient, AzuraCastClient>();
-        builder.Services.AddSingleton<IStreamStatusService, AzuraCastStatusService>();
-        builder.Services.AddScoped<StreamingInfoService>();
-        builder.Services.AddScoped<TimeslotFileProcessor>();
-        builder.Services.AddSingleton<ISender, MailgunSender>(serviceProvider => serviceProvider.CreateMailgunSender());
-        builder.Services.AddHostedService<BroadcastDeletionService>();
-    }
 
     private static void AddEndpointServices(this WebApplicationBuilder builder)
     {
@@ -204,6 +211,7 @@ public static class WebApplicationBuilderExtensions
         {
             var configuration = services.GetRequiredService<IOptions<AzuraCastClientConfiguration>>()
                                         .Value;
+            Console.WriteLine(configuration.ApiUrl);
             client.BaseAddress = configuration.ApiUrl;
             client.DefaultRequestHeaders.Add("X-API-Key", configuration.ApiKey);
         };

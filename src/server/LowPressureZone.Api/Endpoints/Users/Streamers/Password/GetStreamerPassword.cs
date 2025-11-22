@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.Endpoints.Users.Streamers.Password;
 
-public class GetStreamerPassword(UserManager<AppUser> userManager, AzuraCastClient client)
+public class GetStreamerPassword(UserManager<AppUser> userManager, IAzuraCastClient client)
     : EndpointWithoutRequest<StreamerPasswordResponse>
 {
     public override void Configure()

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.Endpoints.Users.Streamers;
 
-public class PutStreamer(UserManager<AppUser> userManager, AzuraCastClient client) : Endpoint<StreamerRequest>
+public class PutStreamer(UserManager<AppUser> userManager, IAzuraCastClient client) : Endpoint<StreamerRequest>
 {
     public override void Configure() => Put("/users/streamers");
 

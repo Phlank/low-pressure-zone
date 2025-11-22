@@ -17,7 +17,7 @@ namespace LowPressureZone.Api.Endpoints.Users.Register;
 public class PostRegister(
     UserManager<AppUser> userManager,
     IdentityContext identityContext,
-    AzuraCastClient radioClient,
+    IAzuraCastClient radioClient,
     EmailService emailService) : Endpoint<RegisterRequest>
 {
     private readonly DateTime _requestTime = DateTime.UtcNow;
