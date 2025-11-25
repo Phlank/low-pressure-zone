@@ -27,6 +27,7 @@ public class PutTimeslot(DataContext dataContext, TimeslotFileProcessor fileProc
 
         var timeslot = await dataContext.Timeslots
                                         .Include(timeslot => timeslot.Performer)
+                                        .Include(timeslot => timeslot.Schedule)
                                         .Where(timeslot => timeslot.Id == timeslotId
                                                            && timeslot.ScheduleId == scheduleId)
                                         .FirstOrDefaultAsync(ct);
@@ -46,7 +47,7 @@ public class PutTimeslot(DataContext dataContext, TimeslotFileProcessor fileProc
         if (request.PerformanceType == PerformanceTypes.Prerecorded
             && request.File is not null)
         {
-            var processResult = await fileProcessor.ProcessUploadedMediaFileAsync(request, ct);
+            var processResult = await fileProcessor.ProcessUploadedMediaFileAsync(request, timeslot.Schedule.StartsAt, ct);
             if (processResult.IsError)
             {
                 ValidationFailures.AddRange(processResult.Error);

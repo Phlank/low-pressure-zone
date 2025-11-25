@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
 using System.Web;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Configuration;
@@ -179,8 +180,6 @@ public sealed class AzuraCastClient(
                                                  .Append($"&flushCache={flushCache.ToString().ToLowerInvariant()}")
                                                  .Append($"&currentDirectory={HttpUtility.UrlEncode(directory.Trim('/'))}");
 
-        Console.WriteLine(queryParameters);
-
         var response = await Client.GetAsync($"{FilesEndpoint()}/list?{queryParameters}");
         if (!response.IsSuccessStatusCode)
             return Result.Err<IEnumerable<StationFileListItem>, HttpResponseMessage>(response);
@@ -194,6 +193,7 @@ public sealed class AzuraCastClient(
 
     public async Task<Result<int, HttpResponseMessage>> PostPlaylistAsync(StationPlaylist playlist)
     {
+        Console.WriteLine(JsonSerializer.Serialize(playlist, new JsonSerializerOptions() { WriteIndented = true }));
         var result = await Client.PostAsJsonAsync(PlaylistsEndpoint(), playlist);
         if (!result.IsSuccessStatusCode)
         {
@@ -213,7 +213,7 @@ public sealed class AzuraCastClient(
 
     public async Task<Result<bool, HttpResponseMessage>> PutMediaAsync(int mediaId, StationMediaRequest mediaRequest)
     {
-        var result = await Client.PostAsJsonAsync(FilesEndpoint(mediaId), mediaRequest);
+        var result = await Client.PutAsJsonAsync(FilesEndpoint(mediaId), mediaRequest);
         if (!result.IsSuccessStatusCode)
             return Result.Err<bool, HttpResponseMessage>(result);
 

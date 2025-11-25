@@ -30,6 +30,7 @@ public sealed class TimeslotFileProcessor(
 
     public async Task<Result<string, IEnumerable<ValidationFailure>>> ProcessUploadedMediaFileAsync(
         TimeslotRequest request,
+        DateTimeOffset scheduleStart,
         CancellationToken ct = default)
     {
         request.File.ShouldNotBeNull();
@@ -52,7 +53,7 @@ public sealed class TimeslotFileProcessor(
             return Result.Err<string>(analysisValidationFailures);
         }
 
-        var newMetadata = await GetAudioMetadataAsync(request, ct);
+        var newMetadata = await GetAudioMetadataAsync(request, scheduleStart, ct);
         var fileName = GetUploadFileName(newMetadata.Artist, newMetadata.Title, request.StartsAt);
         var outputFilePath = Path.Combine(_tempLocation, fileName);
 
@@ -69,15 +70,16 @@ public sealed class TimeslotFileProcessor(
             uploadResult = await azuraCastClient.UploadMediaAsync(azuraCastFilePath, fileStream);
             _ = await fileSaver.DeleteFileAsync(processResult.Value);
         }
-        
+
         if (uploadResult.IsError)
             return Result.Err<string>(uploadResult.Error.ToValidationFailures(nameof(request.File)));
-        
+
         var uploadedFileResult = await GetUploadedFile(azuraCastFilePath);
         if (uploadedFileResult.IsError)
             return Result.Err<string>(uploadedFileResult.Error.ToValidationFailures(nameof(request.File)));
 
         var uploadedFile = uploadedFileResult.Value;
+        uploadedFile.Media.ShouldNotBeNull();
 
         var playlist = ConvertTimeslotToPlaylist(request, newMetadata);
         var createPlaylistResult = await azuraCastClient.PostPlaylistAsync(playlist);
@@ -86,7 +88,8 @@ public sealed class TimeslotFileProcessor(
                                           .ToValidationFailures(nameof(request.File)));
 
         var playlistId = createPlaylistResult.Value;
-        var updateRequest = StationMediaMapper.ToRequest(uploadedFile.Media!);
+
+        var updateRequest = StationMediaMapper.ToRequest(uploadedFile.Media);
         updateRequest.Title = newMetadata.Title;
         updateRequest.Artist = newMetadata.Artist;
         updateRequest.Playlists = [playlistId];
@@ -119,16 +122,23 @@ public sealed class TimeslotFileProcessor(
         return Result.Ok<string, IEnumerable<ValidationFailure>>(outputFilePath);
     }
 
-    private async Task<SimpleAudioMetadata> GetAudioMetadataAsync(TimeslotRequest request, CancellationToken ct)
+    private async Task<SimpleAudioMetadata> GetAudioMetadataAsync(
+        TimeslotRequest request,
+        DateTimeOffset scheduleStart,
+        CancellationToken ct)
     {
         var performerName = await dataContext.Performers
                                              .Where(performer => performer.Id == request.PerformerId)
                                              .Select(performer => performer.Name)
                                              .FirstAsync(ct);
-        return new SimpleAudioMetadata(request.Name, performerName);
+        var title = string.IsNullOrWhiteSpace(request.Name)
+                        ? scheduleStart.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
+                        : request.Name;
+        return new SimpleAudioMetadata(title,
+                                       performerName);
     }
 
-    private static string GetUploadFileName(string artist, string? title, DateTimeOffset start)
+    private static string GetUploadFileName(string artist, string title, DateTimeOffset start)
     {
         if (string.IsNullOrEmpty(title))
             return $"{artist} - {start.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)}.mp3";
@@ -153,7 +163,7 @@ public sealed class TimeslotFileProcessor(
                 new StationPlaylistScheduleItem
                 {
                     Days = [],
-                    StartDate = DateOnly.FromDateTime(playlistEnd.UtcDateTime),
+                    StartDate = DateOnly.FromDateTime(request.StartsAt.UtcDateTime),
                     StartTime = request.StartsAt.Hour * 100 + request.StartsAt.Minute,
                     EndDate = DateOnly.FromDateTime(playlistEnd.UtcDateTime),
                     EndTime = request.EndsAt.Hour * 100 + request.EndsAt.Minute,
@@ -187,7 +197,7 @@ public sealed class TimeslotFileProcessor(
                 await Task.Delay(1000);
                 continue;
             }
-            
+
             return Result.Ok(uploadedFile);
         }
     }
