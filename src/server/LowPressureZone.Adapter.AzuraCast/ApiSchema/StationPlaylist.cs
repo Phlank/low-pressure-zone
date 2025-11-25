@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace LowPressureZone.Adapter.AzuraCast.ApiSchema;
 
 public class StationPlaylist

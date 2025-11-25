@@ -140,9 +140,6 @@ public sealed class AzuraCastClient(
         if (!sftpClient.IsConnected)
             sftpClient.Connect();
 
-        if (await sftpClient.ExistsAsync(targetFilePath))
-            targetFilePath = $"{targetFilePath}_{DateTime.UtcNow.Ticks}";
-
         try
         {
             await sftpClient.UploadFileAsync(fileStream, targetFilePath);
@@ -172,30 +169,40 @@ public sealed class AzuraCastClient(
 
     public async Task<Result<IEnumerable<StationFileListItem>, HttpResponseMessage>> GetStationFilesInDirectoryAsync(
         string directory,
+        bool useInternal = true,
         bool flushCache = false,
         string? searchPhrase = null)
     {
-        var queryParameters = new StringBuilder($"currentDirectory={HttpUtility.UrlEncode(directory)}")
-            .Append($"&flushCache={flushCache}");
-        if (!string.IsNullOrWhiteSpace(searchPhrase))
-            queryParameters.Append($"&searchPhrase={HttpUtility.UrlEncode(searchPhrase)}");
+        var queryParameters = new StringBuilder().Append($"?internal={useInternal.ToString().ToLowerInvariant()}")
+                                                 .Append("&rowCount=100")
+                                                 .Append("&current=1")
+                                                 .Append($"&flushCache={flushCache.ToString().ToLowerInvariant()}")
+                                                 .Append($"&currentDirectory={HttpUtility.UrlEncode(directory.Trim('/'))}");
+
+        Console.WriteLine(queryParameters);
 
         var response = await Client.GetAsync($"{FilesEndpoint()}/list?{queryParameters}");
         if (!response.IsSuccessStatusCode)
             return Result.Err<IEnumerable<StationFileListItem>, HttpResponseMessage>(response);
 
-        var content = await response.Content.ReadFromJsonAsync<IEnumerable<StationFileListItem>>();
+        var content = await response.Content.ReadFromJsonAsync<PagedResponse<StationFileListItem>>();
         if (content == null)
             return Result.Err<IEnumerable<StationFileListItem>, HttpResponseMessage>(response);
 
-        return Result.Ok<IEnumerable<StationFileListItem>, HttpResponseMessage>(content);
+        return Result.Ok<IEnumerable<StationFileListItem>, HttpResponseMessage>(content.Rows);
     }
 
-    public async Task<Result<int, HttpResponseMessage>> PostPlaylist(StationPlaylist playlist)
+    public async Task<Result<int, HttpResponseMessage>> PostPlaylistAsync(StationPlaylist playlist)
     {
         var result = await Client.PostAsJsonAsync(PlaylistsEndpoint(), playlist);
         if (!result.IsSuccessStatusCode)
+        {
+            var errorContent = await result.Content.ReadAsStringAsync();
+            logger.LogError("Failed to create playlist in AzuraCast: {StatusCode} - {ErrorContent}",
+                            result.StatusCode,
+                            errorContent);
             return Result.Err<int, HttpResponseMessage>(result);
+        }
 
         var content = await result.Content.ReadFromJsonAsync<StationPlaylist>();
         if (content?.Id is null)
@@ -204,9 +211,13 @@ public sealed class AzuraCastClient(
         return Result.Ok<int, HttpResponseMessage>(content.Id);
     }
 
-    public Task<Result<bool, HttpResponseMessage>> PutMediaIntoPlaylist(int playlistId, int mediaId)
+    public async Task<Result<bool, HttpResponseMessage>> PutMediaAsync(int mediaId, StationMediaRequest mediaRequest)
     {
-        throw new NotImplementedException();
+        var result = await Client.PostAsJsonAsync(FilesEndpoint(mediaId), mediaRequest);
+        if (!result.IsSuccessStatusCode)
+            return Result.Err<bool, HttpResponseMessage>(result);
+
+        return Result.Ok<bool, HttpResponseMessage>(true);
     }
 
     private string NowPlayingEndpoint() => $"/api/nowplaying/{_stationId}";
@@ -226,5 +237,8 @@ public sealed class AzuraCastClient(
         $"/api/station/{_stationId}/streamer/{streamerId}/broadcast/{broadcastId}";
 
     private string PlaylistsEndpoint() => $"/api/station/{_stationId}/playlists";
-    private string FilesEndpoint() => $"/api/station/{_stationId}/files";
+
+    private string FilesEndpoint(int? id = null) => id is null
+                                                        ? $"/api/station/{_stationId}/files"
+                                                        : $"/api/station/{_stationId}/file/{id}";
 }

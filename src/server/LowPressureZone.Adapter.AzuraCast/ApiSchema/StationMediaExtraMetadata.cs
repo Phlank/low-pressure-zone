@@ -9,7 +9,7 @@ public sealed class StationMediaExtraMetadata
     [JsonPropertyName("cross_start_next")]
     public int? CrossStartNext { get; set; }
 
-    [JsonPropertyName("cross_start_next")]
+    [JsonPropertyName("cue_in")]
     public int? CueIn { get; set; }
 
     [JsonPropertyName("cue_out")]
