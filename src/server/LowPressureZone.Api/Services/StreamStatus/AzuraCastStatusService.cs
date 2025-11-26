@@ -6,7 +6,7 @@ using LowPressureZone.Adapter.AzuraCast.Clients;
 namespace LowPressureZone.Api.Services.StreamStatus;
 
 public sealed class AzuraCastStatusService(
-    AzuraCastClient client,
+    IAzuraCastClient client,
     ILogger<AzuraCastStatusService> logger)
     : IStreamStatusService, IDisposable
 {

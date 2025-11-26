@@ -12,7 +12,7 @@ public sealed class StreamingInfoService(
     IOptions<StreamingConfiguration> streamOptions,
     IHttpContextAccessor httpContextAccessor,
     UserManager<AppUser> userManager,
-    AzuraCastClient azuraCastClient)
+    IAzuraCastClient azuraCastClient)
 {
     private readonly AzuraCastStreamConfiguration _liveConfiguration =
         streamOptions.Value.Live;

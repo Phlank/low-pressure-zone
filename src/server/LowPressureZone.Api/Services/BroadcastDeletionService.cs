@@ -4,7 +4,7 @@ using LowPressureZone.Api.Utilities;
 
 namespace LowPressureZone.Api.Services;
 
-public sealed partial class BroadcastDeletionService(AzuraCastClient client, ILogger<BroadcastDeletionService> logger)
+public sealed partial class BroadcastDeletionService(IAzuraCastClient client, ILogger<BroadcastDeletionService> logger)
     : IHostedService, IDisposable
 {
     private const int RunHour = 5;

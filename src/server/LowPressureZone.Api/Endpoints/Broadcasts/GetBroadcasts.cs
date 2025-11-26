@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.Endpoints.Broadcasts;
 
-public class GetBroadcasts(UserManager<AppUser> userManager, AzuraCastClient client)
+public class GetBroadcasts(UserManager<AppUser> userManager, IAzuraCastClient client)
     : EndpointWithoutRequest<IEnumerable<BroadcastResponse>, BroadcastMapper>
 {
     public override void Configure() => Get("/broadcasts");

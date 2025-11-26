@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.Endpoints.Broadcasts.Download;
 
-public class DownloadBroadcast(AzuraCastClient client, UserManager<AppUser> userManager)
+public class DownloadBroadcast(IAzuraCastClient client, UserManager<AppUser> userManager)
     : Endpoint<DownloadBroadcastRequest, IFormFile>
 {
     public override void Configure() => Get("/broadcasts/download");
