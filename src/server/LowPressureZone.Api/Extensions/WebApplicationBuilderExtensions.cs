@@ -6,6 +6,7 @@ using FluentEmail.Core.Interfaces;
 using FluentEmail.Mailgun;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Adapter.AzuraCast.Configuration;
+using LowPressureZone.Adapter.AzuraCast.Extensions;
 using LowPressureZone.Api.Authentication;
 using LowPressureZone.Api.Endpoints.Broadcasts;
 using LowPressureZone.Api.Endpoints.Communities;
@@ -124,9 +125,7 @@ public static class WebApplicationBuilderExtensions
             options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
-
-        services.Configure<AzuraCastClientConfiguration>(builder.Configuration.GetSection(AzuraCastClientConfiguration
-                                                                                              .Name));
+        
         services.Configure<IcecastConfiguration>(builder.Configuration.GetSection(IcecastConfiguration.Name));
         services.Configure<StreamingConfiguration>(builder.Configuration.GetSection(StreamingConfiguration.Name));
         services.Configure<EmailServiceConfiguration>(builder.Configuration.GetSection(EmailServiceConfiguration.Name));
@@ -155,32 +154,20 @@ public static class WebApplicationBuilderExtensions
         // This is picky and opinionated, but it makes it easy to understand the dependency graph at a glance.
         // Singletons should precede any scoped services, which should precede any transient services.
         builder.AddEndpointServices();
-        builder.Services.AddSftpClient();
+        builder.AddAzuraCast();
         builder.Services.AddSingleton<ISender, MailgunSender>(serviceProvider => serviceProvider.CreateMailgunSender());
-        builder.Services.AddHttpClient("AzuraCastHttpClient", ConfigureAzuraCastHttpClient);
         builder.Services.AddSingleton<MediaAnalyzer>();
         builder.Services.AddSingleton<Mp3Processor>();
         builder.Services.AddSingleton<UriService>();
         
         builder.Services.AddSingleton<EmailService>();
         builder.Services.AddSingleton<FormFileSaver>();
-        builder.Services.AddSingleton<IAzuraCastClient, AzuraCastClient>();
         
         builder.Services.AddSingleton<IStreamStatusService, AzuraCastStatusService>();
         builder.Services.AddHostedService<BroadcastDeletionService>();
         builder.Services.AddScoped<StreamingInfoService>();
         builder.Services.AddScoped<TimeslotFileProcessor>();
     }
-
-    private static void AddSftpClient(this IServiceCollection services) =>
-        services.AddSingleton<ISftpClient>(provider =>
-        {
-            var configuration = provider.GetRequiredService<IOptions<AzuraCastClientConfiguration>>().Value;
-            return new SftpClient(configuration.SftpHost, 
-                                  configuration.SftpPort, 
-                                  configuration.SftpUser,
-                                  configuration.SftpPassword);
-        });
 
     private static void AddEndpointServices(this WebApplicationBuilder builder)
     {

@@ -22,13 +22,12 @@ public interface IAzuraCastClient
     
     Task<Result<HttpContent, HttpResponseMessage>> DeleteBroadcastAsync(int streamerId, int broadcastId);
 
-    Task<Result<string, string>> UploadMediaAsync(string targetFilePath, FileStream fileStream);
+    Task<Result<string, string>> UploadMediaViaSftpAsync(string targetFilePath, FileStream fileStream);
 
     Task<Result<IEnumerable<StationFileListItem>, HttpResponseMessage>> GetStationFilesInDirectoryAsync(
         string directory,
-        bool useInternal = false,
-        bool flushCache = false,
-        string? searchPhrase = null);
+        bool useInternalMode,
+        bool flushCache);
 
     Task<Result<int, HttpResponseMessage>> PostPlaylistAsync(StationPlaylist playlist);
     Task<Result<bool, HttpResponseMessage>> PutMediaAsync(int mediaId, StationMediaRequest mediaRequest);

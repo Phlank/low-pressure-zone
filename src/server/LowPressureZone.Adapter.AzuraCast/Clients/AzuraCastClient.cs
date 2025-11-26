@@ -1,10 +1,10 @@
 ﻿using System.Net.Http.Json;
 using System.Text;
-using System.Text.Json;
 using System.Web;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Configuration;
 using LowPressureZone.Core;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Renci.SshNet;
@@ -15,7 +15,7 @@ namespace LowPressureZone.Adapter.AzuraCast.Clients;
 public sealed class AzuraCastClient(
     IHttpClientFactory clientFactory,
     IOptions<AzuraCastClientConfiguration> options,
-    ISftpClient sftpClient,
+    [FromKeyedServices("AzuraCastSftpClient")] ISftpClient sftpClient,
     ILogger<AzuraCastClient> logger)
     : IAzuraCastClient
 {
@@ -48,7 +48,7 @@ public sealed class AzuraCastClient(
 
         return Result.Ok<IReadOnlyCollection<StationStreamer>, HttpResponseMessage>(content);
     }
-
+    
     public async Task<Result<StationStreamer, HttpResponseMessage>> GetStreamerAsync(int streamerId)
     {
         var response = await Client.GetAsync(StreamerEndpoint(streamerId));
@@ -136,7 +136,7 @@ public sealed class AzuraCastClient(
         return Result.Ok<HttpContent, HttpResponseMessage>(response.Content);
     }
 
-    public async Task<Result<string, string>> UploadMediaAsync(string targetFilePath, FileStream fileStream)
+    public async Task<Result<string, string>> UploadMediaViaSftpAsync(string targetFilePath, FileStream fileStream)
     {
         if (!sftpClient.IsConnected)
             sftpClient.Connect();
@@ -170,13 +170,10 @@ public sealed class AzuraCastClient(
 
     public async Task<Result<IEnumerable<StationFileListItem>, HttpResponseMessage>> GetStationFilesInDirectoryAsync(
         string directory,
-        bool useInternal = true,
-        bool flushCache = false,
-        string? searchPhrase = null)
+        bool useInternalMode = true,
+        bool flushCache = true)
     {
-        var queryParameters = new StringBuilder().Append($"?internal={useInternal.ToString().ToLowerInvariant()}")
-                                                 .Append("&rowCount=100")
-                                                 .Append("&current=1")
+        var queryParameters = new StringBuilder().Append($"?internal={useInternalMode.ToString().ToLowerInvariant()}")
                                                  .Append($"&flushCache={flushCache.ToString().ToLowerInvariant()}")
                                                  .Append($"&currentDirectory={HttpUtility.UrlEncode(directory.Trim('/'))}");
 
@@ -184,16 +181,15 @@ public sealed class AzuraCastClient(
         if (!response.IsSuccessStatusCode)
             return Result.Err<IEnumerable<StationFileListItem>, HttpResponseMessage>(response);
 
-        var content = await response.Content.ReadFromJsonAsync<PagedResponse<StationFileListItem>>();
+        var content = await response.Content.ReadFromJsonAsync<IEnumerable<StationFileListItem>>();
         if (content == null)
             return Result.Err<IEnumerable<StationFileListItem>, HttpResponseMessage>(response);
 
-        return Result.Ok<IEnumerable<StationFileListItem>, HttpResponseMessage>(content.Rows);
+        return Result.Ok<IEnumerable<StationFileListItem>, HttpResponseMessage>(content);
     }
 
     public async Task<Result<int, HttpResponseMessage>> PostPlaylistAsync(StationPlaylist playlist)
     {
-        Console.WriteLine(JsonSerializer.Serialize(playlist, new JsonSerializerOptions() { WriteIndented = true }));
         var result = await Client.PostAsJsonAsync(PlaylistsEndpoint(), playlist);
         if (!result.IsSuccessStatusCode)
         {

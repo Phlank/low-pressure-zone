@@ -67,7 +67,7 @@ public sealed class TimeslotFileProcessor(
         Result<string, string> uploadResult;
         await using (var fileStream = new FileStream(processResult.Value, FileMode.Open, FileAccess.Read))
         {
-            uploadResult = await azuraCastClient.UploadMediaAsync(azuraCastFilePath, fileStream);
+            uploadResult = await azuraCastClient.UploadMediaViaSftpAsync(azuraCastFilePath, fileStream);
             _ = await fileSaver.DeleteFileAsync(processResult.Value);
         }
 
@@ -178,7 +178,7 @@ public sealed class TimeslotFileProcessor(
         while (true)
         {
             var prerecordListResult = await azuraCastClient.GetStationFilesInDirectoryAsync(_prerecordedSetLocation,
-                                                                                            useInternal: true,
+                                                                                            useInternalMode: true,
                                                                                             flushCache: true);
             if (prerecordListResult.IsError)
                 return Result.Err<StationFileListItem>("Failed to retrieve files from AzuraCast");
