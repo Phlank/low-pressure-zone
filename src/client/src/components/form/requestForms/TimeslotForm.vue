@@ -97,9 +97,16 @@
         :message="validation.message('file')"
         size="m">
         <FileUpload
+          :disabled="!isNullishOrWhitespace(timeslotId)"
           mode="basic"
           @select="onFileSelect"
-          @remove="onFileRemove" />
+          @remove="onFileRemove">
+          <template #filelabel>
+            <span v-if="formState.file">{{ formState.file.name }}</span>
+            <span v-else-if="!isNullishOrWhitespace(timeslotId)">File uploaded (cannot change)</span>
+            <span v-else>No file chosen</span>
+          </template>
+        </FileUpload>
       </FormField>
       <FormField
         v-if="formState.performanceType === 'Prerecorded DJ Set'"
@@ -154,6 +161,7 @@ import { showSuccessToast } from '@/utils/toastUtils.ts'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
 import type { ValidationProblemDetails } from '@/api/apiResponse.ts'
 import FormField from '@/components/form/FormField.vue'
+import {isNullishOrWhitespace} from "@/utils/stringUtils.ts";
 
 const toast = useToast()
 const performerStore = usePerformerStore()
