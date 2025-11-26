@@ -26,8 +26,8 @@ public interface IAzuraCastClient
 
     Task<Result<IEnumerable<StationFileListItem>, HttpResponseMessage>> GetMediaInDirectoryAsync(
         string directory,
-        bool useInternalMode,
-        bool flushCache);
+        bool useInternalMode = true,
+        bool flushCache = true);
 
     Task<Result<int, HttpResponseMessage>> PostPlaylistAsync(StationPlaylist playlist);
     Task<Result<bool, HttpResponseMessage>> PutMediaAsync(int mediaId, StationMediaRequest mediaRequest);

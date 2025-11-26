@@ -2,7 +2,7 @@ using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 
 namespace LowPressureZone.Adapter.AzuraCast.Mappers;
 
-public class StationMediaMapper
+public static class StationMediaMapper
 {
     public static StationMediaRequest ToRequest(StationMedia media) =>
         new()
