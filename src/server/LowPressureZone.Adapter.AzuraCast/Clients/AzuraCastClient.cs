@@ -168,7 +168,7 @@ public sealed class AzuraCastClient(
         }
     }
 
-    public async Task<Result<IEnumerable<StationFileListItem>, HttpResponseMessage>> GetStationFilesInDirectoryAsync(
+    public async Task<Result<IEnumerable<StationFileListItem>, HttpResponseMessage>> GetMediaInDirectoryAsync(
         string directory,
         bool useInternalMode = true,
         bool flushCache = true)
