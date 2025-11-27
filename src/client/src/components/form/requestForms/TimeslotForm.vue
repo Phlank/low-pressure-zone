@@ -28,6 +28,7 @@
         input-id="durationInput"
         size="xs">
         <Select
+          :disabled="isSubmitting || !isNullishOrWhitespace(timeslotId)"
           id="durationInput"
           :options="durationOptions"
           option-label="label"
@@ -103,7 +104,7 @@
           @remove="onFileRemove">
           <template #filelabel>
             <span v-if="formState.file">{{ formState.file.name }}</span>
-            <span v-else-if="!isNullishOrWhitespace(timeslotId)">File uploaded (cannot change)</span>
+            <span v-else-if="!isNullishOrWhitespace(timeslotId)">{{ uploadedFileName }}</span>
             <span v-else>No file chosen</span>
           </template>
         </FileUpload>
@@ -141,7 +142,7 @@ import {
   type FileUploadSelectEvent,
   type FileUploadRemoveEvent
 } from 'primevue'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, type ComputedRef, onMounted, ref, watch } from 'vue'
 import timeslotsApi, {
   PerformanceType,
   performanceTypes,
@@ -161,11 +162,19 @@ import { showSuccessToast } from '@/utils/toastUtils.ts'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
 import type { ValidationProblemDetails } from '@/api/apiResponse.ts'
 import FormField from '@/components/form/FormField.vue'
-import {isNullishOrWhitespace} from "@/utils/stringUtils.ts";
+import { isNullishOrWhitespace } from '@/utils/stringUtils.ts'
 
 const toast = useToast()
 const performerStore = usePerformerStore()
 const scheduleStore = useScheduleStore()
+
+const uploadedFileName: ComputedRef<string | null | undefined> = computed(() => {
+  const schedule = scheduleStore.schedules.find((s) => s.id === props.scheduleId)
+  if (!schedule) return null
+
+  const timeslot = schedule.timeslots.find((t) => t.id === props.timeslotId)
+  return timeslot?.uploadedFileName
+})
 
 const props = defineProps<{
   scheduleId: string
@@ -270,9 +279,15 @@ const createPerformer = async (): Promise<Result<string, null>> => {
     if (response.isInvalid()) {
       const details = response.error as ValidationProblemDetails<PerformerRequest>
       if (details.errors.name)
-        validation.setValidity('performerName', { isValid: false, message: details.errors.name[0] ?? '' })
+        validation.setValidity('performerName', {
+          isValid: false,
+          message: details.errors.name[0] ?? ''
+        })
       if (details.errors.url)
-        validation.setValidity('performerUrl', { isValid: false, message: details.errors.url[0] ?? '' })
+        validation.setValidity('performerUrl', {
+          isValid: false,
+          message: details.errors.url[0] ?? ''
+        })
     } else tryHandleUnsuccessfulResponse(response, toast)
     return err(null)
   }
