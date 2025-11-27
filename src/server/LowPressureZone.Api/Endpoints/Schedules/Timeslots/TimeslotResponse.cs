@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using LowPressureZone.Api.Endpoints.Performers;
+﻿using LowPressureZone.Api.Endpoints.Performers;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 

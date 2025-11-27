@@ -28,7 +28,7 @@
         input-id="durationInput"
         size="xs">
         <Select
-          :disabled="isSubmitting || !isNullishOrWhitespace(timeslotId)"
+          :disabled="isSubmitting || isEditing"
           id="durationInput"
           :options="durationOptions"
           option-label="label"
@@ -98,13 +98,13 @@
         :message="validation.message('file')"
         size="m">
         <FileUpload
-          :disabled="!isNullishOrWhitespace(timeslotId)"
+          :disabled="isEditing"
           mode="basic"
           @select="onFileSelect"
           @remove="onFileRemove">
           <template #filelabel>
             <span v-if="formState.file">{{ formState.file.name }}</span>
-            <span v-else-if="!isNullishOrWhitespace(timeslotId)">{{ uploadedFileName }}</span>
+            <span v-else-if="isEditing">{{ uploadedFileName }}</span>
             <span v-else>No file chosen</span>
           </template>
         </FileUpload>
@@ -168,14 +168,6 @@ const toast = useToast()
 const performerStore = usePerformerStore()
 const scheduleStore = useScheduleStore()
 
-const uploadedFileName: ComputedRef<string | null | undefined> = computed(() => {
-  const schedule = scheduleStore.schedules.find((s) => s.id === props.scheduleId)
-  if (!schedule) return null
-
-  const timeslot = schedule.timeslots.find((t) => t.id === props.timeslotId)
-  return timeslot?.uploadedFileName
-})
-
 const props = defineProps<{
   scheduleId: string
   timeslotId?: string
@@ -188,6 +180,16 @@ const defaultStartPerformerId = computed(() => {
   if (props.performers.length === 1) return props.performers[0]!.id
   return undefined
 })
+
+const uploadedFileName: ComputedRef<string | null | undefined> = computed(() => {
+  const schedule = scheduleStore.schedules.find((s) => s.id === props.scheduleId)
+  if (!schedule) return null
+
+  const timeslot = schedule.timeslots.find((t) => t.id === props.timeslotId)
+  return timeslot?.uploadedFileName
+})
+
+const isEditing: ComputedRef<boolean> = computed(() => !isNullishOrWhitespace(props.timeslotId))
 
 type TimeslotFormState = TimeslotRequest & {
   duration: number
