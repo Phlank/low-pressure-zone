@@ -28,6 +28,7 @@
         input-id="durationInput"
         size="xs">
         <Select
+          :disabled="isSubmitting || isEditing"
           id="durationInput"
           :options="durationOptions"
           option-label="label"
@@ -97,9 +98,16 @@
         :message="validation.message('file')"
         size="m">
         <FileUpload
+          :disabled="isEditing"
           mode="basic"
           @select="onFileSelect"
-          @remove="onFileRemove" />
+          @remove="onFileRemove">
+          <template #filelabel>
+            <span v-if="formState.file">{{ formState.file.name }}</span>
+            <span v-else-if="isEditing">{{ uploadedFileName }}</span>
+            <span v-else>No file chosen</span>
+          </template>
+        </FileUpload>
       </FormField>
       <FormField
         v-if="formState.performanceType === 'Prerecorded DJ Set'"
@@ -134,7 +142,7 @@ import {
   type FileUploadSelectEvent,
   type FileUploadRemoveEvent
 } from 'primevue'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, type ComputedRef, onMounted, ref, watch } from 'vue'
 import timeslotsApi, {
   PerformanceType,
   performanceTypes,
@@ -154,6 +162,7 @@ import { showSuccessToast } from '@/utils/toastUtils.ts'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
 import type { ValidationProblemDetails } from '@/api/apiResponse.ts'
 import FormField from '@/components/form/FormField.vue'
+import { isNullishOrWhitespace } from '@/utils/stringUtils.ts'
 
 const toast = useToast()
 const performerStore = usePerformerStore()
@@ -171,6 +180,16 @@ const defaultStartPerformerId = computed(() => {
   if (props.performers.length === 1) return props.performers[0]!.id
   return undefined
 })
+
+const uploadedFileName: ComputedRef<string | null | undefined> = computed(() => {
+  const schedule = scheduleStore.schedules.find((s) => s.id === props.scheduleId)
+  if (!schedule) return null
+
+  const timeslot = schedule.timeslots.find((t) => t.id === props.timeslotId)
+  return timeslot?.uploadedFileName
+})
+
+const isEditing: ComputedRef<boolean> = computed(() => !isNullishOrWhitespace(props.timeslotId))
 
 type TimeslotFormState = TimeslotRequest & {
   duration: number
@@ -262,9 +281,15 @@ const createPerformer = async (): Promise<Result<string, null>> => {
     if (response.isInvalid()) {
       const details = response.error as ValidationProblemDetails<PerformerRequest>
       if (details.errors.name)
-        validation.setValidity('performerName', { isValid: false, message: details.errors.name[0] ?? '' })
+        validation.setValidity('performerName', {
+          isValid: false,
+          message: details.errors.name[0] ?? ''
+        })
       if (details.errors.url)
-        validation.setValidity('performerUrl', { isValid: false, message: details.errors.url[0] ?? '' })
+        validation.setValidity('performerUrl', {
+          isValid: false,
+          message: details.errors.url[0] ?? ''
+        })
     } else tryHandleUnsuccessfulResponse(response, toast)
     return err(null)
   }
