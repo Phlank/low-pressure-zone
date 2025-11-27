@@ -172,6 +172,7 @@ const formInitialValue: Ref<TimeslotRequest> = ref({
 
 const handleCreateClicked = (row: TimeslotRow) => {
   if (row.timeslot !== undefined) return
+  editingId.value = ''
   timeslotDialogTitle.value = 'Create Timeslot'
   formInitialValue.value = {
     startsAt: row.start.toISOString(),

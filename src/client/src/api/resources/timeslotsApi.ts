@@ -47,6 +47,7 @@ export interface TimeslotResponse {
   endsAt: string
   isEditable: boolean
   isDeletable: boolean
+  uploadedFileName: string | null
 }
 
 export enum PerformanceType {
