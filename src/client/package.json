@@ -14,13 +14,13 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@primevue/core": "^4.4.1",
-    "@primevue/themes": "^4.4.1",
+    "@primevue/core": "4.5.0",
+    "@primevue/themes": "4.5.0",
     "@vueuse/core": "^14.0.0",
     "date-fns": "^4.1.0",
     "pinia": "^3.0.4",
-    "primeicons": "^7.0.0",
-    "primevue": "^4.4.1",
+    "primeicons": "7.0.0",
+    "primevue": "4.5.0",
     "vue": "^3.5.24",
     "vue-eslint-parser": "^10.2.0",
     "vue-router": "^4.6.3"
