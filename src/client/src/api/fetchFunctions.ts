@@ -56,6 +56,9 @@ export const sendPut = async <TRequest extends object>(route: string, request: T
   return await sendRequest<TRequest, never>('PUT', route, request)
 }
 
+export const sendPutForm = async <TRequest extends object>(route: string, request: TRequest) =>
+  sendRequest<TRequest, never>('PUT', route, objectToFormData(request))
+
 export const sendPost = async <TRequest extends object, TResponse = never>(
   route: string,
   request?: TRequest

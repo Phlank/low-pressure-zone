@@ -182,10 +182,41 @@ public sealed class AzuraCastClient(
             return Result.Err<IEnumerable<StationFileListItem>, HttpResponseMessage>(response);
 
         var content = await response.Content.ReadFromJsonAsync<IEnumerable<StationFileListItem>>();
-        if (content == null)
+        if (content is null)
             return Result.Err<IEnumerable<StationFileListItem>, HttpResponseMessage>(response);
 
         return Result.Ok<IEnumerable<StationFileListItem>, HttpResponseMessage>(content);
+    }
+    
+    public async Task<Result<bool, HttpResponseMessage>> PutMediaAsync(int mediaId, StationMediaRequest mediaRequest)
+    {
+        var result = await Client.PutAsJsonAsync(FilesEndpoint(mediaId), mediaRequest);
+        if (!result.IsSuccessStatusCode)
+            return Result.Err<bool, HttpResponseMessage>(result);
+
+        return Result.Ok<bool, HttpResponseMessage>(true);
+    }
+    
+    public async Task<Result<bool, HttpResponseMessage>> DeleteMediaAsync(int mediaId)
+    {
+        var result = await Client.DeleteAsync(FilesEndpoint(mediaId));
+        if (!result.IsSuccessStatusCode)
+            return Result.Err<bool, HttpResponseMessage>(result);
+
+        return Result.Ok<bool, HttpResponseMessage>(true);
+    }
+    
+    public async Task<Result<StationPlaylist, HttpResponseMessage>> GetPlaylistAsync(int playlistId)
+    {
+        var response = await Client.GetAsync(PlaylistsEndpoint(playlistId));
+        if (!response.IsSuccessStatusCode)
+            return Result.Err<StationPlaylist, HttpResponseMessage>(response);
+
+        var content = await response.Content.ReadFromJsonAsync<StationPlaylist>();
+        if (content is null)
+            return Result.Err<StationPlaylist, HttpResponseMessage>(response);
+
+        return Result.Ok<StationPlaylist, HttpResponseMessage>(content);
     }
 
     public async Task<Result<int, HttpResponseMessage>> PostPlaylistAsync(StationPlaylist playlist)
@@ -206,12 +237,18 @@ public sealed class AzuraCastClient(
 
         return Result.Ok<int, HttpResponseMessage>(content.Id);
     }
-
-    public async Task<Result<bool, HttpResponseMessage>> PutMediaAsync(int mediaId, StationMediaRequest mediaRequest)
+    
+    public async Task<Result<bool, HttpResponseMessage>> PutPlaylistAsync(StationPlaylist playlist)
     {
-        var result = await Client.PutAsJsonAsync(FilesEndpoint(mediaId), mediaRequest);
+        var result = await Client.PutAsJsonAsync(PlaylistsEndpoint(playlist.Id), playlist);
         if (!result.IsSuccessStatusCode)
+        {
+            var errorContent = await result.Content.ReadAsStringAsync();
+            logger.LogError("Failed to update playlist in AzuraCast: {StatusCode} - {ErrorContent}",
+                            result.StatusCode,
+                            errorContent);
             return Result.Err<bool, HttpResponseMessage>(result);
+        }
 
         return Result.Ok<bool, HttpResponseMessage>(true);
     }
@@ -232,7 +269,9 @@ public sealed class AzuraCastClient(
     private string DeleteBroadcastEndpoint(int streamerId, int broadcastId) =>
         $"/api/station/{_stationId}/streamer/{streamerId}/broadcast/{broadcastId}";
 
-    private string PlaylistsEndpoint() => $"/api/station/{_stationId}/playlists";
+    private string PlaylistsEndpoint(int? id = null) => id is null
+                                                            ? $"/api/station/{_stationId}/playlists"
+                                                            : $"/api/station/{_stationId}/playlists/{id}";
 
     private string FilesEndpoint(int? id = null) => id is null
                                                         ? $"/api/station/{_stationId}/files"
