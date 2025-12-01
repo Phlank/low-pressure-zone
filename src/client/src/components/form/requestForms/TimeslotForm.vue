@@ -92,19 +92,34 @@
           :invalid="!validation.isValid('performerUrl')" />
       </IftaFormField>
       <FormField
+        class="timeslot-form__file-upload"
         v-if="formState.performanceType === 'Prerecorded DJ Set'"
         input-id="fileInput"
         label="Upload Mix"
         :message="validation.message('file')"
         size="m">
+        <div class="checkbox-area">
+          <div class="checkbox-area__item">
+            <Checkbox
+              id="replaceMediaInput"
+              v-if="isEditing"
+              v-model="formState.replaceMedia"
+              binary />
+            <label for="replaceMediaInput">Replace uploaded file</label>
+          </div>
+        </div>
         <FileUpload
-          :disabled="isEditing"
+          :disabled="
+            isEditing &&
+            !formState.replaceMedia &&
+            formState.performanceType == PerformanceType.Prerecorded
+          "
           mode="basic"
           @select="onFileSelect"
           @remove="onFileRemove">
           <template #filelabel>
             <span v-if="formState.file">{{ formState.file.name }}</span>
-            <span v-else-if="isEditing">{{ uploadedFileName }}</span>
+            <span v-else-if="isEditing && !formState.replaceMedia">{{ uploadedFileName }}</span>
             <span v-else>No file chosen</span>
           </template>
         </FileUpload>
@@ -139,6 +154,7 @@ import {
   useToast,
   FileUpload,
   Message,
+  Checkbox,
   type FileUploadSelectEvent,
   type FileUploadRemoveEvent
 } from 'primevue'
@@ -205,9 +221,19 @@ const formState = ref<TimeslotFormState>({
   performanceType: PerformanceType.Live,
   name: '',
   file: null,
+  replaceMedia: false,
   performerName: '',
   performerUrl: ''
 })
+
+watch(
+  () => formState.value.replaceMedia,
+  (newValue: boolean | null, oldValue: boolean | null) => {
+    if (oldValue === true && newValue === false) {
+      formState.value.file = null
+    }
+  }
+)
 
 const timeslotRules = timeslotRequestRules(formState.value)
 const performerRules = performerRequestRules
@@ -219,6 +245,7 @@ const validation = createFormValidation(formState, {
   performanceType: timeslotRules.performanceType,
   name: timeslotRules.name,
   file: timeslotRules.file,
+  replaceMedia: timeslotRules.replaceMedia,
   performerName: applyRuleIf(performerRules.name, () => performerStore.performers.length === 0),
   performerUrl: applyRuleIf(performerRules.url, () => performerStore.performers.length === 0)
 })
@@ -385,3 +412,13 @@ const emits = defineEmits<{
   afterSubmit: []
 }>()
 </script>
+
+<style lang="scss">
+@use '@/assets/styles/variables';
+
+.timeslot-form__file-upload {
+  div.form-field__input {
+    gap: variables.$space-l;
+  }
+}
+</style>

@@ -5,7 +5,6 @@ using FluentValidation.Results;
 using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Services.Audio;
-using LowPressureZone.Api.Utilities;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -32,43 +31,7 @@ public sealed class TimeslotRequestValidator : Validator<TimeslotRequest>
             var scheduleId = contextAccessor.GetGuidRouteParameterOrDefault("scheduleId");
             var timeslotId = contextAccessor.GetGuidRouteParameterOrDefault("timeslotId");
 
-            if (request.PerformanceType == PerformanceTypes.Prerecorded
-                && timeslotId == Guid.Empty
-                && request.File is null)
-            {
-                context.AddFailure(nameof(request.File), Errors.Required);
-                return;
-            }
-
-            if (request.PerformanceType == PerformanceTypes.Prerecorded
-                && request.ReplaceMedia == true
-                && request.File is null)
-            {
-                context.AddFailure(nameof(request.File), Errors.Required);
-                return;
-            }
-
-            if (request.PerformanceType == PerformanceTypes.Prerecorded
-                && request.ReplaceMedia == false
-                && request.File is not null)
-            {
-                context.AddFailure(nameof(request.File), Errors.Prohibited);
-                return;
-            }
-
-            if (request.PerformanceType != PerformanceTypes.Prerecorded
-                && request.File is not null)
-            {
-                context.AddFailure(nameof(request.File), Errors.Prohibited);
-                return;
-            }
-
-            if (request.File is not null
-                && !request.File.ContentType.StartsWithAny(MimeTypes.AudioMimeTypes))
-            {
-                context.AddFailure(nameof(request.File), Errors.InvalidFileType);
-                return;
-            }
+            ValidateFile(request, timeslotId, context);
 
             var dataContext = Resolve<DataContext>();
             var schedule = await dataContext.Schedules
@@ -99,19 +62,66 @@ public sealed class TimeslotRequestValidator : Validator<TimeslotRequest>
         });
     }
 
+    private static void ValidateFile(
+        TimeslotRequest request,
+        Guid timeslotId,
+        FluentValidation.ValidationContext<TimeslotRequest> context)
+    {
+        if (request.PerformanceType != PerformanceTypes.Prerecorded)
+        {
+            if (request.File is not null)
+                context.AddFailure(nameof(request.File), Errors.Prohibited);
+
+            return;
+        }
+
+        var isNewTimeslot = timeslotId == Guid.Empty;
+        if (isNewTimeslot
+            && request.File is null)
+        {
+            context.AddFailure(nameof(request.File), Errors.Required);
+            return;
+        }
+
+        if (!isNewTimeslot
+            && request.File is null
+            && request.ReplaceMedia == true)
+        {
+            context.AddFailure(nameof(request.File), Errors.Required);
+            return;
+        }
+
+        if (!isNewTimeslot
+            && request.File is not null
+            && request.ReplaceMedia != true)
+        {
+            context.AddFailure(nameof(request.File), Errors.Prohibited);
+            return;
+        }
+
+        if (request.File is not null
+            && !request.File.ContentType.StartsWithAny(MimeTypes.AudioMimeTypes))
+        {
+            context.AddFailure(nameof(request.File), Errors.InvalidFileType);
+        }
+    }
+
     public static ICollection<ValidationFailure> ValidateMediaAnalysis(TimeslotRequest request, IMediaAnalysis analysis)
     {
         request.File.ShouldNotBeNull();
         List<ValidationFailure> failures = [];
         var timeslotDuration = request.EndsAt - request.StartsAt;
-        if (TimeSpan.FromMinutes(timeslotDuration.TotalMinutes - PrerecordedDurationMinutesTolerance) > analysis.Duration
-            || TimeSpan.FromMinutes(timeslotDuration.TotalMinutes + PrerecordedDurationMinutesTolerance) < analysis.Duration)
+        if (TimeSpan.FromMinutes(timeslotDuration.TotalMinutes - PrerecordedDurationMinutesTolerance) >
+            analysis.Duration
+            || TimeSpan.FromMinutes(timeslotDuration.TotalMinutes + PrerecordedDurationMinutesTolerance) <
+            analysis.Duration)
         {
             failures.Add(new ValidationFailure(nameof(request.File),
                                                "Media file duration does not match the specified timeslot duration. Ensure it is +/- 2 minutes from the timeslot duration."));
         }
 
-        failures.AddRange(AudioQualityValidator.ValidateAudioQuality(analysis, request.File.Length, nameof(request.File)));
+        failures.AddRange(AudioQualityValidator.ValidateAudioQuality(analysis, request.File.Length,
+                                                                     nameof(request.File)));
         return failures;
     }
 }

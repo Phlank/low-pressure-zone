@@ -17,4 +17,5 @@ public sealed class Timeslot : BaseEntity, IDateTimeRange
     public required DateTimeOffset StartsAt { get; set; }
     public required DateTimeOffset EndsAt { get; set; }
     [MaxLength(1024)] public string? UploadedFileName { get; set; }
+    public int? AzuraCastMediaId { get; set; }
 }

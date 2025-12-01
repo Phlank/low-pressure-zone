@@ -28,7 +28,7 @@ public sealed class TimeslotFileProcessor(
     private readonly string _tempLocation = fileOptions.Value.TemporaryLocation;
     private readonly string _prerecordedSetLocation = fileOptions.Value.AzuraCastPrerecordedSetLocation;
 
-    public async Task<Result<string, IEnumerable<ValidationFailure>>> ProcessUploadedMediaFileAsync(
+    public async Task<Result<int, IEnumerable<ValidationFailure>>> ProcessUploadedMediaFileAsync(
         TimeslotRequest request,
         DateTimeOffset scheduleStart,
         CancellationToken ct = default)
@@ -36,13 +36,13 @@ public sealed class TimeslotFileProcessor(
         request.File.ShouldNotBeNull();
         var saveResult = await fileSaver.SaveFormFileAsync(request.File, ct);
         if (saveResult.IsError)
-            return Result.Err<string>(saveResult.Error.ToValidationFailures(nameof(request.File)));
+            return Result.Err<int>(saveResult.Error.ToValidationFailures(nameof(request.File)));
 
         var analysisResult = await mediaAnalyzer.AnalyzeAsync(saveResult.Value, ct);
         if (analysisResult.IsError)
         {
             _ = await fileSaver.DeleteFileAsync(saveResult.Value);
-            return Result.Err<string>(analysisResult.Error.ToValidationFailures(nameof(request.File)));
+            return Result.Err<int>(analysisResult.Error.ToValidationFailures(nameof(request.File)));
         }
 
         var analysis = analysisResult.Value;
@@ -50,7 +50,7 @@ public sealed class TimeslotFileProcessor(
         if (analysisValidationFailures.Count != 0)
         {
             _ = await fileSaver.DeleteFileAsync(saveResult.Value);
-            return Result.Err<string>(analysisValidationFailures);
+            return Result.Err<int>(analysisValidationFailures);
         }
 
         var newMetadata = await GetAudioMetadataAsync(request, scheduleStart, ct);
@@ -61,7 +61,7 @@ public sealed class TimeslotFileProcessor(
         _ = await fileSaver.DeleteFileAsync(saveResult.Value);
 
         if (processResult.IsError)
-            return Result.Err<string>(processResult.Error);
+            return Result.Err<int>(processResult.Error);
 
         var azuraCastFilePath = $"{_prerecordedSetLocation}/{fileName}";
         Result<string, string> uploadResult;
@@ -72,7 +72,7 @@ public sealed class TimeslotFileProcessor(
         }
 
         if (uploadResult.IsError)
-            return Result.Err<string>(uploadResult.Error.ToValidationFailures(nameof(request.File)));
+            return Result.Err<int>(uploadResult.Error.ToValidationFailures(nameof(request.File)));
 
         var uploadedFileResult = await Retry.RetryAsync(10,
                                                         1000,
@@ -82,7 +82,7 @@ public sealed class TimeslotFileProcessor(
                                                         async () => await GetUploadedFileAsync(azuraCastFilePath),
                                                         ct);
         if (uploadedFileResult.IsError)
-            return Result.Err<string>(uploadedFileResult.Error.ToValidationFailures(nameof(request.File)));
+            return Result.Err<int>(uploadedFileResult.Error.ToValidationFailures(nameof(request.File)));
 
         var uploadedFile = uploadedFileResult.Value;
         uploadedFile.Media.ShouldNotBeNull();
@@ -90,7 +90,7 @@ public sealed class TimeslotFileProcessor(
         var playlist = ConvertTimeslotToPlaylist(request, newMetadata);
         var createPlaylistResult = await azuraCastClient.PostPlaylistAsync(playlist);
         if (createPlaylistResult.IsError)
-            return Result.Err<string>("Failed to create playlist in AzuraCast"
+            return Result.Err<int>("Failed to create playlist in AzuraCast"
                                           .ToValidationFailures(nameof(request.File)));
 
         var playlistId = createPlaylistResult.Value;
@@ -101,10 +101,10 @@ public sealed class TimeslotFileProcessor(
         updateRequest.Playlists = [playlistId];
         var updateMediaResult = await azuraCastClient.PutMediaAsync(uploadedFile.Media.Id, updateRequest);
         if (updateMediaResult.IsError)
-            return Result.Err<string>("Failed to update media metadata in AzuraCast"
+            return Result.Err<int>("Failed to update media metadata in AzuraCast"
                                           .ToValidationFailures(nameof(request.File)));
 
-        return Result.Ok<string, IEnumerable<ValidationFailure>>(azuraCastFilePath);
+        return Result.Ok<int, IEnumerable<ValidationFailure>>(uploadedFile.Media.Id);
     }
 
     private async Task<Result<string, IEnumerable<ValidationFailure>>> ProcessToNewFile(
