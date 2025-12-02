@@ -95,7 +95,7 @@ public class AzuraCastStreamStatusService(
 
     private static string GetStreamName(NowPlayingResponse nowPlaying)
     {
-        var streamerName = nowPlaying.NowPlaying?.Streamer;
+        var streamerName = nowPlaying.NowPlaying?.Streamer ?? nowPlaying.Live.StreamerName;
         if (!string.IsNullOrEmpty(streamerName))
             return streamerName;
 
