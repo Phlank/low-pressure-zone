@@ -8,7 +8,7 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
-public class TimeslotMapper(
+public sealed class TimeslotMapper(
     IHttpContextAccessor contextAccessor,
     TimeslotRules rules,
     PerformerMapper performerMapper)
@@ -22,7 +22,8 @@ public class TimeslotMapper(
             EndsAt = req.EndsAt.ToUniversalTime(),
             Type = req.PerformanceType.Trim(),
             PerformerId = req.PerformerId,
-            ScheduleId = contextAccessor.GetGuidRouteParameterOrDefault("scheduleId")
+            ScheduleId = contextAccessor.GetGuidRouteParameterOrDefault("scheduleId"),
+            UploadedFileName = req.File?.FileName
         };
 
     public async Task UpdateEntityAsync(TimeslotRequest req, Timeslot timeslot, CancellationToken ct = default)
@@ -33,6 +34,7 @@ public class TimeslotMapper(
         timeslot.PerformerId = req.PerformerId;
         timeslot.Type = req.PerformanceType;
         timeslot.Name = req.Name;
+        timeslot.UploadedFileName = req.File?.FileName;
         if (!dataContext.ChangeTracker.HasChanges()) return;
         timeslot.LastModifiedDate = DateTime.UtcNow;
         await dataContext.SaveChangesAsync(ct);
@@ -49,6 +51,7 @@ public class TimeslotMapper(
             Name = timeslot.Name,
             Performer = performerMapper.FromEntity(timeslot.Performer),
             PerformanceType = timeslot.Type,
+            UploadedFileName = timeslot.UploadedFileName,
             IsEditable = rules.IsEditAuthorized(timeslot),
             IsDeletable = rules.IsDeleteAuthorized(timeslot)
         };

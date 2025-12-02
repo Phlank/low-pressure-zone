@@ -34,7 +34,7 @@ const props = defineProps<{
   availableCommunities: CommunityResponse[]
 }>()
 
-const selectedCommunity: Ref<CommunityResponse> = ref(props.availableCommunities[0])
+const selectedCommunity: Ref<CommunityResponse> = ref(props.availableCommunities[0]!)
 
 onMounted(async () => {
   if (communityStore.getRelationships(selectedCommunity.value.id).length === 0) {

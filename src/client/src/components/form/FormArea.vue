@@ -49,7 +49,7 @@ onMounted(() => {
 
 useResizeObserver(formAreaRef, (entries) => {
   const entry = entries[0]
-  width.value = entry.contentRect.width
+  width.value = entry!.contentRect.width
 })
 
 const columnWidth = 80

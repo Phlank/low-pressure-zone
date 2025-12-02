@@ -5,7 +5,7 @@ interface ApiResponseParameters<TRequest, TResponse> {
   readonly headers?: Headers
   readonly data?: TResponse
   readonly validationProblem?: ValidationProblemDetails<TRequest>
-  readonly error?: ValidationProblemDetails<TRequest> | unknown
+  readonly error?: unknown
 }
 
 export class ApiResponse<TRequest, TResponse> {
@@ -13,7 +13,7 @@ export class ApiResponse<TRequest, TResponse> {
   readonly headers?: Headers
   readonly body?: TResponse
   readonly validationProblem?: ValidationProblemDetails<TRequest>
-  readonly error?: ValidationProblemDetails<TRequest> | unknown
+  readonly error?: unknown
 
   constructor(parameters: ApiResponseParameters<TRequest, TResponse>) {
     this.status = parameters.status
@@ -43,7 +43,7 @@ export class ApiResponse<TRequest, TResponse> {
    * Get the data associated with the request after calling `isSuccess()`
    *
    * @returns `body` if it is not undefined
-   * @throws Error if `body is undefined
+   * @throws Error if `body` is undefined
    */
   readonly data = (): TResponse => {
     if (this.body === undefined) throw new Error('No data in response')

@@ -14,13 +14,15 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Community>().HasIndex(nameof(Community.Name)).IsUnique();
-        
+
         modelBuilder.Entity<Schedule>().HasIndex(nameof(Schedule.StartsAt)).IsUnique();
         modelBuilder.Entity<Schedule>().HasIndex(nameof(Schedule.EndsAt)).IsUnique();
 
         modelBuilder.Entity<Timeslot>().HasIndex(nameof(Timeslot.StartsAt)).IsUnique();
         modelBuilder.Entity<Timeslot>().HasIndex(nameof(Timeslot.EndsAt)).IsUnique();
 
-        modelBuilder.Entity<CommunityRelationship>().HasIndex(nameof(CommunityRelationship.CommunityId), nameof(CommunityRelationship.UserId)).IsUnique();
+        modelBuilder.Entity<CommunityRelationship>()
+                    .HasIndex(nameof(CommunityRelationship.CommunityId), nameof(CommunityRelationship.UserId))
+                    .IsUnique();
     }
 }

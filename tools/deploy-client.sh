@@ -1,7 +1,7 @@
 #!/bin/bash
 
-cd src/client
-yarn
+cd src/client || return
+yarn install --ignore-scripts
 sed -i 's/development/production/g' vite.config.ts
 yarn build
 sed -i 's/production/development/g' vite.config.ts

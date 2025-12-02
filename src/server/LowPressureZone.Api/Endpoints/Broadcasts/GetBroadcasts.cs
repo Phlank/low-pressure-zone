@@ -1,13 +1,13 @@
 ﻿using FastEndpoints;
-using LowPressureZone.Api.Clients;
-using LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
+using LowPressureZone.Adapter.AzuraCast.ApiSchema;
+using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.Endpoints.Broadcasts;
 
-public class GetBroadcasts(UserManager<AppUser> userManager, AzuraCastClient client)
+public class GetBroadcasts(UserManager<AppUser> userManager, IAzuraCastClient client)
     : EndpointWithoutRequest<IEnumerable<BroadcastResponse>, BroadcastMapper>
 {
     public override void Configure() => Get("/broadcasts");
@@ -27,7 +27,7 @@ public class GetBroadcasts(UserManager<AppUser> userManager, AzuraCastClient cli
             ThrowError(broadcastsResult.Error.ReasonPhrase ?? "Unknown reason",
                        (int)broadcastsResult.Error.StatusCode);
 
-        IEnumerable<Broadcast> broadcasts = broadcastsResult.Value;
+        IEnumerable<StationStreamerBroadcast> broadcasts = broadcastsResult.Value;
         if (!(User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Organizer)))
             broadcasts = broadcasts.Where(broadcast => broadcast.Streamer?.Id == user.StreamerId);
 

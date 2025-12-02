@@ -1,4 +1,4 @@
-import { sendDelete, sendGet, sendPost, sendPut } from '../fetchFunctions'
+import { sendDelete, sendGet, sendPostForm, sendPut } from '../fetchFunctions'
 import type { PerformerResponse } from './performersApi.ts'
 
 const route = (scheduleId: string, timeslotId?: string) =>
@@ -14,7 +14,7 @@ export default {
     request: TRequest
   ) => sendPut(route(scheduleId, timeslotId), mapRequest(request)),
   post: <TRequest extends TimeslotRequest>(scheduleId: string, request: TRequest) =>
-    sendPost(route(scheduleId), mapRequest(request)),
+    sendPostForm(route(scheduleId), mapRequest(request)),
   delete: (scheduleId: string, timeslotId: string) => sendDelete(route(scheduleId, timeslotId))
 }
 
@@ -24,6 +24,7 @@ export interface TimeslotRequest {
   startsAt: string
   endsAt: string
   name: string
+  file: File | null
 }
 
 const mapRequest = <TRequest extends TimeslotRequest>(request: TRequest): TimeslotRequest => {
@@ -32,7 +33,8 @@ const mapRequest = <TRequest extends TimeslotRequest>(request: TRequest): Timesl
     performanceType: request.performanceType,
     startsAt: request.startsAt,
     endsAt: request.endsAt,
-    name: request.name
+    name: request.name,
+    file: request.file
   }
 }
 
@@ -45,6 +47,7 @@ export interface TimeslotResponse {
   endsAt: string
   isEditable: boolean
   isDeletable: boolean
+  uploadedFileName: string | null
 }
 
 export enum PerformanceType {

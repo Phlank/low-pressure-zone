@@ -1,17 +1,26 @@
 ﻿using FastEndpoints;
+using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
+using LowPressureZone.Api.Services;
+using LowPressureZone.Api.Services.Files;
 using LowPressureZone.Domain;
 using LowPressureZone.Identity.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
-public class PostTimeslot(DataContext dataContext, PerformerRules performerRules, ScheduleRules scheduleRules)
+public partial class PostTimeslot(
+    DataContext dataContext,
+    TimeslotFileProcessor fileProcessor,
+    PerformerRules performerRules,
+    ScheduleRules scheduleRules)
     : EndpointWithMapper<TimeslotRequest, TimeslotMapper>
 {
     public override void Configure()
     {
+        AllowFormData();
+        AllowFileUploads();
         Post("/schedules/{scheduleId}/timeslots");
         Description(builder => builder.Produces(201));
     }
@@ -22,10 +31,12 @@ public class PostTimeslot(DataContext dataContext, PerformerRules performerRules
         var schedule = await dataContext.Schedules
                                         .Include(schedule => schedule.Timeslots)
                                         .Include(schedule => schedule.Community)
-                                        .ThenInclude(community => community.Relationships.Where(relationship => relationship.UserId == User.GetIdOrDefault()))
+                                        .ThenInclude(community =>
+                                                         community.Relationships.Where(relationship =>
+                                                                                           relationship.UserId ==
+                                                                                           User.GetIdOrDefault()))
                                         .Where(schedule => schedule.Id == scheduleId)
                                         .FirstAsync(ct);
-
         var performer = await dataContext.Performers.FirstAsync(p => p.Id == request.PerformerId, ct);
 
         if (!scheduleRules.IsAddingTimeslotsAuthorized(schedule)
@@ -33,6 +44,17 @@ public class PostTimeslot(DataContext dataContext, PerformerRules performerRules
         {
             await SendUnauthorizedAsync(ct);
             return;
+        }
+
+        if (request.PerformanceType == PerformanceTypes.Prerecorded
+            && request.File is not null)
+        {
+            var processResult = await fileProcessor.ProcessUploadedMediaFileAsync(request, schedule.StartsAt, ct);
+            if (processResult.IsError)
+            {
+                ValidationFailures.AddRange(processResult.Error);
+                ThrowIfAnyErrors();
+            }
         }
 
         var timeslot = Map.ToEntity(request);
@@ -44,4 +66,7 @@ public class PostTimeslot(DataContext dataContext, PerformerRules performerRules
             id = scheduleId
         }, Response, cancellation: ct);
     }
+
+    [LoggerMessage(LogLevel.Error, "Unable to save file for analysis: {error}")]
+    static partial void LogUnableToSaveFileError(ILogger logger, string error);
 }

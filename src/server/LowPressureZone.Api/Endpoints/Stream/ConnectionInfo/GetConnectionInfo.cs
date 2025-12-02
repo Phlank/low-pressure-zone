@@ -1,9 +1,9 @@
 ﻿using FastEndpoints;
-using LowPressureZone.Api.Services.Stream;
+using LowPressureZone.Api.Services.StreamConnectionInfo;
 
 namespace LowPressureZone.Api.Endpoints.Stream.ConnectionInfo;
 
-public class GetConnectionInfo(ConnectionInformationService connectionInformationService)
+public class GetConnectionInfo(StreamingInfoService streamingInfoService)
     : EndpointWithoutRequest<IEnumerable<ConnectionInfoResponse>, ConnectionInfoMapper>
 {
     public override void Configure()
@@ -11,20 +11,14 @@ public class GetConnectionInfo(ConnectionInformationService connectionInformatio
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var liveInfoTask = connectionInformationService.GetLiveInfoAsync();
-        var testInfoTask = connectionInformationService.GetTestInfoAsync();
-        await Task.WhenAll(liveInfoTask, testInfoTask);
-        var liveInfoResult = liveInfoTask.Result;
-        if (!liveInfoResult.IsSuccess)
-            ThrowError(liveInfoResult.Error);
-        var testInfoResult = testInfoTask.Result;
-        if (!testInfoResult.IsSuccess)
-            ThrowError(testInfoResult.Error);
+        var infoResult = await streamingInfoService.GetInfoAsync();
+        if (!infoResult.IsSuccess)
+            ThrowError(infoResult.Error);
 
         ConnectionInfoResponse[] responses =
         [
-            Map.FromEntity(liveInfoResult.Value, "Live Stream"),
-            Map.FromEntity(testInfoResult.Value, "Test Stream")
+            Map.FromEntity(infoResult.Value.Live),
+            Map.FromEntity(infoResult.Value.Test)
         ];
         await SendOkAsync(responses, ct);
     }

@@ -26,7 +26,8 @@ public class GetUsers(IdentityContext identityContext) : EndpointWithoutRequest<
                             {
                                 Id = user.Id,
                                 DisplayName = user.DisplayName,
-                                IsAdmin = userRoles != null && userRoles.Any(userRole => userRole.RoleId == adminRoleId),
+                                IsAdmin =
+                                    userRoles != null && userRoles.Any(userRole => userRole.RoleId == adminRoleId),
                                 RegistrationDate = user.Invitation != null ? user.Invitation.RegistrationDate : null,
                                 IsStreamer = user.StreamerId != null
                             };

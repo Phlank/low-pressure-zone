@@ -67,7 +67,7 @@ const computedClass = computed(() => `${baseClass} ${widthClass.value}`)
   &__message {
     width: 100%;
     text-wrap: wrap pretty;
-    height: 0.8rem;
+    line-height: 0.8rem;
     font-size: 0.8rem;
     color: var(--p-red-500);
   }

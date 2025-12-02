@@ -2,6 +2,6 @@
 
 public interface IDateTimeRange
 {
-    public DateTime StartsAt { get; set; }
-    public DateTime EndsAt { get; set; }
+    public DateTimeOffset StartsAt { get; set; }
+    public DateTimeOffset EndsAt { get; set; }
 }

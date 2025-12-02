@@ -1,28 +1,35 @@
 ﻿using FastEndpoints;
+using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Rules;
+using LowPressureZone.Api.Services;
+using LowPressureZone.Api.Services.Files;
 using LowPressureZone.Domain;
-using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
-public class PutTimeslot(DataContext dataContext, TimeslotRules rules) : EndpointWithMapper<TimeslotRequest, TimeslotMapper>
+public class PutTimeslot(DataContext dataContext, TimeslotFileProcessor fileProcessor, TimeslotRules rules)
+    : EndpointWithMapper<TimeslotRequest, TimeslotMapper>
 {
     public override void Configure()
     {
         Put("/schedules/{scheduleId}/timeslots/{timeslotId}");
+        AllowFormData();
+        AllowFileUploads();
         Description(builder => builder.Produces(204)
                                       .Produces(404));
     }
 
-    public override async Task HandleAsync(TimeslotRequest req, CancellationToken ct)
+    public override async Task HandleAsync(TimeslotRequest request, CancellationToken ct)
     {
         var scheduleId = Route<Guid>("scheduleId");
         var timeslotId = Route<Guid>("timeslotId");
 
         var timeslot = await dataContext.Timeslots
-                                        .Include(t => t.Performer)
-                                        .Where(t => t.Id == timeslotId && t.ScheduleId == scheduleId)
+                                        .Include(timeslot => timeslot.Performer)
+                                        .Include(timeslot => timeslot.Schedule)
+                                        .Where(timeslot => timeslot.Id == timeslotId
+                                                           && timeslot.ScheduleId == scheduleId)
                                         .FirstOrDefaultAsync(ct);
 
         if (timeslot == null)
@@ -37,7 +44,18 @@ public class PutTimeslot(DataContext dataContext, TimeslotRules rules) : Endpoin
             return;
         }
 
-        await Map.UpdateEntityAsync(req, timeslot, ct);
+        if (request.PerformanceType == PerformanceTypes.Prerecorded
+            && request.File is not null)
+        {
+            var processResult = await fileProcessor.ProcessUploadedMediaFileAsync(request, timeslot.Schedule.StartsAt, ct);
+            if (processResult.IsError)
+            {
+                ValidationFailures.AddRange(processResult.Error);
+                ThrowIfAnyErrors();
+            }
+        }
+
+        await Map.UpdateEntityAsync(request, timeslot, ct);
         await SendNoContentAsync(ct);
     }
 }

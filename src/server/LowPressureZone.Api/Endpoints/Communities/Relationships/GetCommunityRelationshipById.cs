@@ -7,7 +7,8 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Endpoints.Communities.Relationships;
 
-public class GetCommunityRelationshipById(DataContext dataContext, IdentityContext identityContext) : EndpointWithoutRequest<CommunityRelationshipResponse, CommunityRelationshipMapper>
+public class GetCommunityRelationshipById(DataContext dataContext, IdentityContext identityContext)
+    : EndpointWithoutRequest<CommunityRelationshipResponse, CommunityRelationshipMapper>
 {
     public override void Configure()
     {
@@ -22,12 +23,16 @@ public class GetCommunityRelationshipById(DataContext dataContext, IdentityConte
 
         var requestRelationship = await dataContext.CommunityRelationships
                                                    .AsNoTracking()
-                                                   .Where(relationship => relationship.CommunityId == communityId && relationship.UserId == userId)
+                                                   .Where(relationship =>
+                                                              relationship.CommunityId == communityId &&
+                                                              relationship.UserId == userId)
                                                    .FirstOrDefaultAsync(ct);
 
         var userRelationship = await dataContext.CommunityRelationships
                                                 .AsNoTracking()
-                                                .Where(relationship => relationship.CommunityId == communityId && relationship.UserId == User.GetIdOrDefault())
+                                                .Where(relationship =>
+                                                           relationship.CommunityId == communityId &&
+                                                           relationship.UserId == User.GetIdOrDefault())
                                                 .FirstOrDefaultAsync(ct);
 
         if (requestRelationship == null)
@@ -35,6 +40,7 @@ public class GetCommunityRelationshipById(DataContext dataContext, IdentityConte
             await SendNotFoundAsync(ct);
             return;
         }
+
         var displayName = await identityContext.Users
                                                .AsNoTracking()
                                                .Where(user => user.Id == userId)

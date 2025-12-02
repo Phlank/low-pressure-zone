@@ -2,7 +2,7 @@
 using FastEndpoints;
 using FluentEmail.Core;
 using FluentValidation.Results;
-using LowPressureZone.Api.Clients;
+using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Services;
@@ -14,7 +14,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Users.Register;
 
-public class PostRegister(UserManager<AppUser> userManager, IdentityContext identityContext, AzuraCastClient radioClient, EmailService emailService) : Endpoint<RegisterRequest>
+public class PostRegister(
+    UserManager<AppUser> userManager,
+    IdentityContext identityContext,
+    IAzuraCastClient radioClient,
+    EmailService emailService) : Endpoint<RegisterRequest>
 {
     private readonly DateTime _requestTime = DateTime.UtcNow;
 
@@ -58,10 +62,12 @@ public class PostRegister(UserManager<AppUser> userManager, IdentityContext iden
         }
 
         var normalizedRequestUsername = req.Username.ToUpperInvariant();
-        var isUsernameInUse = await identityContext.Users.AnyAsync(u => u.NormalizedUserName == normalizedRequestUsername, ct);
+        var isUsernameInUse =
+            await identityContext.Users.AnyAsync(u => u.NormalizedUserName == normalizedRequestUsername, ct);
         if (isUsernameInUse) ThrowError(new ValidationFailure(nameof(req.Username), Errors.Unique));
 
-        var isValidToken = await userManager.VerifyUserTokenAsync(user, TokenProviders.Default, TokenPurposes.Invite, context.Token);
+        var isValidToken =
+            await userManager.VerifyUserTokenAsync(user, TokenProviders.Default, TokenPurposes.Invite, context.Token);
         if (!isValidToken)
         {
             await TaskUtilities.DelaySensitiveResponse(_requestTime);
@@ -69,16 +75,22 @@ public class PostRegister(UserManager<AppUser> userManager, IdentityContext iden
         }
 
         var setUsernameResult = await userManager.SetUserNameAsync(user, req.Username);
-        setUsernameResult.Errors.Select(e => e.Description).ForEach((message) =>
+        setUsernameResult.Errors.Select(e => e.Description).ForEach(message =>
         {
-            AddError(new ValidationFailure(nameof(req.Username), message));
+            AddError(new ValidationFailure(nameof(
+                                               req
+                                                   .Username),
+                                           message));
         });
         ThrowIfAnyErrors();
 
         var addPasswordResult = await userManager.AddPasswordAsync(user, req.Password);
-        addPasswordResult.Errors.Select(e => e.Description).ForEach((message) =>
+        addPasswordResult.Errors.Select(e => e.Description).ForEach(message =>
         {
-            AddError(new ValidationFailure(nameof(req.Password), message));
+            AddError(new ValidationFailure(nameof(
+                                               req
+                                                   .Password),
+                                           message));
         });
         ThrowIfAnyErrors();
 
@@ -89,10 +101,11 @@ public class PostRegister(UserManager<AppUser> userManager, IdentityContext iden
 
         var createStreamerResult = await userManager.LinkToNewStreamer(user, radioClient);
         if (!createStreamerResult.IsSuccess)
-        {
-            Logger.LogWarning("Error when creating streamer for new user");
-            _ = await emailService.SendAdminMessage($"Failure to create streamer for new user: {createStreamerResult.Error}", "Streamer creation failed");
-        }
+            _ =
+                await
+                    emailService
+                        .SendAdminMessage($"Failure to create streamer for new user: {createStreamerResult.Error}",
+                                          "Streamer creation failed");
 
         invitation.IsRegistered = true;
         invitation.RegistrationDate = DateTime.UtcNow;

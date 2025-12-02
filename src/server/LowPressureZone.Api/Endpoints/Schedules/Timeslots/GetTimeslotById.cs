@@ -22,13 +22,15 @@ public class GetTimeslotById : EndpointWithoutRequest<TimeslotResponse, Timeslot
         var timeslot = await DataContext.Timeslots
                                         .AsNoTracking()
                                         .Include(timeslot => timeslot.Performer)
-                                        .Where(timeslot => timeslot.Id == timeslotId && timeslot.ScheduleId == scheduleId)
+                                        .Where(timeslot => timeslot.Id == timeslotId &&
+                                                           timeslot.ScheduleId == scheduleId)
                                         .FirstOrDefaultAsync(ct);
         if (timeslot == null)
         {
             await SendNotFoundAsync(ct);
             return;
         }
+
         var response = Map.FromEntity(timeslot);
         await SendOkAsync(response, ct);
     }

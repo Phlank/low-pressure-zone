@@ -1,5 +1,4 @@
 ﻿using FastEndpoints;
-using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Identity;
@@ -10,7 +9,10 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Endpoints.Users.Invites.Resend;
 
-public class GetResendInvite(UserManager<AppUser> userManager, IdentityContext identityContext, EmailService emailService) : Endpoint<GetResendInviteRequest>
+public class GetResendInvite(
+    UserManager<AppUser> userManager,
+    IdentityContext identityContext,
+    EmailService emailService) : Endpoint<GetResendInviteRequest>
 {
     private readonly DateTime _start = DateTime.UtcNow;
 
@@ -30,7 +32,9 @@ public class GetResendInvite(UserManager<AppUser> userManager, IdentityContext i
             return;
         }
 
-        var invite = await identityContext.Invitations.FirstOrDefaultAsync(i => i.UserId == user.Id && !i.IsCancelled && !i.IsRegistered, ct);
+        var invite =
+            await identityContext.Invitations.FirstOrDefaultAsync(i => i.UserId == user.Id && !i.IsCancelled &&
+                                                                       !i.IsRegistered, ct);
         if (invite == null)
         {
             await this.SendDelayedNoContentAsync(_start, ct);
