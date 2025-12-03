@@ -23,6 +23,8 @@ public interface IAzuraCastClient
     Task<Result<HttpContent, HttpResponseMessage>> DeleteBroadcastAsync(int streamerId, int broadcastId);
 
     Task<Result<string, string>> UploadMediaViaSftpAsync(string targetFilePath, FileStream fileStream);
+    
+    Task<Result<StationFileListItem, HttpResponseMessage>> GetMediaAsync(int mediaId);
 
     Task<Result<IEnumerable<StationFileListItem>, HttpResponseMessage>> GetMediaInDirectoryAsync(
         string directory,

@@ -10,6 +10,9 @@ public static class StringExtensions
         StringComparison comparison = StringComparison.InvariantCulture) =>
         itemsToCompare.Any(item => value.StartsWith(item, comparison));
 
+    public static ValidationFailure ToValidationFailure(this string error, string? propertyName) =>
+        new(propertyName, error);
+    
     public static IEnumerable<ValidationFailure> ToValidationFailures(
         this string error,
         string? propertyName) => [new(propertyName, error)];

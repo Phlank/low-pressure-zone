@@ -17,11 +17,15 @@ public sealed class Result<T, TErr>(T? value, TErr? error) where TErr : notnull
 public static class Result
 {
     public static Result<T, string> Ok<T>(T value) => new(value, null);
+
     public static Result<T, TErr> Ok<T, TErr>(T data) where TErr : notnull => new(data, default);
-    
+
     public static Result<T, string> Err<T>(string error) => new(default, error);
+
+    public static Result<T, ValidationFailure> Err<T>(ValidationFailure error) => new(default, error);
 
     public static Result<T, IEnumerable<ValidationFailure>> Err<T>(IEnumerable<ValidationFailure> errors) =>
         new(default, errors);
+
     public static Result<T, TErr> Err<T, TErr>(TErr error) where TErr : notnull => new(default, error);
 }
