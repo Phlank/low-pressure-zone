@@ -4,7 +4,6 @@ using FastEndpoints;
 using FastEndpoints.Swagger;
 using FluentEmail.Core.Interfaces;
 using FluentEmail.Mailgun;
-using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Adapter.AzuraCast.Configuration;
 using LowPressureZone.Adapter.AzuraCast.Extensions;
 using LowPressureZone.Api.Authentication;
@@ -34,7 +33,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Renci.SshNet;
 
 namespace LowPressureZone.Api.Extensions;
 
