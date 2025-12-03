@@ -46,6 +46,7 @@ public partial class PostTimeslot(
             return;
         }
 
+        int? azuraCastMediaId = null;
         if (request.PerformanceType == PerformanceTypes.Prerecorded
             && request.File is not null)
         {
@@ -55,9 +56,19 @@ public partial class PostTimeslot(
                 ValidationFailures.AddRange(processResult.Error);
                 ThrowIfAnyErrors();
             }
+
+            var uploadToAzuraCastResult = await fileProcessor.UploadFileAndCreatePlaylistAsync(request,
+                                                                                               schedule.StartsAt,
+                                                                                               processResult.Value,
+                                                                                               ct);
+            if (uploadToAzuraCastResult.IsError)
+                ThrowError(uploadToAzuraCastResult.Error);
+
+            azuraCastMediaId = uploadToAzuraCastResult.Value;
         }
 
         var timeslot = Map.ToEntity(request);
+        timeslot.AzuraCastMediaId = azuraCastMediaId;
         dataContext.Timeslots.Add(timeslot);
         await dataContext.SaveChangesAsync(ct);
         HttpContext.ExposeLocation();
