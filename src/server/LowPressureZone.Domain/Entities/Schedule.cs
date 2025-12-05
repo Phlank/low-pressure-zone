@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using LowPressureZone.Domain.Interfaces;
+﻿using LowPressureZone.Domain.Interfaces;
 
 namespace LowPressureZone.Domain.Entities;
 
