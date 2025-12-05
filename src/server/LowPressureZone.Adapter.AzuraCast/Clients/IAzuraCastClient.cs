@@ -26,7 +26,7 @@ public interface IAzuraCastClient
     
     Task<Result<string, string>> UploadMediaViaSftpAsync(FileStream fileStream, string targetFilePath);
     
-    Task<Result<StationFileListItem, HttpResponseMessage>> GetMediaAsync(int mediaId);
+    Task<Result<StationMedia, HttpResponseMessage>> GetMediaAsync(int mediaId);
 
     Task<Result<IEnumerable<StationFileListItem>, HttpResponseMessage>> GetMediaInDirectoryAsync(
         string directory,

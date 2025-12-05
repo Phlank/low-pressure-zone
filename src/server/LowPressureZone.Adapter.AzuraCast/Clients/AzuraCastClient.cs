@@ -175,17 +175,17 @@ public sealed class AzuraCastClient(
         }
     }
 
-    public async Task<Result<StationFileListItem, HttpResponseMessage>> GetMediaAsync(int mediaId)
+    public async Task<Result<StationMedia, HttpResponseMessage>> GetMediaAsync(int mediaId)
     {
         var response = await Client.GetAsync($"{FilesEndpoint(mediaId)}");
         if (!response.IsSuccessStatusCode)
-            return Result.Err<StationFileListItem, HttpResponseMessage>(response);
+            return Result.Err<StationMedia, HttpResponseMessage>(response);
         
-        var content = await response.Content.ReadFromJsonAsync<StationFileListItem>();
+        var content = await response.Content.ReadFromJsonAsync<StationMedia>();
         if (content is null)
-            return Result.Err<StationFileListItem, HttpResponseMessage>(response);
+            return Result.Err<StationMedia, HttpResponseMessage>(response);
         
-        return Result.Ok<StationFileListItem, HttpResponseMessage>(content);
+        return Result.Ok<StationMedia, HttpResponseMessage>(content);
     }
 
     public async Task<Result<IEnumerable<StationFileListItem>, HttpResponseMessage>> GetMediaInDirectoryAsync(
