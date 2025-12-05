@@ -46,7 +46,7 @@ public class PutTimeslot(DataContext dataContext, TimeslotFileProcessor fileProc
         if (request.PerformanceType == PerformanceTypes.Prerecorded
             && request.File is not null)
         {
-            var processResult = await fileProcessor.ProcessUploadedMediaFileAsync(request, timeslot.Schedule.StartsAt, ct);
+            var processResult = await fileProcessor.ProcessUploadToMp3Async(request, timeslot.Schedule.StartsAt, ct);
             if (processResult.IsError)
             {
                 ValidationFailures.AddRange(processResult.Error);

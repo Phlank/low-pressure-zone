@@ -7,6 +7,7 @@ using FluentEmail.Mailgun;
 using LowPressureZone.Adapter.AzuraCast.Configuration;
 using LowPressureZone.Adapter.AzuraCast.Extensions;
 using LowPressureZone.Api.Authentication;
+using LowPressureZone.Api.Converters;
 using LowPressureZone.Api.Endpoints.Broadcasts;
 using LowPressureZone.Api.Endpoints.Communities;
 using LowPressureZone.Api.Endpoints.Communities.Relationships;
@@ -38,6 +39,62 @@ namespace LowPressureZone.Api.Extensions;
 
 public static class WebApplicationBuilderExtensions
 {
+    public static void ConfigureWebApi(this WebApplicationBuilder builder)
+    {
+        var services = builder.Services;
+
+        services.Configure<JsonOptions>(options =>
+        {
+            options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
+        
+        services.Configure<IcecastConfiguration>(builder.Configuration.GetSection(IcecastConfiguration.Name));
+        services.Configure<StreamingConfiguration>(builder.Configuration.GetSection(StreamingConfiguration.Name));
+        services.Configure<EmailServiceConfiguration>(builder.Configuration.GetSection(EmailServiceConfiguration.Name));
+        services.Configure<UrlConfiguration>(builder.Configuration.GetSection(UrlConfiguration.Name));
+        services.Configure<FileConfiguration>(builder.Configuration.GetSection(FileConfiguration.Name));
+        services.SwaggerDocument();
+        services.AddCors(options =>
+        {
+            options.AddPolicy("Frontend", policyBuilder =>
+            {
+                var siteUrl = builder.Configuration.GetValue<string>("Url:SiteUrl");
+                policyBuilder.WithOrigins(siteUrl!)
+                             .AllowAnyHeader()
+                             .WithMethods("GET", "PUT", "POST", "DELETE")
+                             .AllowCredentials();
+            });
+        });
+    }
+    
+    public static void AddApiServices(this WebApplicationBuilder builder)
+    {
+        // Ordered by dependency graph. Items grouped lower have dependencies in groups above them.
+        // This is picky and opinionated, but it makes it easy to understand the dependency graph at a glance.
+        // Singletons should precede any scoped services, which should precede any transient services.
+        builder.Services.AddFastEndpoints();
+        builder.Services.AddHttpContextAccessor();
+        builder.AddAzuraCast();
+        builder.Services.AddSingleton<ISender, MailgunSender>(serviceProvider => serviceProvider.CreateMailgunSender());
+        builder.Services.AddSingleton<MediaAnalyzer>();
+        builder.Services.AddSingleton<Mp3Processor>();
+        builder.Services.AddSingleton<UriService>();
+        
+        builder.AddEndpointServices();
+        builder.Services.AddSingleton<EmailService>();
+        builder.Services.AddSingleton<FormFileSaver>();
+        
+        builder.Services.AddSingleton<IStreamStatusService, AzuraCastStatusService>();
+        builder.Services.AddHostedService<BroadcastDeletionService>();
+        builder.AddDatabases();
+        builder.ConfigureIdentity();
+
+        builder.Services.AddScoped<TimeslotRequestToAzuraCastPlaylistConverter>();
+        builder.Services.AddScoped<StreamingInfoService>();
+        builder.Services.AddScoped<TimeslotFileProcessor>();
+    }
+    
     private static readonly Action<CookieAuthenticationOptions> ConfigureDevelopmentCookieOptions = options =>
     {
         options.Cookie.SameSite = SameSiteMode.None;
@@ -45,7 +102,7 @@ public static class WebApplicationBuilderExtensions
         options.Cookie.HttpOnly = true;
     };
 
-    public static void AddDatabases(this WebApplicationBuilder builder)
+    private static void AddDatabases(this WebApplicationBuilder builder)
     {
         var identityConnectionString = builder.Configuration.GetConnectionString("Identity");
         var dataConnectionString = builder.Configuration.GetConnectionString("Data");
@@ -62,7 +119,7 @@ public static class WebApplicationBuilderExtensions
         });
     }
 
-    public static void ConfigureIdentity(this WebApplicationBuilder builder)
+    private static void ConfigureIdentity(this WebApplicationBuilder builder)
     {
         var services = builder.Services;
         var environment = builder.Environment;
@@ -114,59 +171,6 @@ public static class WebApplicationBuilderExtensions
         builder.Services.Configure<FormOptions>(options => { options.MultipartBodyLengthLimit = 1024 * 1024 * 1024; });
     }
 
-    public static void ConfigureWebApi(this WebApplicationBuilder builder)
-    {
-        var services = builder.Services;
-
-        services.Configure<JsonOptions>(options =>
-        {
-            options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-        });
-        
-        services.Configure<IcecastConfiguration>(builder.Configuration.GetSection(IcecastConfiguration.Name));
-        services.Configure<StreamingConfiguration>(builder.Configuration.GetSection(StreamingConfiguration.Name));
-        services.Configure<EmailServiceConfiguration>(builder.Configuration.GetSection(EmailServiceConfiguration.Name));
-        services.Configure<UrlConfiguration>(builder.Configuration.GetSection(UrlConfiguration.Name));
-        services.Configure<FileConfiguration>(builder.Configuration.GetSection(FileConfiguration.Name));
-
-        services.AddFastEndpoints();
-        services.AddHttpContextAccessor();
-        services.SwaggerDocument();
-        services.AddCors(options =>
-        {
-            options.AddPolicy("Frontend", policyBuilder =>
-            {
-                var siteUrl = builder.Configuration.GetValue<string>("Url:SiteUrl");
-                policyBuilder.WithOrigins(siteUrl!)
-                             .AllowAnyHeader()
-                             .WithMethods("GET", "PUT", "POST", "DELETE")
-                             .AllowCredentials();
-            });
-        });
-    }
-
-    public static void AddApiServices(this WebApplicationBuilder builder)
-    {
-        // Ordered by dependency graph. Items grouped lower have dependencies in groups above them.
-        // This is picky and opinionated, but it makes it easy to understand the dependency graph at a glance.
-        // Singletons should precede any scoped services, which should precede any transient services.
-        builder.AddEndpointServices();
-        builder.AddAzuraCast();
-        builder.Services.AddSingleton<ISender, MailgunSender>(serviceProvider => serviceProvider.CreateMailgunSender());
-        builder.Services.AddSingleton<MediaAnalyzer>();
-        builder.Services.AddSingleton<Mp3Processor>();
-        builder.Services.AddSingleton<UriService>();
-        
-        builder.Services.AddSingleton<EmailService>();
-        builder.Services.AddSingleton<FormFileSaver>();
-        
-        builder.Services.AddSingleton<IStreamStatusService, AzuraCastStatusService>();
-        builder.Services.AddHostedService<BroadcastDeletionService>();
-        builder.Services.AddScoped<StreamingInfoService>();
-        builder.Services.AddScoped<TimeslotFileProcessor>();
-    }
-
     private static void AddEndpointServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddSingleton<CommunityMapper>();
@@ -190,15 +194,6 @@ public static class WebApplicationBuilderExtensions
         var options = services.GetRequiredService<IOptions<EmailServiceConfiguration>>();
         return new MailgunSender(options.Value.MailgunDomain, options.Value.MailgunApiKey);
     }
-
-    private static readonly Action<IServiceProvider, HttpClient> ConfigureAzuraCastHttpClient =
-        (services, client) =>
-        {
-            var configuration = services.GetRequiredService<IOptions<AzuraCastClientConfiguration>>()
-                                        .Value;
-            client.BaseAddress = configuration.ApiUrl;
-            client.DefaultRequestHeaders.Add("X-API-Key", configuration.ApiKey);
-        };
 
     public static void CreateFileLocations(this WebApplicationBuilder builder)
     {

@@ -49,14 +49,14 @@ public partial class PostTimeslot(
         if (request.PerformanceType == PerformanceTypes.Prerecorded
             && request.File is not null)
         {
-            var processResult = await fileProcessor.ProcessUploadedMediaFileAsync(request, schedule.StartsAt, ct);
+            var processResult = await fileProcessor.ProcessUploadToMp3Async(request, schedule.StartsAt, ct);
             if (processResult.IsError)
             {
                 ValidationFailures.AddRange(processResult.Error);
                 ThrowIfAnyErrors();
             }
 
-            var uploadToAzuraCastResult = await fileProcessor.UploadFileAndCreatePlaylistAsync(request,
+            var uploadToAzuraCastResult = await fileProcessor.EnqueuePrerecordedMixAsync(request,
                                                                                                schedule.StartsAt,
                                                                                                processResult.Value,
                                                                                                ct);

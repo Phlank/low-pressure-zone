@@ -136,7 +136,14 @@ public sealed class AzuraCastClient(
         return Result.Ok<HttpContent, HttpResponseMessage>(response.Content);
     }
 
-    public async Task<Result<string, string>> UploadMediaViaSftpAsync(string targetFilePath, FileStream fileStream)
+    public async Task<Result<string, string>> UploadMediaViaSftpAsync(string localFilePath, string targetFilePath)
+    {
+        await using var fileStream = new FileStream(localFilePath, FileMode.Open, FileAccess.Read);
+
+        return await UploadMediaViaSftpAsync(fileStream, targetFilePath);
+    }
+    
+    public async Task<Result<string, string>> UploadMediaViaSftpAsync(FileStream fileStream, string targetFilePath)
     {
         if (!sftpClient.IsConnected)
             sftpClient.Connect();
