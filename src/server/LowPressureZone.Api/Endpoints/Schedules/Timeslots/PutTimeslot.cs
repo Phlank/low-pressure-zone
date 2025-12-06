@@ -44,17 +44,19 @@ public class PutTimeslot(DataContext dataContext, TimeslotFileProcessor fileProc
         }
 
         if (request.PerformanceType == PerformanceTypes.Prerecorded
-            && request.File is not null)
+            && timeslot.Type == PerformanceTypes.Prerecorded)
         {
-            var processResult = await fileProcessor.ProcessUploadToMp3Async(request, timeslot.Schedule.StartsAt, ct);
-            if (processResult.IsError)
-            {
-                ValidationFailures.AddRange(processResult.Error);
-                ThrowIfAnyErrors();
-            }
+            var updateAzuraCastResult = await fileProcessor.UpdateEnqueuedPrerecordedMixAsync(timeslotId, request, ct);
+            if (updateAzuraCastResult.IsError)
+                ValidationFailures.AddRange(updateAzuraCastResult.Error);
+            
+            ThrowIfAnyErrors();
+            timeslot.AzuraCastMediaId = updateAzuraCastResult.Value;
         }
 
-        await Map.UpdateEntityAsync(request, timeslot, ct);
+        Map.UpdateEntity(request, timeslot);
+        _ = await dataContext.SaveChangesAsync(ct);
+        
         await SendNoContentAsync(ct);
     }
 }

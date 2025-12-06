@@ -42,4 +42,5 @@ public interface IAzuraCastClient
     Task<Result<int, HttpResponseMessage>> PostPlaylistAsync(StationPlaylist playlist);
 
     Task<Result<bool, HttpResponseMessage>> PutPlaylistAsync(StationPlaylist playlist);
+    Task<Result<bool, HttpResponseMessage>> DeletePlaylistAsync(int playlistId);
 }

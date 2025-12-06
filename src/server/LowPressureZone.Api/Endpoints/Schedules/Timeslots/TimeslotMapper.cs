@@ -25,19 +25,16 @@ public sealed class TimeslotMapper(
             ScheduleId = contextAccessor.GetGuidRouteParameterOrDefault("scheduleId"),
             UploadedFileName = req.File?.FileName
         };
-
-    public async Task UpdateEntityAsync(TimeslotRequest req, Timeslot timeslot, CancellationToken ct = default)
+    
+    public void UpdateEntity(TimeslotRequest req, Timeslot timeslot)
     {
-        var dataContext = contextAccessor.Resolve<DataContext>();
-        timeslot.StartsAt = req.StartsAt;
-        timeslot.EndsAt = req.EndsAt;
+        timeslot.Name = req.Name?.Trim();
+        timeslot.StartsAt = req.StartsAt.ToUniversalTime();
+        timeslot.EndsAt = req.EndsAt.ToUniversalTime();
+        timeslot.Type = req.PerformanceType.Trim();
         timeslot.PerformerId = req.PerformerId;
-        timeslot.Type = req.PerformanceType;
-        timeslot.Name = req.Name;
-        timeslot.UploadedFileName = req.File?.FileName;
-        if (!dataContext.ChangeTracker.HasChanges()) return;
-        timeslot.LastModifiedDate = DateTime.UtcNow;
-        await dataContext.SaveChangesAsync(ct);
+        if (req.File != null)
+            timeslot.UploadedFileName = req.File.FileName;
     }
 
     public TimeslotResponse FromEntity(Timeslot timeslot)

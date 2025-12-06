@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
 using System.Web;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Configuration;
@@ -20,6 +21,11 @@ public sealed class AzuraCastClient(
     : IAzuraCastClient
 {
     private readonly string _stationId = options.Value.StationId;
+    
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+    };
 
     private HttpClient Client => clientFactory.CreateClient("AzuraCastHttpClient");
 
@@ -78,7 +84,7 @@ public sealed class AzuraCastClient(
             EnforceSchedule = false,
             ReactivateAt = null
         };
-        var result = await Client.PostAsJsonAsync(StreamersEndpoint(), body);
+        var result = await Client.PostAsJsonAsync(StreamersEndpoint(), body, JsonSerializerOptions);
         if (!result.IsSuccessStatusCode)
             return Result.Err<int, HttpResponseMessage>(result);
 
@@ -94,7 +100,7 @@ public sealed class AzuraCastClient(
 
     public async Task<Result<bool, HttpResponseMessage>> PutStreamerAsync(StationStreamer streamer)
     {
-        var result = await Client.PutAsJsonAsync(StreamerEndpoint(streamer.Id), streamer);
+        var result = await Client.PutAsJsonAsync(StreamerEndpoint(streamer.Id), streamer, JsonSerializerOptions);
         return !result.IsSuccessStatusCode
                    ? Result.Err<bool, HttpResponseMessage>(result)
                    : Result.Ok<bool, HttpResponseMessage>(true);
@@ -210,7 +216,7 @@ public sealed class AzuraCastClient(
     
     public async Task<Result<bool, HttpResponseMessage>> PutMediaAsync(int mediaId, StationMediaRequest mediaRequest)
     {
-        var result = await Client.PutAsJsonAsync(FilesEndpoint(mediaId), mediaRequest);
+        var result = await Client.PutAsJsonAsync(FilesEndpoint(mediaId), mediaRequest, JsonSerializerOptions);
         if (!result.IsSuccessStatusCode)
             return Result.Err<bool, HttpResponseMessage>(result);
 
@@ -241,7 +247,7 @@ public sealed class AzuraCastClient(
 
     public async Task<Result<int, HttpResponseMessage>> PostPlaylistAsync(StationPlaylist playlist)
     {
-        var result = await Client.PostAsJsonAsync(PlaylistsEndpoint(), playlist);
+        var result = await Client.PostAsJsonAsync(PlaylistsEndpoint(), playlist, JsonSerializerOptions);
         if (!result.IsSuccessStatusCode)
         {
             var errorContent = await result.Content.ReadAsStringAsync();
@@ -260,7 +266,9 @@ public sealed class AzuraCastClient(
     
     public async Task<Result<bool, HttpResponseMessage>> PutPlaylistAsync(StationPlaylist playlist)
     {
-        var result = await Client.PutAsJsonAsync(PlaylistsEndpoint(playlist.Id), playlist);
+        var id = playlist.Id;
+        playlist.Id = 0;
+        var result = await Client.PutAsJsonAsync(PlaylistsEndpoint(id), playlist, JsonSerializerOptions);
         if (!result.IsSuccessStatusCode)
         {
             var errorContent = await result.Content.ReadAsStringAsync();
@@ -269,6 +277,15 @@ public sealed class AzuraCastClient(
                             errorContent);
             return Result.Err<bool, HttpResponseMessage>(result);
         }
+
+        return Result.Ok<bool, HttpResponseMessage>(true);
+    }
+    
+    public async Task<Result<bool, HttpResponseMessage>> DeletePlaylistAsync(int playlistId)
+    {
+        var result = await Client.DeleteAsync(PlaylistsEndpoint(playlistId));
+        if (!result.IsSuccessStatusCode)
+            return Result.Err<bool, HttpResponseMessage>(result);
 
         return Result.Ok<bool, HttpResponseMessage>(true);
     }
@@ -291,7 +308,7 @@ public sealed class AzuraCastClient(
 
     private string PlaylistsEndpoint(int? id = null) => id is null
                                                             ? $"/api/station/{_stationId}/playlists"
-                                                            : $"/api/station/{_stationId}/playlists/{id}";
+                                                            : $"/api/station/{_stationId}/playlist/{id}";
 
     private string FilesEndpoint(int? id = null) => id is null
                                                         ? $"/api/station/{_stationId}/files"

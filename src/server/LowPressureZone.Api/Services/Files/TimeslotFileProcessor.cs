@@ -122,8 +122,8 @@ public sealed class TimeslotFileProcessor(
 
         return Result.Ok<int, ValidationFailure>(uploadedFile.Media.Id);
     }
-
-    public async Task<Result<int, IEnumerable<ValidationFailure>>> UpdateEnqueuedMixAsync(
+    
+    public async Task<Result<int, IEnumerable<ValidationFailure>>> UpdateEnqueuedPrerecordedMixAsync(
         Guid timeslotId,
         TimeslotRequest request,
         CancellationToken ct = default)
@@ -161,7 +161,7 @@ public sealed class TimeslotFileProcessor(
                                         "Unable to delete existing media in AzuraCast")
                                        .ToValidationFailures(nameof(request.File)));
 
-            var azuraCastFilePath = $"{_prerecordedSetLocation}/{Path.GetFileName(localFilePath)}";
+            var azuraCastFilePath = Path.Combine(_prerecordedSetLocation, Path.GetFileName(localFilePath));
             var uploadResult = await azuraCastClient.UploadMediaViaSftpAsync(localFilePath, azuraCastFilePath);
             if (uploadResult.IsError)
                 return Result.Err<int>(uploadResult.Error.ToValidationFailures(nameof(request.File)));
@@ -181,7 +181,7 @@ public sealed class TimeslotFileProcessor(
             newMedia = uploadedFile.Media;
         }
 
-        // Update the metadata and playlist reference on the target media
+        // Update the metadata and playlist reference on the target media.
         var targetMedia = newMedia ?? getExistingMediaResult.Value;
         var updateMediaRequest = StationMediaMapper.ToRequest(targetMedia);
         var metadata = await GetAudioMetadataAsync(request, timeslot.Schedule.StartsAt, ct);
@@ -191,14 +191,15 @@ public sealed class TimeslotFileProcessor(
         var updateMediaResult = await azuraCastClient.PutMediaAsync(targetMedia.Id, updateMediaRequest);
         if (updateMediaResult.IsError)
             return Result.Err<int>("Failed to update media metadata in AzuraCast".ToValidationFailures());
-
+        
         // Both outcomes require a playlist update
         var playlistFromTimeslotResult = await requestToPlaylistConverter.ConvertAsync(request, ct);
         if (playlistFromTimeslotResult.IsError)
             return Result.Err<int>([playlistFromTimeslotResult.Error]);
         var timeslotPlaylist = playlistFromTimeslotResult.Value;
-        var updatePlaylistResult = await azuraCastClient.PutPlaylistAsync(timeslotPlaylist);
-        if (updatePlaylistResult.IsError)
+        timeslotPlaylist.Id = playlistId.Value;
+        var putPlaylistResult = await azuraCastClient.PutPlaylistAsync(timeslotPlaylist);
+        if (putPlaylistResult.IsError)
             return Result.Err<int>("Failed to update playlist in AzuraCast".ToValidationFailures());
         
         return Result.Ok<int, IEnumerable<ValidationFailure>>(targetMedia.Id);
@@ -245,9 +246,9 @@ public sealed class TimeslotFileProcessor(
     private static string GetUploadFileName(string artist, string title, DateTimeOffset start)
     {
         if (string.IsNullOrEmpty(title))
-            return $"{artist} - {start.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)}.mp3";
+            return Path.GetFileName($"{artist} - {start.ToString("yyyy-MM-dd HH_mm", CultureInfo.InvariantCulture)}.mp3");
 
-        return $"{artist} - {title} - {start.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)}.mp3";
+        return Path.GetFileName($"{artist} - {title} - {start.ToString("yyyy-MM-dd HH_mm", CultureInfo.InvariantCulture)}.mp3");
     }
 
     private async Task<Result<StationFileListItem, string>> GetUploadedFileAsync(string filePath)
