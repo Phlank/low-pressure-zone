@@ -167,7 +167,8 @@ const formInitialValue: Ref<TimeslotRequest> = ref({
   name: '',
   performanceType: PerformanceType.Live,
   performerName: '',
-  file: null
+  file: null,
+  replaceMedia: null
 })
 
 const handleCreateClicked = (row: TimeslotRow) => {
@@ -180,7 +181,8 @@ const handleCreateClicked = (row: TimeslotRow) => {
     name: '',
     performerId: '',
     performanceType: PerformanceType.Live,
-    file: null
+    file: null,
+    replaceMedia: null
   }
   showTimeslotDialog.value = true
 }
@@ -195,7 +197,8 @@ const handleEditClicked = (row: TimeslotRow) => {
     name: row.timeslot?.name ?? '',
     performerId: row.timeslot?.performer.id ?? '',
     performanceType: row.timeslot?.performanceType ?? PerformanceType.Live,
-    file: null
+    file: null,
+    replaceMedia: null
   }
   showTimeslotDialog.value = true
 }
