@@ -24,7 +24,7 @@ jobs:
         cache: 'yarn'
         cache-dependency-path: src/client/yarn.lock
         check-latest: true
-    - run: yarn install --ignore-scripts
+    - run: yarn
       working-directory: src/client
     - run: yarn build
       working-directory: src/client
