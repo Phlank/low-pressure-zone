@@ -78,13 +78,7 @@ public sealed class TimeslotFileProcessor(
         var fileName = GetUploadFileName(newMetadata.Artist, newMetadata.Title, request.StartsAt);
 
         var azuraCastFilePath = $"{_prerecordedSetLocation}/{fileName}";
-        Result<string, string> uploadResult;
-        await using (var fileStream = new FileStream(localFilePath, FileMode.Open, FileAccess.Read))
-        {
-            uploadResult = await azuraCastClient.UploadMediaViaSftpAsync(fileStream, azuraCastFilePath);
-            _ = await fileSaver.DeleteFileAsync(localFilePath);
-        }
-
+        var uploadResult = await azuraCastClient.UploadMediaViaSftpAsync(localFilePath, azuraCastFilePath);
         if (uploadResult.IsError)
             return Result.Err<int>(uploadResult.Error.ToValidationFailure(nameof(request.File)));
 
