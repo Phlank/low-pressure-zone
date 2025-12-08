@@ -4,7 +4,8 @@ namespace LowPressureZone.Adapter.AzuraCast.ApiSchema;
 
 public sealed class StationPlaylist
 {
-    public int Id { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public int Id { get; set; }
     public required string Name { get; init; }
     public string Description { get; init; } = "";
     public required StationPlaylistType Type { get; init; }

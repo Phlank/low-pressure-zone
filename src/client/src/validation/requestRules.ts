@@ -64,7 +64,8 @@ export const timeslotRequestRules = (
       mimeType(audioMimeTypes, 'Allowed audio types: wav, flac, mp3, m4a, vorbis, and opus.'),
       maxSize(1024 * 1024 * 1024, 'Max file size is 1GB.'),
       applyRuleIf(required(), () => formState.performanceType === 'Prerecorded DJ Set')
-    )
+    ),
+    replaceMedia: alwaysValid()
   }
 }
 

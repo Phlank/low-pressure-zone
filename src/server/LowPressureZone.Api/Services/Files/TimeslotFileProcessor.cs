@@ -4,6 +4,7 @@ using FluentValidation.Results;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Adapter.AzuraCast.Mappers;
+using LowPressureZone.Api.Converters;
 using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Models;
@@ -23,12 +24,13 @@ public sealed class TimeslotFileProcessor(
     Mp3Processor mp3Processor,
     DataContext dataContext,
     IAzuraCastClient azuraCastClient,
+    TimeslotRequestToAzuraCastPlaylistConverter requestToPlaylistConverter,
     IOptions<FileConfiguration> fileOptions)
 {
     private readonly string _tempLocation = fileOptions.Value.TemporaryLocation;
     private readonly string _prerecordedSetLocation = fileOptions.Value.AzuraCastPrerecordedSetLocation;
 
-    public async Task<Result<string, IEnumerable<ValidationFailure>>> ProcessUploadedMediaFileAsync(
+    public async Task<Result<string, IEnumerable<ValidationFailure>>> ProcessUploadToMp3Async(
         TimeslotRequest request,
         DateTimeOffset scheduleStart,
         CancellationToken ct = default)
@@ -63,16 +65,22 @@ public sealed class TimeslotFileProcessor(
         if (processResult.IsError)
             return Result.Err<string>(processResult.Error);
 
-        var azuraCastFilePath = $"{_prerecordedSetLocation}/{fileName}";
-        Result<string, string> uploadResult;
-        await using (var fileStream = new FileStream(processResult.Value, FileMode.Open, FileAccess.Read))
-        {
-            uploadResult = await azuraCastClient.UploadMediaViaSftpAsync(azuraCastFilePath, fileStream);
-            _ = await fileSaver.DeleteFileAsync(processResult.Value);
-        }
+        return Result.Ok<string, IEnumerable<ValidationFailure>>(processResult.Value);
+    }
 
+    public async Task<Result<int, ValidationFailure>> EnqueuePrerecordedMixAsync(
+        TimeslotRequest request,
+        DateTimeOffset scheduleStart,
+        string localFilePath,
+        CancellationToken ct = default)
+    {
+        var newMetadata = await GetAudioMetadataAsync(request, scheduleStart, ct);
+        var fileName = GetUploadFileName(newMetadata.Artist, newMetadata.Title, request.StartsAt);
+
+        var azuraCastFilePath = $"{_prerecordedSetLocation}/{fileName}";
+        var uploadResult = await azuraCastClient.UploadMediaViaSftpAsync(localFilePath, azuraCastFilePath);
         if (uploadResult.IsError)
-            return Result.Err<string>(uploadResult.Error.ToValidationFailures(nameof(request.File)));
+            return Result.Err<int>(uploadResult.Error.ToValidationFailure(nameof(request.File)));
 
         var uploadedFileResult = await Retry.RetryAsync(10,
                                                         1000,
@@ -82,16 +90,18 @@ public sealed class TimeslotFileProcessor(
                                                         async () => await GetUploadedFileAsync(azuraCastFilePath),
                                                         ct);
         if (uploadedFileResult.IsError)
-            return Result.Err<string>(uploadedFileResult.Error.ToValidationFailures(nameof(request.File)));
+            return Result.Err<int>(uploadedFileResult.Error.ToValidationFailure(nameof(request.File)));
 
         var uploadedFile = uploadedFileResult.Value;
         uploadedFile.Media.ShouldNotBeNull();
 
-        var playlist = ConvertTimeslotToPlaylist(request, newMetadata);
-        var createPlaylistResult = await azuraCastClient.PostPlaylistAsync(playlist);
+        var playlist = await requestToPlaylistConverter.ConvertAsync(request, ct);
+        if (playlist.IsError)
+            return Result.Err<int>(playlist.Error);
+
+        var createPlaylistResult = await azuraCastClient.PostPlaylistAsync(playlist.Value);
         if (createPlaylistResult.IsError)
-            return Result.Err<string>("Failed to create playlist in AzuraCast"
-                                          .ToValidationFailures(nameof(request.File)));
+            return Result.Err<int>("Failed to create playlist in AzuraCast".ToValidationFailure(nameof(request.File)));
 
         var playlistId = createPlaylistResult.Value;
 
@@ -101,10 +111,92 @@ public sealed class TimeslotFileProcessor(
         updateRequest.Playlists = [playlistId];
         var updateMediaResult = await azuraCastClient.PutMediaAsync(uploadedFile.Media.Id, updateRequest);
         if (updateMediaResult.IsError)
-            return Result.Err<string>("Failed to update media metadata in AzuraCast"
-                                          .ToValidationFailures(nameof(request.File)));
+            return Result.Err<int>("Failed to update media metadata in AzuraCast"
+                                       .ToValidationFailure(nameof(request.File)));
 
-        return Result.Ok<string, IEnumerable<ValidationFailure>>(azuraCastFilePath);
+        return Result.Ok<int, ValidationFailure>(uploadedFile.Media.Id);
+    }
+    
+    public async Task<Result<int, IEnumerable<ValidationFailure>>> UpdateEnqueuedPrerecordedMixAsync(
+        Guid timeslotId,
+        TimeslotRequest request,
+        CancellationToken ct = default)
+    {
+        // Get necessary data
+        var timeslot = await dataContext.Timeslots
+                                        .Include(timeslot => timeslot.Schedule)
+                                        .Where(timeslot => timeslot.Id == timeslotId)
+                                        .FirstOrDefaultAsync(ct);
+
+        timeslot.ShouldNotBeNull();
+        timeslot.AzuraCastMediaId.ShouldNotBeNull();
+
+        var getExistingMediaResult = await azuraCastClient.GetMediaAsync(timeslot.AzuraCastMediaId.Value);
+        if (getExistingMediaResult.IsError)
+            return Result.Err<int>("Unable to load existing media in AzuraCast".ToValidationFailures());
+
+        var playlistId = getExistingMediaResult.Value.Playlists.FirstOrDefault()?.Id;
+        if (playlistId is null)
+            return Result.Err<int>("Unable to load playlist in AzuraCast".ToValidationFailures());
+
+        // If there is a new file, we need to delete the old one and upload the new one
+        StationMedia? newMedia = null;
+        if (request.File is not null)
+        {
+            var processResult = await ProcessUploadToMp3Async(request, timeslot.Schedule.StartsAt, ct);
+            if (processResult.IsError)
+                return Result.Err<int>(processResult.Error);
+
+            var localFilePath = processResult.Value;
+
+            var deleteMediaResult = await azuraCastClient.DeleteMediaAsync(timeslot.AzuraCastMediaId.Value);
+            if (deleteMediaResult.IsError)
+                return Result.Err<int>((deleteMediaResult.Error.ReasonPhrase ??
+                                        "Unable to delete existing media in AzuraCast")
+                                       .ToValidationFailures(nameof(request.File)));
+
+            var azuraCastFilePath = Path.Combine(_prerecordedSetLocation, Path.GetFileName(localFilePath));
+            var uploadResult = await azuraCastClient.UploadMediaViaSftpAsync(localFilePath, azuraCastFilePath);
+            if (uploadResult.IsError)
+                return Result.Err<int>(uploadResult.Error.ToValidationFailures(nameof(request.File)));
+
+            var uploadedFileResult = await Retry.RetryAsync(10,
+                                                            1000,
+                                                            result => result.IsError
+                                                                      || (result.IsSuccess
+                                                                          && result.Value.Media is not null),
+                                                            async () => await GetUploadedFileAsync(azuraCastFilePath),
+                                                            ct);
+            if (uploadedFileResult.IsError)
+                return Result.Err<int>(uploadedFileResult.Error.ToValidationFailures(nameof(request.File)));
+            
+            var uploadedFile = uploadedFileResult.Value;
+            uploadedFile.Media.ShouldNotBeNull();
+            newMedia = uploadedFile.Media;
+        }
+
+        // Update the metadata and playlist reference on the target media.
+        var targetMedia = newMedia ?? getExistingMediaResult.Value;
+        var updateMediaRequest = StationMediaMapper.ToRequest(targetMedia);
+        var metadata = await GetAudioMetadataAsync(request, timeslot.Schedule.StartsAt, ct);
+        updateMediaRequest.Title = metadata.Title;
+        updateMediaRequest.Artist = metadata.Artist;
+        updateMediaRequest.Playlists = [playlistId.Value];
+        var updateMediaResult = await azuraCastClient.PutMediaAsync(targetMedia.Id, updateMediaRequest);
+        if (updateMediaResult.IsError)
+            return Result.Err<int>("Failed to update media metadata in AzuraCast".ToValidationFailures());
+        
+        // Both outcomes require a playlist update
+        var playlistFromTimeslotResult = await requestToPlaylistConverter.ConvertAsync(request, ct);
+        if (playlistFromTimeslotResult.IsError)
+            return Result.Err<int>([playlistFromTimeslotResult.Error]);
+        var timeslotPlaylist = playlistFromTimeslotResult.Value;
+        timeslotPlaylist.Id = playlistId.Value;
+        var putPlaylistResult = await azuraCastClient.PutPlaylistAsync(timeslotPlaylist);
+        if (putPlaylistResult.IsError)
+            return Result.Err<int>("Failed to update playlist in AzuraCast".ToValidationFailures());
+        
+        return Result.Ok<int, IEnumerable<ValidationFailure>>(targetMedia.Id);
     }
 
     private async Task<Result<string, IEnumerable<ValidationFailure>>> ProcessToNewFile(
@@ -112,6 +204,7 @@ public sealed class TimeslotFileProcessor(
         string inputFilePath,
         string outputFilePath)
     {
+        analysis.AudioStreams.ShouldHaveSingleItem();
         if (analysis.AudioStreams[0].CodecName == "mp3")
         {
             var stripResult = await mp3Processor.StripMp3MetadataAsync(inputFilePath, outputFilePath);
@@ -147,36 +240,9 @@ public sealed class TimeslotFileProcessor(
     private static string GetUploadFileName(string artist, string title, DateTimeOffset start)
     {
         if (string.IsNullOrEmpty(title))
-            return $"{artist} - {start.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)}.mp3";
+            return Path.GetFileName($"{artist} - {start.ToString("yyyy-MM-dd HH_mm", CultureInfo.InvariantCulture)}.mp3");
 
-        return $"{artist} - {title} - {start.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)}.mp3";
-    }
-
-    private static StationPlaylist ConvertTimeslotToPlaylist(TimeslotRequest request, SimpleAudioMetadata metadata)
-    {
-        var playlistEnd = request.EndsAt.AddMinutes(5);
-        return new()
-        {
-            IsEnabled = true,
-            Name = $"Prerecorded Slot - {metadata.Artist} - {metadata.Title}",
-            Type = StationPlaylistType.Default,
-            Order = StationPlaylistOrder.Sequential,
-            Source = StationPlaylistSource.Songs,
-            Weight = 1,
-            BackendOptions = [StationPlaylistBackendOption.Interrupt, StationPlaylistBackendOption.SingleTrack],
-            ScheduleItems =
-            [
-                new StationPlaylistScheduleItem
-                {
-                    Days = [],
-                    StartDate = DateOnly.FromDateTime(request.StartsAt.UtcDateTime),
-                    StartTime = request.StartsAt.Hour * 100 + request.StartsAt.Minute,
-                    EndDate = DateOnly.FromDateTime(playlistEnd.UtcDateTime),
-                    EndTime = request.EndsAt.Hour * 100 + request.EndsAt.Minute,
-                    LoopOnce = true
-                }
-            ]
-        };
+        return Path.GetFileName($"{artist} - {title} - {start.ToString("yyyy-MM-dd HH_mm", CultureInfo.InvariantCulture)}.mp3");
     }
 
     private async Task<Result<StationFileListItem, string>> GetUploadedFileAsync(string filePath)
@@ -184,7 +250,7 @@ public sealed class TimeslotFileProcessor(
         var prerecordListResult = await azuraCastClient.GetMediaInDirectoryAsync(_prerecordedSetLocation,
                                                                                  useInternalMode: true,
                                                                                  flushCache: true);
-        
+
         if (prerecordListResult.IsError)
             return Result.Err<StationFileListItem>("Failed to retrieve files from AzuraCast");
 

@@ -15,8 +15,6 @@ builder.Services.Configure<JsonOptions>(options =>
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
-builder.AddDatabases();
-builder.ConfigureIdentity();
 builder.ConfigureKestrel();
 builder.ConfigureWebApi();
 builder.AddApiServices();

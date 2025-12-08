@@ -2,7 +2,6 @@
 using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
-using LowPressureZone.Api.Services;
 using LowPressureZone.Api.Services.Files;
 using LowPressureZone.Domain;
 using LowPressureZone.Identity.Extensions;
@@ -46,18 +45,28 @@ public partial class PostTimeslot(
             return;
         }
 
+        var timeslot = Map.ToEntity(request);
+        
         if (request.PerformanceType == PerformanceTypes.Prerecorded
             && request.File is not null)
         {
-            var processResult = await fileProcessor.ProcessUploadedMediaFileAsync(request, schedule.StartsAt, ct);
+            var processResult = await fileProcessor.ProcessUploadToMp3Async(request, schedule.StartsAt, ct);
             if (processResult.IsError)
             {
                 ValidationFailures.AddRange(processResult.Error);
                 ThrowIfAnyErrors();
             }
-        }
 
-        var timeslot = Map.ToEntity(request);
+            var uploadToAzuraCastResult = await fileProcessor.EnqueuePrerecordedMixAsync(request,
+                                                                                         schedule.StartsAt,
+                                                                                         processResult.Value,
+                                                                                         ct);
+            if (uploadToAzuraCastResult.IsError)
+                ThrowError(uploadToAzuraCastResult.Error);
+
+            timeslot.AzuraCastMediaId = uploadToAzuraCastResult.Value;
+        }
+        
         dataContext.Timeslots.Add(timeslot);
         await dataContext.SaveChangesAsync(ct);
         HttpContext.ExposeLocation();
