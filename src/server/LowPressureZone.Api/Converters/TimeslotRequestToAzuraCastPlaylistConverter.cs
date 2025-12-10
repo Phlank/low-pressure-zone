@@ -11,13 +11,15 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Converters;
 
-public sealed class TimeslotRequestToAzuraCastPlaylistConverter(DataContext dataContext)
+public sealed class TimeslotRequestToAzuraCastPlaylistConverter(IHttpContextAccessor accessor)
     : IAsyncConverter<TimeslotRequest, StationPlaylist>
 {
     public async Task<Result<StationPlaylist, ValidationFailure>> ConvertAsync(
         TimeslotRequest source,
         CancellationToken ct = default)
     {
+        var dataContext = accessor.Resolve<DataContext>();
+        
         var performer = await dataContext.Performers
                                          .Where(performer => performer.Id == source.PerformerId)
                                          .FirstOrDefaultAsync(ct);

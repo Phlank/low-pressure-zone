@@ -20,6 +20,7 @@ using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Api.Services.Audio;
 using LowPressureZone.Api.Services.Files;
+using LowPressureZone.Api.Services.NightlyTasks;
 using LowPressureZone.Api.Services.StreamConnectionInfo;
 using LowPressureZone.Api.Services.StreamStatus;
 using LowPressureZone.Domain;
@@ -33,6 +34,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using NightlyBroadcastDeletionModule = LowPressureZone.Api.Services.NightlyTasks.NightlyBroadcastDeletionModule;
+using NightlyTaskService = LowPressureZone.Api.Services.NightlyTasks.NightlyTaskService;
 
 namespace LowPressureZone.Api.Extensions;
 
@@ -72,26 +75,31 @@ public static class WebApplicationBuilderExtensions
         // Ordered by dependency graph. Items grouped lower have dependencies in groups above them.
         // This is picky and opinionated, but it makes it easy to understand the dependency graph at a glance.
         // Singletons should precede any scoped services, which should precede any transient services.
-        builder.Services.AddFastEndpoints();
         builder.Services.AddHttpContextAccessor();
         builder.AddAzuraCast();
         builder.Services.AddSingleton<ISender, MailgunSender>(serviceProvider => serviceProvider.CreateMailgunSender());
         builder.Services.AddSingleton<MediaAnalyzer>();
         builder.Services.AddSingleton<Mp3Processor>();
         builder.Services.AddSingleton<UriService>();
-        
+
         builder.AddEndpointServices();
+        builder.Services.AddSingleton<PrerecordedMixCleanupService>();
         builder.Services.AddSingleton<EmailService>();
         builder.Services.AddSingleton<FormFileSaver>();
-        
         builder.Services.AddSingleton<IStreamStatusService, AzuraCastStatusService>();
-        builder.Services.AddHostedService<BroadcastDeletionService>();
+        
+        builder.Services.AddSingleton<NightlyBroadcastDeletionModule>();
+        builder.Services.AddSingleton<NightlyPrerecordedMixCleanupModule>();
+        builder.Services.AddHostedService<NightlyTaskService>();
+        
         builder.AddDatabases();
         builder.ConfigureIdentity();
 
         builder.Services.AddScoped<TimeslotRequestToAzuraCastPlaylistConverter>();
         builder.Services.AddScoped<StreamingInfoService>();
         builder.Services.AddScoped<TimeslotFileProcessor>();
+        
+        builder.Services.AddFastEndpoints();
     }
     
     private static readonly Action<CookieAuthenticationOptions> ConfigureDevelopmentCookieOptions = options =>

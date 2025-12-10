@@ -11,7 +11,7 @@ namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
 public class DeleteTimeslot(
     DataContext dataContext,
-    TimeslotFileProcessor fileProcessor,
+    PrerecordedMixCleanupService cleanupService,
     TimeslotRules rules,
     EmailService emailService,
     ILogger<DeleteTimeslot> logger)
@@ -48,7 +48,7 @@ public class DeleteTimeslot(
 
         if (timeslot.Type == PerformanceTypes.Prerecorded && timeslot.AzuraCastMediaId.HasValue)
         {
-            var deleteResult = await fileProcessor.DeleteEnqueuedPrerecordedMixAsync(timeslot.AzuraCastMediaId.Value);
+            var deleteResult = await cleanupService.DeleteEnqueuedPrerecordedMixAsync(timeslot.AzuraCastMediaId.Value);
             if (deleteResult.IsError)
             {
                 logger.LogWarning("Failed to delete items in AzuraCast for prerecorded timeslot. Timeslot date and time: {Timestamp}",
