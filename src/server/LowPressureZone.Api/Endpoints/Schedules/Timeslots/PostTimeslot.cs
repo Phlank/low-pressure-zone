@@ -11,7 +11,7 @@ namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
 public partial class PostTimeslot(
     DataContext dataContext,
-    TimeslotFileProcessor fileProcessor,
+    PrerecordedMixFileProcessor fileProcessor,
     PerformerRules performerRules,
     ScheduleRules scheduleRules)
     : EndpointWithMapper<TimeslotRequest, TimeslotMapper>

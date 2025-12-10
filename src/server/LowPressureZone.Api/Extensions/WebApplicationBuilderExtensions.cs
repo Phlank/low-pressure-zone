@@ -97,7 +97,7 @@ public static class WebApplicationBuilderExtensions
 
         builder.Services.AddScoped<TimeslotRequestToAzuraCastPlaylistConverter>();
         builder.Services.AddScoped<StreamingInfoService>();
-        builder.Services.AddScoped<TimeslotFileProcessor>();
+        builder.Services.AddScoped<PrerecordedMixFileProcessor>();
         
         builder.Services.AddFastEndpoints();
     }

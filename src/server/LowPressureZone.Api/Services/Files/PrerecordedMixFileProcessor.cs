@@ -18,7 +18,7 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Services.Files;
 
-public sealed class TimeslotFileProcessor(
+public sealed class PrerecordedMixFileProcessor(
     FormFileSaver fileSaver,
     MediaAnalyzer mediaAnalyzer,
     Mp3Processor mp3Processor,
