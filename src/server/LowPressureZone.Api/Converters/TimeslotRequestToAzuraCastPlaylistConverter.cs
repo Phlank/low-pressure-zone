@@ -7,29 +7,23 @@ using LowPressureZone.Core;
 using LowPressureZone.Core.Interfaces;
 using LowPressureZone.Domain;
 using Microsoft.EntityFrameworkCore;
-using Shouldly;
 
 namespace LowPressureZone.Api.Converters;
 
-public sealed class TimeslotRequestToAzuraCastPlaylistConverter(IHttpContextAccessor accessor)
+public sealed class TimeslotRequestToAzuraCastPlaylistConverter(DataContext dataContext)
     : IAsyncConverter<TimeslotRequest, StationPlaylist>
 {
     public async Task<Result<StationPlaylist, ValidationFailure>> ConvertAsync(
         TimeslotRequest source,
         CancellationToken ct = default)
     {
-        var dataContext = accessor.Resolve<DataContext>();
-        
         var performer = await dataContext.Performers
                                          .Where(performer => performer.Id == source.PerformerId)
-                                         .FirstOrDefaultAsync(ct);
+                                         .FirstAsync(ct);
         var schedule = await dataContext.Schedules
                                         .Where(schedule => schedule.StartsAt <= source.StartsAt
                                                            && schedule.EndsAt >= source.EndsAt)
-                                        .FirstOrDefaultAsync(ct);
-
-        performer.ShouldNotBeNull();
-        schedule.ShouldNotBeNull();
+                                        .FirstAsync(ct);
 
         var title = string.IsNullOrWhiteSpace(source.Name)
                         ? schedule.StartsAt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)

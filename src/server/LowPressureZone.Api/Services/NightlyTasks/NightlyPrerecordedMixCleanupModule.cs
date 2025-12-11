@@ -14,6 +14,7 @@ public sealed class NightlyPrerecordedMixCleanupModule(
 
     public async Task CleanupPrerecordedMixesAsync()
     {
+        logger.LogInformation("Starting nightly prerecorded mix cleanup task");
         await using var scope = services.CreateAsyncScope();
         await using var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
         
@@ -23,9 +24,7 @@ public sealed class NightlyPrerecordedMixCleanupModule(
                                                                        && timeslot.EndsAt <= CutoffTime)
                                                     .ToListAsync();
 
-        if (prerecordedTimeslots.Count == 0)
-            return;
-
+        logger.LogInformation("Deleting media and playlists for {TimeslotCount} past timeslots", prerecordedTimeslots.Count);
         foreach (var timeslot in prerecordedTimeslots)
         {
             var mediaId = timeslot.AzuraCastMediaId!.Value;
@@ -45,5 +44,6 @@ public sealed class NightlyPrerecordedMixCleanupModule(
         }
 
         await dataContext.SaveChangesAsync();
+        logger.LogInformation("Finished deleting media and playlists for past prerecorded timeslots");
     }
 }
