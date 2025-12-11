@@ -10,8 +10,7 @@ public sealed partial class NightlyTaskService(
     : IHostedService, IDisposable
 {
     private const int RunHour = 5;
-    private readonly PeriodicTimer _timer = new(TimeSpan.FromSeconds(5));
-    // private readonly PeriodicTimer _timer = new(TimeSpanToFirst);
+    private readonly PeriodicTimer _timer = new(TimeSpanToFirst);
 
     private bool _isFirstTick = true;
     private bool _isStarted;
