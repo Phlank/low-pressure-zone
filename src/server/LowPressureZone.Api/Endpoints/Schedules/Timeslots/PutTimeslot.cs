@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
-public class PutTimeslot(DataContext dataContext, TimeslotFileProcessor fileProcessor, TimeslotRules rules)
+public class PutTimeslot(DataContext dataContext, PrerecordedMixFileProcessor fileProcessor, TimeslotRules rules)
     : EndpointWithMapper<TimeslotRequest, TimeslotMapper>
 {
     public override void Configure()

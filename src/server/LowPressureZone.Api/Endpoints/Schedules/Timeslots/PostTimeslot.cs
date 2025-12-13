@@ -11,7 +11,8 @@ namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
 public partial class PostTimeslot(
     DataContext dataContext,
-    TimeslotFileProcessor fileProcessor,
+    PrerecordedMixFileProcessor fileProcessor,
+    FormFileSaver fileSaver,
     PerformerRules performerRules,
     ScheduleRules scheduleRules)
     : EndpointWithMapper<TimeslotRequest, TimeslotMapper>
@@ -65,6 +66,8 @@ public partial class PostTimeslot(
                 ThrowError(uploadToAzuraCastResult.Error);
 
             timeslot.AzuraCastMediaId = uploadToAzuraCastResult.Value;
+
+            _ = await fileSaver.DeleteFileAsync(processResult.Value);
         }
         
         dataContext.Timeslots.Add(timeslot);
