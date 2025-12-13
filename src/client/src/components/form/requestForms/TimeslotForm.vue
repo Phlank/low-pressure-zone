@@ -31,7 +31,7 @@
           :disabled="
             isSubmitting ||
             (isEditing &&
-              formState.performanceType == 'Prerecorded DJ Set' &&
+              formState.performanceType === 'Prerecorded DJ Set' &&
               !formState.replaceMedia) ||
             disabled
           "
