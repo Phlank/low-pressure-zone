@@ -9,7 +9,7 @@
         <Select
           id="typeInput"
           v-model:model-value="formState.performanceType"
-          :disabled="isSubmitting || disabled"
+          :disabled="isSubmitting || disabled || isEditing"
           :invalid="!validation.isValid('performanceType')"
           :options="performanceTypes"
           @change="() => validation.validateIfDirty('performanceType')" />
