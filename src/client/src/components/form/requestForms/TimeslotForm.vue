@@ -28,7 +28,13 @@
         input-id="durationInput"
         size="xs">
         <Select
-          :disabled="isSubmitting || isEditing"
+          :disabled="
+            isSubmitting ||
+            (isEditing &&
+              formState.performanceType === 'Prerecorded DJ Set' &&
+              !formState.replaceMedia) ||
+            disabled
+          "
           id="durationInput"
           :options="durationOptions"
           option-label="label"
@@ -98,11 +104,27 @@
         label="Upload Mix"
         :message="validation.message('file')"
         size="m">
-        <div class="checkbox-area">
+        <div class="timeslot-form__file-upload__help-text">
+          <div>File limits:</div>
+          <ul>
+            <li>No larger than 1 GB.</li>
+            <li>
+              Accepted encodings: wav, flac, m4a/mp4, ogg+opus, ogg+vorbis. All non-mp3 files are
+              re-encoded to 320kbps mp3.
+            </li>
+            <li>
+              Lossless files must be at least 16-bit, 44.1kHz. Lossy files must have a bitrate of at
+              least 256kbps.
+            </li>
+            <li>Duration must match the timeslot +/- 2 minutes.</li>
+          </ul>
+        </div>
+        <div
+          class="checkbox-area"
+          v-if="isEditing">
           <div class="checkbox-area__item">
             <Checkbox
               id="replaceMediaInput"
-              v-if="isEditing"
               v-model="formState.replaceMedia"
               binary />
             <label for="replaceMediaInput">Replace uploaded file</label>
@@ -127,9 +149,9 @@
       <FormField
         v-if="formState.performanceType === 'Prerecorded DJ Set'"
         size="m">
-        <Message v-if="formState.performanceType == 'Prerecorded DJ Set'">
+        <Message v-if="formState.performanceType === 'Prerecorded DJ Set'">
           Uploading prerecorded sets is a new feature, and there may be some issues to work out
-          still. Please let Phlank know if you have any issues!
+          still. Please let Phlank know if you have any problems!
         </Message>
       </FormField>
       <template #actions>
@@ -419,6 +441,15 @@ const emits = defineEmits<{
 .timeslot-form__file-upload {
   div.form-field__input {
     gap: variables.$space-l;
+  }
+
+  &__help-text {
+    display: flex;
+    flex-direction: column;
+
+    ul {
+      margin: variables.$space-s;
+    }
   }
 }
 </style>
