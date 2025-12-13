@@ -149,7 +149,7 @@
       <FormField
         v-if="formState.performanceType === 'Prerecorded DJ Set'"
         size="m">
-        <Message v-if="formState.performanceType == 'Prerecorded DJ Set'">
+        <Message v-if="formState.performanceType === 'Prerecorded DJ Set'">
           Uploading prerecorded sets is a new feature, and there may be some issues to work out
           still. Please let Phlank know if you have any problems!
         </Message>
