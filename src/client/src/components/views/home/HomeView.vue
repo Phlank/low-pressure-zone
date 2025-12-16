@@ -1,7 +1,7 @@
 <template>
   <div class="home-view">
     <Panel class="home-view__panel">
-      <AboutSection />
+      <InfoArea />
       <Divider />
       <UpcomingSchedules />
     </Panel>
@@ -11,7 +11,7 @@
 <script lang="ts" setup>
 import UpcomingSchedules from './UpcomingSchedules.vue'
 import { Divider, Panel } from 'primevue'
-import AboutSection from '@/components/views/home/AboutSection.vue'
+import InfoArea from '@/components/views/home/InfoArea.vue'
 </script>
 
 <style lang="scss">
