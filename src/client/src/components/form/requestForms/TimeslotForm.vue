@@ -134,7 +134,8 @@
           :disabled="
             isEditing &&
             !formState.replaceMedia &&
-            formState.performanceType == PerformanceType.Prerecorded
+            formState.performanceType == PerformanceType.Prerecorded &&
+            !isSubmitting
           "
           mode="basic"
           @select="onFileSelect"
@@ -145,6 +146,16 @@
             <span v-else>No file chosen</span>
           </template>
         </FileUpload>
+        <ProgressBar
+          v-if="
+            formState.performanceType === 'Prerecorded DJ Set' &&
+            formState.file !== null &&
+            isSubmitting
+          "
+          :value="uploadProgress * 100"
+          style="width: 100%">
+          {{ displayedUploadProgress }}
+        </ProgressBar>
       </FormField>
       <FormField
         v-if="formState.performanceType === 'Prerecorded DJ Set'"
@@ -177,10 +188,11 @@ import {
   FileUpload,
   Message,
   Checkbox,
+  ProgressBar,
   type FileUploadSelectEvent,
   type FileUploadRemoveEvent
 } from 'primevue'
-import { computed, type ComputedRef, onMounted, ref, watch } from 'vue'
+import { computed, type ComputedRef, onMounted, type Ref, ref, watch } from 'vue'
 import timeslotsApi, {
   PerformanceType,
   performanceTypes,
@@ -228,6 +240,11 @@ const uploadedFileName: ComputedRef<string | null | undefined> = computed(() => 
 })
 
 const isEditing: ComputedRef<boolean> = computed(() => !isNullishOrWhitespace(props.timeslotId))
+const uploadProgress: Ref<number> = ref(0)
+const displayedUploadProgress: ComputedRef<string> = computed(() => {
+  if (uploadProgress.value >= 0.99) return 'Processing...'
+  return `${Math.floor(uploadProgress.value * 100)}%`
+})
 
 type TimeslotFormState = TimeslotRequest & {
   duration: number
@@ -285,6 +302,7 @@ const isSubmitting = ref(false)
 const submit = async () => {
   if (!validation.validate()) return
   isSubmitting.value = true
+  uploadProgress.value = 0
 
   let result: Result<null, string>
   if (props.timeslotId === '' || props.timeslotId === undefined) {
@@ -292,6 +310,7 @@ const submit = async () => {
   } else {
     result = await submitPut()
   }
+  uploadProgress.value = 0
   isSubmitting.value = false
 
   if (!result.isSuccess) return
@@ -312,10 +331,14 @@ const submitPost = async (): Promise<Result<null, string>> => {
     formState.value.performerId = createPerformerResult.value!
   }
 
-  const createTimeslotResponse = await timeslotsApi.post(props.scheduleId, formState.value)
-  if (tryHandleUnsuccessfulResponse(createTimeslotResponse, toast, validation))
+  const createTimeslotResponse = await timeslotsApi.post(
+    props.scheduleId,
+    formState.value,
+    uploadProgress
+  )
+  if (tryHandleUnsuccessfulResponse(createTimeslotResponse, toast, validation)) {
     return err('API failure when creating timeslot')
-
+  }
   showSuccessToast(toast, 'Created', 'Timeslot', formatReadableTime(formState.value.startsAt))
   return ok(null)
 }
@@ -357,9 +380,15 @@ const submitPut = async (): Promise<Result<null, string>> => {
   if (props.timeslotId === '' || props.timeslotId === undefined)
     return err('Cannot PUT when timeslotId is not provided')
 
-  const response = await timeslotsApi.put(props.scheduleId, props.timeslotId, formState.value)
-  if (tryHandleUnsuccessfulResponse(response, toast, validation))
+  const response = await timeslotsApi.put(
+    props.scheduleId,
+    props.timeslotId,
+    formState.value,
+    uploadProgress
+  )
+  if (tryHandleUnsuccessfulResponse(response, toast, validation)) {
     return err('API failure when updating timeslot')
+  }
 
   showSuccessToast(toast, 'Updated', 'Timeslot', formatReadableTime(formState.value.startsAt))
   return ok(null)

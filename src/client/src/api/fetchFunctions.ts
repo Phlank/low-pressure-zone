@@ -1,5 +1,4 @@
 import { err, ok, type Result } from '@/types/result.ts'
-import objectToFormData from '@/utils/objectToFormData.ts'
 import { ApiResponse, type ValidationProblemDetails } from '@/api/apiResponse.ts'
 
 const API_URL = import.meta.env.VITE_API_URL
@@ -56,18 +55,11 @@ export const sendPut = async <TRequest extends object>(route: string, request: T
   return await sendRequest<TRequest, never>('PUT', route, request)
 }
 
-export const sendPutForm = async <TRequest extends object>(route: string, request: TRequest) =>
-  sendRequest<TRequest, never>('PUT', route, objectToFormData(request))
-
 export const sendPost = async <TRequest extends object, TResponse = never>(
   route: string,
   request?: TRequest
 ) => {
   return await sendRequest<TRequest, TResponse>('POST', route, request)
-}
-
-export const sendPostForm = <TRequest extends object>(route: string, request: TRequest) => {
-  return sendRequest<TRequest, never>('POST', route, objectToFormData(request))
 }
 
 export const sendDelete = async (route: string) => {

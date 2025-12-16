@@ -1,5 +1,7 @@
-import { sendDelete, sendGet, sendPostForm, sendPutForm } from '../fetchFunctions'
+import { sendDelete, sendGet } from '../fetchFunctions'
 import type { PerformerResponse } from './performersApi.ts'
+import { sendPostXhr, sendPutXhr } from '@/api/xhrFunctions.ts'
+import type { Ref } from 'vue'
 
 const route = (scheduleId: string, timeslotId?: string) =>
   `/schedules/${scheduleId}/timeslots${timeslotId ? '/' + timeslotId : ''}`
@@ -11,10 +13,14 @@ export default {
   put: <TRequest extends TimeslotRequest>(
     scheduleId: string,
     timeslotId: string,
-    request: TRequest
-  ) => sendPutForm(route(scheduleId, timeslotId), mapRequest(request)),
-  post: <TRequest extends TimeslotRequest>(scheduleId: string, request: TRequest) =>
-    sendPostForm(route(scheduleId), mapRequest(request)),
+    request: TRequest,
+    progressRef: Ref<number>
+  ) => sendPutXhr(route(scheduleId, timeslotId), mapRequest(request), progressRef),
+  post: <TRequest extends TimeslotRequest>(
+    scheduleId: string,
+    request: TRequest,
+    progressRef: Ref<number>
+  ) => sendPostXhr(route(scheduleId), mapRequest(request), progressRef),
   delete: (scheduleId: string, timeslotId: string) => sendDelete(route(scheduleId, timeslotId))
 }
 
