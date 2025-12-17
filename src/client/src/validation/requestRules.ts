@@ -7,10 +7,9 @@ import {
   minimumLength,
   requireAnyCharacter,
   requireAnyOtherCharacter,
-  required,
   url
 } from './rules/stringRules'
-import { alwaysValid } from './rules/untypedRules'
+import { alwaysValid, applyRuleIf, required } from './rules/untypedRules'
 import type { PropertyRules } from './types/propertyRules'
 import { combineRules } from './types/validationRule'
 import type { CommunityRequest } from '@/api/resources/communitiesApi.ts'
@@ -20,6 +19,8 @@ import type { TimeslotRequest } from '@/api/resources/timeslotsApi.ts'
 import type { LoginRequest, RegisterRequest } from '@/api/resources/authApi.ts'
 import type { InviteRequest } from '@/api/resources/invitesApi.ts'
 import type { StreamerRequest } from '@/api/resources/usersApi.ts'
+import { maxSize, mimeType } from '@/validation/rules/fileRules.ts'
+import { audioMimeTypes } from '@/constants/audioMimeTypes.ts'
 
 export const communityRequestRules: PropertyRules<CommunityRequest> = {
   name: combineRules(required(), maximumLength(64)),
@@ -58,7 +59,13 @@ export const timeslotRequestRules = (
       hourOnly(),
       withinRangeOf(() => formState.startsAt, 60, 180, '1 - 3h allowed')
     ),
-    name: maximumLength(64)
+    name: maximumLength(64),
+    file: combineRules<File | null>(
+      mimeType(audioMimeTypes, 'Allowed audio types: wav, flac, mp3, m4a, vorbis, and opus.'),
+      maxSize(1024 * 1024 * 1024, 'Max file size is 1GB.'),
+      applyRuleIf(required(), () => formState.performanceType === 'Prerecorded DJ Set')
+    ),
+    replaceMedia: alwaysValid()
   }
 }
 

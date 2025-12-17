@@ -202,14 +202,14 @@ watch(
 const updateTextScrollingBehavior = useThrottleFn(
   () => {
     const artistTextWidth = document
-      .getElementsByClassName('play-button__content__text-area__now-playing')[0]
+      .getElementsByClassName('play-button__content__text-area__now-playing')[0]!
       .getBoundingClientRect().width
     const statusTextWidth = document
-      .getElementsByClassName('play-button__content__text-area__status')[0]
+      .getElementsByClassName('play-button__content__text-area__status')[0]!
       .getBoundingClientRect().width
     textWidth.value = Math.max(artistTextWidth, statusTextWidth)
     buttonWidth.value = document
-      .getElementsByClassName('play-button__play-element')[0]
+      .getElementsByClassName('play-button__play-element')[0]!
       .getBoundingClientRect().width
     let translateWidth = Math.round(
       clamp(textWidth.value - buttonWidth.value + buttonPadding + playIconWidth + centerMargin, 0)

@@ -11,10 +11,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Communities.Relationships;
 
-public class UpdateCommunityRelationship(DataContext dataContext,
-                                         IdentityContext identityContext,
-                                         UserManager<AppUser> userManager,
-                                         CommunityRules communityRules)
+public class UpdateCommunityRelationship(
+    DataContext dataContext,
+    IdentityContext identityContext,
+    UserManager<AppUser> userManager,
+    CommunityRules communityRules)
     : EndpointWithMapper<CommunityRelationshipRequest, CommunityRelationshipMapper>
 {
     public override void Configure()
@@ -53,7 +54,10 @@ public class UpdateCommunityRelationship(DataContext dataContext,
         var community = await dataContext.Communities
                                          .AsNoTracking()
                                          .Where(community => community.Id == communityId)
-                                         .Include(community => community.Relationships.Where(relationship => relationship.UserId == User.GetIdOrDefault()))
+                                         .Include(community =>
+                                                      community.Relationships.Where(relationship =>
+                                                                                        relationship.UserId ==
+                                                                                        User.GetIdOrDefault()))
                                          .FirstAsync(ct);
 
         if (!communityRules.IsOrganizingAuthorized(community))
@@ -63,7 +67,9 @@ public class UpdateCommunityRelationship(DataContext dataContext,
         }
 
         var existing = await dataContext.CommunityRelationships
-                                        .Where(relationship => relationship.CommunityId == communityId && relationship.UserId == userId)
+                                        .Where(relationship =>
+                                                   relationship.CommunityId == communityId &&
+                                                   relationship.UserId == userId)
                                         .FirstOrDefaultAsync(ct);
         if (existing != null)
         {

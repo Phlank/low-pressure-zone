@@ -1,5 +1,7 @@
-import { sendDelete, sendGet, sendPost, sendPut } from '../fetchFunctions'
+import { sendDelete, sendGet } from '../fetchFunctions'
 import type { PerformerResponse } from './performersApi.ts'
+import { sendPostXhr, sendPutXhr } from '@/api/xhrFunctions.ts'
+import type { Ref } from 'vue'
 
 const route = (scheduleId: string, timeslotId?: string) =>
   `/schedules/${scheduleId}/timeslots${timeslotId ? '/' + timeslotId : ''}`
@@ -11,10 +13,14 @@ export default {
   put: <TRequest extends TimeslotRequest>(
     scheduleId: string,
     timeslotId: string,
-    request: TRequest
-  ) => sendPut(route(scheduleId, timeslotId), mapRequest(request)),
-  post: <TRequest extends TimeslotRequest>(scheduleId: string, request: TRequest) =>
-    sendPost(route(scheduleId), mapRequest(request)),
+    request: TRequest,
+    progressRef: Ref<number>
+  ) => sendPutXhr(route(scheduleId, timeslotId), mapRequest(request), progressRef),
+  post: <TRequest extends TimeslotRequest>(
+    scheduleId: string,
+    request: TRequest,
+    progressRef: Ref<number>
+  ) => sendPostXhr(route(scheduleId), mapRequest(request), progressRef),
   delete: (scheduleId: string, timeslotId: string) => sendDelete(route(scheduleId, timeslotId))
 }
 
@@ -24,6 +30,8 @@ export interface TimeslotRequest {
   startsAt: string
   endsAt: string
   name: string
+  replaceMedia: boolean | null
+  file: File | null
 }
 
 const mapRequest = <TRequest extends TimeslotRequest>(request: TRequest): TimeslotRequest => {
@@ -32,7 +40,9 @@ const mapRequest = <TRequest extends TimeslotRequest>(request: TRequest): Timesl
     performanceType: request.performanceType,
     startsAt: request.startsAt,
     endsAt: request.endsAt,
-    name: request.name
+    name: request.name,
+    file: request.file,
+    replaceMedia: request.replaceMedia
   }
 }
 
@@ -45,6 +55,7 @@ export interface TimeslotResponse {
   endsAt: string
   isEditable: boolean
   isDeletable: boolean
+  uploadedFileName: string | null
 }
 
 export enum PerformanceType {

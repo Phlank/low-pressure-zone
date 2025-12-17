@@ -1,9 +1,10 @@
 ﻿using FastEndpoints;
-using LowPressureZone.Api.Services.Stream;
+using LowPressureZone.Api.Services.StreamStatus;
 
 namespace LowPressureZone.Api.Endpoints.Stream.Status;
 
-public class GetStreamStatus(IStreamStatusService streamStatusService) : EndpointWithoutRequest<StreamStatusResponse, StreamStatusMapper>
+public class GetStreamStatus(IStreamStatusService streamStatusService)
+    : EndpointWithoutRequest<StreamStatusResponse, StreamStatusMapper>
 {
     public override void Configure()
     {

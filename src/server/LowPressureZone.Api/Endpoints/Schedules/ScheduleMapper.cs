@@ -9,7 +9,7 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
-public class ScheduleMapper(
+public sealed class ScheduleMapper(
     IHttpContextAccessor accessor,
     CommunityMapper communityMapper,
     TimeslotMapper timeslotMapper,
@@ -21,19 +21,21 @@ public class ScheduleMapper(
         {
             Id = Guid.NewGuid(),
             CommunityId = req.CommunityId,
-            Description = req.Description,
+            Subtitle = req.Description,
             StartsAt = req.StartsAt.ToUniversalTime(),
             EndsAt = req.EndsAt.ToUniversalTime()
         };
 
-    public async Task UpdateEntityAsync(ScheduleRequest req, Schedule schedule,
-                                        CancellationToken ct = default)
+    public async Task UpdateEntityAsync(
+        ScheduleRequest req,
+        Schedule schedule,
+        CancellationToken ct = default)
     {
         var dataContext = accessor.Resolve<DataContext>();
         schedule.StartsAt = req.StartsAt;
         schedule.EndsAt = req.EndsAt;
         schedule.CommunityId = req.CommunityId;
-        schedule.Description = req.Description;
+        schedule.Subtitle = req.Description;
         if (!dataContext.ChangeTracker.HasChanges()) return;
         schedule.LastModifiedDate = DateTime.UtcNow;
         await dataContext.SaveChangesAsync(ct);
@@ -50,7 +52,7 @@ public class ScheduleMapper(
             Id = schedule.Id,
             StartsAt = schedule.StartsAt,
             EndsAt = schedule.EndsAt,
-            Description = schedule.Description,
+            Description = schedule.Subtitle,
             Community = communityMapper.FromEntity(schedule.Community),
             Timeslots = schedule.Timeslots.Select(timeslotMapper.FromEntity),
             IsEditable = rules.IsEditAuthorized(schedule),

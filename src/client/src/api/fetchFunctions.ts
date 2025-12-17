@@ -1,18 +1,27 @@
-import { ApiResponse, type ValidationProblemDetails } from '@/api/apiResponse'
 import { err, ok, type Result } from '@/types/result.ts'
+import { ApiResponse, type ValidationProblemDetails } from '@/api/apiResponse.ts'
 
 const API_URL = import.meta.env.VITE_API_URL
 
 const sendRequest = async <TRequest extends object, TResponse = never>(
   method: string,
   route: string,
-  request?: TRequest
+  request?: TRequest | FormData
 ) => {
   try {
+    let formedBody: FormData | string | undefined = undefined
+    let isFormData = false
+    if (request instanceof FormData) {
+      formedBody = request
+      isFormData = true
+    } else if (request) {
+      formedBody = JSON.stringify(request)
+    }
+
     const response = await fetch(`${API_URL}${route}`, {
-      body: request ? JSON.stringify(request) : undefined,
+      body: formedBody,
       method: method,
-      headers: request ? { 'Content-Type': 'application/json' } : undefined,
+      headers: request && !isFormData ? { 'Content-Type': 'application/json' } : undefined,
       credentials: 'include'
     })
 

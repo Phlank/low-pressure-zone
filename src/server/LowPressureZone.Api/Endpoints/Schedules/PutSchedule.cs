@@ -6,7 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
-public class PutSchedule(DataContext dataContext, ScheduleRules rules) : EndpointWithMapper<ScheduleRequest, ScheduleMapper>
+public class PutSchedule(DataContext dataContext, ScheduleRules rules)
+    : EndpointWithMapper<ScheduleRequest, ScheduleMapper>
 {
     public override void Configure()
     {

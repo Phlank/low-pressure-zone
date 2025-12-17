@@ -34,7 +34,7 @@
 </template>
 
 <script lang="ts" setup>
-import { emailAddress, required } from '@/validation/rules/stringRules'
+import { emailAddress } from '@/validation/rules/stringRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { combineRules } from '@/validation/types/validationRule'
 import { Button, InputText, Message, useToast } from 'primevue'
@@ -45,6 +45,7 @@ import SinglePanelViewWrapper from '@/components/layout/SinglePanelViewWrapper.v
 import FormArea from '@/components/form/FormArea.vue'
 import FormField from '@/components/form/FormField.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
+import { required } from '@/validation/rules/untypedRules.ts'
 
 const toast = useToast()
 const isSubmitting = ref(false)

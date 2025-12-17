@@ -8,7 +8,7 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
 
-public class TimeslotMapper(
+public sealed class TimeslotMapper(
     IHttpContextAccessor contextAccessor,
     TimeslotRules rules,
     PerformerMapper performerMapper)
@@ -22,20 +22,19 @@ public class TimeslotMapper(
             EndsAt = req.EndsAt.ToUniversalTime(),
             Type = req.PerformanceType.Trim(),
             PerformerId = req.PerformerId,
-            ScheduleId = contextAccessor.GetGuidRouteParameterOrDefault("scheduleId")
+            ScheduleId = contextAccessor.GetGuidRouteParameterOrDefault("scheduleId"),
+            UploadedFileName = req.File?.FileName
         };
-
-    public async Task UpdateEntityAsync(TimeslotRequest req, Timeslot timeslot, CancellationToken ct = default)
+    
+    public void UpdateEntity(TimeslotRequest req, Timeslot timeslot)
     {
-        var dataContext = contextAccessor.Resolve<DataContext>();
-        timeslot.StartsAt = req.StartsAt;
-        timeslot.EndsAt = req.EndsAt;
+        timeslot.Name = req.Name?.Trim();
+        timeslot.StartsAt = req.StartsAt.ToUniversalTime();
+        timeslot.EndsAt = req.EndsAt.ToUniversalTime();
+        timeslot.Type = req.PerformanceType.Trim();
         timeslot.PerformerId = req.PerformerId;
-        timeslot.Type = req.PerformanceType;
-        timeslot.Name = req.Name;
-        if (!dataContext.ChangeTracker.HasChanges()) return;
-        timeslot.LastModifiedDate = DateTime.UtcNow;
-        await dataContext.SaveChangesAsync(ct);
+        if (req.File != null)
+            timeslot.UploadedFileName = req.File.FileName;
     }
 
     public TimeslotResponse FromEntity(Timeslot timeslot)
@@ -49,6 +48,7 @@ public class TimeslotMapper(
             Name = timeslot.Name,
             Performer = performerMapper.FromEntity(timeslot.Performer),
             PerformanceType = timeslot.Type,
+            UploadedFileName = timeslot.UploadedFileName,
             IsEditable = rules.IsEditAuthorized(timeslot),
             IsDeletable = rules.IsDeleteAuthorized(timeslot)
         };

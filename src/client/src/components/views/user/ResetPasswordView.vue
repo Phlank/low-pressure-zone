@@ -55,7 +55,7 @@
 <script lang="ts" setup>
 import { KeyName } from '@/constants/keys'
 import { Routes } from '@/router/routes'
-import { equals, password, required } from '@/validation/rules/stringRules'
+import { equals, password } from '@/validation/rules/stringRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { onKeyDown } from '@vueuse/core'
 import { Button, Message, Password, useToast } from 'primevue'
@@ -67,6 +67,7 @@ import SinglePanelViewWrapper from '@/components/layout/SinglePanelViewWrapper.v
 import FormArea from '@/components/form/FormArea.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import FormField from '@/components/form/FormField.vue'
+import {required} from "@/validation/rules/untypedRules.ts";
 
 const toast = useToast()
 const router = useRouter()

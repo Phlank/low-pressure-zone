@@ -8,7 +8,8 @@ using Microsoft.Extensions.Configuration;
 
 namespace LowPressureZone.Identity;
 
-public class IdentityContext(DbContextOptions<IdentityContext> options) : IdentityDbContext<AppUser, AppRole, Guid>(options), IDataProtectionKeyContext
+public class IdentityContext(DbContextOptions<IdentityContext> options)
+    : IdentityDbContext<AppUser, AppRole, Guid>(options), IDataProtectionKeyContext
 {
     public DbSet<Invitation<Guid, AppUser>> Invitations { get; set; }
     public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
@@ -31,6 +32,7 @@ public class IdentityContext(DbContextOptions<IdentityContext> options) : Identi
                     ConcurrencyStamp = Guid.NewGuid().ToString()
                 });
             }
+
             context.SaveChanges();
 
             var users = context.Set<AppUser>();
@@ -69,6 +71,7 @@ public class IdentityContext(DbContextOptions<IdentityContext> options) : Identi
                     RoleId = adminRole.Id
                 });
             }
+
             context.SaveChanges();
         });
 
@@ -79,6 +82,7 @@ public class IdentityContext(DbContextOptions<IdentityContext> options) : Identi
                                                .AddJsonFile("appsettings.Production.json", true)
                                                .Build();
         var section = config.GetRequiredSection("SeedData:Identity");
-        return section.Get<IdentitySeedData>() ?? throw new InvalidOperationException("Seed data missing from configuration.");
+        return section.Get<IdentitySeedData>() ??
+               throw new InvalidOperationException("Seed data missing from configuration.");
     }
 }

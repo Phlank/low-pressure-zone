@@ -1,12 +1,12 @@
 ﻿using FastEndpoints;
-using LowPressureZone.Api.Models.Stream.AzuraCast.Schema;
+using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Api.Rules;
 
 namespace LowPressureZone.Api.Endpoints.Broadcasts;
 
 public class BroadcastMapper(BroadcastRules rules) : IResponseMapper
 {
-    public BroadcastResponse FromEntity(Broadcast broadcast)
+    public BroadcastResponse FromEntity(StationStreamerBroadcast broadcast)
         => new()
         {
             Start = broadcast.TimestampStart,

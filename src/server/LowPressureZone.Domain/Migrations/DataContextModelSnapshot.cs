@@ -17,7 +17,7 @@ namespace LowPressureZone.Domain.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.4")
+                .HasAnnotation("ProductVersion", "9.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -132,18 +132,18 @@ namespace LowPressureZone.Domain.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("EndsAt")
+                    b.Property<DateTimeOffset>("EndsAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("StartsAt")
+                    b.Property<DateTimeOffset>("StartsAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Subtitle")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -164,10 +164,13 @@ namespace LowPressureZone.Domain.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<int?>("AzuraCastMediaId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("EndsAt")
+                    b.Property<DateTimeOffset>("EndsAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("LastModifiedDate")
@@ -183,13 +186,17 @@ namespace LowPressureZone.Domain.Migrations
                     b.Property<Guid>("ScheduleId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("StartsAt")
+                    b.Property<DateTimeOffset>("StartsAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
+
+                    b.Property<string>("UploadedFileName")
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
 
                     b.HasKey("Id");
 

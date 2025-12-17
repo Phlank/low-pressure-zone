@@ -22,5 +22,8 @@
         "stylelint-config-recommended-vue/scss"
       ]
     }
-  ]
+  ],
+  "rules": {
+    "no-invalid-position-declaration": null
+  }
 }

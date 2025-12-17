@@ -1,6 +1,6 @@
 ﻿namespace LowPressureZone.Api.Endpoints.Stream.Status;
 
-public class StreamStatusResponse
+public sealed class StreamStatusResponse
 {
     public required bool IsOnline { get; set; }
     public required bool IsLive { get; set; }

@@ -67,7 +67,7 @@ const hasPrevious = computed(
 const handlePreviousClick = () => {
   if (hasPrevious.value) {
     const index = selectOptions.value.findIndex((option) => option.value == currentScheduleId.value)
-    currentScheduleId.value = selectOptions.value[index - 1].value
+    currentScheduleId.value = selectOptions.value[index - 1]!.value
   }
 }
 const hasNext = computed(
@@ -78,7 +78,7 @@ const hasNext = computed(
 const handleNextClick = () => {
   if (hasNext.value) {
     const index = selectOptions.value.findIndex((option) => option.value == currentScheduleId.value)
-    currentScheduleId.value = selectOptions.value[index + 1].value
+    currentScheduleId.value = selectOptions.value[index + 1]!.value
   }
 }
 
@@ -86,7 +86,7 @@ onMounted(async () => {
   await scheduleStore.loadDefaultSchedulesAsync()
   isLoading.value = false
   if (scheduleStore.upcomingSchedules.length > 0) {
-    currentScheduleId.value = scheduleStore.upcomingSchedules[0].id
+    currentScheduleId.value = scheduleStore.upcomingSchedules[0]!.id
   }
 })
 

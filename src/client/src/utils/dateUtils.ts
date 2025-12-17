@@ -50,9 +50,10 @@ export const hoursBetween = (start: Date, end: Date) => {
 }
 
 export const minimumDate = (...dates: Date[]) => {
-  let minimum = dates[0].getTime()
+  if (dates.length === 0) return undefined
+  let minimum = dates[0]!.getTime()
   for (let i = 1; i < dates.length; i++) {
-    const currentTime = dates[i].getTime()
+    const currentTime = dates[i]!.getTime()
     if (currentTime < minimum) {
       minimum = currentTime
     }
@@ -74,14 +75,31 @@ export const getDuration = (start: Date | string, end: Date | string) => {
   return Math.abs(timeB - timeA)
 }
 
-export const formatDuration = (durationMs: number) => {
+export const formatDurationTimestamp = (durationMs: number) => {
   const seconds = Math.floor(durationMs / 1000)
   const minutes = Math.floor(seconds / 60)
   const hours = Math.floor(minutes / 60)
   return `${Math.floor(hours).toFixed(0)}:${formatTwoDigits(minutes % 60)}:${formatTwoDigits(seconds % 60)}`
 }
 
+export const formatDurationOption = (durationMinutes: number) => {
+  const minutes = durationMinutes % 60
+  const hours = Math.floor(durationMinutes / 60)
+  let output = `${hours.toFixed(0)}h`
+  if (minutes !== 0) {
+    output += ` ${minutes.toFixed(0)}m`
+  }
+  return output
+}
+
 const formatTwoDigits = (value: number) => ('0' + value.toFixed(0)).slice(-2)
 
 export const formatForFilename = (date: Date) =>
   `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}_${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}`
+
+export const isDateInTimeslot = (date: Date, timespan: { startsAt: string, endsAt: string }) => {
+  const time = date.getTime()
+  const startsAt = parseTime(timespan.startsAt)
+  const endsAt = parseTime(timespan.endsAt)
+  return time >= startsAt && time < endsAt
+}

@@ -6,8 +6,8 @@ namespace LowPressureZone.Api.Endpoints.Schedules;
 public sealed class ScheduleResponse
 {
     public required Guid Id { get; set; }
-    public required DateTime StartsAt { get; set; }
-    public required DateTime EndsAt { get; set; }
+    public required DateTimeOffset StartsAt { get; set; }
+    public required DateTimeOffset EndsAt { get; set; }
     public required string Description { get; set; }
     public required CommunityResponse Community { get; set; }
     public required IEnumerable<TimeslotResponse> Timeslots { get; set; }

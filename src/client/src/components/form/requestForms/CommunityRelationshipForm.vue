@@ -57,8 +57,7 @@ import communityRelationshipsApi, {
 import FormArea from '@/components/form/FormArea.vue'
 import FormField from '@/components/form/FormField.vue'
 import { createFormValidation } from '@/validation/types/formValidation.ts'
-import { required } from '@/validation/rules/stringRules.ts'
-import { alwaysValid } from '@/validation/rules/untypedRules.ts'
+import { alwaysValid, required } from '@/validation/rules/untypedRules.ts'
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import { useAuthStore } from '@/stores/authStore.ts'
 import roles from '@/constants/roles.ts'
@@ -102,7 +101,7 @@ onMounted(async () => {
 })
 
 const reset = () => {
-  formState.value.userId = props.initialState?.userId ?? props.availableUsers[0].id
+  formState.value.userId = props.initialState?.userId ?? props.availableUsers[0]!.id
   formState.value.isPerformer = props.initialState?.isPerformer ?? false
   formState.value.isOrganizer = props.initialState?.isOrganizer ?? false
 }

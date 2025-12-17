@@ -8,7 +8,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Users.VerifyToken;
 
-public class GetVerifyToken(UserManager<AppUser> userManager, IdentityContext identityContext) : Endpoint<GetVerifyTokenRequest>
+public class GetVerifyToken(UserManager<AppUser> userManager, IdentityContext identityContext)
+    : Endpoint<GetVerifyTokenRequest>
 {
     private readonly DateTime _start = DateTime.UtcNow;
 
@@ -49,14 +50,17 @@ public class GetVerifyToken(UserManager<AppUser> userManager, IdentityContext id
             return;
         }
 
-        var invitation = await identityContext.Invitations.FirstOrDefaultAsync(i => i.UserId == user.Id && !i.IsRegistered && !i.IsCancelled, ct);
+        var invitation =
+            await identityContext.Invitations.FirstOrDefaultAsync(i => i.UserId == user.Id && !i.IsRegistered &&
+                                                                       !i.IsCancelled, ct);
         if (invitation == null)
         {
             await this.SendDelayedForbiddenAsync(_start, ct);
             return;
         }
 
-        var isTokenVerified = await userManager.VerifyUserTokenAsync(user, req.Provider, req.Purpose, inviteTokenContext.Token);
+        var isTokenVerified =
+            await userManager.VerifyUserTokenAsync(user, req.Provider, req.Purpose, inviteTokenContext.Token);
         if (!isTokenVerified)
         {
             await this.SendDelayedForbiddenAsync(_start, ct);

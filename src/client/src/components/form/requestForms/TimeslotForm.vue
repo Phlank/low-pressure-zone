@@ -2,6 +2,19 @@
   <div class="timeslot-form">
     <FormArea align-actions="right">
       <IftaFormField
+        :message="validation.message('performanceType')"
+        input-id="typeInput"
+        label="Type"
+        size="m">
+        <Select
+          id="typeInput"
+          v-model:model-value="formState.performanceType"
+          :disabled="isSubmitting || disabled || isEditing"
+          :invalid="!validation.isValid('performanceType')"
+          :options="performanceTypes"
+          @change="() => validation.validateIfDirty('performanceType')" />
+      </IftaFormField>
+      <IftaFormField
         input-id="startInput"
         label="Start"
         size="xs">
@@ -11,17 +24,23 @@
           disabled />
       </IftaFormField>
       <IftaFormField
-        :message="validation.message('performanceType')"
-        input-id="typeInput"
-        label="Type"
+        label="Duration"
+        input-id="durationInput"
         size="xs">
         <Select
-          id="typeInput"
-          v-model:model-value="formState.performanceType"
-          :disabled="isSubmitting || disabled"
-          :invalid="!validation.isValid('performanceType')"
-          :options="performanceTypes"
-          @change="() => validation.validateIfDirty('performanceType')" />
+          :disabled="
+            isSubmitting ||
+            (isEditing &&
+              formState.performanceType === 'Prerecorded DJ Set' &&
+              !formState.replaceMedia) ||
+            disabled
+          "
+          id="durationInput"
+          :options="durationOptions"
+          option-label="label"
+          option-value="value"
+          v-model:model-value="formState.duration">
+        </Select>
       </IftaFormField>
       <IftaFormField
         :message="validation.message('name')"
@@ -78,6 +97,74 @@
           :disabled="isSubmitting || disabled"
           :invalid="!validation.isValid('performerUrl')" />
       </IftaFormField>
+      <FormField
+        class="timeslot-form__file-upload"
+        v-if="formState.performanceType === 'Prerecorded DJ Set'"
+        input-id="fileInput"
+        label="Upload Mix"
+        :message="validation.message('file')"
+        size="m">
+        <div class="timeslot-form__file-upload__help-text">
+          <div>File limits:</div>
+          <ul>
+            <li>No larger than 1 GB.</li>
+            <li>
+              Accepted encodings: wav, flac, m4a/mp4, ogg+opus, ogg+vorbis. All non-mp3 files are
+              re-encoded to 320kbps mp3.
+            </li>
+            <li>
+              Lossless files must be at least 16-bit, 44.1kHz. Lossy files must have a bitrate of at
+              least 256kbps.
+            </li>
+            <li>Duration must match the timeslot +/- 2 minutes.</li>
+          </ul>
+        </div>
+        <div
+          class="checkbox-area"
+          v-if="isEditing">
+          <div class="checkbox-area__item">
+            <Checkbox
+              id="replaceMediaInput"
+              v-model="formState.replaceMedia"
+              binary />
+            <label for="replaceMediaInput">Replace uploaded file</label>
+          </div>
+        </div>
+        <FileUpload
+          :disabled="
+            isSubmitting ||
+            (isEditing &&
+              !formState.replaceMedia &&
+              formState.performanceType == PerformanceType.Prerecorded)
+          "
+          mode="basic"
+          @select="onFileSelect"
+          @remove="onFileRemove">
+          <template #filelabel>
+            <span v-if="formState.file">{{ formState.file.name }}</span>
+            <span v-else-if="isEditing && !formState.replaceMedia">{{ uploadedFileName }}</span>
+            <span v-else>No file chosen</span>
+          </template>
+        </FileUpload>
+        <ProgressBar
+          v-if="
+            formState.performanceType === 'Prerecorded DJ Set' &&
+            formState.file !== null &&
+            isSubmitting
+          "
+          :value="Math.floor(uploadProgress * 100)"
+          style="width: 100%">
+          {{ displayedUploadProgress }}
+        </ProgressBar>
+      </FormField>
+      <FormField
+        v-if="formState.performanceType === 'Prerecorded DJ Set'"
+        size="m">
+        <Message v-if="formState.performanceType === 'Prerecorded DJ Set'">
+          Uploading prerecorded sets is a new feature, and there may be some issues to work out
+          still. Please let Phlank know if you have any problems!
+        </Message>
+      </FormField>
       <template #actions>
         <Button
           :disabled="isSubmitting || disabled"
@@ -90,22 +177,42 @@
 </template>
 
 <script lang="ts" setup>
-import {formatReadableTime, parseDate} from '@/utils/dateUtils'
-import {performerRequestRules, timeslotRequestRules} from '@/validation/requestRules'
-import {createFormValidation} from '@/validation/types/formValidation'
-import {Button, InputText, Select, useToast} from 'primevue'
-import {computed, onMounted, ref} from 'vue'
-import timeslotsApi, {PerformanceType, performanceTypes, type TimeslotRequest} from '@/api/resources/timeslotsApi.ts'
-import performersApi, {type PerformerRequest, type PerformerResponse} from '@/api/resources/performersApi.ts'
+import { formatDurationOption, formatReadableTime, parseDate, parseTime } from '@/utils/dateUtils'
+import { performerRequestRules, timeslotRequestRules } from '@/validation/requestRules'
+import { createFormValidation } from '@/validation/types/formValidation'
+import {
+  Button,
+  InputText,
+  Select,
+  useToast,
+  FileUpload,
+  Message,
+  Checkbox,
+  ProgressBar,
+  type FileUploadSelectEvent,
+  type FileUploadRemoveEvent
+} from 'primevue'
+import { computed, type ComputedRef, onMounted, type Ref, ref, watch } from 'vue'
+import timeslotsApi, {
+  PerformanceType,
+  performanceTypes,
+  type TimeslotRequest
+} from '@/api/resources/timeslotsApi.ts'
+import performersApi, {
+  type PerformerRequest,
+  type PerformerResponse
+} from '@/api/resources/performersApi.ts'
 import FormArea from '@/components/form/FormArea.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
-import {usePerformerStore} from '@/stores/performerStore.ts'
-import {applyRuleIf} from '@/validation/rules/untypedRules.ts'
+import { usePerformerStore } from '@/stores/performerStore.ts'
+import { alwaysValid, applyRuleIf } from '@/validation/rules/untypedRules.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
-import {err, ok, type Result} from '@/types/result.ts'
-import {showSuccessToast} from '@/utils/toastUtils.ts'
-import {useScheduleStore} from '@/stores/scheduleStore.ts'
-import type {ValidationProblemDetails} from '@/api/apiResponse.ts'
+import { err, ok, type Result } from '@/types/result.ts'
+import { showSuccessToast } from '@/utils/toastUtils.ts'
+import { useScheduleStore } from '@/stores/scheduleStore.ts'
+import type { ValidationProblemDetails } from '@/api/apiResponse.ts'
+import FormField from '@/components/form/FormField.vue'
+import { isNullishOrWhitespace } from '@/utils/stringUtils.ts'
 
 const toast = useToast()
 const performerStore = usePerformerStore()
@@ -120,64 +227,125 @@ const props = defineProps<{
 }>()
 
 const defaultStartPerformerId = computed(() => {
-  if (props.performers.length === 1) return props.performers[0].id
+  if (props.performers.length === 1) return props.performers[0]!.id
   return undefined
 })
 
-const formState = ref({
+const uploadedFileName: ComputedRef<string | null | undefined> = computed(() => {
+  const schedule = scheduleStore.schedules.find((s) => s.id === props.scheduleId)
+  if (!schedule) return null
+
+  const timeslot = schedule.timeslots.find((t) => t.id === props.timeslotId)
+  return timeslot?.uploadedFileName
+})
+
+const isEditing: ComputedRef<boolean> = computed(() => !isNullishOrWhitespace(props.timeslotId))
+const uploadProgress: Ref<number> = ref(0)
+const displayedUploadProgress: ComputedRef<string> = computed(() => {
+  if (uploadProgress.value >= 0.99) return 'Processing...'
+  return `${Math.floor(uploadProgress.value * 100)}%`
+})
+
+type TimeslotFormState = TimeslotRequest & {
+  duration: number
+  performerName: string
+  performerUrl: string
+}
+
+const formState = ref<TimeslotFormState>({
   startsAt: '',
+  duration: 60,
   endsAt: '',
   performerId: '',
   performanceType: PerformanceType.Live,
   name: '',
+  file: null,
+  replaceMedia: false,
   performerName: '',
   performerUrl: ''
 })
+
+watch(
+  () => formState.value.replaceMedia,
+  (newValue: boolean | null, oldValue: boolean | null) => {
+    if (oldValue === true && newValue === false) {
+      formState.value.file = null
+    }
+  }
+)
+
 const timeslotRules = timeslotRequestRules(formState.value)
 const performerRules = performerRequestRules
 const validation = createFormValidation(formState, {
   startsAt: timeslotRules.startsAt,
+  duration: alwaysValid(),
   endsAt: timeslotRules.endsAt,
   performerId: applyRuleIf(timeslotRules.performerId, () => performerStore.performers.length > 0),
   performanceType: timeslotRules.performanceType,
   name: timeslotRules.name,
+  file: timeslotRules.file,
+  replaceMedia: timeslotRules.replaceMedia,
   performerName: applyRuleIf(performerRules.name, () => performerStore.performers.length === 0),
   performerUrl: applyRuleIf(performerRules.url, () => performerStore.performers.length === 0)
 })
 
+const onFileSelect = (e: FileUploadSelectEvent) => {
+  formState.value.file = e.files.length > 0 ? (e.files[0] as File) : null
+}
+
+const onFileRemove = (e: FileUploadRemoveEvent) => {
+  if (e.files.length === 0) formState.value.file = null
+}
+
 const isSubmitting = ref(false)
+
 const submit = async () => {
   if (!validation.validate()) return
   isSubmitting.value = true
-  let result: Result<null, null>
+  uploadProgress.value = 0
+
+  let result: Result<null, string>
   if (props.timeslotId === '' || props.timeslotId === undefined) {
     result = await submitPost()
   } else {
     result = await submitPut()
   }
+  uploadProgress.value = 0
   isSubmitting.value = false
-  if (result.isSuccess) {
-    await scheduleStore.reloadTimeslotsAsync(props.scheduleId)
-    reset()
-    emits('afterSubmit')
-  }
+
+  if (!result.isSuccess) return
+
+  await scheduleStore.reloadTimeslotsAsync(props.scheduleId)
+  reset()
+  emits('afterSubmit')
 }
 
-const submitPost = async (): Promise<Result<null, null>> => {
+const submitPost = async (): Promise<Result<null, string>> => {
+  if (props.timeslotId !== '' && props.timeslotId !== undefined)
+    return err('Cannot POST when timeslotId is provided')
+
   if (formState.value.performerId === '') {
     const createPerformerResult = await createPerformer()
-    if (!createPerformerResult.isSuccess) return err(null)
+    if (!createPerformerResult.isSuccess) return err('Failed to create performer')
+
     formState.value.performerId = createPerformerResult.value!
   }
-  const createTimeslotResponse = await timeslotsApi.post(props.scheduleId, formState.value)
-  if (tryHandleUnsuccessfulResponse(createTimeslotResponse, toast, validation)) return err(null)
+
+  const createTimeslotResponse = await timeslotsApi.post(
+    props.scheduleId,
+    formState.value,
+    uploadProgress
+  )
+  if (tryHandleUnsuccessfulResponse(createTimeslotResponse, toast, validation)) {
+    return err('API failure when creating timeslot')
+  }
   showSuccessToast(toast, 'Created', 'Timeslot', formatReadableTime(formState.value.startsAt))
   return ok(null)
 }
 
 const createPerformer = async (): Promise<Result<string, null>> => {
   const request: PerformerRequest = {
-    name: formState.value.name,
+    name: formState.value.performerName,
     url: formState.value.performerUrl
   }
   const response = await performersApi.post(request)
@@ -185,9 +353,15 @@ const createPerformer = async (): Promise<Result<string, null>> => {
     if (response.isInvalid()) {
       const details = response.error as ValidationProblemDetails<PerformerRequest>
       if (details.errors.name)
-        validation.setValidity('performerName', { isValid: false, message: details.errors.name[0] })
+        validation.setValidity('performerName', {
+          isValid: false,
+          message: details.errors.name[0] ?? ''
+        })
       if (details.errors.url)
-        validation.setValidity('performerUrl', { isValid: false, message: details.errors.url[0] })
+        validation.setValidity('performerUrl', {
+          isValid: false,
+          message: details.errors.url[0] ?? ''
+        })
     } else tryHandleUnsuccessfulResponse(response, toast)
     return err(null)
   }
@@ -202,11 +376,20 @@ const createPerformer = async (): Promise<Result<string, null>> => {
   return ok(response.getCreatedId())
 }
 
-const submitPut = async (): Promise<Result<null, null>> => {
-  if (props.timeslotId === '' || props.timeslotId === undefined) return err(null)
-  console.log(props.timeslotId)
-  const response = await timeslotsApi.put(props.scheduleId, props.timeslotId, formState.value)
-  if (tryHandleUnsuccessfulResponse(response, toast, validation)) err(null)
+const submitPut = async (): Promise<Result<null, string>> => {
+  if (props.timeslotId === '' || props.timeslotId === undefined)
+    return err('Cannot PUT when timeslotId is not provided')
+
+  const response = await timeslotsApi.put(
+    props.scheduleId,
+    props.timeslotId,
+    formState.value,
+    uploadProgress
+  )
+  if (tryHandleUnsuccessfulResponse(response, toast, validation)) {
+    return err('API failure when updating timeslot')
+  }
+
   showSuccessToast(toast, 'Updated', 'Timeslot', formatReadableTime(formState.value.startsAt))
   return ok(null)
 }
@@ -219,14 +402,83 @@ onMounted(async () => {
 const reset = () => {
   formState.value.startsAt = props.initialState.startsAt
   formState.value.endsAt = props.initialState.endsAt
+  formState.value.duration = Math.round(
+    (parseTime(props.initialState.endsAt) - parseTime(props.initialState.startsAt)) / 60000
+  )
   formState.value.performerId = defaultStartPerformerId.value ?? props.initialState.performerId
   formState.value.performanceType = props.initialState.performanceType
   formState.value.name = props.initialState.name
-  formState.value.name = ''
+  formState.value.performerName = ''
   formState.value.performerUrl = ''
 }
+
+const durationOptions = computed((): { label: string; value: number }[] => {
+  const options: { label: string; value: number }[] = []
+  const schedule = scheduleStore.schedules.find((schedule) => schedule.id === props.scheduleId)
+  if (!schedule) return []
+
+  const endOfSchedule = parseTime(schedule.endsAt)
+
+  const timeslots = schedule.timeslots
+  const timeslotsFollowingCurrent = timeslots
+    .filter((timeslot) => parseTime(timeslot.startsAt) > parseTime(formState.value.startsAt))
+    .sort((a, b) => parseTime(a.startsAt) - parseTime(b.startsAt))
+  const nextBoundaryTime =
+    timeslotsFollowingCurrent.length > 0
+      ? parseTime(timeslotsFollowingCurrent[0]!.startsAt)
+      : endOfSchedule
+
+  const maxDurationMinutes = Math.floor(
+    (nextBoundaryTime - parseTime(formState.value.startsAt)) / 60000
+  )
+  if (maxDurationMinutes >= 60)
+    options.push({
+      label: formatDurationOption(60),
+      value: 60
+    })
+  if (maxDurationMinutes >= 120)
+    options.push({
+      label: formatDurationOption(120),
+      value: 120
+    })
+  if (maxDurationMinutes >= 180)
+    options.push({
+      label: formatDurationOption(180),
+      value: 180
+    })
+
+  return options
+})
+
+watch(
+  () => formState.value.duration,
+  (newDuration) => {
+    const startDate = parseDate(formState.value.startsAt)
+    const endDate = new Date(startDate.getTime() + newDuration * 60000)
+    formState.value.endsAt = endDate.toISOString()
+  }
+)
 
 const emits = defineEmits<{
   afterSubmit: []
 }>()
 </script>
+
+<style lang="scss">
+@use '@/assets/styles/variables';
+
+.timeslot-form__file-upload {
+  div.form-field__input {
+    gap: variables.$space-l;
+  }
+
+  &__help-text {
+    display: flex;
+    flex-direction: column;
+
+    ul {
+      margin: variables.$space-s;
+    }
+  }
+}
+</style>

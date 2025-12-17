@@ -1,6 +1,5 @@
 ﻿using FastEndpoints;
 using FluentEmail.Core;
-using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Domain;
@@ -12,10 +11,11 @@ using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.Endpoints.Users.Invites;
 
-public class PostInvite(UserManager<AppUser> userManager,
-                        IdentityContext identityContext,
-                        DataContext dataContext,
-                        EmailService emailService)
+public class PostInvite(
+    UserManager<AppUser> userManager,
+    IdentityContext identityContext,
+    DataContext dataContext,
+    EmailService emailService)
     : EndpointWithMapper<InviteRequest, InviteMapper>
 {
     public override void Configure()
