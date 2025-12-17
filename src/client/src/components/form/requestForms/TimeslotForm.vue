@@ -132,10 +132,10 @@
         </div>
         <FileUpload
           :disabled="
-            isEditing &&
-            !formState.replaceMedia &&
-            formState.performanceType == PerformanceType.Prerecorded &&
-            !isSubmitting
+            isSubmitting ||
+            (isEditing &&
+              !formState.replaceMedia &&
+              formState.performanceType == PerformanceType.Prerecorded)
           "
           mode="basic"
           @select="onFileSelect"
@@ -152,7 +152,7 @@
             formState.file !== null &&
             isSubmitting
           "
-          :value="uploadProgress * 100"
+          :value="Math.floor(uploadProgress * 100)"
           style="width: 100%">
           {{ displayedUploadProgress }}
         </ProgressBar>
