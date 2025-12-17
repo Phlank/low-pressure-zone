@@ -51,7 +51,7 @@ public partial class PostTimeslot(
         if (request.PerformanceType == PerformanceTypes.Prerecorded
             && request.File is not null)
         {
-            var processResult = await fileProcessor.ProcessUploadToMp3Async(request, schedule.StartsAt, ct);
+            var processResult = await fileProcessor.ProcessRequestFileToMp3Async(request, schedule.StartsAt, ct);
             if (processResult.IsError)
             {
                 ValidationFailures.AddRange(processResult.Error);

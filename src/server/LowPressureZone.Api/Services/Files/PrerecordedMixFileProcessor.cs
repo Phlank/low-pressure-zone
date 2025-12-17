@@ -30,7 +30,7 @@ public sealed class PrerecordedMixFileProcessor(
     private readonly string _tempLocation = fileOptions.Value.TemporaryLocation;
     private readonly string _prerecordedSetLocation = fileOptions.Value.AzuraCastPrerecordedSetLocation;
 
-    public async Task<Result<string, IEnumerable<ValidationFailure>>> ProcessUploadToMp3Async(
+    public async Task<Result<string, IEnumerable<ValidationFailure>>> ProcessRequestFileToMp3Async(
         TimeslotRequest request,
         DateTimeOffset scheduleStart,
         CancellationToken ct = default)
@@ -59,7 +59,7 @@ public sealed class PrerecordedMixFileProcessor(
         var fileName = GetUploadFileName(newMetadata.Artist, newMetadata.Title, request.StartsAt);
         var outputFilePath = Path.Combine(_tempLocation, fileName);
 
-        var processResult = await ProcessToNewFile(analysis, saveResult.Value, outputFilePath);
+        var processResult = await ProcessToNewFile(analysis, saveResult.Value);
         _ = await fileSaver.DeleteFileAsync(saveResult.Value);
 
         if (processResult.IsError)
@@ -143,7 +143,7 @@ public sealed class PrerecordedMixFileProcessor(
         StationMedia? newMedia = null;
         if (request.File is not null)
         {
-            var processResult = await ProcessUploadToMp3Async(request, timeslot.Schedule.StartsAt, ct);
+            var processResult = await ProcessRequestFileToMp3Async(request, timeslot.Schedule.StartsAt, ct);
             if (processResult.IsError)
                 return Result.Err<int>(processResult.Error);
 
@@ -201,21 +201,25 @@ public sealed class PrerecordedMixFileProcessor(
 
     private async Task<Result<string, IEnumerable<ValidationFailure>>> ProcessToNewFile(
         IMediaAnalysis analysis,
-        string inputFilePath,
-        string outputFilePath)
+        string inputFilePath)
     {
+        string outputFilePath;
         analysis.AudioStreams.ShouldHaveSingleItem();
         if (analysis.AudioStreams[0].CodecName == "mp3")
         {
-            var stripResult = await mp3Processor.StripMp3MetadataAsync(inputFilePath, outputFilePath);
+            var stripResult = await mp3Processor.StripMp3MetadataAsync(inputFilePath);
             if (stripResult.IsError)
                 return Result.Err<string>(stripResult.Error.ToValidationFailures(nameof(TimeslotRequest.File)));
+
+            outputFilePath = stripResult.Value;
         }
         else
         {
-            var conversionResult = await mp3Processor.ConvertFileToMp3Async(inputFilePath, outputFilePath);
+            var conversionResult = await mp3Processor.ConvertFileToMp3Async(inputFilePath);
             if (conversionResult.IsError)
                 return Result.Err<string>(conversionResult.Error.ToValidationFailures(nameof(TimeslotRequest.File)));
+            
+            outputFilePath = conversionResult.Value;
         }
 
         return Result.Ok<string, IEnumerable<ValidationFailure>>(outputFilePath);

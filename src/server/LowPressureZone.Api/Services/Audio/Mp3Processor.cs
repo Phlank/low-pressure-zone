@@ -1,13 +1,17 @@
 using FFMpegCore;
 using FFMpegCore.Enums;
+using LowPressureZone.Api.Models.Configuration;
 using LowPressureZone.Core;
+using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Api.Services.Audio;
 
-public sealed partial class Mp3Processor(ILogger<Mp3Processor> logger)
+public sealed partial class Mp3Processor(ILogger<Mp3Processor> logger, IOptions<FileConfiguration> fileConfig)
 {
-    public async Task<Result<bool, string>> ConvertFileToMp3Async(string inputFilePath, string outputFilePath)
+    private readonly string _temporaryLocation = fileConfig.Value.TemporaryLocation;
+    public async Task<Result<string, string>> ConvertFileToMp3Async(string inputFilePath)
     {
+        var outputFilePath = Path.Combine(_temporaryLocation, $"{Guid.NewGuid()}.mp3");
         try
         {
             var isConversionSuccessful =
@@ -21,20 +25,21 @@ public sealed partial class Mp3Processor(ILogger<Mp3Processor> logger)
                                      .ProcessAsynchronously(throwOnError: true);
 
             if (isConversionSuccessful)
-                return Result.Ok(true);
+                return Result.Ok(outputFilePath);
 
             LogUnableToConvertFile(logger, inputFilePath);
-            return Result.Err<bool>("Failed to process audio file.");
+            return Result.Err<string>("Failed to process audio file.");
         }
         catch (Exception ex)
         {
             LogUnableToConvertFileException(logger, inputFilePath, ex.Message);
-            return Result.Err<bool>("Failed to process audio file.");
+            return Result.Err<string>("Failed to process audio file.");
         }
     }
 
-    public async Task<Result<bool, string>> StripMp3MetadataAsync(string inputFilePath, string outputFilePath)
+    public async Task<Result<string, string>> StripMp3MetadataAsync(string inputFilePath)
     {
+        var outputFilePath = Path.Combine(_temporaryLocation, $"{Guid.NewGuid()}.mp3");
         try
         {
             var isMetadataStripSuccessful =
@@ -45,15 +50,15 @@ public sealed partial class Mp3Processor(ILogger<Mp3Processor> logger)
                                                                      .WithoutMetadata())
                                      .ProcessAsynchronously(throwOnError: true);
             if (isMetadataStripSuccessful)
-                return Result.Ok(true);
+                return Result.Ok(outputFilePath);
 
             LogUnableToStripMetadata(logger, inputFilePath);
-            return Result.Err<bool>("Failed to process MP3 file.");
+            return Result.Err<string>("Failed to process MP3 file.");
         }
         catch (Exception ex)
         {
             LogUnableToStripMetadataException(logger, inputFilePath, ex.Message);
-            return Result.Err<bool>("Failed to process MP3 file.");
+            return Result.Err<string>("Failed to process MP3 file.");
         }
     }
 
