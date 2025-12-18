@@ -190,41 +190,32 @@ const buttonElement = ref(null)
 useResizeObserver(buttonElement, () => updateTextScrollingBehavior())
 watch(
   () => streamStore.status,
-  (newStatus, oldStatus) => {
-    if (newStatus.name !== oldStatus.name || newStatus.listenerCount !== oldStatus.listenerCount) {
-      setTimeout(() => {
-        updateTextScrollingBehavior()
-      })
-    }
-  }
+  () => setTimeout(() => updateTextScrollingBehavior())
 )
 
-const updateTextScrollingBehavior = useThrottleFn(
-  () => {
-    const artistTextWidth = document
-      .getElementsByClassName('play-button__content__text-area__now-playing')[0]!
-      .getBoundingClientRect().width
-    const statusTextWidth = document
-      .getElementsByClassName('play-button__content__text-area__status')[0]!
-      .getBoundingClientRect().width
-    textWidth.value = Math.max(artistTextWidth, statusTextWidth)
-    buttonWidth.value = document
-      .getElementsByClassName('play-button__play-element')[0]!
-      .getBoundingClientRect().width
-    let translateWidth = Math.round(
-      clamp(textWidth.value - buttonWidth.value + buttonPadding + playIconWidth + centerMargin, 0)
-    )
-    if (Math.abs(translateWidth) < 5) {
-      translateWidth = 0
-    } else {
-      translateWidth = -translateWidth
-    }
-    nameTranslateWidth.value = translateWidth
-  },
-  75,
-  true,
-  false
-)
+const updateTextScrollingBehavior = useThrottleFn(async () => {
+  const artistTextWidth = document
+    .getElementsByClassName('play-button__content__text-area__now-playing')[0]!
+    .getBoundingClientRect().width
+  const statusTextWidth = document
+    .getElementsByClassName('play-button__content__text-area__status')[0]!
+    .getBoundingClientRect().width
+  textWidth.value = Math.max(artistTextWidth, statusTextWidth)
+  await delay(50)
+  buttonWidth.value = document
+    .getElementsByClassName('play-button__play-element')[0]!
+    .getBoundingClientRect().width
+  let translateWidth = Math.round(
+    clamp(textWidth.value - buttonWidth.value + buttonPadding + playIconWidth + centerMargin, 0)
+  )
+  console.log(translateWidth)
+  if (Math.abs(translateWidth) < 5) {
+    translateWidth = 0
+  } else {
+    translateWidth = -translateWidth
+  }
+  nameTranslateWidth.value = translateWidth
+}, 75)
 
 const volumeSliderAmount = ref(100)
 const volume = computed(() => volumeSliderAmount.value / 100)
