@@ -190,13 +190,10 @@ const buttonElement = ref(null)
 useResizeObserver(buttonElement, () => updateTextScrollingBehavior())
 watch(
   () => streamStore.status,
-  (newStatus, oldStatus) => {
-    if (newStatus.name !== oldStatus.name || newStatus.listenerCount !== oldStatus.listenerCount) {
-      setTimeout(() => {
-        updateTextScrollingBehavior()
-      })
-    }
-  }
+  () =>
+    setTimeout(() => {
+      updateTextScrollingBehavior()
+    }, 50)
 )
 
 const updateTextScrollingBehavior = useThrottleFn(
