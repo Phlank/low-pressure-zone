@@ -5,7 +5,7 @@ using LowPressureZone.Domain.Enums;
 
 namespace LowPressureZone.Api.Endpoints.Settings.About;
 
-public class AboutSettingsMapper : IRequestMapper, IResponseMapper
+public sealed class AboutSettingsMapper(ILogger<AboutSettingsMapper> logger) : IRequestMapper, IResponseMapper
 {
     public Setting ToEntity(AboutSettingsRequest req) =>
         new()
@@ -16,17 +16,27 @@ public class AboutSettingsMapper : IRequestMapper, IResponseMapper
 
     public AboutSettingsResponse ToResponse(Setting? setting)
     {
-        if (setting is not null)
+        if (setting is null)
+            return DefaultResponse;
+        
+        try
         {
             var response = JsonSerializer.Deserialize<AboutSettingsResponse>(setting.Value);
             if (response is not null)
                 return response;
-        }
 
-        return new AboutSettingsResponse
+            return DefaultResponse;
+        }
+        catch (Exception ex)
         {
-            TopText = "",
-            BottomText = ""
-        };
+            logger.LogError(ex, "Failed to deserialize AboutSettings value");
+            return DefaultResponse;
+        }
     }
+    
+    private static readonly AboutSettingsResponse DefaultResponse = new()
+    {
+        TopText = "",
+        BottomText = ""
+    };
 }

@@ -13,6 +13,7 @@ using LowPressureZone.Api.Endpoints.Communities.Relationships;
 using LowPressureZone.Api.Endpoints.Performers;
 using LowPressureZone.Api.Endpoints.Schedules;
 using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
+using LowPressureZone.Api.Endpoints.Settings.About;
 using LowPressureZone.Api.Endpoints.Users.Invites;
 using LowPressureZone.Api.Models.Configuration;
 using LowPressureZone.Api.Models.Configuration.Streaming;
@@ -185,6 +186,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton<TimeslotMapper>();
         builder.Services.AddSingleton<InviteMapper>();
         builder.Services.AddSingleton<BroadcastMapper>();
+        builder.Services.AddSingleton<AboutSettingsMapper>();
 
         builder.Services.AddSingleton<CommunityRules>();
         builder.Services.AddSingleton<CommunityRelationshipRules>();

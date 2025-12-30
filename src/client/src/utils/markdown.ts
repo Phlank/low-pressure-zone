@@ -36,7 +36,6 @@ const domPurifyConfig: Config = {
     'li',
     'a',
     'img',
-    'hr',
-    'div'
+    'hr'
   ]
 }
