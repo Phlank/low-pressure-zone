@@ -9,5 +9,7 @@ export enum Routes {
   Schedules = '/dashboard',
   Communities = '/dashboard/communities',
   Performers = '/dashboard/performers',
-  Broadcasts = '/dashboard/broadcasts'
+  Broadcasts = '/dashboard/broadcasts',
+  Admin = '/admin',
+  ContentAreas = '/admin/contentareas'
 }

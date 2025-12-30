@@ -12,7 +12,6 @@
       ref="navMenuRef"
       :model="navMenuItems"
       :popup="true">
-      <!-- https://primevue.org/menu/#router -->
       <template #item="{ item, props }">
         <div>
           <RouterLink
@@ -79,6 +78,7 @@ import type { MenuItem } from 'primevue/menuitem'
 import { computed, inject, onMounted, ref, type Ref, useTemplateRef } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import authApi from '@/api/resources/authApi.ts'
+import roles from '@/constants/roles.ts'
 
 const router = useRouter()
 const navMenuRef = useTemplateRef('navMenuRef')
@@ -103,6 +103,13 @@ const loggedInNavMenuItems: MenuItem[] = [
     icon: 'pi pi-cog',
     route: '/dashboard',
     visible: true
+  },
+  {
+    label: 'Admin',
+    labelString: 'Admin',
+    icon: 'pi pi-sliders-h',
+    route: '/admin',
+    visible: () => authStore.isInRole(roles.admin)
   },
   {
     label: 'Logout',
