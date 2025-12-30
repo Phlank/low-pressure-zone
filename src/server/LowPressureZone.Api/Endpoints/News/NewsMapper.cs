@@ -13,8 +13,9 @@ public sealed class NewsMapper : IRequestMapper, IResponseMapper
 
     public NewsResponse FromEntity(Domain.Entities.News entity) => new()
     {
+        Id = entity.Id,
         Title = entity.Title,
         Body = entity.Body,
-        Date = entity.CreatedDate
+        CreatedAt = entity.CreatedDate
     };
 }

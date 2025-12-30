@@ -51,6 +51,12 @@ const menuItems: MenuItem[] = [
     icon: 'pi pi-book',
     route: '/admin',
     visible: true
+  },
+  {
+    label: 'News',
+    icon: 'pi pi-calendar',
+    route: '/admin/news',
+    visible: true
   }
 ]
 </script>

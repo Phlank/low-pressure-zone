@@ -84,6 +84,12 @@ const router = createRouter({
           name: 'Content Areas',
           component: () => import('@/components/views/admin/content-areas/ContentAreasView.vue'),
           meta: { auth: true, roles: [roles.admin] }
+        },
+        {
+          path: 'news',
+          name: 'News',
+          component: () => import('@/components/views/admin/news/NewsView.vue'),
+          meta: { auth: true, roles: [roles.admin] }
         }
       ],
       meta: {

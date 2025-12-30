@@ -40,11 +40,11 @@
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import { Button, Textarea, useToast } from 'primevue'
 import FormArea from '@/components/form/FormArea.vue'
-import { useAboutSettings } from '@/composables/settings/useAboutSettings.ts'
 import { ref, type Ref, watch } from 'vue'
 import type { AboutSettingsRequest } from '@/api/resources/settingsApi.ts'
 import { createFormValidation } from '@/validation/types/formValidation.ts'
 import { required } from '@/validation/rules/untypedRules.ts'
+import useAboutSettings from '@/composables/settings/useAboutSettings.ts'
 
 const toast = useToast()
 const aboutSettings = useAboutSettings(toast)

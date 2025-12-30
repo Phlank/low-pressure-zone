@@ -3,7 +3,6 @@
     <Tabs v-model:value="tabValue">
       <TabList>
         <Tab value="about">About</Tab>
-        <Tab value="news">News</Tab>
       </TabList>
       <TabPanels>
         <TabPanel value="about">

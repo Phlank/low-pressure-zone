@@ -17,3 +17,7 @@ th.p-datatable-column-sorted {
 div.p-dialog.p-component {
   width: min(600px, calc(100vw - 2 * #{variables.$space-l}));
 }
+
+div.p-drawer {
+  border-style: none;
+}

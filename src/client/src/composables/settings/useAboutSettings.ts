@@ -5,7 +5,7 @@ import { type ToastServiceMethods } from 'primevue'
 import type { FormValidation } from '@/validation/types/formValidation.ts'
 import delay from '@/utils/delay.ts'
 
-export function useAboutSettings(toast: ToastServiceMethods) {
+export default (toast: ToastServiceMethods) => {
   const topText = ref('')
   const bottomText = ref('')
   const autoRefreshing = ref<boolean>(false)

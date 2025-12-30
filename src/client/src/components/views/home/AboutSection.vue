@@ -13,9 +13,9 @@
 <script lang="ts" setup>
 import { useToast } from 'primevue'
 import { ref, watch } from 'vue'
-import { useAboutSettings } from '@/composables/settings/useAboutSettings.ts'
 import ExpandableContent from '@/components/controls/ExpandableContent.vue'
 import { parseMarkdownAsync } from '@/utils/markdown.ts'
+import useAboutSettings from '@/composables/settings/useAboutSettings.ts'
 
 const toast = useToast()
 const aboutSettings = useAboutSettings(toast)
