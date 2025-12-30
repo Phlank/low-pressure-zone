@@ -21,5 +21,3 @@ import AboutTab from '@/components/views/admin/content-areas/AboutTab.vue'
 
 const tabValue = ref('about')
 </script>
-
-<style lang="scss" scoped></style>

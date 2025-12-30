@@ -78,5 +78,3 @@ const submit = async () => {
 
 defineExpose({ formState, validation })
 </script>
-
-<style lang="scss" scoped></style>
