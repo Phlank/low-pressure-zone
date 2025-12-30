@@ -13,6 +13,7 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     public DbSet<Schedule> Schedules { get; set; }
     public DbSet<Setting> Settings { get; set; }
     public DbSet<Timeslot> Timeslots { get; set; }
+    public DbSet<News> News { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
