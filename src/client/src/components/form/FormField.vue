@@ -28,10 +28,12 @@ const props = withDefaults(
     label?: string
     message?: string
     optional?: boolean
+    displayStyle?: 'flex' | 'block'
   }>(),
   {
     size: 's',
-    optional: false
+    optional: false,
+    displayStyle: 'flex'
   }
 )
 
@@ -74,13 +76,13 @@ const computedClass = computed(() => `${baseClass} ${widthClass.value}`)
 
   &__input {
     width: 100%;
-    display: flex;
+    display: v-bind(displayStyle);
     flex-direction: column;
     align-items: start;
     gap: variables.$space-m;
 
     div {
-      display: flex;
+      display: v-bind(displayStyle);
       gap: variables.$space-m;
     }
   }

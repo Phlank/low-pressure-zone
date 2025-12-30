@@ -1,1 +1,1 @@
-export type FieldSize = 'xs' | 's' | 'm' | 'l' | 'xl'
+export type FieldSize = 'xs' | 's' | 'm' | 'l' | 'xl' | 'full'

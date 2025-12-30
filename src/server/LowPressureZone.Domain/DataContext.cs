@@ -1,5 +1,7 @@
 ﻿using LowPressureZone.Domain.Entities;
+using LowPressureZone.Domain.Entities.Settings;
 using Microsoft.EntityFrameworkCore;
+using SmartEnum.EFCore;
 
 namespace LowPressureZone.Domain;
 
@@ -9,6 +11,7 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     public DbSet<CommunityRelationship> CommunityRelationships { get; set; }
     public DbSet<Performer> Performers { get; set; }
     public DbSet<Schedule> Schedules { get; set; }
+    public DbSet<Setting> Settings { get; set; }
     public DbSet<Timeslot> Timeslots { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -24,5 +27,11 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
         modelBuilder.Entity<CommunityRelationship>()
                     .HasIndex(nameof(CommunityRelationship.CommunityId), nameof(CommunityRelationship.UserId))
                     .IsUnique();
+
+        modelBuilder.Entity<Setting>()
+                    .HasIndex(nameof(Setting.Key)).IsUnique();
     }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder) =>
+        configurationBuilder.ConfigureSmartEnum();
 }
