@@ -114,9 +114,7 @@ watch(
   { deep: true, immediate: true }
 )
 
-onMounted(() => {
-
-})
+onMounted(() => {})
 </script>
 
 <style lang="scss" scoped>
