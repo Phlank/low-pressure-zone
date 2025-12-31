@@ -13,7 +13,8 @@
           :invalid="!validation.isValid('userId')"
           :option-label="(user: UserResponse) => user.displayName"
           :option-value="(user: UserResponse) => user.id"
-          :options="availableUsers" />
+          :options="availableUsers"
+          autofocus />
       </IftaFormField>
       <FormField
         input-id="rolesInput"

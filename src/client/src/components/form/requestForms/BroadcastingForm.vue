@@ -9,7 +9,8 @@
         <InputText
           id="playButtonTextInput"
           v-model="formState.displayName"
-          :invalid="!validation.isValid('displayName')" />
+          :invalid="!validation.isValid('displayName')"
+          autofocus />
       </IftaFormField>
       <template #actions>
         <Button

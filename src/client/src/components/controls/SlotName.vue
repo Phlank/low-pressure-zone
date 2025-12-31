@@ -6,7 +6,6 @@
 
 <script lang="ts" setup>
 import TwoLineData from '@/components/layout/TwoLineData.vue'
-import { defineProps, withDefaults } from 'vue'
 
 withDefaults(
   defineProps<{

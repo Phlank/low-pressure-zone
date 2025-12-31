@@ -9,21 +9,21 @@
       </TabList>
       <TabPanels>
         <TabPanel value="about">
-          <AboutSection />
+          <AboutTab />
         </TabPanel>
         <TabPanel value="news">
-          <NewsSection />
+          <NewsTab />
         </TabPanel>
       </TabPanels>
     </Tabs>
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { ref } from 'vue'
-import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primevue'
-import AboutSection from "@/components/views/home/AboutSection.vue";
-import NewsSection from "@/components/views/home/NewsSection.vue";
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primevue'
+import NewsTab from '@/components/views/home/NewsTab.vue'
+import AboutTab from '@/components/views/home/AboutTab.vue'
 
 const tabValue = ref('about')
 </script>

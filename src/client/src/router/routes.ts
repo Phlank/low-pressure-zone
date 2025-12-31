@@ -11,5 +11,6 @@ export enum Routes {
   Performers = '/dashboard/performers',
   Broadcasts = '/dashboard/broadcasts',
   Admin = '/admin',
-  ContentAreas = '/admin/contentareas'
+  ContentAreas = '/admin/contentareas',
+  News = '/admin/news'
 }

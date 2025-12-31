@@ -1,28 +1,18 @@
-import settingsApi, { type AboutSettingsRequest } from '@/api/resources/settingsApi.ts'
-import { onMounted, type Ref, ref } from 'vue'
-import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
-import { type ToastServiceMethods } from 'primevue'
-import type { FormValidation } from '@/validation/types/formValidation.ts'
+import { defineStore } from 'pinia'
+import { type Ref, ref } from 'vue'
 import delay from '@/utils/delay.ts'
+import settingsApi, { type AboutSettingsRequest } from '@/api/resources/settingsApi.ts'
+import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import type { FormValidation } from '@/validation/types/formValidation.ts'
+import { useToast } from 'primevue'
+import { err, ok, type Result } from '@/types/result.ts'
 
-export function useAboutSettings(toast: ToastServiceMethods) {
+export const useAboutSettingsStore = defineStore('aboutSettingsStore', () => {
   const topText = ref('')
   const bottomText = ref('')
   const autoRefreshing = ref<boolean>(false)
-
-  onMounted(async () => {
-    await refresh()
-    autoRefresh().then(() => {})
-  })
-
-  const autoRefresh = async () => {
-    if (autoRefreshing.value) return
-    autoRefreshing.value = true
-    while (autoRefreshing.value) {
-      await delay(300000)
-      await refresh()
-    }
-  }
+  const toast = useToast()
+  const isLoading = ref(true)
 
   const refresh = async () => {
     const response = await settingsApi.getAboutSettings()
@@ -32,17 +22,30 @@ export function useAboutSettings(toast: ToastServiceMethods) {
     topText.value = response.data().topText
     bottomText.value = response.data().bottomText
   }
+  const autoRefresh = async () => {
+    if (autoRefreshing.value) return
+    autoRefreshing.value = true
+    while (autoRefreshing.value) {
+      await delay(300000)
+      await refresh()
+    }
+  }
+  refresh().then(() => {
+    isLoading.value = false
+    autoRefresh().then(() => {})
+  })
 
   const update = async (
     formState: Ref<AboutSettingsRequest>,
     validation: FormValidation<AboutSettingsRequest>
-  ) => {
-    if (!validation.validate()) return
+  ): Promise<Result> => {
+    if (!validation.validate()) return err()
     const response = await settingsApi.putAboutSettings(formState.value)
-    if (tryHandleUnsuccessfulResponse(response, toast, validation)) return
+    if (tryHandleUnsuccessfulResponse(response, toast, validation)) return err()
     topText.value = formState.value.topText
     bottomText.value = formState.value.bottomText
+    return ok()
   }
 
-  return { topText, bottomText, update }
-}
+  return { isLoading, topText, bottomText, update }
+})

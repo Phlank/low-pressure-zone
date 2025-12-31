@@ -43,7 +43,7 @@
 import { Button, Slider, useToast } from 'primevue'
 import { computed, onMounted, type Ref, ref, watch } from 'vue'
 import clamp from '@/utils/clamp.ts'
-import { useResizeObserver, useThrottleFn } from '@vueuse/core'
+import { useDebounceFn, useResizeObserver } from '@vueuse/core'
 import { useStreamStore } from '@/stores/streamStore.ts'
 import delay from '@/utils/delay.ts'
 
@@ -193,7 +193,7 @@ watch(
   () => setTimeout(() => updateTextScrollingBehavior())
 )
 
-const updateTextScrollingBehavior = useThrottleFn(async () => {
+const updateTextScrollingBehavior = useDebounceFn(async () => {
   const artistTextWidth = document
     .getElementsByClassName('play-button__content__text-area__now-playing')[0]!
     .getBoundingClientRect().width
@@ -201,21 +201,20 @@ const updateTextScrollingBehavior = useThrottleFn(async () => {
     .getElementsByClassName('play-button__content__text-area__status')[0]!
     .getBoundingClientRect().width
   textWidth.value = Math.max(artistTextWidth, statusTextWidth)
-  await delay(50)
+  await delay(100)
   buttonWidth.value = document
     .getElementsByClassName('play-button__play-element')[0]!
     .getBoundingClientRect().width
   let translateWidth = Math.round(
-    clamp(textWidth.value - buttonWidth.value + buttonPadding + playIconWidth + centerMargin, 0)
+    clamp(artistTextWidth - buttonWidth.value + buttonPadding + playIconWidth + centerMargin, 0)
   )
-  console.log(translateWidth)
   if (Math.abs(translateWidth) < 5) {
     translateWidth = 0
   } else {
     translateWidth = -translateWidth
   }
   nameTranslateWidth.value = translateWidth
-}, 75)
+}, 200)
 
 const volumeSliderAmount = ref(100)
 const volume = computed(() => volumeSliderAmount.value / 100)

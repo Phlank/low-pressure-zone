@@ -11,7 +11,8 @@
           v-model:model-value="formState.topText"
           :disabled="isSubmitting"
           :invalid="!validation.isValid('topText')"
-          auto-resize />
+          auto-resize
+          autofocus />
       </IftaFormField>
       <IftaFormField
         :message="validation.message('bottomText')"
@@ -38,20 +39,19 @@
 
 <script lang="ts" setup>
 import IftaFormField from '@/components/form/IftaFormField.vue'
-import { Button, Textarea, useToast } from 'primevue'
+import { Button, Textarea } from 'primevue'
 import FormArea from '@/components/form/FormArea.vue'
-import { useAboutSettings } from '@/composables/settings/useAboutSettings.ts'
 import { ref, type Ref, watch } from 'vue'
 import type { AboutSettingsRequest } from '@/api/resources/settingsApi.ts'
 import { createFormValidation } from '@/validation/types/formValidation.ts'
 import { required } from '@/validation/rules/untypedRules.ts'
+import { useAboutSettingsStore } from '@/stores/aboutSettingsStore.ts'
 
-const toast = useToast()
-const aboutSettings = useAboutSettings(toast)
+const aboutSettings = useAboutSettingsStore()
 
 const formState: Ref<AboutSettingsRequest> = ref({
-  topText: aboutSettings.topText.value,
-  bottomText: aboutSettings.bottomText.value
+  topText: aboutSettings.topText,
+  bottomText: aboutSettings.bottomText
 })
 const validation = createFormValidation(formState, {
   topText: required(),
@@ -59,14 +59,14 @@ const validation = createFormValidation(formState, {
 })
 
 watch(
-  () => [aboutSettings.topText.value, aboutSettings.bottomText.value],
+  () => [aboutSettings.topText, aboutSettings.bottomText],
   () => reset(),
   { once: true }
 )
 
 const reset = () => {
-  formState.value.topText = aboutSettings.topText.value
-  formState.value.bottomText = aboutSettings.bottomText.value
+  formState.value.topText = aboutSettings.topText
+  formState.value.bottomText = aboutSettings.bottomText
 }
 
 const isSubmitting = ref(false)

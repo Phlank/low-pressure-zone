@@ -5,7 +5,7 @@
     </div>
     <div
       ref="bottomElementRef"
-      :class="moreClass">
+      :class="bottomClass">
       <slot name="bottom"></slot>
     </div>
     <div class="expandable-content__show-more">
@@ -22,29 +22,37 @@
 <script lang="ts" setup>
 import { Button } from 'primevue'
 import { computed, ref } from 'vue'
-import { useResizeObserver } from '@vueuse/core'
+import { useMutationObserver, useResizeObserver } from '@vueuse/core'
 
 const isShowingMore = ref(false)
 const bottomElementRef = ref<HTMLElement | null>(null)
-const moreClass = computed(
+const bottomClass = computed(
   () =>
     `expandable-content__bottom expandable-content__bottom--${isShowingMore.value ? 'visible' : 'hidden'}`
 )
-const moreHeight = ref('0px')
+const bottomHeight = ref('0px')
 const recalculateHeight = () => {
   const newHeight =
-    (document.getElementsByClassName('expandable-content__bottom')[0]?.children[0]?.scrollHeight ??
-      0) + 'px'
-  if (newHeight !== moreHeight.value) {
-    moreHeight.value = newHeight
+    (document.getElementsByClassName('expandable-content__bottom')[0]?.scrollHeight ?? 0) + 'px'
+  if (newHeight !== bottomHeight.value) {
+    bottomHeight.value = newHeight
   }
 }
 useResizeObserver(document.body, () => {
   recalculateHeight()
 })
-useResizeObserver(bottomElementRef, () => {
-  recalculateHeight()
-})
+
+useMutationObserver(
+  bottomElementRef.value as HTMLElement,
+  () => {
+    recalculateHeight()
+  },
+  {
+    subtree: true,
+    childList: true,
+    characterData: true
+  }
+)
 </script>
 
 <style lang="scss" scoped>
@@ -58,7 +66,7 @@ useResizeObserver(bottomElementRef, () => {
     }
 
     &--visible {
-      max-height: v-bind(moreHeight);
+      max-height: v-bind(bottomHeight);
     }
 
     :first-child {

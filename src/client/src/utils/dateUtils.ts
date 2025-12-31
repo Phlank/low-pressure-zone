@@ -97,7 +97,7 @@ const formatTwoDigits = (value: number) => ('0' + value.toFixed(0)).slice(-2)
 export const formatForFilename = (date: Date) =>
   `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}_${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}`
 
-export const isDateInTimeslot = (date: Date, timespan: { startsAt: string, endsAt: string }) => {
+export const isDateInTimeslot = (date: Date, timespan: { startsAt: string; endsAt: string }) => {
   const time = date.getTime()
   const startsAt = parseTime(timespan.startsAt)
   const endsAt = parseTime(timespan.endsAt)
