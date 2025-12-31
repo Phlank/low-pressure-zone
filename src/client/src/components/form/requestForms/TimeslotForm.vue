@@ -24,10 +24,12 @@
           disabled />
       </IftaFormField>
       <IftaFormField
-        label="Duration"
         input-id="durationInput"
+        label="Duration"
         size="xs">
         <Select
+          id="durationInput"
+          v-model:model-value="formState.duration"
           :disabled="
             isSubmitting ||
             (isEditing &&
@@ -35,11 +37,9 @@
               !formState.replaceMedia) ||
             disabled
           "
-          id="durationInput"
           :options="durationOptions"
           option-label="label"
-          option-value="value"
-          v-model:model-value="formState.duration">
+          option-value="value">
         </Select>
       </IftaFormField>
       <IftaFormField
@@ -98,11 +98,11 @@
           :invalid="!validation.isValid('performerUrl')" />
       </IftaFormField>
       <FormField
-        class="timeslot-form__file-upload"
         v-if="formState.performanceType === 'Prerecorded DJ Set'"
+        :message="validation.message('file')"
+        class="timeslot-form__file-upload"
         input-id="fileInput"
         label="Upload Mix"
-        :message="validation.message('file')"
         size="m">
         <div class="timeslot-form__file-upload__help-text">
           <div>File limits:</div>
@@ -120,8 +120,8 @@
           </ul>
         </div>
         <div
-          class="checkbox-area"
-          v-if="isEditing">
+          v-if="isEditing"
+          class="checkbox-area">
           <div class="checkbox-area__item">
             <Checkbox
               id="replaceMediaInput"
@@ -138,8 +138,8 @@
               formState.performanceType == PerformanceType.Prerecorded)
           "
           mode="basic"
-          @select="onFileSelect"
-          @remove="onFileRemove">
+          @remove="onFileRemove"
+          @select="onFileSelect">
           <template #filelabel>
             <span v-if="formState.file">{{ formState.file.name }}</span>
             <span v-else-if="isEditing && !formState.replaceMedia">{{ uploadedFileName }}</span>
@@ -182,15 +182,15 @@ import { performerRequestRules, timeslotRequestRules } from '@/validation/reques
 import { createFormValidation } from '@/validation/types/formValidation'
 import {
   Button,
-  InputText,
-  Select,
-  useToast,
-  FileUpload,
-  Message,
   Checkbox,
-  ProgressBar,
+  FileUpload,
+  type FileUploadRemoveEvent,
   type FileUploadSelectEvent,
-  type FileUploadRemoveEvent
+  InputText,
+  Message,
+  ProgressBar,
+  Select,
+  useToast
 } from 'primevue'
 import { computed, type ComputedRef, onMounted, type Ref, ref, watch } from 'vue'
 import timeslotsApi, {

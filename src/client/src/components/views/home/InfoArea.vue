@@ -19,11 +19,11 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { ref } from 'vue'
-import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primevue'
-import AboutSection from "@/components/views/home/AboutSection.vue";
-import NewsTab from "@/components/views/home/NewsTab.vue";
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primevue'
+import AboutSection from '@/components/views/home/AboutSection.vue'
+import NewsTab from '@/components/views/home/NewsTab.vue'
 
 const tabValue = ref('about')
 </script>

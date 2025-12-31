@@ -8,7 +8,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { ref, watch } from 'vue'
 import { parseMarkdownAsync } from '@/utils/markdown.ts'
 
@@ -29,7 +29,7 @@ watch(
 )
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .news-post {
   &__title {
     margin-bottom: 0;

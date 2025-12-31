@@ -43,7 +43,7 @@
 import { Button, Slider, useToast } from 'primevue'
 import { computed, onMounted, type Ref, ref, watch } from 'vue'
 import clamp from '@/utils/clamp.ts'
-import { useDebounceFn, useResizeObserver, useThrottleFn } from '@vueuse/core'
+import { useDebounceFn, useResizeObserver } from '@vueuse/core'
 import { useStreamStore } from '@/stores/streamStore.ts'
 import delay from '@/utils/delay.ts'
 
@@ -208,7 +208,6 @@ const updateTextScrollingBehavior = useDebounceFn(async () => {
   let translateWidth = Math.round(
     clamp(artistTextWidth - buttonWidth.value + buttonPadding + playIconWidth + centerMargin, 0)
   )
-  console.log(translateWidth)
   if (Math.abs(translateWidth) < 5) {
     translateWidth = 0
   } else {

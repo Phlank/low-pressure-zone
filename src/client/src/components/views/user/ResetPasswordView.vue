@@ -67,7 +67,7 @@ import SinglePanelViewWrapper from '@/components/layout/SinglePanelViewWrapper.v
 import FormArea from '@/components/form/FormArea.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import FormField from '@/components/form/FormField.vue'
-import {required} from "@/validation/rules/untypedRules.ts";
+import { required } from '@/validation/rules/untypedRules.ts'
 
 const toast = useToast()
 const router = useRouter()
