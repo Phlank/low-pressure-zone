@@ -107,11 +107,15 @@ watch(
   () => {
     updatePreview()
   },
-  { deep: true }
+  { deep: true, immediate: true }
 )
 const updatePreview = useDebounceFn(async () => {
   previewTitle.value = formState.value.title
   previewBody.value = await parseMarkdownAsync(formState.value.body)
+}, 200)
+
+onMounted(() => {
+
 })
 </script>
 

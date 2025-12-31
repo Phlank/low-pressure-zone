@@ -63,11 +63,13 @@ div.p-drawer.p-component {
   flex-direction: column;
   flex-grow: unset;
   width: 600px;
+  border-radius: variables.$space-m 0 0 variables.$space-m;
 
   @include variables.mobile() {
     height: fit-content;
     max-height: 95dvh;
     width: 100%;
+    border-radius: variables.$space-m variables.$space-m 0 0;
   }
 }
 

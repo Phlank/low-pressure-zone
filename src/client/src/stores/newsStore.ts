@@ -10,6 +10,7 @@ import { showSuccessToast } from '@/utils/toastUtils.ts'
 
 export const useNewsStore = defineStore('newsStore', () => {
   const items: Ref<NewsResponse[]> = ref([])
+  const isLoading = ref(true)
   const toast = useToast()
 
   const autoRefreshing = ref(false)
@@ -17,8 +18,12 @@ export const useNewsStore = defineStore('newsStore', () => {
     if (autoRefreshing.value) return
     autoRefreshing.value = true
     while (autoRefreshing.value) {
-      await delay(300000)
-      await refresh()
+      try {
+        await delay(300000)
+        await refresh()
+      } catch {
+        // Ignore errors during auto-refresh
+      }
     }
   }
 
@@ -27,7 +32,10 @@ export const useNewsStore = defineStore('newsStore', () => {
     if (tryHandleUnsuccessfulResponse(response, toast)) return
     items.value = response.data()
   }
-  refresh().then(() => autoRefresh())
+  refresh().then(() => {
+    isLoading.value = false
+    autoRefresh().then(() => {})
+  })
 
   const create = async (
     formState: Ref<NewsRequest>,

@@ -19,5 +19,9 @@ div.p-dialog.p-component {
 }
 
 div.p-drawer {
-  border-style: none;
+  border-style: none none none solid;
+  
+  @include variables.mobile() {
+    border-style: solid none none none;
+  }
 }
