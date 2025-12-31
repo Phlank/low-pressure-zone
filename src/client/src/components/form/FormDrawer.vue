@@ -1,6 +1,7 @@
 <template>
   <div class="form-drawer">
     <Drawer
+      class="form-drawer-component"
       :position="position"
       auto-z-index
       modal
@@ -58,7 +59,11 @@ watch(
 <style lang="scss">
 @use '@/assets/styles/variables';
 
-div.p-drawer.p-component {
+:root {
+  --p-form-drawer-content-background: hsl(from var(--p-drawer-background) h s calc(l - 3));
+}
+
+div.p-drawer.p-component.form-drawer-component {
   display: flex;
   flex-direction: column;
   flex-grow: unset;
@@ -67,20 +72,33 @@ div.p-drawer.p-component {
 
   @include variables.mobile() {
     height: fit-content;
-    max-height: 95dvh;
-    width: 100%;
+    max-height: calc(100dvh - #{variables.$space-l});
+    width: 100dvw;
+    margin: 0 variables.$space-m;
     border-radius: variables.$space-m variables.$space-m 0 0;
   }
-}
 
-.form-drawer__footer {
-  display: flex;
-  justify-content: space-between;
-  gap: variables.$space-m;
+  div.p-drawer-content {
+    background-color: var(--p-form-drawer-content-background);
+    border-style: solid none solid none;
+    border-width: 1px;
+    border-color: var(--p-drawer-border-color);
+    padding: variables.$space-l;
+  }
 
-  &__reset-button,
-  &__submit-button {
-    flex-grow: 1;
+  div.p-divider-content {
+    background-color: var(--p-form-drawer-content-background);
+  }
+
+  .form-drawer__footer {
+    display: flex;
+    justify-content: space-between;
+    gap: variables.$space-m;
+
+    &__reset-button,
+    &__submit-button {
+      flex-grow: 1;
+    }
   }
 }
 </style>

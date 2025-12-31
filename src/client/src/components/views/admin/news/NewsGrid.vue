@@ -43,23 +43,25 @@
           <template #left>No data to display.</template>
         </ListItem>
       </template>
-      <template #list="{ items, index }: { items: NewsResponse[]; index: number }">
-        <ListItem
-          v-for="newsItem in items"
+      <template #list="{ items }: { items: NewsResponse[]; index: number }">
+        <div
+          v-for="(newsItem, index) in items"
           :key="newsItem.id">
-          <template #left>
-            <span>{{ newsItem.title }}</span>
-            <span>{{ parseDate(newsItem.createdAt).toLocaleDateString() }}</span>
-          </template>
-          <template #right>
-            <GridActions
-              show-delete
-              show-edit
-              @delete="emit('delete', newsItem)"
-              @edit="emit('edit', newsItem)" />
-          </template>
-        </ListItem>
-        <Divider v-if="index < items.length - 1" />
+          <ListItem>
+            <template #left>
+              <span>{{ newsItem.title }}</span>
+              <span>{{ parseDate(newsItem.createdAt).toLocaleDateString() }}</span>
+            </template>
+            <template #right>
+              <GridActions
+                show-delete
+                show-edit
+                @delete="emit('delete', newsItem)"
+                @edit="emit('edit', newsItem)" />
+            </template>
+          </ListItem>
+          <Divider v-if="index < items.length - 1" />
+        </div>
       </template>
       <template #footer>
         <Button

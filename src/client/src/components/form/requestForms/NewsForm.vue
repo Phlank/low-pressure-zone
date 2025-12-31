@@ -89,8 +89,6 @@ const reset = () => {
   formState.value.body = props.initialData?.body ?? ''
 }
 
-onMounted(() => reset())
-
 defineExpose({
   formState,
   validation,
@@ -115,7 +113,9 @@ watch(
   { deep: true, immediate: true }
 )
 
-onMounted(() => {})
+onMounted(() => {
+  reset()
+})
 </script>
 
 <style lang="scss" scoped>
