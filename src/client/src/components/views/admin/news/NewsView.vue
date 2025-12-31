@@ -17,6 +17,7 @@
         @submitted="isDrawerVisible = false" />
     </FormDrawer>
     <DeleteDialog
+      @close="isDeleteDialogVisible = false"
       v-model:visible="isDeleteDialogVisible"
       :is-submitting="isDeleteSubmitting"
       entity-type="News"

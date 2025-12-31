@@ -47,5 +47,5 @@ export const useAboutSettingsStore = defineStore('aboutSettingsStore', () => {
     return ok()
   }
 
-  return { topText, bottomText, update }
+  return { isLoading, topText, bottomText, update }
 })

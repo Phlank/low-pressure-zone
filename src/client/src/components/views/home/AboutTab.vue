@@ -1,6 +1,9 @@
 ﻿<template>
   <div class="about-section">
-    <ExpandableContent>
+    <Skeleton
+      v-if="aboutSettings.isLoading"
+      style="height: 200px" />
+    <ExpandableContent v-else>
       <template #top>
         <div v-html="topHtml" />
       </template>
@@ -11,21 +14,30 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import ExpandableContent from '@/components/controls/ExpandableContent.vue'
 import { parseMarkdownAsync } from '@/utils/markdown.ts'
 import { useAboutSettingsStore } from '@/stores/aboutSettingsStore.ts'
+import { Skeleton } from 'primevue'
 
 const aboutSettings = useAboutSettingsStore()
 
+const topHtml = ref('')
+const bottomHtml = ref('')
+const updateContent = async () => {
+  console.log('Loading')
+  topHtml.value = await parseMarkdownAsync(aboutSettings.topText)
+  bottomHtml.value = await parseMarkdownAsync(aboutSettings.bottomText)
+}
+
 watch(
-  () => [aboutSettings.topText, aboutSettings.bottomText],
+  () => [aboutSettings.topText, aboutSettings.bottomText, aboutSettings.isLoading],
   async () => {
-    topHtml.value = await parseMarkdownAsync(aboutSettings.topText)
-    bottomHtml.value = await parseMarkdownAsync(aboutSettings.bottomText)
+    await updateContent()
   }
 )
 
-const topHtml = ref('')
-const bottomHtml = ref('')
+onMounted(() => {
+  updateContent()
+})
 </script>
