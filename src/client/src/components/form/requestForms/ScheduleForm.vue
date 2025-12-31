@@ -12,6 +12,7 @@
           :disabled="isSubmitting"
           :invalid="!validation.isValid('communityId')"
           :options="communities"
+          autofocus
           option-label="name"
           option-value="id"
           placeholder="Select an community"

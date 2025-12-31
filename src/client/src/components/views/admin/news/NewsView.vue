@@ -26,7 +26,6 @@
 </template>
 
 <script lang="ts" setup>
-import { useToast } from 'primevue'
 import { ref, type Ref, useTemplateRef } from 'vue'
 import type { NewsResponse } from '@/api/resources/newsApi.ts'
 import FormDrawer from '@/components/form/FormDrawer.vue'
@@ -35,7 +34,6 @@ import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
 import NewsGrid from '@/components/views/admin/news/NewsGrid.vue'
 import { useNewsStore } from '@/stores/newsStore.ts'
 
-const toast = useToast()
 const news = useNewsStore()
 const newsFormRef = useTemplateRef('newsFormRef')
 const isDrawerVisible = ref(false)

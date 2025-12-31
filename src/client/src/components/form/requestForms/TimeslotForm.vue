@@ -12,6 +12,7 @@
           :disabled="isSubmitting || disabled || isEditing"
           :invalid="!validation.isValid('performanceType')"
           :options="performanceTypes"
+          autofocus
           @change="() => validation.validateIfDirty('performanceType')" />
       </IftaFormField>
       <IftaFormField

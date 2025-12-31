@@ -9,7 +9,7 @@
       </TabList>
       <TabPanels>
         <TabPanel value="about">
-          <AboutSection />
+          <AboutTab />
         </TabPanel>
         <TabPanel value="news">
           <NewsTab />
@@ -22,8 +22,8 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primevue'
-import AboutSection from '@/components/views/home/AboutSection.vue'
 import NewsTab from '@/components/views/home/NewsTab.vue'
+import AboutTab from '@/components/views/home/AboutTab.vue'
 
 const tabValue = ref('about')
 </script>

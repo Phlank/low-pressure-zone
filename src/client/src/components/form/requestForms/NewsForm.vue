@@ -10,7 +10,8 @@
           id="titleInput"
           v-model:model-value="formState.title"
           :disabled="isSubmitting"
-          :invalid="!validation.isValid('title')" />
+          :invalid="!validation.isValid('title')"
+          autofocus />
       </IftaFormField>
       <IftaFormField
         :message="validation.message('body')"

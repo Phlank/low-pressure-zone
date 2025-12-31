@@ -11,6 +11,7 @@
           v-model:model-value="formState.name"
           :disabled="disabled || isSubmitting"
           :invalid="!validation.isValid('name')"
+          autofocus
           @update:model-value="validation.validateIfDirty('name')" />
       </IftaFormField>
       <IftaFormField

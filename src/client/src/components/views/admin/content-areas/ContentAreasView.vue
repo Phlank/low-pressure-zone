@@ -6,7 +6,7 @@
       </TabList>
       <TabPanels>
         <TabPanel value="about">
-          <AboutTab />
+          <AboutContentTab />
         </TabPanel>
       </TabPanels>
     </Tabs>
@@ -16,7 +16,7 @@
 <script lang="ts" setup>
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primevue'
 import { ref } from 'vue'
-import AboutTab from '@/components/views/admin/content-areas/AboutTab.vue'
+import AboutContentTab from '@/components/views/admin/content-areas/AboutContentTab.vue'
 
 const tabValue = ref('about')
 </script>

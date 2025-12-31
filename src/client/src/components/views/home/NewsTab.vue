@@ -30,5 +30,3 @@ import { simplePaginatorTemplate } from '@/constants/componentTemplates.ts'
 
 const news = useNewsStore()
 </script>
-
-<style lang="scss" scoped></style>

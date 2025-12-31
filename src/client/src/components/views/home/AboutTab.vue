@@ -11,20 +11,18 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { useToast } from 'primevue'
 import { ref, watch } from 'vue'
 import ExpandableContent from '@/components/controls/ExpandableContent.vue'
 import { parseMarkdownAsync } from '@/utils/markdown.ts'
-import useAboutSettings from '@/composables/settings/useAboutSettings.ts'
+import { useAboutSettingsStore } from '@/stores/aboutSettingsStore.ts'
 
-const toast = useToast()
-const aboutSettings = useAboutSettings(toast)
+const aboutSettings = useAboutSettingsStore()
 
 watch(
-  () => [aboutSettings.topText.value, aboutSettings.bottomText.value],
+  () => [aboutSettings.topText, aboutSettings.bottomText],
   async () => {
-    topHtml.value = await parseMarkdownAsync(aboutSettings.topText.value)
-    bottomHtml.value = await parseMarkdownAsync(aboutSettings.bottomText.value)
+    topHtml.value = await parseMarkdownAsync(aboutSettings.topText)
+    bottomHtml.value = await parseMarkdownAsync(aboutSettings.bottomText)
   }
 )
 
