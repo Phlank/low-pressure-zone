@@ -102,6 +102,10 @@ const emit = defineEmits(['submitted'])
 
 const previewTitle = ref('')
 const previewBody = ref('')
+const updatePreview = useDebounceFn(async () => {
+  previewTitle.value = formState.value.title
+  previewBody.value = await parseMarkdownAsync(formState.value.body)
+}, 200)
 watch(
   () => [formState.value.title, formState.value.body],
   () => {
@@ -109,10 +113,6 @@ watch(
   },
   { deep: true, immediate: true }
 )
-const updatePreview = useDebounceFn(async () => {
-  previewTitle.value = formState.value.title
-  previewBody.value = await parseMarkdownAsync(formState.value.body)
-}, 200)
 
 onMounted(() => {
 

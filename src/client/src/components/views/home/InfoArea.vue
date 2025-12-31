@@ -12,7 +12,7 @@
           <AboutSection />
         </TabPanel>
         <TabPanel value="news">
-          <NewsSection />
+          <NewsTab />
         </TabPanel>
       </TabPanels>
     </Tabs>
@@ -23,7 +23,7 @@
 import { ref } from 'vue'
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primevue'
 import AboutSection from "@/components/views/home/AboutSection.vue";
-import NewsSection from "@/components/views/home/NewsSection.vue";
+import NewsTab from "@/components/views/home/NewsTab.vue";
 
 const tabValue = ref('about')
 </script>

@@ -48,8 +48,8 @@
           v-for="newsItem in items"
           :key="newsItem.id">
           <template #left>
-            <div>{{ newsItem.title }}</div>
-            <div>{{ parseDate(newsItem.createdAt).toLocaleDateString() }}</div>
+            <span>{{ newsItem.title }}</span>
+            <span>{{ parseDate(newsItem.createdAt).toLocaleDateString() }}</span>
           </template>
           <template #right>
             <GridActions
