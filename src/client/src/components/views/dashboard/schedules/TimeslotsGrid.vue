@@ -85,7 +85,7 @@
       :visible="showDeleteDialog"
       entity-type="timeslot"
       header="Delete Timeslot"
-      @close="showDeleteDialog = false"
+      @hide="showDeleteDialog = false"
       @delete="handleDelete" />
   </div>
 </template>

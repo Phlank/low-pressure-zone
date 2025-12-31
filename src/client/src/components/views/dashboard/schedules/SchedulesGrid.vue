@@ -76,7 +76,7 @@
       :visible="showDeleteScheduleDialog"
       entity-type="schedule"
       header="Delete Schedule"
-      @close="showDeleteScheduleDialog = false"
+      @hide="showDeleteScheduleDialog = false"
       @delete="handleDelete" />
   </div>
 </template>

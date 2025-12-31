@@ -55,7 +55,7 @@
         :visible="showDeleteDialog"
         entity-type="community"
         header="Delete Community"
-        @close="showDeleteDialog = false"
+        @hide="showDeleteDialog = false"
         @delete="handleDelete" />
     </div>
   </div>

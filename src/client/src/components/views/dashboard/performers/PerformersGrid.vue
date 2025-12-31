@@ -62,7 +62,7 @@
       :visible="showDeleteDialog"
       entity-type="performer"
       header="Delete Performer"
-      @close="showDeleteDialog = false"
+      @hide="showDeleteDialog = false"
       @delete="handleDelete" />
   </div>
 </template>

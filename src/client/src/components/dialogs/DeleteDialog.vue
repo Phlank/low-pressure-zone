@@ -1,8 +1,8 @@
 <template>
   <Dialog
+    $attrs
     :draggable="false"
     :header="header"
-    :visible="visible"
     class="delete-dialog"
     modal
     @hide="emit('close')"
@@ -27,14 +27,13 @@ import { Button, Dialog } from 'primevue'
 
 defineProps<{
   header: string
-  visible: boolean
   isSubmitting: boolean
   entityType: string
   entityName?: string
 }>()
 
 const emit = defineEmits<{
-  close: []
+  hide: []
   delete: []
 }>()
 </script>

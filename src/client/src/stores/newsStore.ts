@@ -1,12 +1,13 @@
 import { defineStore } from 'pinia'
 import newsApi, { type NewsRequest, type NewsResponse } from '@/api/resources/newsApi.ts'
-import { ref, type Ref } from 'vue'
+import { computed, ref, type Ref } from 'vue'
 import delay from '@/utils/delay.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import type { FormValidation } from '@/validation/types/formValidation.ts'
 import { err, ok, type Result } from '@/types/result.ts'
 import { useToast } from 'primevue'
 import { showSuccessToast } from '@/utils/toastUtils.ts'
+import { getEntity } from '@/utils/arrayUtils.ts'
 
 export const useNewsStore = defineStore('newsStore', () => {
   const items: Ref<NewsResponse[]> = ref([])
@@ -18,12 +19,8 @@ export const useNewsStore = defineStore('newsStore', () => {
     if (autoRefreshing.value) return
     autoRefreshing.value = true
     while (autoRefreshing.value) {
-      try {
-        await delay(300000)
-        await refresh()
-      } catch {
-        // Ignore errors during auto-refresh
-      }
+      await delay(300000)
+      await refresh()
     }
   }
 
@@ -59,14 +56,13 @@ export const useNewsStore = defineStore('newsStore', () => {
     formState: Ref<NewsRequest>,
     validation: FormValidation<NewsRequest>
   ): Promise<Result<void, void>> => {
-    const isInSet = items.value.some((item) => item.id === id)
-    if (!isInSet) return err()
+    const entity = getEntity(items.value, id)
+    if (!entity) return err()
     if (!validation.validate()) return err()
     const response = await newsApi.put(id, formState.value)
     if (tryHandleUnsuccessfulResponse(response, toast, validation)) return err()
-    const item = items.value.find((item) => item.id === id)!
-    item.title = formState.value.title
-    item.body = formState.value.body
+    entity.title = formState.value.title
+    entity.body = formState.value.body
     showSuccessToast(toast, 'Updated', 'News', formState.value.title)
     return ok()
   }
@@ -81,5 +77,7 @@ export const useNewsStore = defineStore('newsStore', () => {
     return ok()
   }
 
-  return { items, refresh, create, update, remove }
+  const getItems = computed(() => items.value)
+
+  return { items: getItems, create, update, remove }
 })

@@ -8,6 +8,6 @@ public static class DateTimeUtilities
         var now = DateTime.UtcNow;
         if (now.Hour < hour)
             return new DateTime(now.Year, now.Month, now.Day, hour, 0, 0);
-        return new DateTime(now.Year, now.Month, now.Day + 1, hour, 0, 0);
+        return new DateTime(now.Year, now.Month, now.Day, hour, 0, 0).AddDays(1);
     }
 }

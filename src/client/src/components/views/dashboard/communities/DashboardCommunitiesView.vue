@@ -79,7 +79,7 @@ onMounted(async () => {
   if (communityStore.communities.length === 0) {
     promises.push(communityStore.loadCommunitiesAsync())
   }
-  if (userStore.users.length === 0) {
+  if (userStore.items.length === 0) {
     promises.push(userStore.loadUsersAsync())
   }
   await Promise.all(promises)

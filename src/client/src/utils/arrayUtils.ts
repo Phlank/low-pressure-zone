@@ -12,7 +12,12 @@ export const distinct = <T>(array: T[]) => {
   })
 }
 
-export const joinIf = (array: { label: string; condition: boolean }[], separator: string) => {
-  const appliedLabels = array.filter((item) => item.condition).map((item) => item.label)
-  return appliedLabels.join(separator)
+export const getEntity = <T extends { id: string }>(array: T[], id: string): T | undefined =>
+  array.find((item) => item.id === id)
+
+export const getEntityMap = <T extends { id: string }>(array: T[]) => {
+  return array.reduce((map: Record<string, T>, item: T) => {
+    map[item.id] = item
+    return map
+  }, {})
 }

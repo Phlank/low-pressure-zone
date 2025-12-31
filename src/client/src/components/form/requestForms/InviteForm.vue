@@ -1,23 +1,22 @@
 <template>
-  <div class="invite-user">
+  <div class="invite-form">
     <FormArea>
       <IftaFormField
         :message="validation.message('email')"
         input-id="emailInput"
         label="Email"
-        size="m">
+        size="l">
         <InputText
           id="emailInput"
           v-model="formState.email"
           :invalid="!validation.isValid('email')"
           @update:model-value="validation.validateIfDirty('email')" />
       </IftaFormField>
-      <GridRowFill />
       <IftaFormField
         :message="validation.message('communityId')"
         input-id="communityInput"
         label="Community"
-        size="m">
+        size="l">
         <Select
           v-model="formState.communityId"
           :invalid="!validation.isValid('communityId')"
@@ -26,11 +25,10 @@
           option-value="id"
           @update:model-value="validation.validateIfDirty('communityId')" />
       </IftaFormField>
-      <GridRowFill />
       <FormField
         input-id="rolesInput"
         label="Roles"
-        size="xs">
+        size="l">
         <div class="checkbox-area">
           <div class="checkbox-area__item">
             <Checkbox
@@ -50,39 +48,43 @@
           </div>
         </div>
       </FormField>
-      <GridRowFill />
       <template #actions>
         <Button
+          v-if="!hideSubmit"
           :disabled="isSubmitting"
           :loading="isSubmitting"
           label="Send Invite"
-          @click="handleSubmit" />
+          @click="submit" />
       </template>
     </FormArea>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { inviteRequestRules } from '@/validation/requestRules'
-import { createFormValidation } from '@/validation/types/formValidation'
-import { Button, Checkbox, InputText, Select, useToast } from 'primevue'
-import { computed, onMounted, reactive, ref, watch } from 'vue'
-import invitesApi from '@/api/resources/invitesApi.ts'
-import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import { Button, Checkbox, InputText, Select } from 'primevue'
 import FormArea from '@/components/form/FormArea.vue'
-import IftaFormField from '@/components/form/IftaFormField.vue'
 import FormField from '@/components/form/FormField.vue'
-import GridRowFill from '@/components/layout/GridRowFill.vue'
+import IftaFormField from '@/components/form/IftaFormField.vue'
 import { useCommunityStore } from '@/stores/communityStore.ts'
+import { computed, ref, type Ref } from 'vue'
+import { createFormValidation } from '@/validation/types/formValidation.ts'
+import { inviteRequestRules } from '@/validation/requestRules.ts'
+import { type InviteRequest } from '@/api/resources/invitesApi.ts'
+import { useInviteStore } from '@/stores/inviteStore.ts'
 
-const toast = useToast()
 const communityStore = useCommunityStore()
-
+const invites = useInviteStore()
 const availableCommunities = computed(() =>
   communityStore.communities.filter((community) => community.isOrganizable)
 )
 
-const formState = reactive({
+withDefaults(defineProps<{
+  hideSubmit: boolean
+}>(), {
+  hideSubmit: false
+})
+
+const formState: Ref<InviteRequest> = ref({
   email: '',
   communityId: '',
   isPerformer: false,
@@ -90,46 +92,30 @@ const formState = reactive({
 })
 const validation = createFormValidation(formState, inviteRequestRules)
 
-const props = defineProps<{
-  visible?: boolean
-}>()
-
-onMounted(async () => {
-  if (communityStore.communities.length === 0) {
-    await communityStore.loadCommunitiesAsync()
-  }
-})
-
-const emit = defineEmits<{ create: [] }>()
-
 const isSubmitting = ref(false)
-const handleSubmit = async () => {
-  const isValid = validation.validate()
-  if (!isValid) return
-
+const submit = async () => {
   isSubmitting.value = true
-  const response = await invitesApi.post(formState)
+  if (!validation.validate()) return
+  const result = await invites.create(formState, validation)
   isSubmitting.value = false
-
-  if (tryHandleUnsuccessfulResponse(response, toast, validation)) return
-
-  toast.add({ detail: 'Successfully invited new user: ' + formState.email, severity: 'success' })
+  if (!result.isSuccess) return
   reset()
-  emit('create')
+  emit('submitted')
 }
-
-watch(
-  () => props.visible,
-  () => {
-    reset()
-  }
-)
 
 const reset = () => {
-  formState.email = ''
-  formState.communityId = ''
-  formState.isPerformer = false
-  formState.isOrganizer = false
+  formState.value.email = ''
+  formState.value.communityId = ''
+  formState.value.isPerformer = false
+  formState.value.isOrganizer = false
   validation.reset()
 }
+
+const emit = defineEmits<{ submitted: [] }>()
+
+defineExpose({
+  submit,
+  reset,
+  isSubmitting,
+})
 </script>

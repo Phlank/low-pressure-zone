@@ -129,14 +129,14 @@ const props = defineProps<{
 }>()
 
 onMounted(async () => {
-  if (userStore.users.length === 0) await userStore.loadUsersAsync()
+  if (userStore.items.length === 0) await userStore.loadUsersAsync()
 })
 
 const availableUsers: ComputedRef<UserResponse[]> = computed(() => {
   const userIdsInUse = communityStore
     .getRelationships(props.community.id)
     .map((relationship) => relationship.userId)
-  const usersNotInUse = userStore.users.filter((user) => userIdsInUse.indexOf(user.id) === -1)
+  const usersNotInUse = userStore.items.filter((user) => userIdsInUse.indexOf(user.id) === -1)
   return usersNotInUse.filter((user) => !user.isAdmin)
 })
 
