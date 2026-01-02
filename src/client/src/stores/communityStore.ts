@@ -47,7 +47,7 @@ export const useCommunityStore = defineStore('communityStore', () => {
     communities.value = response.data()
   }
   const refreshRelationships = async () => {
-    if (!auth.isInAnySpecifiedRole(roles.admin, roles.organizer)) return
+    if (!auth.isInAnyRoles(roles.admin, roles.organizer)) return
     const userCommunities = communities.value.filter((community) => community.isOrganizable)
     const relationshipPromises: Promise<ApiResponse<void, CommunityRelationshipResponse[]>>[] = []
     for (const community of userCommunities) {
@@ -188,8 +188,8 @@ export const useCommunityStore = defineStore('communityStore', () => {
   const getIsLoading = computed(() => isLoading.value)
 
   return {
-    items: getCommunities,
-    getCommunity,
+    communities: getCommunities,
+    getCommunityById: getCommunity,
     relatedCommunities: getRelatedCommunities,
     organizableCommunities: getOrganizableCommunities,
     performableCommunities: getPerformableCommunities,

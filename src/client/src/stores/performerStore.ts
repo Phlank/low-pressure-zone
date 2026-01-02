@@ -2,41 +2,28 @@ import { defineStore } from 'pinia'
 import type { PerformerRequest, PerformerResponse } from '@/api/resources/performersApi.ts'
 import performersApi from '@/api/resources/performersApi.ts'
 import { computed, type Ref, ref } from 'vue'
-import delay from '@/utils/delay.ts'
 import { useToast } from 'primevue'
-import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import { addAlphabetically, getEntityMap, removeEntity } from '@/utils/arrayUtils.ts'
 import {
   useCreatePersistentItemFn,
   useRemovePersistentItemFn,
   useUpdatePersistentItemFn
 } from '@/utils/storeFunctions.ts'
+import { useRefresh } from '@/composables/useRefresh.ts'
+import { showCreateSuccessToast, showDeleteSuccessToast, showEditSuccessToast } from '@/utils/toastUtils.ts'
 
 export const usePerformerStore = defineStore('performerStore', () => {
   const performers: Ref<PerformerResponse[]> = ref([])
   const performersMap = ref(getEntityMap(performers.value))
   const toast = useToast()
 
-  let autoRefreshing = false
-  const isLoading = ref(true)
-  const autoRefresh = async () => {
-    if (autoRefreshing) return
-    autoRefreshing = true
-    while (autoRefreshing) {
-      await delay(300000)
-      await refresh()
+  const { isLoading } = useRefresh(
+    performersApi.get,
+    (data) => {
+      performers.value = data
+      performersMap.value = getEntityMap(performers.value)
     }
-  }
-  const refresh = async () => {
-    const response = await performersApi.get()
-    if (tryHandleUnsuccessfulResponse(response, toast)) return
-    performers.value = response.data()
-    performersMap.value = getEntityMap(performers.value)
-  }
-  refresh().then(() => {
-    isLoading.value = false
-    autoRefresh().then(() => {})
-  })
+  )
 
   const getById = (id: string) => performersMap.value[id]
 
@@ -52,6 +39,7 @@ export const usePerformerStore = defineStore('performerStore', () => {
       }
       addAlphabetically(performers.value, performer, (item) => item.name)
       performersMap.value[performer.id] = performer
+      showCreateSuccessToast(toast, 'Performer', form.name)
     },
     toast
   )
@@ -65,6 +53,7 @@ export const usePerformerStore = defineStore('performerStore', () => {
         entity.name = form.name
         performers.value.sort((a, b) => a.name.localeCompare(b.name))
       }
+      showEditSuccessToast(toast, 'Performer', form.name)
     },
     toast
   )
@@ -75,18 +64,18 @@ export const usePerformerStore = defineStore('performerStore', () => {
     (entity) => {
       performersMap.value[entity.id] = undefined
       removeEntity(performers.value, entity.id)
+      showDeleteSuccessToast(toast, 'Performer', entity.name)
     },
     toast
   )
 
-  const getIsLoading = computed(() => isLoading.value)
   const getPerformers = computed(() => performers.value)
   const getLinkablePerformers = computed(() =>
     performers.value.filter((performer) => performer.isLinkableToTimeslot)
   )
 
   return {
-    isLoading: getIsLoading,
+    isLoading: isLoading,
     items: getPerformers,
     linkablePerformers: getLinkablePerformers,
     getById,

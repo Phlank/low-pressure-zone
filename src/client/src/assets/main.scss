@@ -24,6 +24,8 @@ body {
   overflow: hidden;
   background-image: url(./bg-invert.jpg);
   background-attachment: fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
   font-family: 'Nunito Sans', 'Helvetica Neue', sans-serif;
   text-rendering: optimizeLegibility;
   overflow-y: auto;

@@ -116,7 +116,7 @@ router.beforeEach(async (to, _, next) => {
   }
 
   const allowedRoles = (meta.roles ?? [])
-  if (allowedRoles.length === 0 || authStore.isInAnySpecifiedRole(...allowedRoles)) {
+  if (allowedRoles.length === 0 || authStore.isInAnyRoles(...allowedRoles)) {
     next()
     return
   }

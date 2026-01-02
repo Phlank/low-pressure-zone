@@ -3,7 +3,7 @@
     <DataTable
       v-if="!isMobile"
       :rows="10"
-      :value="news.items"
+      :value="news.users"
       data-key="id"
       paginator>
       <template #empty>No data to display.</template>
@@ -36,7 +36,7 @@
       v-else
       :paginator-template="mobilePaginatorTemplate"
       :rows="5"
-      :value="news.items"
+      :value="news.users"
       paginator>
       <template #empty>
         <ListItem>

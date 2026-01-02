@@ -1,10 +1,10 @@
 <template>
   <div class="news-tab">
     <DataView
-      :paginator="news.items.length > 1"
+      :paginator="news.users.length > 1"
       :paginator-template="simplePaginatorTemplate"
       :rows="1"
-      :value="news.items">
+      :value="news.users">
       <template #empty>
         <div>No news!</div>
       </template>

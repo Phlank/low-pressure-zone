@@ -81,7 +81,7 @@ const availableUsers = computed(() => {
   const inUse = communities
     .getRelationships(props.communityId)
     .map((relationship) => relationship.userId)
-  return entitiesExceptIds(users.items, inUse)
+  return entitiesExceptIds(users.users, inUse)
 })
 
 const props = withDefaults(

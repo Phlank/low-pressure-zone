@@ -10,7 +10,7 @@ using LowPressureZone.Domain.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Shouldly;
 
-namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
+namespace LowPressureZone.Api.Endpoints.Timeslots;
 
 public sealed class TimeslotRequestValidator : Validator<TimeslotRequest>
 {
@@ -18,6 +18,8 @@ public sealed class TimeslotRequestValidator : Validator<TimeslotRequest>
 
     public TimeslotRequestValidator(IHttpContextAccessor contextAccessor, ILogger<TimeslotRequestValidator> logger)
     {
+        RuleFor(request => request.ScheduleId).NotEmpty().WithMessage(Errors.Required);
+        RuleFor(request => request.PerformerId).NotEmpty().WithMessage(Errors.Required);
         RuleFor(request => request.PerformanceType).Must(type => PerformanceTypes.All.Contains(type))
                                                    .WithMessage("Invalid type");
         RuleFor(request => request.StartsAt).GreaterThan(DateTime.UtcNow).WithMessage(Errors.TimeInPast);
@@ -28,7 +30,6 @@ public sealed class TimeslotRequestValidator : Validator<TimeslotRequest>
 
         RuleFor(t => t).CustomAsync(async (request, context, ct) =>
         {
-            var scheduleId = contextAccessor.GetGuidRouteParameterOrDefault("scheduleId");
             var timeslotId = contextAccessor.GetGuidRouteParameterOrDefault("timeslotId");
 
             ValidateFile(request, timeslotId, context);
@@ -36,7 +37,7 @@ public sealed class TimeslotRequestValidator : Validator<TimeslotRequest>
             var dataContext = Resolve<DataContext>();
             var schedule = await dataContext.Schedules
                                             .Include(schedule => schedule.Timeslots)
-                                            .Where(schedule => schedule.Id == scheduleId)
+                                            .Where(schedule => schedule.Id == request.ScheduleId)
                                             .FirstOrDefaultAsync(ct);
             var performer = await dataContext.Performers
                                              .Where(performer => performer.Id == request.PerformerId)
@@ -46,7 +47,7 @@ public sealed class TimeslotRequestValidator : Validator<TimeslotRequest>
                 context.AddFailure(nameof(request.PerformerId), Errors.DoesNotExist);
             if (schedule is null)
             {
-                context.AddFailure(nameof(scheduleId), Errors.DoesNotExist);
+                context.AddFailure(nameof(request.ScheduleId), Errors.DoesNotExist);
                 return;
             }
 

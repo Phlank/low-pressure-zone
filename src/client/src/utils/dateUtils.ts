@@ -1,8 +1,12 @@
 import { formatDate } from '@vueuse/core'
 
-export const parseDate = (dateString: string) => new Date(Date.parse(dateString))
+export const parseDate = (date: string | Date): Date => {
+  if (date instanceof Date)
+    return date
+  return new Date(Date.parse(date))
+}
 
-export const parseTime = (dateString: string) => parseDate(dateString).getTime()
+export const parseTime = (date: string | Date) => parseDate(date).getTime()
 
 export const compareDateStrings = (a: string, b: string) => parseTime(b) - parseTime(a)
 

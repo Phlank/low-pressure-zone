@@ -2,14 +2,12 @@
 using LowPressureZone.Api.Endpoints.Performers;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
-using LowPressureZone.Domain;
 using LowPressureZone.Domain.Entities;
 using Shouldly;
 
-namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
+namespace LowPressureZone.Api.Endpoints.Timeslots;
 
 public sealed class TimeslotMapper(
-    IHttpContextAccessor contextAccessor,
     TimeslotRules rules,
     PerformerMapper performerMapper)
     : IRequestMapper, IResponseMapper
@@ -22,7 +20,7 @@ public sealed class TimeslotMapper(
             EndsAt = req.EndsAt.ToUniversalTime(),
             Type = req.PerformanceType.Trim(),
             PerformerId = req.PerformerId,
-            ScheduleId = contextAccessor.GetGuidRouteParameterOrDefault("scheduleId"),
+            ScheduleId = req.ScheduleId,
             UploadedFileName = req.File?.FileName
         };
     
@@ -33,6 +31,7 @@ public sealed class TimeslotMapper(
         timeslot.EndsAt = req.EndsAt.ToUniversalTime();
         timeslot.Type = req.PerformanceType.Trim();
         timeslot.PerformerId = req.PerformerId;
+        timeslot.ScheduleId = req.ScheduleId;
         if (req.File != null)
             timeslot.UploadedFileName = req.File.FileName;
     }
@@ -43,6 +42,7 @@ public sealed class TimeslotMapper(
         return new TimeslotResponse
         {
             Id = timeslot.Id,
+            ScheduleId = timeslot.ScheduleId,
             StartsAt = timeslot.StartsAt,
             EndsAt = timeslot.EndsAt,
             Name = timeslot.Name,

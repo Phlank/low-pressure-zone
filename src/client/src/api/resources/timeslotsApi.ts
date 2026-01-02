@@ -25,6 +25,7 @@ export default {
 }
 
 export interface TimeslotRequest {
+  scheduleId: string
   performerId: string
   performanceType: PerformanceType
   startsAt: string
@@ -36,6 +37,7 @@ export interface TimeslotRequest {
 
 const mapRequest = <TRequest extends TimeslotRequest>(request: TRequest): TimeslotRequest => {
   return {
+    scheduleId: request.scheduleId,
     performerId: request.performerId,
     performanceType: request.performanceType,
     startsAt: request.startsAt,
@@ -48,6 +50,7 @@ const mapRequest = <TRequest extends TimeslotRequest>(request: TRequest): Timesl
 
 export interface TimeslotResponse {
   id: string
+  scheduleId: string
   performer: PerformerResponse
   performanceType: PerformanceType
   name: string | null

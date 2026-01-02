@@ -9,9 +9,9 @@
         <Select
           id="communityInput"
           v-model:model-value="formState.communityId"
-          :disabled="isSubmitting"
+          :disabled="isSubmitting || props.schedule?.community.id !== undefined"
           :invalid="!validation.isValid('communityId')"
-          :options="communities"
+          :options="availableCommunities"
           autofocus
           option-label="name"
           option-value="id"
@@ -68,37 +68,27 @@
           :invalid="!validation.isValid('description')"
           auto-resize />
       </IftaFormField>
-      <template #actions>
-        <Button
-          :disabled="isSubmitting"
-          :loading="isSubmitting"
-          label="Save"
-          @click="submit" />
-      </template>
     </FormArea>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Button, DatePicker, Select, Textarea, useToast } from 'primevue'
+import { DatePicker, Select, Textarea } from 'primevue'
 import { computed, onMounted, type Ref, ref } from 'vue'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { MS_PER_MINUTE } from '@/constants/times'
 import { minimumDate, parseDate } from '@/utils/dateUtils'
 import { scheduleRequestRules } from '@/validation/requestRules'
-import schedulesApi, { type ScheduleRequest } from '@/api/resources/schedulesApi.ts'
+import { type ScheduleRequest, type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
 import type { CommunityResponse } from '@/api/resources/communitiesApi.ts'
 import FormArea from '@/components/form/FormArea.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
-import type { ApiResponse } from '@/api/apiResponse.ts'
-import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
-import { showSuccessToast } from '@/utils/toastUtils.ts'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
+import type { Result } from '@/types/result.ts'
 
 const maxDurationMinutes = 1440
 const defaultMinutes = 60
-const isSubmitting = ref(false)
-const scheduleStore = useScheduleStore()
+const schedules = useScheduleStore()
 
 let now = new Date()
 const resetStartTime = new Date(
@@ -160,9 +150,8 @@ const handleStartTimeChange = (value: Date) => {
 
 const props = withDefaults(
   defineProps<{
-    scheduleId?: string
-    initialState?: ScheduleRequest
-    communities: CommunityResponse[]
+    schedule?: ScheduleResponse
+    availableCommunities: CommunityResponse[]
     alignActions?: 'left' | 'right'
   }>(),
   {
@@ -170,40 +159,43 @@ const props = withDefaults(
   }
 )
 
-onMounted(() => {
-  reset()
-})
-
-const reset = () => {
-  now = new Date()
-  formState.value.communityId = props.initialState?.communityId ?? ''
-  formState.value.startsAt = props.initialState?.startsAt ?? resetStartTime.toISOString()
-  formState.value.description = props.initialState?.description ?? ''
-  formState.value.endsAt =
-    props.initialState?.endsAt ??
-    new Date(resetStartTime.getTime() + defaultMinutes * MS_PER_MINUTE).toISOString()
-}
-
-const toast = useToast()
-
+const isSubmitting = ref(false)
 const submit = async () => {
   if (!validation.validate()) return
   isSubmitting.value = true
-  let response: ApiResponse<ScheduleRequest, never>
-  if (props.scheduleId === '' || props.scheduleId === undefined) {
-    response = await schedulesApi.post(formState.value)
-  } else {
-    response = await schedulesApi.put(props.scheduleId, formState.value)
-  }
+  let response: Result
+  if (props.schedule)
+    response = await schedules.updateSchedule(props.schedule.id, formState, validation)
+  else response = await schedules.createSchedule(formState, validation)
   isSubmitting.value = false
-  if (tryHandleUnsuccessfulResponse(response, toast, validation)) return
-  await scheduleStore.updateScheduleAsync(props.scheduleId ?? response.getCreatedId())
-  showSuccessToast(toast, props.scheduleId ? 'Updated' : 'Created', 'Schedule')
-  emits('afterSubmit')
+  if (!response.isSuccess) return
+  emits('submitted')
   reset()
 }
 
+const reset = () => {
+  now = new Date()
+  formState.value.communityId = props.schedule?.community.id ?? ''
+  formState.value.startsAt = props.schedule?.startsAt ?? resetStartTime.toISOString()
+  formState.value.description = props.schedule?.description ?? ''
+  formState.value.endsAt =
+    props.schedule?.endsAt ??
+    new Date(resetStartTime.getTime() + defaultMinutes * MS_PER_MINUTE).toISOString()
+}
+
+defineExpose({
+  formState,
+  validation,
+  isSubmitting,
+  reset,
+  submit
+})
+
 const emits = defineEmits<{
-  afterSubmit: []
+  submitted: []
 }>()
+
+onMounted(() => {
+  reset()
+})
 </script>

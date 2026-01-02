@@ -1,5 +1,6 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Constants;
+using LowPressureZone.Api.Endpoints.Schedules;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services.Files;
@@ -7,7 +8,7 @@ using LowPressureZone.Domain;
 using LowPressureZone.Identity.Extensions;
 using Microsoft.EntityFrameworkCore;
 
-namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
+namespace LowPressureZone.Api.Endpoints.Timeslots;
 
 public partial class PostTimeslot(
     DataContext dataContext,
@@ -27,7 +28,6 @@ public partial class PostTimeslot(
 
     public override async Task HandleAsync(TimeslotRequest request, CancellationToken ct)
     {
-        var scheduleId = Route<Guid>("scheduleId");
         var schedule = await dataContext.Schedules
                                         .Include(schedule => schedule.Timeslots)
                                         .Include(schedule => schedule.Community)
@@ -35,7 +35,7 @@ public partial class PostTimeslot(
                                                          community.Relationships.Where(relationship =>
                                                                                            relationship.UserId ==
                                                                                            User.GetIdOrDefault()))
-                                        .Where(schedule => schedule.Id == scheduleId)
+                                        .Where(schedule => schedule.Id == request.ScheduleId)
                                         .FirstAsync(ct);
         var performer = await dataContext.Performers.FirstAsync(p => p.Id == request.PerformerId, ct);
 
@@ -73,9 +73,9 @@ public partial class PostTimeslot(
         dataContext.Timeslots.Add(timeslot);
         await dataContext.SaveChangesAsync(ct);
         HttpContext.ExposeLocation();
-        await SendCreatedAtAsync<GetScheduleById>(new
+        await SendCreatedAtAsync<GetTimeslotById>(new
         {
-            id = scheduleId
+            id = timeslot.Id
         }, Response, cancellation: ct);
     }
 

@@ -1,10 +1,11 @@
 ﻿using LowPressureZone.Api.Endpoints.Performers;
 
-namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
+namespace LowPressureZone.Api.Endpoints.Timeslots;
 
 public sealed class TimeslotResponse
 {
     public required Guid Id { get; set; }
+    public required Guid ScheduleId { get; set; }
     public required PerformerResponse Performer { get; set; }
     public required string PerformanceType { get; set; }
     public string? Name { get; set; }

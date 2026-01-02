@@ -3,9 +3,12 @@
     <div>
       <DataTable
         :expanded-rows="expandedRows"
+        :paginator-template="isMobile ? mobilePaginatorTemplate : undefined"
+        :rows="isMobile ? 5 : 10"
         :value="schedules"
         class="schedules-grid__table"
-        data-key="id">
+        data-key="id"
+        paginator>
         <template #empty> No items to display.</template>
         <template>
           <Column
@@ -46,8 +49,8 @@
               <GridActions
                 :show-delete="data.isDeletable"
                 :show-edit="data.isEditable"
-                @delete="handleDeleteScheduleActionClick(data)"
-                @edit="handleEditScheduleActionClick(data)" />
+                @delete="emit('delete', data)"
+                @edit="emit('edit', data)" />
             </template>
           </Column>
         </template>
@@ -56,96 +59,60 @@
             :disabled="false"
             :schedule="rowProps.data" />
         </template>
+        <template #paginatorstart>
+          <Button
+            v-if="!hideActions && !isMobile"
+            label="Create Schedule"
+            @click="emit('create')" />
+        </template>
+        <template #footer>
+          <Button
+            v-if="!hideActions && isMobile"
+            label="Create Schedule"
+            style="width: 100%"
+            @click="emit('create')" />
+        </template>
       </DataTable>
     </div>
-    <Dialog
-      v-model:visible="showEditScheduleDialog"
-      :draggable="false"
-      :is-submitting="false"
-      header="Edit Schedule"
-      modal>
-      <ScheduleForm
-        :communities="communityStore.items.filter((community) => community.isOrganizable)"
-        :initial-state="editingSchedule"
-        :schedule-id="editingId"
-        align-actions="right"
-        @after-submit="afterEditSubmit" />
-    </Dialog>
-    <DeleteDialog
-      :is-submitting="false"
-      :visible="showDeleteScheduleDialog"
-      entity-type="schedule"
-      header="Delete Schedule"
-      @hide="showDeleteScheduleDialog = false"
-      @delete="handleDelete" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
-import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
-import ScheduleForm from '@/components/form/requestForms/ScheduleForm.vue'
 import { formatReadableTime, parseDate, parseTime } from '@/utils/dateUtils'
-import { Column, DataTable, Dialog, useToast } from 'primevue'
+import { Button, Column, DataTable } from 'primevue'
 import { computed, inject, ref, type Ref } from 'vue'
 import TimeslotsGrid from './TimeslotsGrid.vue'
-import schedulesApi, {
-  type ScheduleRequest,
-  type ScheduleResponse
-} from '@/api/resources/schedulesApi.ts'
-import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
-import { useCommunityStore } from '@/stores/communityStore.ts'
-import { useScheduleStore } from '@/stores/scheduleStore.ts'
+import { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
+import { mobilePaginatorTemplate } from '@/constants/componentTemplates.ts'
 
-const communityStore = useCommunityStore()
-const scheduleStore = useScheduleStore()
 const expandedRows = ref({})
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
-const toast = useToast()
 
-const props = defineProps<{
-  schedules: ScheduleResponse[]
-}>()
-
-const showActionColumn = computed(() =>
-  props.schedules.some(
-    (schedule) =>
-      parseTime(schedule.endsAt) > Date.now() && (schedule.isDeletable || schedule.isEditable)
-  )
+const props = withDefaults(
+  defineProps<{
+    hideActions?: boolean
+    schedules: ScheduleResponse[]
+  }>(),
+  {
+    hideActions: false
+  }
 )
 
-const showEditScheduleDialog = ref(false)
-const editingId = ref('')
-const editingSchedule: Ref<ScheduleRequest> = ref({
-  communityId: '',
-  startsAt: '',
-  endsAt: '',
-  description: ''
-})
+const showActionColumn = computed(
+  () =>
+    !props.hideActions &&
+    props.schedules.some(
+      (schedule) =>
+        parseTime(schedule.endsAt) > Date.now() && (schedule.isDeletable || schedule.isEditable)
+    )
+)
 
-const handleEditScheduleActionClick = (schedule: ScheduleResponse) => {
-  editingId.value = schedule.id
-  editingSchedule.value = schedulesApi.mapResponseToRequest(schedule)
-  showEditScheduleDialog.value = true
-}
-
-const afterEditSubmit = () => {
-  showEditScheduleDialog.value = false
-  scheduleStore.reloadTimeslotsAsync(editingId.value)
-}
-
-let deletingId = ''
-const showDeleteScheduleDialog = ref(false)
-const handleDeleteScheduleActionClick = (schedule: ScheduleResponse) => {
-  deletingId = schedule.id
-  showDeleteScheduleDialog.value = true
-}
-const handleDelete = async () => {
-  showDeleteScheduleDialog.value = false
-  const response = await schedulesApi.delete(deletingId)
-  tryHandleUnsuccessfulResponse(response, toast)
-  scheduleStore.removeSchedule(deletingId)
-}
+const emit = defineEmits<{
+  create: []
+  edit: [schedule: ScheduleResponse]
+  delete: [schedule: ScheduleResponse]
+}>()
 </script>
 
 <style lang="scss">

@@ -11,11 +11,14 @@ import { getEntity } from '@/utils/arrayUtils.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
 import roles from '@/constants/roles.ts'
 import { showSuccessToast } from '@/utils/toastUtils.ts'
+import {useRefresh} from "@/composables/useRefresh.ts";
 
 export const useInviteStore = defineStore('inviteStore', () => {
   const items: Ref<InviteResponse[]> = ref([])
-  const isLoading = ref(true)
 
+  useRefresh(invitesApi.get, (data) => {
+    items.value = data
+  })
   const autoRefreshing = ref(false)
   const autoRefresh = async () => {
     if (autoRefreshing.value) return
@@ -30,13 +33,6 @@ export const useInviteStore = defineStore('inviteStore', () => {
     if (!response.isSuccess()) return
     items.value = response.data()
   }
-
-  const auth = useAuthStore()
-  if (auth.isInRole(roles.admin))
-    refresh().then(() => {
-      isLoading.value = false
-      autoRefresh().then(() => {})
-    })
 
   const toast = useToast()
   const create = async (

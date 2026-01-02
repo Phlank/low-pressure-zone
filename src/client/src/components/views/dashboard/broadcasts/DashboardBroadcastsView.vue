@@ -1,7 +1,7 @@
 ﻿<template>
   <div class="dashboard-broadcasts-view">
     <BroadcastsGrid
-      :show-streamer-name="authStore.isInAnySpecifiedRole(Roles.admin, Roles.organizer)" />
+      :show-streamer-name="authStore.isInAnyRoles(Roles.admin, Roles.organizer)" />
   </div>
 </template>
 

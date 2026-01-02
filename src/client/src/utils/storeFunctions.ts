@@ -62,3 +62,18 @@ export const useRemovePersistentItemFn =
     onSuccess(entity)
     return ok()
   }
+
+export const useUpdateSettingFn =
+  <TSettings extends object>(
+    apiFunction: (data: TSettings) => Promise<ApiResponse<TSettings>>,
+    onSuccess: (settings: TSettings) => void,
+    toast?: ToastServiceMethods
+  ) =>
+  async (formState: Ref<TSettings>, validation: FormValidation<TSettings>) => {
+    if (!validation.validate()) return err()
+    const response = await apiFunction(formState.value)
+    if (toast && tryHandleUnsuccessfulResponse(response, toast, validation)) return err()
+    else if (!response.isSuccess()) return err()
+    onSuccess(formState.value)
+    return ok()
+  }

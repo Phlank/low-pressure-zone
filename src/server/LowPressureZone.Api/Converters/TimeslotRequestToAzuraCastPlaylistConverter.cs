@@ -1,7 +1,7 @@
 using System.Globalization;
 using FluentValidation.Results;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
-using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
+using LowPressureZone.Api.Endpoints.Timeslots;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Core;
 using LowPressureZone.Core.Interfaces;

@@ -1,4 +1,5 @@
 import type { Entity } from '@/types/entity.ts'
+import { parseTime } from '@/utils/dateUtils.ts'
 
 export const hasIntersection = <T>(a: T[], b: T[]) => {
   if (a.length === 0 || b.length === 0) return false
@@ -71,11 +72,25 @@ export const addAlphabetically = <TEntity extends Entity>(
   selector: (item: TEntity) => string
 ): void => {
   const index = array.findIndex(
-    (item) =>
-      selector(item).toLowerCase().localeCompare(selector(entity).toLowerCase()) > 0
+    (item) => selector(item).toLowerCase().localeCompare(selector(entity).toLowerCase()) > 0
   )
   if (index === -1) {
     array.unshift(entity)
+  } else {
+    array.splice(index, 0, entity)
+  }
+}
+
+export const addChronologically = <TEntity extends Entity>(
+  array: TEntity[],
+  entity: TEntity,
+  selector: (item: TEntity) => Date | string
+): void => {
+  const index = array.findIndex(
+    (arrayItem) => parseTime(selector(entity)) < parseTime(selector(arrayItem))
+  )
+  if (index === -1) {
+    array.push(entity)
   } else {
     array.splice(index, 0, entity)
   }

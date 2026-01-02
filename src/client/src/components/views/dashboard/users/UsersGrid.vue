@@ -3,7 +3,7 @@
     <div v-if="!isMobile">
       <DataTable
         :rows="10"
-        :value="userStore.items.filter((user) => user.registrationDate)"
+        :value="userStore.users.filter((user) => user.registrationDate)"
         data-key="id"
         paginator>
         <Column
@@ -27,7 +27,7 @@
         </Column>
         <template #footer>
           <Button
-            v-if="authStore.isInAnySpecifiedRole(Roles.organizer, Roles.admin)"
+            v-if="authStore.isInAnyRoles(Roles.organizer, Roles.admin)"
             label="Invite New User"
             @click="emit('newInvite')" />
         </template>
@@ -38,7 +38,7 @@
         :paginator-templat="mobilePaginatorTemplate"
         :paginator-template="mobilePaginatorTemplate"
         :rows="5"
-        :value="userStore.items.filter((user) => user.registrationDate)"
+        :value="userStore.users.filter((user) => user.registrationDate)"
         data-key="id"
         paginator>
         <template #empty>
@@ -69,12 +69,12 @@
                   @click="emit('createStreamer', user)" />
               </template>
             </ListItem>
-            <Divider v-if="index !== userStore.items.length - 1" />
+            <Divider v-if="index !== userStore.users.length - 1" />
           </div>
         </template>
         <template #footer>
           <Button
-            v-if="authStore.isInAnySpecifiedRole(Roles.organizer, Roles.admin)"
+            v-if="authStore.isInAnyRoles(Roles.organizer, Roles.admin)"
             label="Invite New User"
             style="width: 100%"
             @click="emit('newInvite')" />

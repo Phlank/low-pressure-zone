@@ -105,7 +105,7 @@ export const useAuthStore = defineStore('authStore', () => {
     return userInfo.value.roles.includes(roleToCheck)
   }
 
-  const isInAnySpecifiedRole = (...rolesToCheck: string[]): boolean => {
+  const isInAnyRoles = (...rolesToCheck: string[]): boolean => {
     if (rolesToCheck.length === 0) return true
 
     return hasIntersection(rolesToCheck, userInfo.value.roles)
@@ -129,7 +129,7 @@ export const useAuthStore = defineStore('authStore', () => {
     twoFactorLoginAsync,
     logoutAsync,
     isInRole,
-    isInAnySpecifiedRole,
+    isInAnyRoles,
     reset
   }
 })

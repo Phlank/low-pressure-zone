@@ -5,7 +5,7 @@ using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Adapter.AzuraCast.Mappers;
 using LowPressureZone.Api.Converters;
-using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
+using LowPressureZone.Api.Endpoints.Timeslots;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Models;
 using LowPressureZone.Api.Models.Configuration;

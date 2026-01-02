@@ -102,7 +102,7 @@ const availableUsers: ComputedRef<UserResponse[]> = computed(() => {
   const userIdsInUse = communities
     .getRelationships(props.community.id)
     .map((relationship) => relationship.userId)
-  const usersNotInUse = users.items.filter((user) => userIdsInUse.indexOf(user.id) === -1)
+  const usersNotInUse = users.users.filter((user) => userIdsInUse.indexOf(user.id) === -1)
   return usersNotInUse.filter((user) => !user.isAdmin)
 })
 

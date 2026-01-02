@@ -3,7 +3,7 @@
     <DataTable
       v-if="!isMobile"
       :rows="10"
-      :value="communities.items"
+      :value="communities.communities"
       data-key="id"
       paginator>
       <template #paginatorstart>
@@ -42,7 +42,7 @@
       v-else
       :paginator-template="mobilePaginatorTemplate"
       :rows="5"
-      :value="communities.items"
+      :value="communities.communities"
       paginator>
       <template #list="{ items }: { items: CommunityResponse[] }">
         <div
