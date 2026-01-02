@@ -19,7 +19,7 @@ import { isTrueString } from '@/utils/booleanUtils.ts'
 const authStore = useAuthStore()
 
 onMounted(async () => {
-  await authStore.loadIfNotInitialized()
+  await authStore.initializeAsync()
 })
 
 const isMobile: Ref<boolean> = ref(false)

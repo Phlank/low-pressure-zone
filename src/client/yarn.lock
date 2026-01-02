@@ -1232,10 +1232,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tsconfig/node22@npm:^22.0.5":
-  version: 22.0.5
-  resolution: "@tsconfig/node22@npm:22.0.5"
-  checksum: 10c0/c64b1d51e1556da9212463799f5096289d2cc8561eaed10cd0a0a36c25790b4c6bed30c0f846afccf8da75b5750326fa281216a908c2b67ead7b55adaf3eda22
+"@tsconfig/node-lts@npm:^24.0.0":
+  version: 24.0.0
+  resolution: "@tsconfig/node-lts@npm:24.0.0"
+  checksum: 10c0/63f5e2c576d4beb19e92ce32b22b132b013b66327137d7c54ee15f9b19812e2ed81bcc5d16ce32450ac7114e774d57100cabd4442571827ed50bfba58aaded0e
   languageName: node
   linkType: hard
 
@@ -3290,7 +3290,7 @@ __metadata:
   dependencies:
     "@primevue/core": "npm:^4.5.4"
     "@primevue/themes": "npm:^4.5.4"
-    "@tsconfig/node22": "npm:^22.0.5"
+    "@tsconfig/node-lts": "npm:^24.0.0"
     "@types/node": "npm:^24.10.4"
     "@typescript-eslint/eslint-plugin": "npm:^8.51.0"
     "@typescript-eslint/parser": "npm:^8.51.0"

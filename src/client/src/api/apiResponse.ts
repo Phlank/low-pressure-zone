@@ -1,6 +1,6 @@
 import httpStatus from '@/constants/httpStatus.ts'
 
-interface ApiResponseParameters<TRequest, TResponse> {
+interface ApiResponseParameters<TRequest = void, TResponse = void> {
   readonly status: number
   readonly headers?: Headers
   readonly data?: TResponse
@@ -8,7 +8,7 @@ interface ApiResponseParameters<TRequest, TResponse> {
   readonly error?: unknown
 }
 
-export class ApiResponse<TRequest, TResponse> {
+export class ApiResponse<TRequest = void, TResponse = void> {
   readonly status: number
   readonly headers?: Headers
   readonly body?: TResponse

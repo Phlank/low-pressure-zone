@@ -56,7 +56,7 @@
           :invalid="!validation.isValid('name')" />
       </IftaFormField>
       <IftaFormField
-        v-if="performerStore.performers.length > 0"
+        v-if="performerStore.items.length > 0"
         :message="validation.message('performerId')"
         input-id="performerInput"
         label="Performer"
@@ -73,7 +73,7 @@
           @change="() => validation.validateIfDirty('performerId')" />
       </IftaFormField>
       <IftaFormField
-        v-if="performerStore.performers.length === 0"
+        v-if="performerStore.items.length === 0"
         :message="validation.message('performerName')"
         input-id="performerNameInput"
         label="Performer Name"
@@ -86,7 +86,7 @@
           autofocus />
       </IftaFormField>
       <IftaFormField
-        v-if="performerStore.performers.length === 0"
+        v-if="performerStore.items.length === 0"
         :message="validation.message('performerUrl')"
         input-id="performerUrlInput"
         label="Performer URL"
@@ -281,13 +281,13 @@ const validation = createFormValidation(formState, {
   startsAt: timeslotRules.startsAt,
   duration: alwaysValid(),
   endsAt: timeslotRules.endsAt,
-  performerId: applyRuleIf(timeslotRules.performerId, () => performerStore.performers.length > 0),
+  performerId: applyRuleIf(timeslotRules.performerId, () => performerStore.items.length > 0),
   performanceType: timeslotRules.performanceType,
   name: timeslotRules.name,
   file: timeslotRules.file,
   replaceMedia: timeslotRules.replaceMedia,
-  performerName: applyRuleIf(performerRules.name, () => performerStore.performers.length === 0),
-  performerUrl: applyRuleIf(performerRules.url, () => performerStore.performers.length === 0)
+  performerName: applyRuleIf(performerRules.name, () => performerStore.items.length === 0),
+  performerUrl: applyRuleIf(performerRules.url, () => performerStore.items.length === 0)
 })
 
 const onFileSelect = (e: FileUploadSelectEvent) => {

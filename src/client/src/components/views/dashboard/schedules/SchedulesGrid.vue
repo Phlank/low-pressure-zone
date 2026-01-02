@@ -65,7 +65,7 @@
       header="Edit Schedule"
       modal>
       <ScheduleForm
-        :communities="communityStore.communities.filter((community) => community.isOrganizable)"
+        :communities="communityStore.items.filter((community) => community.isOrganizable)"
         :initial-state="editingSchedule"
         :schedule-id="editingId"
         align-actions="right"

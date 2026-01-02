@@ -1,117 +1,105 @@
 <template>
   <div class="communities-grid">
-    <div v-if="!isMobile">
-      <DataTable
-        :value="communities"
-        data-key="id">
-        <Column
-          field="name"
-          header="Name" />
-        <Column
-          field="url"
-          header="URL" />
-        <Column class="grid-action-col grid-action-col--2">
-          <template #body="{ data }: { data: CommunityResponse }">
-            <GridActions
-              :show-delete="data.isDeletable"
-              :show-edit="data.isEditable"
-              @delete="handleDeleteActionClick(data)"
-              @edit="handleEditActionClick(data)" />
-          </template>
-        </Column>
-      </DataTable>
-    </div>
-    <div v-else>
-      <ListItem
-        v-for="community in communities"
-        :key="community.id">
-        <template #left>
-          {{ community.name }}
+    <DataTable
+      v-if="!isMobile"
+      :rows="10"
+      :value="communities.items"
+      data-key="id"
+      paginator>
+      <template #paginatorstart>
+        <Button
+          v-if="auth.isInRole(roles.admin)"
+          label="Create Community"
+          style="width: 100%"
+          @click="emit('create')" />
+      </template>
+      <Column
+        field="name"
+        header="Name" />
+      <Column header="Roles">
+        <template #body="{ data }: { data: CommunityResponse }">
+          <div
+            v-for="role in getCommunityRoles(data)"
+            :key="role">
+            {{ role }}
+          </div>
         </template>
-        <template #right>
+      </Column>
+      <Column
+        field="url"
+        header="URL" />
+      <Column class="grid-action-col grid-action-col--2">
+        <template #body="{ data }: { data: CommunityResponse }">
           <GridActions
-            :show-delete="community.isDeletable"
-            :show-edit="community.isEditable"
-            @delete="handleDeleteActionClick(community)"
-            @edit="handleEditActionClick(community)" />
+            :show-delete="data.isDeletable"
+            :show-edit="data.isEditable"
+            @delete="emit('delete', data)"
+            @edit="emit('edit', data)" />
         </template>
-      </ListItem>
-    </div>
-    <div class="community-grid__dialogs">
-      <Dialog
-        v-model:visible="showEditDialog"
-        :draggable="false"
-        header="Edit Community"
-        modal>
-        <CommunityForm
-          :community-id="editingId"
-          :initial-state="editFormInitialState"
-          align-actions="right"
-          @after-submit="showEditDialog = false" />
-      </Dialog>
-      <DeleteDialog
-        :entity-name="deletingName"
-        :is-submitting="isSubmitting"
-        :visible="showDeleteDialog"
-        entity-type="community"
-        header="Delete Community"
-        @hide="showDeleteDialog = false"
-        @delete="handleDelete" />
-    </div>
+      </Column>
+    </DataTable>
+    <DataView
+      v-else
+      :paginator-template="mobilePaginatorTemplate"
+      :rows="5"
+      :value="communities.items"
+      paginator>
+      <template #list="{ items }: { items: CommunityResponse[] }">
+        <div
+          v-for="(community, index) in items"
+          :key="community.id">
+          <ListItem>
+            <template #left>
+              <span>{{ community.name }}</span>
+              <span class="text-s">{{ getCommunityRoles(community).join(', ') }}</span>
+            </template>
+            <template #right>
+              <GridActions
+                :show-delete="community.isDeletable"
+                :show-edit="community.isEditable"
+                @delete="emit('delete', community)"
+                @edit="emit('edit', community)" />
+            </template>
+          </ListItem>
+          <Divider v-if="index < items.length - 1" />
+        </div>
+      </template>
+      <template #footer>
+        <Button
+          v-if="auth.isInRole(roles.admin)"
+          label="Create Community"
+          style="width: 100%"
+          @click="emit('create')" />
+      </template>
+    </DataView>
   </div>
 </template>
 
 <script lang="ts" setup>
-import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
-import CommunityForm from '@/components/form/requestForms/CommunityForm.vue'
-import { showDeleteSuccessToast } from '@/utils/toastUtils'
-import { Column, DataTable, Dialog, useToast } from 'primevue'
-import { inject, ref, type Ref } from 'vue'
+import { Button, Column, DataTable, DataView, Divider } from 'primevue'
+import { inject, type Ref } from 'vue'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import ListItem from '@/components/data/ListItem.vue'
-import communitiesApi, {
-  type CommunityRequest,
-  type CommunityResponse
-} from '@/api/resources/communitiesApi.ts'
-import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import { type CommunityResponse } from '@/api/resources/communitiesApi.ts'
+import { useAuthStore } from '@/stores/authStore.ts'
+import roles from '@/constants/roles.ts'
 import { useCommunityStore } from '@/stores/communityStore.ts'
+import { mobilePaginatorTemplate } from '@/constants/componentTemplates.ts'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
-const isSubmitting = ref(false)
-const toast = useToast()
-const communityStore = useCommunityStore()
+const auth = useAuthStore()
+const communities = useCommunityStore()
 
-defineProps<{
-  communities: CommunityResponse[]
+const getCommunityRoles = (community: CommunityResponse): string[] => {
+  const roles: string[] = []
+  if (community.isPerformable) roles.push('Performer')
+  if (community.isOrganizable) roles.push('Organizer')
+  return roles
+}
+
+const emit = defineEmits<{
+  edit: [community: CommunityResponse]
+  delete: [community: CommunityResponse]
+  create: []
 }>()
-
-const showEditDialog = ref(false)
-const editFormInitialState: Ref<CommunityRequest> = ref({ name: '', url: '' })
-const editingId = ref('')
-
-const handleEditActionClick = (community: CommunityResponse) => {
-  editingId.value = community.id
-  editFormInitialState.value = community
-  showEditDialog.value = true
-}
-
-const showDeleteDialog = ref(false)
-let deletingId = ''
-const deletingName = ref('')
-const handleDeleteActionClick = (community: CommunityResponse) => {
-  deletingId = community.id
-  deletingName.value = community.name
-  showDeleteDialog.value = true
-}
-const handleDelete = async () => {
-  isSubmitting.value = true
-  const response = await communitiesApi.delete(deletingId)
-  isSubmitting.value = false
-
-  if (tryHandleUnsuccessfulResponse(response, toast)) return
-
-  showDeleteSuccessToast(toast, 'community', deletingName.value)
-  showDeleteDialog.value = false
-  communityStore.removeCommunity(deletingId)
-}
 </script>

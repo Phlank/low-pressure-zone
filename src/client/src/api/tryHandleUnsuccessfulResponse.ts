@@ -17,22 +17,22 @@ export default <TRequest extends object, TResponse>(
 ) => {
   if (response.isSuccess()) return false
   if (tryHandleFailure(response, toast)) return true
-  if (tryHandleInvalidResponse(response, toast, validation)) return true
+  if (tryHandleInvalidResponse(response, validation, toast)) return true
   showApiStatusToast(toast, response.status)
   return true
 }
 
-const tryHandleInvalidResponse = <TRequest extends object, TResponse>(
+export const tryHandleInvalidResponse = <TRequest extends object, TResponse>(
   response: ApiResponse<TRequest, TResponse>,
-  toast: ToastServiceMethods,
-  validation?: FormValidation<TRequest>
+  validation?: FormValidation<TRequest>,
+  toast?: ToastServiceMethods
 ): boolean => {
   if (!response.isInvalid()) return false
   if (validation != null) {
     validation.mapApiValidationErrors(response.getValidationErrors())
   }
   const unmappedErrors = response.getValidationErrors()['generalErrors'] ?? []
-  if (unmappedErrors.length > 0) {
+  if (unmappedErrors.length > 0 && toast) {
     toast.add({
       severity: 'error',
       summary: 'Error',

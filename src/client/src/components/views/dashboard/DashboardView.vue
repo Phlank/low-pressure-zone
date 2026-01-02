@@ -98,8 +98,8 @@ const menuItems: MenuItem[] = [
 ]
 
 onMounted(async () => {
-  await authStore.loadIfNotInitialized()
-  if (!authStore.isLoggedIn()) {
+  await authStore.initializeAsync()
+  if (!authStore.isLoggedIn) {
     await router.push('/')
   }
 })

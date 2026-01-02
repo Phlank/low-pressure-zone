@@ -14,16 +14,15 @@ export const useNewsStore = defineStore('newsStore', () => {
   const isLoading = ref(true)
   const toast = useToast()
 
-  const autoRefreshing = ref(false)
+  let autoRefreshing = false
   const autoRefresh = async () => {
-    if (autoRefreshing.value) return
-    autoRefreshing.value = true
-    while (autoRefreshing.value) {
+    if (autoRefreshing) return
+    autoRefreshing = true
+    while (autoRefreshing) {
       await delay(300000)
       await refresh()
     }
   }
-
   const refresh = async () => {
     const response = await newsApi.get()
     if (tryHandleUnsuccessfulResponse(response, toast)) return
@@ -55,7 +54,7 @@ export const useNewsStore = defineStore('newsStore', () => {
     id: string,
     formState: Ref<NewsRequest>,
     validation: FormValidation<NewsRequest>
-  ): Promise<Result<void, void>> => {
+  ): Promise<Result> => {
     const entity = getEntity(items.value, id)
     if (!entity) return err()
     if (!validation.validate()) return err()

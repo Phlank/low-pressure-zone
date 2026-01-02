@@ -7,7 +7,7 @@
         <Tab value="upcoming">Upcoming</Tab>
         <Tab value="past">Past</Tab>
         <Tab
-          v-if="communityStore.organizableCommunities.length > 0"
+          v-if="communities.organizableCommunities.length > 0"
           value="create">
           Create
         </Tab>
@@ -20,12 +20,12 @@
           <SchedulesGrid :schedules="scheduleStore.pastSchedules" />
         </TabPanel>
         <TabPanel
-          v-if="communityStore.organizableCommunities.length > 0"
+          v-if="communities.organizableCommunities.length > 0"
           value="create">
           <h4>Create New Schedule</h4>
           <ScheduleForm
             ref="createForm"
-            :communities="communityStore.organizableCommunities" />
+            :communities="communities.organizableCommunities" />
         </TabPanel>
       </TabPanels>
       <Skeleton
@@ -45,24 +45,12 @@ import { useScheduleStore } from '@/stores/scheduleStore.ts'
 import { usePerformerStore } from '@/stores/performerStore.ts'
 
 const scheduleStore = useScheduleStore()
-const communityStore = useCommunityStore()
-const performerStore = usePerformerStore()
+const communities = useCommunityStore()
 const isLoaded = ref(false)
 const tabValue: Ref<string | number> = ref('upcoming')
 
 onMounted(async () => {
-  await load()
+  if (scheduleStore.schedules.length === 0) await scheduleStore.loadDefaultSchedulesAsync()
   isLoaded.value = true
 })
-
-const load = async () => {
-  const loadingPromises: Promise<unknown>[] = []
-  if (communityStore.communities.length === 0)
-    loadingPromises.push(communityStore.loadCommunitiesAsync())
-  if (scheduleStore.schedules.length === 0)
-    loadingPromises.push(scheduleStore.loadDefaultSchedulesAsync())
-  if (performerStore.performers.length === 0)
-    loadingPromises.push(performerStore.loadPerformersAsync())
-  await Promise.all(loadingPromises)
-}
 </script>

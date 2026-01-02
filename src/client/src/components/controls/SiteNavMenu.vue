@@ -82,48 +82,40 @@ import roles from '@/constants/roles.ts'
 
 const router = useRouter()
 const navMenuRef = useTemplateRef('navMenuRef')
-const authStore = useAuthStore()
+const auth = useAuthStore()
 const discordInvite = import.meta.env.VITE_DISCORD_INVITE_LINK
 const githubUrl = import.meta.env.VITE_GITHUB_URL
 const soundcloudUrl = import.meta.env.VITE_SOUNDCLOUD_URL
 const isDarkMode: Ref<boolean> = inject('isDarkMode', ref(true))
 
-const navMenuItems = computed(() => {
-  if (authStore.isLoggedIn()) {
-    return loggedInNavMenuItems
-  } else {
-    return loggedOutNavMenuItems
-  }
-})
-
-const loggedInNavMenuItems: MenuItem[] = [
+const navMenuItems: MenuItem[] = [
+  {
+    label: 'Login',
+    labelString: 'Login',
+    icon: 'pi pi-sign-in',
+    route: '/user/login',
+    visible: () => !auth.isLoggedIn
+  },
   {
     label: 'Dashboard',
     labelString: 'Dashboard',
     icon: 'pi pi-cog',
     route: '/dashboard',
-    visible: true
+    visible: () => auth.isLoggedIn
   },
   {
     label: 'Admin',
     labelString: 'Admin',
     icon: 'pi pi-sliders-h',
     route: '/admin',
-    visible: () => authStore.isInRole(roles.admin)
+    visible: () => auth.isInRole(roles.admin)
   },
   {
     label: 'Logout',
     labelString: 'Logout',
     icon: 'pi pi-sign-out',
-    callback: async () => {
-      await authStore.loadIfNotInitialized()
-      if (authStore.isLoggedIn()) {
-        await authApi.getLogout()
-      }
-      await authStore.load()
-      await router.push(Routes.Home)
-    },
-    visible: true
+    callback: async () => await auth.logoutAsync(),
+    visible: () => auth.isLoggedIn
   },
   {
     label: 'Github',
@@ -147,40 +139,8 @@ const loggedInNavMenuItems: MenuItem[] = [
     visible: true
   }
 ]
-
-const loggedOutNavMenuItems: MenuItem[] = [
-  {
-    label: 'Login',
-    labelString: 'Login',
-    icon: 'pi pi-sign-in',
-    route: '/user/login',
-    visible: true
-  },
-  {
-    label: 'Github',
-    labelString: 'Github',
-    icon: 'pi pi-github',
-    href: githubUrl,
-    visible: true
-  },
-  {
-    label: 'Chat',
-    labelString: 'Chat',
-    icon: 'pi pi-discord',
-    href: discordInvite,
-    visible: () => window.innerWidth < 240
-  },
-  {
-    label: 'Soundcloud',
-    labelString: 'Soundcloud',
-    href: soundcloudUrl,
-    iconSvg: () => (isDarkMode.value ? '/soundcloud-logo-white.svg' : '/soundcloud-logo-black.svg'),
-    visible: true
-  }
-]
-
 onMounted(async () => {
-  await authStore.loadIfNotInitialized()
+  await auth.initializeAsync()
 })
 
 const toggleMenu = (event: MouseEvent) => {
