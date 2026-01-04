@@ -56,8 +56,8 @@
         </template>
         <template #expansion="rowProps">
           <TimeslotsGrid
-            :disabled="false"
-            :schedule="rowProps.data" />
+            :schedule="rowProps.data"
+            :disabled="false" />
         </template>
         <template #paginatorstart>
           <Button

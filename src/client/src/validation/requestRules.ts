@@ -51,6 +51,7 @@ export const timeslotRequestRules = (
   formState: TimeslotRequest
 ): PropertyRules<TimeslotRequest> => {
   return {
+    scheduleId: required(),
     performerId: required(),
     performanceType: required(),
     startsAt: combineRules(required(), hourOnly()),

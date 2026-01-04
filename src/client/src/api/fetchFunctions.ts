@@ -41,7 +41,7 @@ const sendRequest = async <TRequest, TResponse = void>(
   } catch (error: unknown) {
     return new ApiResponse<TRequest, TResponse>({
       status: 0,
-      error: error
+      failure: error
     })
   }
 }

@@ -26,12 +26,12 @@
         style="height: 300px" />
       <FormDrawer
         v-model:visible="showFormDrawer"
-        :is-submitting="formRef?.isSubmitting"
+        :is-submitting="scheduleFormRef?.isSubmitting"
         :title="editingSchedule ? 'Edit Schedule' : 'Create Schedule'"
-        @reset="formRef?.reset"
-        @submit="formRef?.submit">
+        @reset="scheduleFormRef?.reset"
+        @submit="scheduleFormRef?.submit">
         <ScheduleForm
-          ref="formRef"
+          ref="scheduleFormRef"
           :availableCommunities="communities.organizableCommunities"
           :schedule="editingSchedule"
           @submitted="showFormDrawer = false" />
@@ -66,7 +66,7 @@ const tabValue: Ref<string | number> = ref('upcoming')
 
 const showFormDrawer = ref(false)
 const editingSchedule: Ref<ScheduleResponse | undefined> = ref(undefined)
-const formRef = useTemplateRef('formRef')
+const scheduleFormRef = useTemplateRef('scheduleFormRef')
 const handleCreate = () => {
   editingSchedule.value = undefined
   showFormDrawer.value = true

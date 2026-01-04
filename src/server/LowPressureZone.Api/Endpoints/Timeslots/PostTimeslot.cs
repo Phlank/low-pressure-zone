@@ -22,7 +22,7 @@ public partial class PostTimeslot(
     {
         AllowFormData();
         AllowFileUploads();
-        Post("/schedules/{scheduleId}/timeslots");
+        Post("/timeslots");
         Description(builder => builder.Produces(201));
     }
 
@@ -75,7 +75,7 @@ public partial class PostTimeslot(
         HttpContext.ExposeLocation();
         await SendCreatedAtAsync<GetTimeslotById>(new
         {
-            id = timeslot.Id
+            timeslot.Id
         }, Response, cancellation: ct);
     }
 

@@ -30,9 +30,9 @@ public sealed class TimeslotRequestValidator : Validator<TimeslotRequest>
 
         RuleFor(t => t).CustomAsync(async (request, context, ct) =>
         {
-            var timeslotId = contextAccessor.GetGuidRouteParameterOrDefault("timeslotId");
+            var id = contextAccessor.GetGuidRouteParameterOrDefault("id");
 
-            ValidateFile(request, timeslotId, context);
+            ValidateFile(request, id, context);
 
             var dataContext = Resolve<DataContext>();
             var schedule = await dataContext.Schedules
@@ -55,7 +55,7 @@ public sealed class TimeslotRequestValidator : Validator<TimeslotRequest>
                 context.AddFailure(nameof(request.StartsAt), Errors.OutOfScheduleRange);
             if (request.EndsAt < schedule.StartsAt || request.EndsAt > schedule.EndsAt)
                 context.AddFailure(nameof(request.EndsAt), Errors.OutOfScheduleRange);
-            if (schedule.Timeslots.WhereOverlaps(request).Any(timeslot => timeslot.Id != timeslotId))
+            if (schedule.Timeslots.WhereOverlaps(request).Any(timeslot => timeslot.Id != id))
             {
                 context.AddFailure(nameof(request.StartsAt), Errors.OverlapsOtherTimeslot);
                 context.AddFailure(nameof(request.EndsAt), Errors.OverlapsOtherTimeslot);

@@ -41,7 +41,7 @@ const sendXhrRequest = async <TRequest extends object, TResponse = never>(
       resolve(
         new ApiResponse<TRequest, TResponse>({
           status: 0,
-          error: new Error(`XHR request error; event phase: ${event.eventPhase}`)
+          failure: new Error(`XHR request error; event phase: ${event.eventPhase}`)
         })
       )
     }

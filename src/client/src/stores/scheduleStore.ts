@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
-import { computed, type Ref, ref } from 'vue'
+import { computed, type ComputedRef, type Ref, ref } from 'vue'
 import schedulesApi, { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
-import timeslotsApi from '@/api/resources/timeslotsApi.ts'
+import timeslotsApi, { type TimeslotResponse } from '@/api/resources/timeslotsApi.ts'
 import { addDays, compareAsc, getTime } from 'date-fns'
 import { useRefresh } from '@/composables/useRefresh.ts'
 import {
@@ -11,16 +11,25 @@ import {
 } from '@/utils/storeFunctions.ts'
 import { useCommunityStore } from '@/stores/communityStore.ts'
 import { useToast } from 'primevue'
-import { addChronologically, getEntityMap, removeEntity } from '@/utils/arrayUtils.ts'
-import {showCreateSuccessToast, showDeleteSuccessToast, showEditSuccessToast } from '@/utils/toastUtils.ts'
+import { addChronologically, getEntity, getEntityMap, removeEntity } from '@/utils/arrayUtils.ts'
+import {
+  showCreateSuccessToast,
+  showDeleteSuccessToast,
+  showEditSuccessToast
+} from '@/utils/toastUtils.ts'
 import { parseDate } from '@/utils/dateUtils.ts'
+import { usePerformerStore } from '@/stores/performerStore.ts'
 
 const DEFAULT_SCHEDULE_DAY_RANGE = 30
 
 export const useScheduleStore = defineStore('scheduleStore', () => {
   const schedules: Ref<ScheduleResponse[]> = ref([])
   const schedulesMap: Ref<Partial<Record<string, ScheduleResponse>>> = ref({})
+  const timeslots: ComputedRef<TimeslotResponse[]> = computed(() =>
+    schedules.value.map((schedule) => schedule.timeslots).flat()
+  )
   const toast = useToast()
+  const performers = usePerformerStore()
   const { getCommunityById } = useCommunityStore()
 
   const { isLoading } = useRefresh(
@@ -51,6 +60,10 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
     schedules.value.sort((a, b) => compareAsc(a.endsAt, b.endsAt))
     return schedules.value.find((schedule) => getTime(schedule.endsAt) > Date.now())
   })
+
+  const getScheduleById = (id: string): ScheduleResponse | undefined => {
+    return schedulesMap.value[id]
+  }
 
   const createSchedule = useCreatePersistentItemFn(
     schedulesApi.post,
@@ -98,12 +111,59 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
     toast
   )
 
-  const reloadTimeslotsAsync = async (scheduleId: string): Promise<void> => {
-    if (schedulesMap.value[scheduleId] === undefined) return
-    const response = await timeslotsApi.get(scheduleId)
-    if (!response.isSuccess()) return
-    schedulesMap.value[scheduleId].timeslots = response.data()
-  }
+  const getTimeslotById = (id: string) => getEntity(timeslots.value, id)
+
+  const createTimeslot = useCreatePersistentItemFn(
+    timeslotsApi.post,
+    (id, form) => {
+      const schedule = getEntity(schedules.value, form.scheduleId)
+      const performer = performers.getById(form.performerId)
+      if (!schedule || !performer) throw Error('Schedule or performer not found')
+      const entity = {
+        id,
+        scheduleId: form.scheduleId,
+        performer: performer,
+        performanceType: form.performanceType,
+        name: form.name,
+        startsAt: form.startsAt,
+        endsAt: form.endsAt,
+        isEditable: true,
+        isDeletable: true,
+        uploadedFileName: form.file?.name ?? null
+      }
+      addChronologically(schedule.timeslots, entity, (timeslot) => timeslot.startsAt)
+    },
+    toast
+  )
+
+  const updateTimeslot = useUpdatePersistentItemFn(
+    timeslots,
+    timeslotsApi.put,
+    (form, entity) => {
+      entity.performanceType = form.performanceType
+      entity.name = form.name
+      entity.startsAt = form.startsAt
+      entity.endsAt = form.endsAt
+      if (form.replaceMedia && form.file) {
+        entity.uploadedFileName = form.file.name
+      }
+      entity.performer = performers.getById(form.performerId)!
+      showEditSuccessToast(toast, 'Timeslot', parseDate(entity.startsAt).toLocaleString())
+    },
+    toast
+  )
+
+  const removeTimeslot = useRemovePersistentItemFn(
+    timeslots,
+    timeslotsApi.delete,
+    (entity) => {
+      const schedule = schedulesMap.value[entity.scheduleId]
+      if (!schedule) return
+      removeEntity(schedule.timeslots, entity.id)
+      showDeleteSuccessToast(toast, 'Timeslot', parseDate(entity.startsAt).toLocaleString())
+    },
+    toast
+  )
 
   return {
     isLoading,
@@ -111,9 +171,13 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
     schedules: getSchedules,
     upcomingSchedules,
     pastSchedules,
-    reloadTimeslotsAsync,
-    createSchedule: createSchedule,
+    getScheduleById,
+    createSchedule,
     removeSchedule,
-    updateSchedule
+    updateSchedule,
+    getTimeslotById,
+    createTimeslot,
+    updateTimeslot,
+    removeTimeslot
   }
 })

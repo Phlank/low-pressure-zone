@@ -12,7 +12,7 @@ public class PutTimeslot(DataContext dataContext, PrerecordedMixFileProcessor fi
 {
     public override void Configure()
     {
-        Put("/schedules/{scheduleId}/timeslots/{timeslotId}");
+        Put("/timeslots/{id}");
         AllowFormData();
         AllowFileUploads();
         Description(builder => builder.Produces(204)
@@ -21,7 +21,7 @@ public class PutTimeslot(DataContext dataContext, PrerecordedMixFileProcessor fi
 
     public override async Task HandleAsync(TimeslotRequest request, CancellationToken ct)
     {
-        var timeslotId = Route<Guid>("timeslotId");
+        var timeslotId = Route<Guid>("id");
 
         var timeslot = await dataContext.Timeslots
                                         .Include(timeslot => timeslot.Performer)

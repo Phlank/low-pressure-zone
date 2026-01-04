@@ -25,3 +25,7 @@ div.p-drawer {
     border-style: solid none none none;
   }
 }
+
+.p-progressbar-determinate .p-progressbar-value {
+  transition: width 0.1s ease-in-out !important;
+}

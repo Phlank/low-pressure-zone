@@ -12,13 +12,14 @@ import type { ApiResponse } from './apiResponse'
  */
 export default <TRequest extends object, TResponse>(
   response: ApiResponse<TRequest, TResponse>,
-  toast: ToastServiceMethods,
+  toast?: ToastServiceMethods,
   validation?: FormValidation<TRequest>
 ) => {
   if (response.isSuccess()) return false
   if (tryHandleFailure(response, toast)) return true
   if (tryHandleInvalidResponse(response, validation, toast)) return true
-  showApiStatusToast(toast, response.status)
+  if (toast) showApiStatusToast(toast, response.status)
+  else console.error('API request failed with status ' + response.status)
   return true
 }
 
@@ -32,25 +33,30 @@ export const tryHandleInvalidResponse = <TRequest extends object, TResponse>(
     validation.mapApiValidationErrors(response.getValidationErrors())
   }
   const unmappedErrors = response.getValidationErrors()['generalErrors'] ?? []
-  if (unmappedErrors.length > 0 && toast) {
-    toast.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: unmappedErrors.join('\n'),
-      life: 7000
-    })
+  if (unmappedErrors.length > 0) {
+    if (toast)
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: unmappedErrors.join('\n'),
+        life: 7000
+      })
+    else console.error(unmappedErrors.join('\n'))
   }
   return true
 }
 
-const tryHandleFailure = (response: ApiResponse<object, unknown>, toast: ToastServiceMethods) => {
+const tryHandleFailure = (response: ApiResponse<object, unknown>, toast?: ToastServiceMethods) => {
   if (response.isFailure()) {
-    toast.add({
-      severity: 'error',
-      summary: 'HTTP Failure',
-      detail: 'There was an issue when sending a request to the API. Is the API operational?',
-      life: 7000
-    })
+    if (toast)
+      toast.add({
+        severity: 'error',
+        summary: 'HTTP Failure',
+        detail: 'There was an issue when sending a request to the API. Is the API operational?',
+        life: 7000
+      })
+    else
+      console.error('There was an issue when sending a request to the API. Is the API operational?')
     return true
   }
   return false

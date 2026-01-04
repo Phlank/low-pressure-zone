@@ -10,13 +10,13 @@ public class GetTimeslotById : EndpointWithoutRequest<TimeslotResponse, Timeslot
 
     public override void Configure()
     {
-        Get("/timeslots/{timeslotId}");
+        Get("/timeslots/{id}");
         Description(builder => builder.Produces(404));
     }
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var timeslotId = Route<Guid>("timeslotId");
+        var timeslotId = Route<Guid>("id");
 
         var timeslot = await DataContext.Timeslots
                                         .AsNoTracking()
