@@ -28,9 +28,7 @@ export const useAuthStore = defineStore('authStore', () => {
   let initializePromise: Promise<void> | null = null
   const initializeAsync = async () => {
     if (isInitialized) return
-    if (initializePromise === null) {
-      initializePromise = reloadAsync()
-    }
+    initializePromise ??= null
     await initializePromise
   }
   const reloadAsync = async () => {

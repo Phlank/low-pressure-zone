@@ -99,11 +99,10 @@ const props = defineProps<{
 }>()
 
 const availableUsers: ComputedRef<UserResponse[]> = computed(() => {
-  const userIdsInUse = communities
+  const userIdsInUse = new Set(communities
     .getRelationships(props.community.id)
-    .map((relationship) => relationship.userId)
-  const usersNotInUse = users.users.filter((user) => userIdsInUse.includes(user.id))
-  return usersNotInUse.filter((user) => !user.isAdmin)
+    .map((relationship) => relationship.userId))
+  return users.users.filter((user) => userIdsInUse.has(user.id) && !user.isAdmin)
 })
 
 const getMobileRelationshipText = (relationship: CommunityRelationshipResponse) => {
