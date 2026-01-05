@@ -1,5 +1,6 @@
 ﻿<template>
   <Dialog
+    v-bind="$attrs"
     :draggable="false"
     :header="header"
     class="confirm-dialog"

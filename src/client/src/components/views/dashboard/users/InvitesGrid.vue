@@ -43,7 +43,7 @@
           :key="invite.id">
           <ListItem>
             <template #left>
-              <span classs="ellipsis">{{ invite.email }}</span>
+              <span class="ellipsis">{{ invite.email }}</span>
               <span class="ellipsis text-s">
                 {{ parseDate(invite.invitedAt).toLocaleDateString() }}
               </span>

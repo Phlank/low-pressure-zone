@@ -49,7 +49,6 @@ provide('isDarkMode', isDarkMode)
 
 .app {
   width: 100%;
-  //width: 100%;
 
   &__toast {
     max-width: calc(100vw - 2 * #{variables.$space-l});

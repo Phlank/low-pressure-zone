@@ -12,11 +12,11 @@ import {
 } from '@/utils/storeFns.ts'
 
 export const useNewsStore = defineStore('newsStore', () => {
-  const users: Ref<NewsResponse[]> = ref([])
+  const newsItems: Ref<NewsResponse[]> = ref([])
   const toast = useToast()
 
   useRefresh(newsApi.get, (data) => {
-    users.value = data
+    newsItems.value = data
   })
 
   const create = useCreatePersistentItemFn(
@@ -27,14 +27,14 @@ export const useNewsStore = defineStore('newsStore', () => {
         createdAt: new Date().toUTCString(),
         ...form
       }
-      users.value.unshift(entity)
+      newsItems.value.unshift(entity)
       showSuccessToast(toast, 'Created', 'News', form.title)
     },
     toast
   )
 
   const update = useUpdatePersistentItemFn(
-    users,
+    newsItems,
     newsApi.put,
     (form, entity) => {
       entity.title = form.title
@@ -45,15 +45,15 @@ export const useNewsStore = defineStore('newsStore', () => {
   )
 
   const remove = useRemovePersistentItemFn(
-    users,
+    newsItems,
     newsApi.delete,
     (entity) => {
-      removeEntity(users.value, entity.id)
+      removeEntity(newsItems.value, entity.id)
       showDeleteSuccessToast(toast, 'News', entity.title)
     },
     toast
   )
-  const getItems = computed(() => users.value)
+  const getNewsItems = computed(() => newsItems.value)
 
-  return { users: getItems, create, update, remove }
+  return { newsItems: getNewsItems, create, update, remove }
 })
