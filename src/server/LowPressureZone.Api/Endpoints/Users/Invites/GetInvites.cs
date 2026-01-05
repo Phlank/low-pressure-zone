@@ -31,7 +31,8 @@ public class GetInvites(IdentityContext identityContext, DataContext dataContext
                                                .Where(relationship => userIds.Contains(relationship.UserId))
                                                .GroupBy(relationship => relationship.UserId)
                                                .ToDictionaryAsync(grouping => grouping.Key,
-                                                                  grouping => grouping.Select(group => group.CommunityId), ct);
+                                                                  grouping =>
+                                                                      grouping.Select(group => group.CommunityId), ct);
 
         var responses = invites.Where(invitation => userCommunities.ContainsKey(invitation.UserId))
                                .Select(invitation => Map.FromEntity(invitation, userCommunities[invitation.UserId]));

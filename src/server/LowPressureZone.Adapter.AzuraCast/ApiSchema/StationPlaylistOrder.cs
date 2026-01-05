@@ -7,8 +7,10 @@ public enum StationPlaylistOrder
 {
     [JsonStringEnumMemberName("random")]
     Random,
+
     [JsonStringEnumMemberName("shuffle")]
     Shuffle,
+
     [JsonStringEnumMemberName("sequential")]
     Sequential
 }

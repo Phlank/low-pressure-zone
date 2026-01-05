@@ -102,9 +102,7 @@ public sealed class TimeslotRequestValidator : Validator<TimeslotRequest>
 
         if (request.File is not null
             && !request.File.ContentType.StartsWithAny(MimeTypes.AudioMimeTypes))
-        {
             context.AddFailure(nameof(request.File), Errors.InvalidFileType);
-        }
     }
 
     public static ICollection<ValidationFailure> ValidateMediaAnalysis(TimeslotRequest request, IMediaAnalysis analysis)
@@ -116,10 +114,8 @@ public sealed class TimeslotRequestValidator : Validator<TimeslotRequest>
             analysis.Duration
             || TimeSpan.FromMinutes(timeslotDuration.TotalMinutes + PrerecordedDurationMinutesTolerance) <
             analysis.Duration)
-        {
             failures.Add(new ValidationFailure(nameof(request.File),
                                                "Media file duration does not match the specified timeslot duration. Ensure it is +/- 2 minutes from the timeslot duration."));
-        }
 
         failures.AddRange(AudioQualityValidator.ValidateAudioQuality(analysis, request.File.Length,
                                                                      nameof(request.File)));

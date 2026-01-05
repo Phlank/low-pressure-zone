@@ -46,7 +46,6 @@ export const entitiesExceptIds = <T extends Entity>(source: T[], exceptIds: stri
   if (source.length === 0) return []
   if (exceptIds.length === 0) return [...source]
   const output: T[] = [...source]
-  source = [...source].sort((a, b) => a.id.localeCompare(b.id))
   for (const id of exceptIds) {
     const index = output.findIndex((item) => item.id === id)
     if (index !== -1) {

@@ -4,7 +4,7 @@ public static class DateTimeUtilities
 {
     public static DateTime GetNextHour(int hour)
     {
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(hour, 23, nameof(hour));
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(hour, 23);
         var now = DateTime.UtcNow;
         if (now.Hour < hour)
             return new DateTime(now.Year, now.Month, now.Day, hour, 0, 0);

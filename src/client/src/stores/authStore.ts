@@ -1,6 +1,6 @@
 import { hasIntersection } from '@/utils/arrayUtils'
 import { defineStore } from 'pinia'
-import { computed, ref, type Ref, watch} from 'vue'
+import { computed, ref, type Ref } from 'vue'
 import authApi, {
   type LoginRequest,
   type TwoFactorRequest,
@@ -28,7 +28,7 @@ export const useAuthStore = defineStore('authStore', () => {
   let initializePromise: Promise<void> | null = null
   const initializeAsync = async () => {
     if (isInitialized) return
-    if (!initializePromise) {
+    if (initializePromise === null) {
       initializePromise = reloadAsync()
     }
     await initializePromise

@@ -7,8 +7,10 @@ public enum StationPlaylistBackendOption
 {
     [JsonStringEnumMemberName("interrupt")]
     Interrupt,
+
     [JsonStringEnumMemberName("single_track")]
     SingleTrack,
+
     [JsonStringEnumMemberName("merge")]
     Merge
 }

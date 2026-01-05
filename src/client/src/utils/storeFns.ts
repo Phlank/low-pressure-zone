@@ -23,8 +23,10 @@ export const useCreatePersistentItemFn =
     if (progressRef && apiFunction.length === 2)
       response = await apiFunction(formState.value, progressRef)
     else response = await apiFunction(formState.value)
-    if (toast && tryHandleUnsuccessfulResponse(response, toast, validation)) return err()
-    else if (!response.isSuccess()) return err()
+    if (!response.isSuccess()) {
+      if (toast) tryHandleUnsuccessfulResponse(response, toast, validation)
+      return err()
+    }
     onSuccess(response.getCreatedId(), formState.value)
     return ok()
   }
@@ -53,8 +55,10 @@ export const useUpdatePersistentItemFn =
     if (progressRef && apiFunction.length === 3)
       response = await apiFunction(id, formState.value, progressRef)
     else response = await apiFunction(id, formState.value)
-    if (toast && tryHandleUnsuccessfulResponse(response, toast, validation)) return err()
-    else if (!response.isSuccess()) return err()
+    if (!response.isSuccess()) {
+      if (toast) tryHandleUnsuccessfulResponse(response, toast, validation)
+      return err()
+    }
     onSuccess(formState.value, entity)
     return ok()
   }
@@ -70,8 +74,10 @@ export const useRemovePersistentItemFn =
     const entity = getEntity(entities.value, id)
     if (!entity) return err()
     const response = await apiFunction(id)
-    if (toast && tryHandleUnsuccessfulResponse(response, toast)) return err()
-    else if (!response.isSuccess()) return err()
+    if (!response.isSuccess()) {
+      if (toast) tryHandleUnsuccessfulResponse(response, toast)
+      return err()
+    }
     onSuccess(entity)
     return ok()
   }
@@ -85,8 +91,10 @@ export const useUpdateSettingFn =
   async (formState: Ref<TSettings>, validation: FormValidation<TSettings>) => {
     if (!validation.validate()) return err()
     const response = await apiFunction(formState.value)
-    if (toast && tryHandleUnsuccessfulResponse(response, toast, validation)) return err()
-    else if (!response.isSuccess()) return err()
+    if (!response.isSuccess()) {
+      if (toast) tryHandleUnsuccessfulResponse(response, toast, validation)
+      return err()
+    }
     onSuccess(formState.value)
     return ok()
   }

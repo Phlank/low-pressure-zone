@@ -47,14 +47,14 @@ public class PutTimeslot(DataContext dataContext, PrerecordedMixFileProcessor fi
             var updateAzuraCastResult = await fileProcessor.UpdateEnqueuedPrerecordedMixAsync(timeslotId, request, ct);
             if (updateAzuraCastResult.IsError)
                 ValidationFailures.AddRange(updateAzuraCastResult.Error);
-            
+
             ThrowIfAnyErrors();
             timeslot.AzuraCastMediaId = updateAzuraCastResult.Value;
         }
 
         Map.UpdateEntity(request, timeslot);
         _ = await dataContext.SaveChangesAsync(ct);
-        
+
         await SendNoContentAsync(ct);
     }
 }

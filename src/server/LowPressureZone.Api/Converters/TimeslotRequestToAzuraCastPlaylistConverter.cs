@@ -31,7 +31,7 @@ public sealed class TimeslotRequestToAzuraCastPlaylistConverter(DataContext data
 
         var playlistEnd = source.EndsAt.AddMinutes(5);
 
-        return Result.Ok<StationPlaylist, ValidationFailure>(new()
+        return Result.Ok<StationPlaylist, ValidationFailure>(new StationPlaylist
         {
             IsEnabled = true,
             Name = $"Prerecorded Slot - {performer.Name} - {title}",

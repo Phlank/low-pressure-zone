@@ -48,7 +48,7 @@ export const useRefresh = <TResponse, TParams = void>(
   const refresh = async () => {
     let response: ApiResponse<void, TResponse>
     if (apiFn.length === 0) response = await apiFn()
-    else response = await apiFn(options?.params as TParams)
+    else response = await apiFn(options?.params)
     if (!response.isSuccess()) return
     onRefresh(response.data())
   }

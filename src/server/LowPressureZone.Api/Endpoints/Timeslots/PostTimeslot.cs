@@ -1,6 +1,5 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Constants;
-using LowPressureZone.Api.Endpoints.Schedules;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services.Files;
@@ -47,7 +46,7 @@ public partial class PostTimeslot(
         }
 
         var timeslot = Map.ToEntity(request);
-        
+
         if (request.PerformanceType == PerformanceTypes.Prerecorded
             && request.File is not null)
         {
@@ -69,7 +68,7 @@ public partial class PostTimeslot(
 
             _ = await fileSaver.DeleteFileAsync(processResult.Value);
         }
-        
+
         dataContext.Timeslots.Add(timeslot);
         await dataContext.SaveChangesAsync(ct);
         HttpContext.ExposeLocation();

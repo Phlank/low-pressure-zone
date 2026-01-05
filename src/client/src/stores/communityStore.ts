@@ -10,7 +10,6 @@ import communityRelationshipsApi, {
 } from '@/api/resources/communityRelationshipsApi.ts'
 import { useToast } from 'primevue'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
-import delay from '@/utils/delay.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
 import roles from '@/constants/roles.ts'
 import { err, ok, type Result } from '@/types/result.ts'
@@ -19,7 +18,7 @@ import { getEntity, removeEntity } from '@/utils/arrayUtils.ts'
 import type { FormValidation } from '@/validation/types/formValidation.ts'
 import { showSuccessToast } from '@/utils/toastUtils.ts'
 import { useUserStore } from '@/stores/userStore.ts'
-import {useRefresh} from "@/composables/useRefresh.ts";
+import { useRefresh } from '@/composables/useRefresh.ts'
 
 export const useCommunityStore = defineStore('communityStore', () => {
   const communities: Ref<CommunityResponse[]> = ref([])

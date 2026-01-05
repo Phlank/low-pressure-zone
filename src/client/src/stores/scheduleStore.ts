@@ -27,7 +27,7 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
   const schedules: Ref<ScheduleResponse[]> = ref([])
   const schedulesMap: Ref<Partial<Record<string, ScheduleResponse>>> = ref({})
   const timeslots: ComputedRef<TimeslotResponse[]> = computed(() =>
-    schedules.value.map((schedule) => schedule.timeslots).flat()
+    schedules.value.flatMap((schedule) => schedule.timeslots)
   )
   const toast = useToast()
   const performers = usePerformerStore()
@@ -37,7 +37,7 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
   const { isLoading, refresh } = useRefresh(
     schedulesApi.get,
     (data) => {
-      schedules.value = data.sort((a, b) => compareAsc(a.endsAt, b.endsAt))
+      schedules.value = [...data].sort((a, b) => compareAsc(a.endsAt, b.endsAt))
       schedulesMap.value = getEntityMap(data)
     },
     {
@@ -126,7 +126,7 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
     (id, form) => {
       const schedule = getEntity(schedules.value, form.scheduleId)
       const performer = performers.getById(form.performerId)
-      if (!schedule || !performer) throw Error('Schedule or performer not found')
+      if (!schedule || !performer) throw new Error('Schedule or performer not found')
       const entity = {
         id,
         scheduleId: form.scheduleId,

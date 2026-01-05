@@ -1,6 +1,5 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Endpoints.Performers;
-using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain.Entities;
 using Shouldly;
@@ -23,7 +22,7 @@ public sealed class TimeslotMapper(
             ScheduleId = req.ScheduleId,
             UploadedFileName = req.File?.FileName
         };
-    
+
     public void UpdateEntity(TimeslotRequest req, Timeslot timeslot)
     {
         timeslot.Name = req.Name?.Trim();
