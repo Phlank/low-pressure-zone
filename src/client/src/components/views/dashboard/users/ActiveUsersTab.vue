@@ -37,5 +37,3 @@ const handleNewInvite = () => {
   isDrawerVisible.value = true
 }
 </script>
-
-<style lang="scss" scoped></style>

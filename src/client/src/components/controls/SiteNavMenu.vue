@@ -71,16 +71,13 @@
 </template>
 
 <script lang="ts" setup>
-import { Routes } from '@/router/routes'
 import { useAuthStore } from '@/stores/authStore'
 import { Button, Menu } from 'primevue'
 import type { MenuItem } from 'primevue/menuitem'
-import { computed, inject, onMounted, ref, type Ref, useTemplateRef } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
-import authApi from '@/api/resources/authApi.ts'
+import { inject, onMounted, ref, type Ref, useTemplateRef } from 'vue'
+import { RouterLink } from 'vue-router'
 import roles from '@/constants/roles.ts'
 
-const router = useRouter()
 const navMenuRef = useTemplateRef('navMenuRef')
 const auth = useAuthStore()
 const discordInvite = import.meta.env.VITE_DISCORD_INVITE_LINK
