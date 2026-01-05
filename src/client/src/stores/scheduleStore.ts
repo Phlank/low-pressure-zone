@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { computed, type ComputedRef, type Ref, ref } from 'vue'
+import { computed, type ComputedRef, type Ref, ref, watch } from 'vue'
 import schedulesApi, { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
 import timeslotsApi, { type TimeslotResponse } from '@/api/resources/timeslotsApi.ts'
 import { addDays, compareAsc, getTime } from 'date-fns'
@@ -8,7 +8,7 @@ import {
   useCreatePersistentItemFn,
   useRemovePersistentItemFn,
   useUpdatePersistentItemFn
-} from '@/utils/storeFunctions.ts'
+} from '@/utils/storeFns.ts'
 import { useCommunityStore } from '@/stores/communityStore.ts'
 import { useToast } from 'primevue'
 import { addChronologically, getEntity, getEntityMap, removeEntity } from '@/utils/arrayUtils.ts'
@@ -19,6 +19,7 @@ import {
 } from '@/utils/toastUtils.ts'
 import { parseDate } from '@/utils/dateUtils.ts'
 import { usePerformerStore } from '@/stores/performerStore.ts'
+import { useAuthStore } from '@/stores/authStore.ts'
 
 const DEFAULT_SCHEDULE_DAY_RANGE = 30
 
@@ -30,9 +31,10 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
   )
   const toast = useToast()
   const performers = usePerformerStore()
+  const auth = useAuthStore()
   const { getCommunityById } = useCommunityStore()
 
-  const { isLoading } = useRefresh(
+  const { isLoading, refresh } = useRefresh(
     schedulesApi.get,
     (data) => {
       schedules.value = data.sort((a, b) => compareAsc(a.endsAt, b.endsAt))
@@ -43,6 +45,12 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
         after: addDays(new Date(), -DEFAULT_SCHEDULE_DAY_RANGE).toISOString(),
         before: addDays(new Date(), DEFAULT_SCHEDULE_DAY_RANGE).toISOString()
       }
+    }
+  )
+  watch(
+    () => auth.isLoggedIn,
+    async (newVal) => {
+      if (newVal) await refresh()
     }
   )
 
@@ -167,6 +175,7 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
 
   return {
     isLoading,
+    refresh,
     nextSchedule,
     schedules: getSchedules,
     upcomingSchedules,

@@ -7,8 +7,8 @@
 
 @font-face {
   font-family: 'Nunito Sans';
-  font-stretch: 100%; /* Note that font-stretch is a % of normal width */
-  font-style: normal; /* See note below */
+  font-stretch: 100%;
+  font-style: normal;
   font-weight: 400;
   src: url('fonts/Nunito_Sans.woff2') format('woff2');
 }
@@ -17,6 +17,10 @@ h1,
 h2,
 h3 {
   font-family: 'Helvetica Neue', sans-serif;
+}
+
+html {
+  //scrollbar-gutter: stable;
 }
 
 body {
@@ -31,6 +35,11 @@ body {
   overflow-y: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+}
+
+#app {
+  width: 100%;
 }
 
 body.dark-mode-toggle {

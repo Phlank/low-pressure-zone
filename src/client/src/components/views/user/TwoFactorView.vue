@@ -69,7 +69,7 @@ const validation = createFormValidation(formState, {
   rememberClient: alwaysValid()
 })
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     redirect?: string
   }>(),
@@ -81,7 +81,6 @@ const props = withDefaults(
 const isSubmitting = ref(false)
 const auth = useAuthStore()
 const handleVerify = async () => {
-  console.log('handleVerify called')
   isSubmitting.value = true
   await auth.twoFactorLoginAsync(formState, validation)
   isSubmitting.value = false

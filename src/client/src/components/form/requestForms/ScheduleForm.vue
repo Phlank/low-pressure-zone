@@ -75,7 +75,6 @@
 <script lang="ts" setup>
 import { DatePicker, Select, Textarea } from 'primevue'
 import { computed, onMounted, type Ref, ref } from 'vue'
-import { createFormValidation } from '@/validation/types/formValidation'
 import { MS_PER_MINUTE } from '@/constants/times'
 import { minimumDate, parseDate } from '@/utils/dateUtils'
 import { scheduleRequestRules } from '@/validation/requestRules'
@@ -84,13 +83,14 @@ import type { CommunityResponse } from '@/api/resources/communitiesApi.ts'
 import FormArea from '@/components/form/FormArea.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
-import type { Result } from '@/types/result.ts'
+import { useEntityForm } from '@/composables/useEntityForm.ts'
+import { alwaysValid } from '@/validation/rules/untypedRules.ts'
 
 const maxDurationMinutes = 1440
 const defaultMinutes = 60
 const schedules = useScheduleStore()
 
-let now = new Date()
+const now = new Date()
 const resetStartTime = new Date(
   now.getFullYear(),
   now.getMonth(),
@@ -110,30 +110,70 @@ const minStartTime = new Date(
   0
 )
 
+const props = withDefaults(
+  defineProps<{
+    schedule?: ScheduleResponse
+    availableCommunities: CommunityResponse[]
+    alignActions?: 'left' | 'right'
+  }>(),
+  {
+    alignActions: 'left'
+  }
+)
+
 interface ScheduleFormState extends ScheduleRequest {
   startTime: Date
   endTime: Date
 }
 
-const formState: Ref<ScheduleFormState> = ref({
-  communityId: '',
-  startTime: computed({
-    get: () => parseDate(formState.value.startsAt),
-    set: (value) => {
-      formState.value.startsAt = value.toISOString()
-    }
+const {
+  state: formState,
+  val: validation,
+  isSubmitting,
+  submit,
+  reset
+} = useEntityForm<ScheduleRequest, ScheduleFormState, ScheduleResponse>({
+  validationRules: (form) => ({
+    startTime: alwaysValid(),
+    endTime: alwaysValid(),
+    ...scheduleRequestRules(form)
   }),
-  startsAt: resetStartTime.toISOString(),
-  description: '',
-  endTime: computed({
-    get: () => parseDate(formState.value.endsAt),
-    set: (value) => {
-      formState.value.endsAt = value.toISOString()
-    }
-  }),
-  endsAt: new Date(resetStartTime.getTime() + defaultMinutes * MS_PER_MINUTE).toISOString()
+  entity: props.schedule,
+  formStateInitializeFn: (schedule) => {
+    const stateRef: Ref<ScheduleFormState> = ref({
+      communityId: schedule?.community.id ?? '',
+      startTime: computed({
+        get: () => parseDate(stateRef.value.startsAt),
+        set: (value) => {
+          stateRef.value.startsAt = value.toISOString()
+        }
+      }),
+      startsAt: schedule?.startsAt ?? resetStartTime.toISOString(),
+      description: schedule?.description ?? '',
+      endTime: computed({
+        get: () => parseDate(stateRef.value.endsAt),
+        set: (value) => {
+          stateRef.value.endsAt = value.toISOString()
+        }
+      }),
+      endsAt:
+        schedule?.endsAt ??
+        new Date(resetStartTime.getTime() + defaultMinutes * MS_PER_MINUTE).toISOString()
+    })
+    return stateRef
+  },
+  createPersistentEntityFn: schedules.createSchedule,
+  updatePersistentEntityFn: schedules.updateSchedule,
+  onSubmitted: () => emit('submitted')
 })
-const validation = createFormValidation(formState, scheduleRequestRules(formState.value))
+
+defineExpose({
+  formState,
+  validation,
+  isSubmitting,
+  reset,
+  submit
+})
 
 const handleStartTimeChange = (value: Date) => {
   formState.value.startTime = value
@@ -148,50 +188,7 @@ const handleStartTimeChange = (value: Date) => {
   validation.validateIfDirty('startsAt')
 }
 
-const props = withDefaults(
-  defineProps<{
-    schedule?: ScheduleResponse
-    availableCommunities: CommunityResponse[]
-    alignActions?: 'left' | 'right'
-  }>(),
-  {
-    alignActions: 'left'
-  }
-)
-
-const isSubmitting = ref(false)
-const submit = async () => {
-  if (!validation.validate()) return
-  isSubmitting.value = true
-  let response: Result
-  if (props.schedule)
-    response = await schedules.updateSchedule(props.schedule.id, formState, validation)
-  else response = await schedules.createSchedule(formState, validation)
-  isSubmitting.value = false
-  if (!response.isSuccess) return
-  emits('submitted')
-  reset()
-}
-
-const reset = () => {
-  now = new Date()
-  formState.value.communityId = props.schedule?.community.id ?? ''
-  formState.value.startsAt = props.schedule?.startsAt ?? resetStartTime.toISOString()
-  formState.value.description = props.schedule?.description ?? ''
-  formState.value.endsAt =
-    props.schedule?.endsAt ??
-    new Date(resetStartTime.getTime() + defaultMinutes * MS_PER_MINUTE).toISOString()
-}
-
-defineExpose({
-  formState,
-  validation,
-  isSubmitting,
-  reset,
-  submit
-})
-
-const emits = defineEmits<{
+const emit = defineEmits<{
   submitted: []
 }>()
 

@@ -19,33 +19,24 @@ import { getEntity, removeEntity } from '@/utils/arrayUtils.ts'
 import type { FormValidation } from '@/validation/types/formValidation.ts'
 import { showSuccessToast } from '@/utils/toastUtils.ts'
 import { useUserStore } from '@/stores/userStore.ts'
+import {useRefresh} from "@/composables/useRefresh.ts";
 
 export const useCommunityStore = defineStore('communityStore', () => {
   const communities: Ref<CommunityResponse[]> = ref([])
   const relationships: Ref<Record<string, CommunityRelationshipResponse[]>> = ref({})
-  const isLoading = ref(true)
   const toast = useToast()
   const auth = useAuthStore()
   const users = useUserStore()
 
-  let autoRefreshing = false
-  const autoRefresh = async () => {
-    if (autoRefreshing) return
-    autoRefreshing = true
-    while (autoRefreshing) {
-      await delay(300000)
-      await refresh()
-    }
-  }
-  const refresh = async () => {
-    await refreshCommunities()
-    await refreshRelationships()
-  }
-  const refreshCommunities = async () => {
-    const response = await communitiesApi.get()
-    if (tryHandleUnsuccessfulResponse(response, toast)) return
-    communities.value = response.data()
-  }
+  const { isLoading } = useRefresh(
+    communitiesApi.get,
+    (data) => {
+      communities.value = data
+      refreshRelationships().then(() => {})
+    },
+    { permissionFn: () => auth.isLoggedIn }
+  )
+
   const refreshRelationships = async () => {
     if (!auth.isInAnyRoles(roles.admin, roles.organizer)) return
     const userCommunities = communities.value.filter((community) => community.isOrganizable)
@@ -61,10 +52,6 @@ export const useCommunityStore = defineStore('communityStore', () => {
       relationships.value[response.data()[0]!.communityId] = response.data()
     }
   }
-  refresh().then(() => {
-    isLoading.value = false
-    autoRefresh().then()
-  })
 
   const getCommunity = (id: string) => communities.value.find((community) => community.id === id)
   const getCommunities = computed(() => communities.value)

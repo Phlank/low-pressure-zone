@@ -1,6 +1,6 @@
 import { hasIntersection } from '@/utils/arrayUtils'
 import { defineStore } from 'pinia'
-import { computed, ref, type Ref } from 'vue'
+import { computed, ref, type Ref, watch} from 'vue'
 import authApi, {
   type LoginRequest,
   type TwoFactorRequest,
@@ -61,10 +61,10 @@ export const useAuthStore = defineStore('authStore', () => {
     if (tryHandleInvalidResponse(response, validation) || !response.isSuccess()) return err()
     if (response.data().requiresTwoFactor) {
       await router.replace(Routes.TwoFactor)
-      isLoggedIn.value = true
       return ok(LoginOutcome.RequiresTwoFactor)
     }
     await reloadAsync()
+    isLoggedIn.value = true
     return ok(LoginOutcome.LoggedIn)
   }
 
@@ -72,8 +72,10 @@ export const useAuthStore = defineStore('authStore', () => {
     formState: Ref<TwoFactorRequest>,
     validation: FormValidation<TwoFactorRequest>
   ): Promise<Result<LoginOutcome>> => {
-    console.log('twoFactorLoginAsync called')
+    console.log('2fa')
+    console.log(isLoggedIn.value)
     if (isLoggedIn.value) return err()
+    console.log('2fa')
     if (!validation.validate()) return err()
     const response = await authApi.postTwoFactor(formState.value)
     if (response.status === 403 || response.status === 401) {

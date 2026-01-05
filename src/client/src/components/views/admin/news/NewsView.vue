@@ -12,7 +12,7 @@
       @submit="newsFormRef?.submit">
       <NewsForm
         ref="newsFormRef"
-        :initial-data="editingNewsItem"
+        :news-item="editingNewsItem"
         hide-submit
         @submitted="isDrawerVisible = false" />
     </FormDrawer>

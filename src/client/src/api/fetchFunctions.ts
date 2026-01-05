@@ -35,8 +35,7 @@ const sendRequest = async <TRequest, TResponse = void>(
       headers: response.headers,
       data: data,
       // Only 400 responses will ever have problem details
-      validationProblem: validationProblem,
-      error: undefined
+      validationProblem: validationProblem
     })
   } catch (error: unknown) {
     return new ApiResponse<TRequest, TResponse>({

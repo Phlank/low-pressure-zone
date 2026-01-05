@@ -38,19 +38,14 @@
         </div>
       </FormField>
       <template #actions>
-        <Button
-          v-if="!props.hideActions"
-          :disabled="isSubmitting"
-          :loading="isSubmitting"
-          label="Save"
-          @click="submit" />
+        <slot name="actions"></slot>
       </template>
     </FormArea>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Button, Checkbox, Select } from 'primevue'
+import { Checkbox, Select } from 'primevue'
 import { type UserResponse } from '@/api/resources/usersApi.ts'
 import { computed, onMounted, type Ref, ref } from 'vue'
 import {
@@ -84,16 +79,10 @@ const availableUsers = computed(() => {
   return entitiesExceptIds(users.users, inUse)
 })
 
-const props = withDefaults(
-  defineProps<{
-    communityId: string
-    relationship?: CommunityRelationshipResponse
-    hideActions?: boolean
-  }>(),
-  {
-    hideActions: false
-  }
-)
+const props = defineProps<{
+  communityId: string
+  relationship?: CommunityRelationshipResponse
+}>()
 
 const formState: Ref<CommunityRelationshipRequest & { userId: string }> = ref({
   userId: '',

@@ -8,21 +8,28 @@ import {
   useCreatePersistentItemFn,
   useRemovePersistentItemFn,
   useUpdatePersistentItemFn
-} from '@/utils/storeFunctions.ts'
+} from '@/utils/storeFns.ts'
 import { useRefresh } from '@/composables/useRefresh.ts'
-import { showCreateSuccessToast, showDeleteSuccessToast, showEditSuccessToast } from '@/utils/toastUtils.ts'
+import {
+  showCreateSuccessToast,
+  showDeleteSuccessToast,
+  showEditSuccessToast
+} from '@/utils/toastUtils.ts'
+import { useAuthStore } from '@/stores/authStore.ts'
 
 export const usePerformerStore = defineStore('performerStore', () => {
   const performers: Ref<PerformerResponse[]> = ref([])
   const performersMap = ref(getEntityMap(performers.value))
   const toast = useToast()
+  const auth = useAuthStore()
 
   const { isLoading } = useRefresh(
     performersApi.get,
     (data) => {
       performers.value = data
       performersMap.value = getEntityMap(performers.value)
-    }
+    },
+    { permissionFn: () => auth.isLoggedIn }
   )
 
   const getById = (id: string) => performersMap.value[id]

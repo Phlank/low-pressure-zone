@@ -9,7 +9,7 @@ import {
   useCreatePersistentItemFn,
   useRemovePersistentItemFn,
   useUpdatePersistentItemFn
-} from '@/utils/storeFunctions.ts'
+} from '@/utils/storeFns.ts'
 
 export const useNewsStore = defineStore('newsStore', () => {
   const users: Ref<NewsResponse[]> = ref([])

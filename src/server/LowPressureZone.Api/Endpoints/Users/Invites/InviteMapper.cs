@@ -4,7 +4,7 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Endpoints.Users.Invites;
 
-public class InviteMapper : IRequestMapper, IResponseMapper
+public sealed class InviteMapper : IRequestMapper, IResponseMapper
 {
     public Invitation<Guid, AppUser> ToEntity(InviteRequest request)
         => new()
@@ -14,7 +14,7 @@ public class InviteMapper : IRequestMapper, IResponseMapper
             LastSentDate = DateTime.UtcNow
         };
 
-    public InviteResponse FromEntity(Invitation<Guid, AppUser> invitation, Guid communityId)
+    public InviteResponse FromEntity(Invitation<Guid, AppUser> invitation, IEnumerable<Guid> communityIds)
     {
         invitation.User.ShouldNotBeNull();
         invitation.User.Email.ShouldNotBeNull();
@@ -22,11 +22,11 @@ public class InviteMapper : IRequestMapper, IResponseMapper
         return new InviteResponse
         {
             Id = invitation.Id,
-            CommunityId = communityId,
+            CommunityIds = communityIds,
             InvitedAt = invitation.InvitationDate,
             LastSentAt = invitation.LastSentDate,
             Email = invitation.User.Email,
-            DisplayName = invitation.User.DisplayName
+            DisplayName = invitation.User.Email
         };
     }
 }

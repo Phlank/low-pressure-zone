@@ -43,8 +43,10 @@
           :key="invite.id">
           <ListItem>
             <template #left>
-              <span>{{ parseDate(invite.invitedAt).toLocaleDateString() }}</span>
-              <span class="ellipsis text-s">{{ invite.email }}</span>
+              <span classs="ellipsis">{{ invite.email }}</span>
+              <span class="ellipsis text-s">
+                {{ parseDate(invite.invitedAt).toLocaleDateString() }}
+              </span>
             </template>
             <template #right>
               <GridActions
@@ -62,22 +64,14 @@
 <script lang="ts" setup>
 import ListItem from '@/components/data/ListItem.vue'
 import { Column, DataTable, DataView, Divider } from 'primevue'
-import { inject, onMounted, type Ref } from 'vue'
+import { inject, type Ref } from 'vue'
 import { type InviteResponse } from '@/api/resources/invitesApi.ts'
 import { useInviteStore } from '@/stores/inviteStore.ts'
-import { useCommunityStore } from '@/stores/communityStore.ts'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import { parseDate } from '@/utils/dateUtils.ts'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const invites = useInviteStore()
-const communityStore = useCommunityStore()
-
-onMounted(async () => {
-  if (communityStore.communities.length === 0) {
-    await communityStore.loadCommunitiesAsync()
-  }
-})
 
 const emit = defineEmits<{
   resend: [InviteResponse]

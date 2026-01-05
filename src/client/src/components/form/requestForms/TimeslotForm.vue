@@ -220,8 +220,8 @@ type TimeslotFormState = TimeslotRequest & {
   duration: number
 }
 
-const timeslotForm = useEntityForm<TimeslotRequest, TimeslotFormState, TimeslotResponse>(
-  (formState) => {
+const timeslotForm = useEntityForm<TimeslotRequest, TimeslotFormState, TimeslotResponse>({
+  validationRules: (formState) => {
     const timeslotRules = timeslotRequestRules(formState)
     return {
       ...timeslotRules,
@@ -230,8 +230,8 @@ const timeslotForm = useEntityForm<TimeslotRequest, TimeslotFormState, TimeslotR
         performers.linkablePerformers.length > 0 ? timeslotRules.performerId : alwaysValid()
     }
   },
-  props.timeslot,
-  (entity) => {
+  entity: props.timeslot,
+  formStateInitializeFn: (entity) => {
     return ref({
       scheduleId: props.scheduleId,
       startsAt: entity?.startsAt ?? props.start.toISOString(),
@@ -246,11 +246,10 @@ const timeslotForm = useEntityForm<TimeslotRequest, TimeslotFormState, TimeslotR
       replaceMedia: false
     })
   },
-  schedules.createTimeslot,
-  schedules.updateTimeslot,
-  () => {},
-  true
-)
+  createPersistentEntityFn: schedules.createTimeslot,
+  updatePersistentEntityFn: schedules.updateTimeslot,
+  useProgress: true
+})
 const uploadProgressText = computed(() => {
   if (timeslotForm.progress.value >= 0.99) return 'Processing...'
   return `${Math.floor(timeslotForm.progress.value * 100)}%`
@@ -274,17 +273,17 @@ const onFileRemove = (e: FileUploadRemoveEvent) => {
   if (e.files.length === 0) timeslotForm.state.value.file = null
 }
 
-const performerForm = useEntityForm<PerformerRequest, PerformerRequest, PerformerResponse>(
-  performerRequestRules,
-  undefined,
-  () => {
+const performerForm = useEntityForm<PerformerRequest, PerformerRequest, PerformerResponse>({
+  validationRules: performerRequestRules,
+  entity: undefined,
+  formStateInitializeFn: () => {
     return ref({
       name: '',
       url: ''
     })
   },
-  performers.create
-)
+  createPersistentEntityFn: performers.create
+})
 
 const isSubmitting = ref(false)
 const submit = async (): Promise<Result> => {
@@ -297,7 +296,6 @@ const submit = async (): Promise<Result> => {
     }
   }
   const timeslotResult = await timeslotForm.submit()
-  console.log('timeslotResult', timeslotResult)
   isSubmitting.value = false
   if (!timeslotResult.isSuccess) return err()
   emit('submitted')

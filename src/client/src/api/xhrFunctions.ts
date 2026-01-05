@@ -19,7 +19,6 @@ const sendXhrRequest = async <TRequest extends object, TResponse = never>(
       if (progressRef === undefined) return
       let progress = 0
       if (event.lengthComputable) progress = event.loaded / event.total
-      // console.log(progress)
       progressRef.value = progress
     }
 
@@ -31,7 +30,7 @@ const sendXhrRequest = async <TRequest extends object, TResponse = never>(
           status: xhr.status,
           data: parsedResponse.data,
           validationProblem: parsedResponse.validationProblem,
-          error: parsedResponse.error,
+          failure: parsedResponse.error,
           headers: parsedHeaders
         })
       )

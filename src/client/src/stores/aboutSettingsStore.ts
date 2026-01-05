@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import settingsApi from '@/api/resources/settingsApi.ts'
 import { useToast } from 'primevue'
 import { useRefresh } from '@/composables/useRefresh.ts'
-import { useUpdateSettingFn } from '@/utils/storeFunctions.ts'
+import { useUpdateSettingFn } from '@/utils/storeFns.ts'
 import { showEditSuccessToast } from '@/utils/toastUtils.ts'
 
 export const useAboutSettingsStore = defineStore('aboutSettingsStore', () => {

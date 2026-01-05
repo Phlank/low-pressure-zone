@@ -18,7 +18,6 @@
       <CommunityForm
         ref="communityFormRef"
         :community="editingCommunity"
-        hide-actions
         @submitted="showCommunityForm = false" />
     </FormDrawer>
     <DeleteDialog
@@ -48,12 +47,10 @@ const showCommunityForm = ref(false)
 const editingCommunity: Ref<CommunityResponse | undefined> = ref(undefined)
 const communityFormRef = useTemplateRef('communityFormRef')
 const handleCreate = () => {
-  console.log('Create Community')
   editingCommunity.value = undefined
   showCommunityForm.value = true
 }
 const handleEdit = (community: CommunityResponse) => {
-  console.log('Edit Community')
   editingCommunity.value = community
   showCommunityForm.value = true
 }

@@ -25,7 +25,6 @@ export const useConnectionInfoStore = defineStore('connectionInfoStore', () => {
     }
     liveInfoRef.value = response.data().find((info) => info.streamType === 'Live Stream')
     testInfoRef.value = response.data().find((info) => info.streamType === 'Test Stream')
-    console.log(JSON.stringify(liveInfoRef.value))
     return ok<boolean, string>(true)
   }
 

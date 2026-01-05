@@ -1,10 +1,9 @@
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import delay from '@/utils/delay.ts'
 import type { ApiResponse } from '@/api/apiResponse.ts'
 
 const DEFAULT_AUTO_REFRESH_INTERVAL = 300000 // 5 minutes
-const DEFAULT_AUTO_REFRESH = true
-
+const DEFAULT_USE_AUTO_REFRESH = true
 const DEFAULT_PERMISSION_FN = () => true
 
 interface UseRefreshOptions<TParams = void> {
@@ -35,12 +34,12 @@ export const useRefresh = <TResponse, TParams = void>(
   onRefresh: (data: TResponse) => void,
   options?: UseRefreshOptions<TParams>
 ) => {
-  const isAutoRefreshing = ref(options?.useAutoRefresh ?? DEFAULT_AUTO_REFRESH)
+  const isAutoRefreshing = ref(options?.useAutoRefresh ?? DEFAULT_USE_AUTO_REFRESH)
   const isLoading = ref(true)
 
   const autoRefresh = async () => {
     // noinspection InfiniteLoopJS
-    while (true) {
+    while (isAutoRefreshing.value) {
       await delay(options?.autoRefreshInterval ?? DEFAULT_AUTO_REFRESH_INTERVAL)
       if (isAutoRefreshing.value) await refresh()
     }
@@ -54,14 +53,20 @@ export const useRefresh = <TResponse, TParams = void>(
     onRefresh(response.data())
   }
 
-  if ((options?.permissionFn ?? DEFAULT_PERMISSION_FN)()) {
-    refresh().then(() => {
+  watch(() => (options?.permissionFn ?? DEFAULT_PERMISSION_FN)(), (newVal) => {
+    if (newVal) {
+      refresh().then(() => {
+        isLoading.value = false
+        if (options?.useAutoRefresh) {
+          isAutoRefreshing.value = true
+          autoRefresh().then(() => {})
+        }
+      })
+    } else {
       isLoading.value = false
-      if (options?.useAutoRefresh) autoRefresh().then(() => {})
-    })
-  } else {
-    isLoading.value = false
-  }
+      isAutoRefreshing.value = false
+    }
+  }, { immediate: true })
 
   const getIsLoading = computed(() => isLoading.value)
   return { isLoading: getIsLoading, refresh, isAutoRefreshing }

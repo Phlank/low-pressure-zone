@@ -1,15 +1,17 @@
 <template>
   <div class="site-layout">
     <SiteHeader class="site-layout__header" />
-    <main class="site-layout__view">
-      <RouterView class="site-layout__content" />
-    </main>
-    <div
-      v-if="isMobile"
-      class="site-layout__footer-space" />
-    <SiteFooter
-      ref="footer"
-      class="site-layout__footer" />
+    <div class="content-footer">
+      <main class="site-layout__view">
+        <RouterView class="site-layout__content" />
+      </main>
+      <div
+        v-if="isMobile"
+        class="site-layout__footer-space" />
+      <SiteFooter
+        ref="footer"
+        class="site-layout__footer" />
+    </div>
   </div>
 </template>
 
@@ -31,10 +33,18 @@ const footerPosition = computed(() => (!isMobile?.value ? 'sticky' : 'fixed'))
 .site-layout {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   min-height: 100dvh;
   align-items: center;
-  width: 100dvw;
+  width: 100%;
+
+  .content-footer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    min-height: calc(100dvh - #{variables.$header-height});
+  }
 
   .p-toolbar.site-layout__header {
     width: 100%;
@@ -50,7 +60,6 @@ const footerPosition = computed(() => (!isMobile?.value ? 'sticky' : 'fixed'))
   }
 
   &__view {
-    min-height: calc(100dvh - #{variables.$header-height} - #{variables.$footer-height});
     width: 100%;
   }
 

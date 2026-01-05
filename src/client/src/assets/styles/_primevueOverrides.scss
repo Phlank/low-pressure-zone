@@ -2,6 +2,14 @@
 
 div.p-panel {
   border-style: none;
+
+  div.p-panel-content-container {
+    display: flex;
+
+    div.p-panel-content-wrapper {
+      width: 100%;
+    }
+  }
 }
 
 div.p-datepicker-minute-picker {

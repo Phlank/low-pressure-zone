@@ -1,17 +1,14 @@
-import type { InviteRequest, InviteResponse } from '@/api/resources/invitesApi.ts'
+import type { InviteResponse } from '@/api/resources/invitesApi.ts'
 import invitesApi from '@/api/resources/invitesApi.ts'
 import { computed, ref, type Ref } from 'vue'
 import { defineStore } from 'pinia'
-import delay from '@/utils/delay.ts'
 import { useToast } from 'primevue'
-import type { FormValidation } from '@/validation/types/formValidation.ts'
-import { err, ok, type Result } from '@/types/result.ts'
+import { err, ok } from '@/types/result.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import { getEntity } from '@/utils/arrayUtils.ts'
-import { useAuthStore } from '@/stores/authStore.ts'
-import roles from '@/constants/roles.ts'
 import { showSuccessToast } from '@/utils/toastUtils.ts'
-import {useRefresh} from "@/composables/useRefresh.ts";
+import { useRefresh } from '@/composables/useRefresh.ts'
+import { useCreatePersistentItemFn } from '@/utils/storeFns.ts'
 
 export const useInviteStore = defineStore('inviteStore', () => {
   const items: Ref<InviteResponse[]> = ref([])
@@ -19,40 +16,20 @@ export const useInviteStore = defineStore('inviteStore', () => {
   useRefresh(invitesApi.get, (data) => {
     items.value = data
   })
-  const autoRefreshing = ref(false)
-  const autoRefresh = async () => {
-    if (autoRefreshing.value) return
-    autoRefreshing.value = true
-    while (autoRefreshing.value) {
-      await delay(300000)
-      await refresh()
-    }
-  }
-  const refresh = async () => {
-    const response = await invitesApi.get()
-    if (!response.isSuccess()) return
-    items.value = response.data()
-  }
 
   const toast = useToast()
-  const create = async (
-    formState: Ref<InviteRequest>,
-    validation: FormValidation<InviteRequest>
-  ): Promise<Result> => {
-    if (!validation.validate()) return err()
-    const response = await invitesApi.post(formState.value)
-    if (tryHandleUnsuccessfulResponse(response, toast, validation)) return err()
+  const create = useCreatePersistentItemFn(invitesApi.post, (id, request) => {
     const item: InviteResponse = {
-      id: response.getCreatedId(),
+      id: id,
+      communityIds: [request.communityId],
       invitedAt: new Date().toUTCString(),
       lastSentAt: new Date().toUTCString(),
-      displayName: formState.value.email,
-      ...formState.value
+      displayName: request.email,
+      email: request.email
     }
     items.value.unshift(item)
-    showSuccessToast(toast, 'Created', 'Invite created successfully.', formState.value.email)
-    return ok()
-  }
+    showSuccessToast(toast, 'Created', 'Invite created successfully.', request.email)
+  })
 
   const resendEmail = async (id: string) => {
     const entity = getEntity(items.value, id)
