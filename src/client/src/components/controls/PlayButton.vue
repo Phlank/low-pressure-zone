@@ -80,12 +80,12 @@ const stopAudio = () => {
       try {
         audio.src = '' // This will always fail (on purpose), so catch it and ignore it.
       } catch (e) {
-        console.log(e)
+        console.error(e)
       }
       audio = undefined
     }
   } catch (error) {
-    console.log(JSON.stringify(error))
+    console.error(JSON.stringify(error))
   }
 }
 

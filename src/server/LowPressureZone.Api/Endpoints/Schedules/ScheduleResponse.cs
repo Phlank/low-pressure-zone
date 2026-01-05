@@ -1,5 +1,5 @@
 ﻿using LowPressureZone.Api.Endpoints.Communities;
-using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
+using LowPressureZone.Api.Endpoints.Timeslots;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 

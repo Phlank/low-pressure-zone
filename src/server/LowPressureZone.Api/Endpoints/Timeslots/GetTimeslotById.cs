@@ -2,7 +2,7 @@
 using LowPressureZone.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
+namespace LowPressureZone.Api.Endpoints.Timeslots;
 
 public class GetTimeslotById : EndpointWithoutRequest<TimeslotResponse, TimeslotMapper>
 {
@@ -10,20 +10,18 @@ public class GetTimeslotById : EndpointWithoutRequest<TimeslotResponse, Timeslot
 
     public override void Configure()
     {
-        Get("/schedules/{scheduleId}/timeslots/{timeslotId}");
+        Get("/timeslots/{id}");
         Description(builder => builder.Produces(404));
     }
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var scheduleId = Route<Guid>("scheduleId");
-        var timeslotId = Route<Guid>("timeslotId");
+        var timeslotId = Route<Guid>("id");
 
         var timeslot = await DataContext.Timeslots
                                         .AsNoTracking()
                                         .Include(timeslot => timeslot.Performer)
-                                        .Where(timeslot => timeslot.Id == timeslotId &&
-                                                           timeslot.ScheduleId == scheduleId)
+                                        .Where(timeslot => timeslot.Id == timeslotId)
                                         .FirstOrDefaultAsync(ct);
         if (timeslot == null)
         {

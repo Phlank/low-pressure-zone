@@ -7,6 +7,12 @@ namespace LowPressureZone.Api.Endpoints.Settings.About;
 
 public sealed class AboutSettingsMapper(ILogger<AboutSettingsMapper> logger) : IRequestMapper, IResponseMapper
 {
+    private static readonly AboutSettingsResponse DefaultResponse = new()
+    {
+        TopText = "",
+        BottomText = ""
+    };
+
     public Setting ToEntity(AboutSettingsRequest req) =>
         new()
         {
@@ -18,7 +24,7 @@ public sealed class AboutSettingsMapper(ILogger<AboutSettingsMapper> logger) : I
     {
         if (setting is null)
             return DefaultResponse;
-        
+
         try
         {
             var response = JsonSerializer.Deserialize<AboutSettingsResponse>(setting.Value);
@@ -33,10 +39,4 @@ public sealed class AboutSettingsMapper(ILogger<AboutSettingsMapper> logger) : I
             return DefaultResponse;
         }
     }
-    
-    private static readonly AboutSettingsResponse DefaultResponse = new()
-    {
-        TopText = "",
-        BottomText = ""
-    };
 }

@@ -9,6 +9,7 @@ namespace LowPressureZone.Api.Services.Audio;
 public sealed partial class Mp3Processor(ILogger<Mp3Processor> logger, IOptions<FileConfiguration> fileConfig)
 {
     private readonly string _temporaryLocation = fileConfig.Value.TemporaryLocation;
+
     public async Task<Result<string, string>> ConvertFileToMp3Async(string inputFilePath)
     {
         var outputFilePath = Path.Combine(_temporaryLocation, $"{Guid.NewGuid()}.mp3");
@@ -18,11 +19,11 @@ public sealed partial class Mp3Processor(ILogger<Mp3Processor> logger, IOptions<
                 await FFMpegArguments.FromFileInput(inputFilePath,
                                                     false)
                                      .OutputToFile(outputFilePath,
-                                                   overwrite: true,
+                                                   true,
                                                    options => options.WithAudioCodec(AudioCodec.LibMp3Lame)
                                                                      .WithAudioBitrate(320)
                                                                      .WithoutMetadata())
-                                     .ProcessAsynchronously(throwOnError: true);
+                                     .ProcessAsynchronously(true);
 
             if (isConversionSuccessful)
                 return Result.Ok(outputFilePath);
@@ -43,12 +44,12 @@ public sealed partial class Mp3Processor(ILogger<Mp3Processor> logger, IOptions<
         try
         {
             var isMetadataStripSuccessful =
-                await FFMpegArguments.FromFileInput(inputFilePath, 
+                await FFMpegArguments.FromFileInput(inputFilePath,
                                                     false)
-                                     .OutputToFile(outputFilePath, overwrite: true,
+                                     .OutputToFile(outputFilePath, true,
                                                    options => options.WithCopyCodec()
                                                                      .WithoutMetadata())
-                                     .ProcessAsynchronously(throwOnError: true);
+                                     .ProcessAsynchronously(true);
             if (isMetadataStripSuccessful)
                 return Result.Ok(outputFilePath);
 

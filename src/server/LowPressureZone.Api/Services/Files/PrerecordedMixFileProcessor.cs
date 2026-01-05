@@ -5,7 +5,7 @@ using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Adapter.AzuraCast.Mappers;
 using LowPressureZone.Api.Converters;
-using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
+using LowPressureZone.Api.Endpoints.Timeslots;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Models;
 using LowPressureZone.Api.Models.Configuration;
@@ -27,8 +27,8 @@ public sealed class PrerecordedMixFileProcessor(
     TimeslotRequestToAzuraCastPlaylistConverter requestToPlaylistConverter,
     IOptions<FileConfiguration> fileOptions)
 {
-    private readonly string _tempLocation = fileOptions.Value.TemporaryLocation;
     private readonly string _prerecordedSetLocation = fileOptions.Value.AzuraCastPrerecordedSetLocation;
+    private readonly string _tempLocation = fileOptions.Value.TemporaryLocation;
 
     public async Task<Result<string, IEnumerable<ValidationFailure>>> ProcessRequestFileToMp3Async(
         TimeslotRequest request,
@@ -218,7 +218,7 @@ public sealed class PrerecordedMixFileProcessor(
             var conversionResult = await mp3Processor.ConvertFileToMp3Async(inputFilePath);
             if (conversionResult.IsError)
                 return Result.Err<string>(conversionResult.Error.ToValidationFailures(nameof(TimeslotRequest.File)));
-            
+
             outputFilePath = conversionResult.Value;
         }
 
@@ -254,8 +254,8 @@ public sealed class PrerecordedMixFileProcessor(
     private async Task<Result<StationFileListItem, string>> GetUploadedFileAsync(string filePath)
     {
         var prerecordListResult = await azuraCastClient.GetMediaInDirectoryAsync(_prerecordedSetLocation,
-                                                                                 useInternalMode: true,
-                                                                                 flushCache: true);
+                                                                                 true,
+                                                                                 true);
 
         if (prerecordListResult.IsError)
             return Result.Err<StationFileListItem>("Failed to retrieve files from AzuraCast");

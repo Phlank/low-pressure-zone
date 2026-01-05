@@ -4,21 +4,20 @@ using LowPressureZone.Domain.Entities;
 using LowPressureZone.Domain.Extensions;
 using Microsoft.EntityFrameworkCore;
 
-namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
+namespace LowPressureZone.Api.Endpoints.Timeslots;
 
 public class GetTimeslots(DataContext dataContext)
-    : EndpointWithoutRequest<IEnumerable<TimeslotResponse>, TimeslotMapper>
+    : Endpoint<GetTimeslotsRequest, IEnumerable<TimeslotResponse>, TimeslotMapper>
 {
     public override void Configure()
     {
-        Get("/schedules/{scheduleId}/timeslots");
+        Get("/timeslots");
         Description(builder => builder.Produces(404));
     }
 
-    public override async Task HandleAsync(CancellationToken ct)
+    public override async Task HandleAsync(GetTimeslotsRequest req, CancellationToken ct)
     {
-        var scheduleId = Route<Guid>("scheduleId");
-        if (!await dataContext.HasAsync<Schedule>(scheduleId, ct))
+        if (!await dataContext.HasAsync<Schedule>(req.ScheduleId, ct))
         {
             await SendNotFoundAsync(ct);
             return;
@@ -27,7 +26,7 @@ public class GetTimeslots(DataContext dataContext)
         var timeslots = await dataContext.Timeslots
                                          .AsNoTracking()
                                          .Include(timeslot => timeslot.Performer)
-                                         .Where(timeslot => timeslot.ScheduleId == scheduleId)
+                                         .Where(timeslot => timeslot.ScheduleId == req.ScheduleId)
                                          .OrderBy(timeslot => timeslot.StartsAt)
                                          .ToListAsync(ct);
         await SendOkAsync(timeslots.Select(Map.FromEntity), ct);

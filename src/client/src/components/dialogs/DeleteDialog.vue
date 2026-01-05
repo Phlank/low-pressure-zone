@@ -1,12 +1,12 @@
 <template>
   <Dialog
+    $attrs
     :draggable="false"
     :header="header"
-    :visible="visible"
     class="delete-dialog"
     modal
-    @hide="emit('close')"
-    @update:visible="isSubmitting ? undefined : emit('close')">
+    @hide="emit('hide')"
+    @update:visible="isSubmitting ? undefined : emit('hide')">
     <template #default>
       <span v-if="entityName"> Delete {{ entityType }} {{ entityName }}? </span>
       <span v-else> Delete {{ entityType }}? </span>
@@ -27,14 +27,13 @@ import { Button, Dialog } from 'primevue'
 
 defineProps<{
   header: string
-  visible: boolean
   isSubmitting: boolean
   entityType: string
   entityName?: string
 }>()
 
 const emit = defineEmits<{
-  close: []
+  hide: []
   delete: []
 }>()
 </script>

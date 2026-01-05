@@ -1,7 +1,7 @@
 using System.Globalization;
 using FluentValidation.Results;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
-using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
+using LowPressureZone.Api.Endpoints.Timeslots;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Core;
 using LowPressureZone.Core.Interfaces;
@@ -31,7 +31,7 @@ public sealed class TimeslotRequestToAzuraCastPlaylistConverter(DataContext data
 
         var playlistEnd = source.EndsAt.AddMinutes(5);
 
-        return Result.Ok<StationPlaylist, ValidationFailure>(new()
+        return Result.Ok<StationPlaylist, ValidationFailure>(new StationPlaylist
         {
             IsEnabled = true,
             Name = $"Prerecorded Slot - {performer.Name} - {title}",

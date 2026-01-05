@@ -111,13 +111,13 @@ const formState: RegisterRequest = reactive({
 })
 const validation = createFormValidation(formState, registerRequestRules(formState))
 
-const authStore = useAuthStore()
+const auth = useAuthStore()
 onMounted(async () => {
   if (!props.context) {
     await router.replace(Routes.Home)
   }
   await authApi.getLogout()
-  authStore.clear()
+  auth.reset()
 
   const response = await authApi.getVerifyToken({
     context: props.context,

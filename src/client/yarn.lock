@@ -592,13 +592,13 @@ __metadata:
   linkType: hard
 
 "@eslint-community/eslint-utils@npm:^4.4.0, @eslint-community/eslint-utils@npm:^4.7.0, @eslint-community/eslint-utils@npm:^4.8.0":
-  version: 4.9.0
-  resolution: "@eslint-community/eslint-utils@npm:4.9.0"
+  version: 4.9.1
+  resolution: "@eslint-community/eslint-utils@npm:4.9.1"
   dependencies:
     eslint-visitor-keys: "npm:^3.4.3"
   peerDependencies:
     eslint: ^6.0.0 || ^7.0.0 || >=8.0.0
-  checksum: 10c0/8881e22d519326e7dba85ea915ac7a143367c805e6ba1374c987aa2fbdd09195cc51183d2da72c0e2ff388f84363e1b220fd0d19bef10c272c63455162176817
+  checksum: 10c0/dc4ab5e3e364ef27e33666b11f4b86e1a6c1d7cbf16f0c6ff87b1619b3562335e9201a3d6ce806221887ff780ec9d828962a290bb910759fd40a674686503f02
   languageName: node
   linkType: hard
 
@@ -1014,7 +1014,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@primeuix/styles@npm:^2.0.1":
+"@primeuix/styles@npm:^2.0.2":
   version: 2.0.2
   resolution: "@primeuix/styles@npm:2.0.2"
   dependencies:
@@ -1023,7 +1023,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@primeuix/themes@npm:^2.0.1":
+"@primeuix/themes@npm:^2.0.2":
   version: 2.0.2
   resolution: "@primeuix/themes@npm:2.0.2"
   dependencies:
@@ -1039,35 +1039,35 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@primevue/core@npm:4.5.0":
-  version: 4.5.0
-  resolution: "@primevue/core@npm:4.5.0"
+"@primevue/core@npm:4.5.4, @primevue/core@npm:^4.5.4":
+  version: 4.5.4
+  resolution: "@primevue/core@npm:4.5.4"
   dependencies:
     "@primeuix/styled": "npm:^0.7.4"
     "@primeuix/utils": "npm:^0.6.2"
   peerDependencies:
     vue: ^3.5.0
-  checksum: 10c0/5d51e3bfae137984d6c47dd622479cbfe36dd650d1eda95297020511bc96860a7c8786d81bfa3743155bf9bc5d69cc802b46e77845031d0999533c2d8d240aca
+  checksum: 10c0/a76b1cbadee3d03da1dd521b07faafccbb004093a440278ab6d8bda5f7d83fb1721700ffa9eb9b8c0e9a397793760fed63e7904d59032a0704cc158008df37e9
   languageName: node
   linkType: hard
 
-"@primevue/icons@npm:4.5.0":
-  version: 4.5.0
-  resolution: "@primevue/icons@npm:4.5.0"
+"@primevue/icons@npm:4.5.4":
+  version: 4.5.4
+  resolution: "@primevue/icons@npm:4.5.4"
   dependencies:
     "@primeuix/utils": "npm:^0.6.2"
-    "@primevue/core": "npm:4.5.0"
-  checksum: 10c0/4bc5146af9ab9e073bd6f4c8eae41582eb1742b55636e0d33aad9401200a9673aec3e83f44b0b13f4cebafa76f00a6d3d65b5538dfd4e65af61bd43ded17d40b
+    "@primevue/core": "npm:4.5.4"
+  checksum: 10c0/7a6eedd20aa395d6ec25a0ceb530e8fca610ff8c8af6dbd4d7f88599c35f1fe82e09c986f473f43b74046a1dc6c4d67d7a5911b7e3d825a5e9d721daf904dd32
   languageName: node
   linkType: hard
 
-"@primevue/themes@npm:4.5.0":
-  version: 4.5.0
-  resolution: "@primevue/themes@npm:4.5.0"
+"@primevue/themes@npm:^4.5.4":
+  version: 4.5.4
+  resolution: "@primevue/themes@npm:4.5.4"
   dependencies:
     "@primeuix/styled": "npm:^0.7.4"
-    "@primeuix/themes": "npm:^2.0.1"
-  checksum: 10c0/a7c2538f73410706ae54d0fd7c1fabec13f3a9a4540653c7fa927afbc35764c89ef3c651a18de37e67d44a478736c734104d0e4c39a43402c930f83c37f8349c
+    "@primeuix/themes": "npm:^2.0.2"
+  checksum: 10c0/8d1babbd7aed5b51221853863a8e86295cd77e6855463126705e3260b3ee47ce2a70c0f673414faf1c5c63094910ed2f980f4f3802611561a17b23ca2e355a01
   languageName: node
   linkType: hard
 
@@ -1232,10 +1232,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tsconfig/node22@npm:^22.0.5":
-  version: 22.0.5
-  resolution: "@tsconfig/node22@npm:22.0.5"
-  checksum: 10c0/c64b1d51e1556da9212463799f5096289d2cc8561eaed10cd0a0a36c25790b4c6bed30c0f846afccf8da75b5750326fa281216a908c2b67ead7b55adaf3eda22
+"@tsconfig/node-lts@npm:^24.0.0":
+  version: 24.0.0
+  resolution: "@tsconfig/node-lts@npm:24.0.0"
+  checksum: 10c0/63f5e2c576d4beb19e92ce32b22b132b013b66327137d7c54ee15f9b19812e2ed81bcc5d16ce32450ac7114e774d57100cabd4442571827ed50bfba58aaded0e
   languageName: node
   linkType: hard
 
@@ -1253,7 +1253,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^24.10.1":
+"@types/node@npm:^24.10.4":
   version: 24.10.4
   resolution: "@types/node@npm:24.10.4"
   dependencies:
@@ -1276,7 +1276,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/eslint-plugin@npm:8.51.0, @typescript-eslint/eslint-plugin@npm:^8.47.0":
+"@typescript-eslint/eslint-plugin@npm:8.51.0, @typescript-eslint/eslint-plugin@npm:^8.51.0":
   version: 8.51.0
   resolution: "@typescript-eslint/eslint-plugin@npm:8.51.0"
   dependencies:
@@ -1296,7 +1296,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/parser@npm:8.51.0, @typescript-eslint/parser@npm:^8.47.0":
+"@typescript-eslint/parser@npm:8.51.0, @typescript-eslint/parser@npm:^8.51.0":
   version: 8.51.0
   resolution: "@typescript-eslint/parser@npm:8.51.0"
   dependencies:
@@ -1411,7 +1411,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitejs/plugin-vue@npm:^6.0.1":
+"@vitejs/plugin-vue@npm:^6.0.3":
   version: 6.0.3
   resolution: "@vitejs/plugin-vue@npm:6.0.3"
   dependencies:
@@ -1736,7 +1736,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vueuse/core@npm:^14.0.0":
+"@vueuse/core@npm:^14.1.0":
   version: 14.1.0
   resolution: "@vueuse/core@npm:14.1.0"
   dependencies:
@@ -2466,7 +2466,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-vue@npm:^10.5.1":
+"eslint-plugin-vue@npm:^10.6.2":
   version: 10.6.2
   resolution: "eslint-plugin-vue@npm:10.6.2"
   dependencies:
@@ -2514,7 +2514,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^9.39.1":
+"eslint@npm:^9.39.2":
   version: 9.39.2
   resolution: "eslint@npm:9.39.2"
   dependencies:
@@ -2575,11 +2575,11 @@ __metadata:
   linkType: hard
 
 "esquery@npm:^1.5.0, esquery@npm:^1.6.0":
-  version: 1.6.0
-  resolution: "esquery@npm:1.6.0"
+  version: 1.7.0
+  resolution: "esquery@npm:1.7.0"
   dependencies:
     estraverse: "npm:^5.1.0"
-  checksum: 10c0/cb9065ec605f9da7a76ca6dadb0619dfb611e37a81e318732977d90fab50a256b95fee2d925fba7c2f3f0523aa16f91587246693bc09bc34d5a59575fe6e93d2
+  checksum: 10c0/77d5173db450b66f3bc685d11af4c90cffeedb340f34a39af96d43509a335ce39c894fd79233df32d38f5e4e219fa0f7076f6ec90bae8320170ba082c0db4793
   languageName: node
   linkType: hard
 
@@ -3288,21 +3288,21 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "low-pressure-zone@workspace:."
   dependencies:
-    "@primevue/core": "npm:4.5.0"
-    "@primevue/themes": "npm:4.5.0"
-    "@tsconfig/node22": "npm:^22.0.5"
-    "@types/node": "npm:^24.10.1"
-    "@typescript-eslint/eslint-plugin": "npm:^8.47.0"
-    "@typescript-eslint/parser": "npm:^8.47.0"
-    "@vitejs/plugin-vue": "npm:^6.0.1"
+    "@primevue/core": "npm:^4.5.4"
+    "@primevue/themes": "npm:^4.5.4"
+    "@tsconfig/node-lts": "npm:^24.0.0"
+    "@types/node": "npm:^24.10.4"
+    "@typescript-eslint/eslint-plugin": "npm:^8.51.0"
+    "@typescript-eslint/parser": "npm:^8.51.0"
+    "@vitejs/plugin-vue": "npm:^6.0.3"
     "@vue/eslint-config-prettier": "npm:^10.2.0"
     "@vue/eslint-config-typescript": "npm:^14.6.0"
     "@vue/tsconfig": "npm:^0.8.1"
-    "@vueuse/core": "npm:^14.0.0"
+    "@vueuse/core": "npm:^14.1.0"
     date-fns: "npm:^4.1.0"
     dompurify: "npm:^3.3.1"
-    eslint: "npm:^9.39.1"
-    eslint-plugin-vue: "npm:^10.5.1"
+    eslint: "npm:^9.39.2"
+    eslint-plugin-vue: "npm:^10.6.2"
     jiti: "npm:^2.6.1"
     marked: "npm:^17.0.1"
     npm-run-all2: "npm:^8.0.4"
@@ -3310,23 +3310,23 @@ __metadata:
     postcss: "npm:^8.5.6"
     postcss-html: "npm:^1.8.0"
     postcss-scss: "npm:^4.0.9"
-    prettier: "npm:^3.6.2"
-    primeicons: "npm:7.0.0"
-    primevue: "npm:4.5.0"
-    sass: "npm:^1.94.1"
+    prettier: "npm:^3.7.4"
+    primeicons: "npm:^7.0.0"
+    primevue: "npm:^4.5.4"
+    sass: "npm:^1.97.1"
     sass-loader: "npm:^16.0.6"
-    stylelint: "npm:^16.25.0"
+    stylelint: "npm:^16.26.1"
     stylelint-config-recommended-scss: "npm:^16.0.2"
     stylelint-config-recommended-vue: "npm:^1.6.1"
     stylelint-config-standard: "npm:^39.0.1"
-    stylelint-scss: "npm:^6.12.1"
+    stylelint-scss: "npm:^6.14.0"
     typescript: "npm:~5.9.3"
-    vite: "npm:^7.2.2"
+    vite: "npm:^7.3.0"
     vite-plugin-vue-devtools: "npm:^8.0.5"
-    vue: "npm:^3.5.24"
+    vue: "npm:^3.5.26"
     vue-eslint-parser: "npm:^10.2.0"
-    vue-router: "npm:^4.6.3"
-    vue-tsc: "npm:^3.1.4"
+    vue-router: "npm:^4.6.4"
+    vue-tsc: "npm:^3.2.1"
   languageName: unknown
   linkType: soft
 
@@ -3976,7 +3976,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^3.6.2":
+"prettier@npm:^3.7.4":
   version: 3.7.4
   resolution: "prettier@npm:3.7.4"
   bin:
@@ -3985,23 +3985,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"primeicons@npm:7.0.0":
+"primeicons@npm:^7.0.0":
   version: 7.0.0
   resolution: "primeicons@npm:7.0.0"
   checksum: 10c0/a7f6344d6db49e785d2040b35f8cae761d15bb8f8ee70ade8981d45438245414e913fe7235921122aade2b0a11a032c98b44dc527be2da11aa791ff145099c06
   languageName: node
   linkType: hard
 
-"primevue@npm:4.5.0":
-  version: 4.5.0
-  resolution: "primevue@npm:4.5.0"
+"primevue@npm:^4.5.4":
+  version: 4.5.4
+  resolution: "primevue@npm:4.5.4"
   dependencies:
     "@primeuix/styled": "npm:^0.7.4"
-    "@primeuix/styles": "npm:^2.0.1"
+    "@primeuix/styles": "npm:^2.0.2"
     "@primeuix/utils": "npm:^0.6.2"
-    "@primevue/core": "npm:4.5.0"
-    "@primevue/icons": "npm:4.5.0"
-  checksum: 10c0/4f6b6c3627df136a118d4606cc7c1be1c1127acc30e6692a6b0df9984997a5ff5b6f3a76a3a872936236dc4777a92aac574d0d273f1141d3a44f3ff98e61bfc6
+    "@primevue/core": "npm:4.5.4"
+    "@primevue/icons": "npm:4.5.4"
+  checksum: 10c0/1e006ca3851dc2196d37abd32e49381b4bd6f11b89900943a6006775d313d610150daa087bc5cc9126b734f3b7870d0fe0bd0ace41fa8f1941b3942e58b40898
   languageName: node
   linkType: hard
 
@@ -4234,7 +4234,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass@npm:^1.94.1":
+"sass@npm:^1.97.1":
   version: 1.97.1
   resolution: "sass@npm:1.97.1"
   dependencies:
@@ -4467,7 +4467,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stylelint-scss@npm:^6.12.1":
+"stylelint-scss@npm:^6.12.1, stylelint-scss@npm:^6.14.0":
   version: 6.14.0
   resolution: "stylelint-scss@npm:6.14.0"
   dependencies:
@@ -4485,7 +4485,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stylelint@npm:^16.25.0":
+"stylelint@npm:^16.26.1":
   version: 16.26.1
   resolution: "stylelint@npm:16.26.1"
   dependencies:
@@ -4826,7 +4826,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:^7.2.2":
+"vite@npm:^7.3.0":
   version: 7.3.0
   resolution: "vite@npm:7.3.0"
   dependencies:
@@ -4904,7 +4904,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vue-router@npm:^4.6.3":
+"vue-router@npm:^4.6.4":
   version: 4.6.4
   resolution: "vue-router@npm:4.6.4"
   dependencies:
@@ -4915,7 +4915,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vue-tsc@npm:^3.1.4":
+"vue-tsc@npm:^3.2.1":
   version: 3.2.1
   resolution: "vue-tsc@npm:3.2.1"
   dependencies:
@@ -4929,7 +4929,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vue@npm:^3.5.24":
+"vue@npm:^3.5.26":
   version: 3.5.26
   resolution: "vue@npm:3.5.26"
   dependencies:

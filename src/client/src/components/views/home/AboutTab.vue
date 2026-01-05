@@ -24,8 +24,8 @@ const aboutSettings = useAboutSettingsStore()
 
 const topHtml = ref('')
 const bottomHtml = ref('')
+
 const updateContent = async () => {
-  console.log('Loading')
   topHtml.value = await parseMarkdownAsync(aboutSettings.topText)
   bottomHtml.value = await parseMarkdownAsync(aboutSettings.bottomText)
 }

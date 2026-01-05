@@ -3,7 +3,9 @@ using LowPressureZone.Core;
 
 namespace LowPressureZone.Api.Services.Files;
 
-public sealed class PrerecordedMixCleanupService(IAzuraCastClient azuraCastClient, ILogger<PrerecordedMixCleanupService> logger)
+public sealed class PrerecordedMixCleanupService(
+    IAzuraCastClient azuraCastClient,
+    ILogger<PrerecordedMixCleanupService> logger)
 {
     public async Task<Result<bool, string>> DeleteEnqueuedPrerecordedMixAsync(int azuraCastMediaId)
     {
@@ -24,7 +26,7 @@ public sealed class PrerecordedMixCleanupService(IAzuraCastClient azuraCastClien
         var deleteMediaResult = await azuraCastClient.DeleteMediaAsync(mediaId);
         if (deleteMediaResult.IsError)
             return Result.Err<bool>("Failed to delete media in AzuraCast");
-        
+
         if (isPlaylistDeleteError)
             logger.LogWarning("Failed to delete AzuraCast playlist for timeslot, but successfully deleted the media.");
 

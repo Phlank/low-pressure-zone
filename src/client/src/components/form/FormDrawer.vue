@@ -8,7 +8,7 @@
       show-close-icon
       v-bind="$attrs">
       <template #header>
-        <h2>{{ title }}</h2>
+        <h2 class="form-drawer__title">{{ title }}</h2>
       </template>
       <slot></slot>
       <template #footer>
@@ -88,6 +88,10 @@ div.p-drawer.p-component.form-drawer-component {
 
   div.p-divider-content {
     background-color: var(--p-form-drawer-content-background);
+  }
+
+  .form-drawer__title {
+    margin: 0;
   }
 
   .form-drawer__footer {

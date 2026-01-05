@@ -2,37 +2,32 @@
   <div class="news-form">
     <FormArea>
       <IftaFormField
-        :message="validation.message('title')"
+        :message="val.message('title')"
         input-id="titleInput"
         label="Title"
         size="xl">
         <InputText
           id="titleInput"
-          v-model:model-value="formState.title"
+          v-model:model-value="state.title"
           :disabled="isSubmitting"
-          :invalid="!validation.isValid('title')"
+          :invalid="!val.isValid('title')"
           autofocus />
       </IftaFormField>
       <IftaFormField
-        :message="validation.message('body')"
+        :message="val.message('body')"
         input-id="bodyInput"
         label="Body"
         size="full">
         <Textarea
           id="bodyInput"
-          v-model:model-value="formState.body"
+          v-model:model-value="state.body"
           :disabled="isSubmitting"
-          :invalid="!validation.isValid('body')"
+          :invalid="!val.isValid('body')"
           :rows="5"
           auto-resize />
       </IftaFormField>
       <template #actions>
-        <Button
-          v-if="!hideSubmit"
-          :disabled="isSubmitting"
-          :loading="isSubmitting"
-          label="Submit"
-          @click="submit" />
+        <slot name="actions"></slot>
       </template>
     </FormArea>
     <div class="news-form__preview">
@@ -45,53 +40,39 @@
 
 <script lang="ts" setup>
 import FormArea from '@/components/form/FormArea.vue'
-import type { NewsRequest, NewsResponse } from '@/api/resources/newsApi.ts'
-import { onMounted, ref, type Ref, watch } from 'vue'
-import { createFormValidation } from '@/validation/types/formValidation.ts'
+import type { NewsResponse } from '@/api/resources/newsApi.ts'
+import { onMounted, ref, watch } from 'vue'
 import { required } from '@/validation/rules/untypedRules.ts'
-import { Button, Divider, InputText, Textarea } from 'primevue'
-import type { Result } from '@/types/result.ts'
+import { Divider, InputText, Textarea } from 'primevue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import { useDebounceFn } from '@vueuse/core'
 import { parseMarkdownAsync } from '@/utils/markdown.ts'
 import { useNewsStore } from '@/stores/newsStore.ts'
+import { useEntityForm } from '@/composables/useEntityForm.ts'
 
 const news = useNewsStore()
 
 const props = defineProps<{
-  initialData?: NewsResponse
-  hideSubmit?: boolean
+  newsItem?: NewsResponse
 }>()
 
-const formState: Ref<NewsRequest> = ref({
-  title: '',
-  body: ''
+const { state, val, isSubmitting, submit, reset } = useEntityForm({
+  validationRules: {
+    title: required(),
+    body: required()
+  },
+  entity: props.newsItem,
+  formStateInitializeFn: (newsItem) =>
+    ref({
+      title: newsItem?.title ?? '',
+      body: newsItem?.body ?? ''
+    }),
+  createPersistentEntityFn: news.create,
+  updatePersistentEntityFn: news.update,
+  onSubmitted: () => emit('submitted')
 })
-const validation = createFormValidation(formState, {
-  title: required(),
-  body: required()
-})
-
-const isSubmitting = ref(false)
-const submit = async () => {
-  isSubmitting.value = true
-  let result: Result
-  if (props.initialData?.id) result = await news.update(props.initialData.id, formState, validation)
-  else result = await news.create(formState, validation)
-  isSubmitting.value = false
-  if (result.isSuccess) {
-    reset()
-    emit('submitted')
-  }
-}
-const reset = () => {
-  formState.value.title = props.initialData?.title ?? ''
-  formState.value.body = props.initialData?.body ?? ''
-}
 
 defineExpose({
-  formState,
-  validation,
   isSubmitting,
   submit,
   reset
@@ -102,11 +83,11 @@ const emit = defineEmits(['submitted'])
 const previewTitle = ref('')
 const previewBody = ref('')
 const updatePreview = useDebounceFn(async () => {
-  previewTitle.value = formState.value.title
-  previewBody.value = await parseMarkdownAsync(formState.value.body)
+  previewTitle.value = state.value.title
+  previewBody.value = await parseMarkdownAsync(state.value.body)
 }, 200)
 watch(
-  () => [formState.value.title, formState.value.body],
+  () => [state.value.title, state.value.body],
   () => {
     updatePreview()
   },

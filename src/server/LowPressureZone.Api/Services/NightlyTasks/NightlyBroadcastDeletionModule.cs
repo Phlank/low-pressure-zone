@@ -3,11 +3,13 @@ using LowPressureZone.Adapter.AzuraCast.Clients;
 
 namespace LowPressureZone.Api.Services.NightlyTasks;
 
-public sealed partial class NightlyBroadcastDeletionModule(IAzuraCastClient client, ILogger<NightlyBroadcastDeletionModule> logger)
+public sealed partial class NightlyBroadcastDeletionModule(
+    IAzuraCastClient client,
+    ILogger<NightlyBroadcastDeletionModule> logger)
 {
     private const int DaysToKeep = 14;
     private static DateTime CutoffDate => DateTime.UtcNow.AddDays(-DaysToKeep);
-    
+
     public async Task DeleteOutOfDateBroadcastsAsync()
     {
         LogDeletingBroadcasts(logger, DaysToKeep);
@@ -41,12 +43,14 @@ public sealed partial class NightlyBroadcastDeletionModule(IAzuraCastClient clie
 
         LogFinishedDeletingBroadcasts(logger);
     }
-    
+
     [LoggerMessage(LogLevel.Information, "Deleting broadcasts older than {days} days")]
     static partial void LogDeletingBroadcasts(ILogger<NightlyBroadcastDeletionModule> logger, int days);
 
     [LoggerMessage(LogLevel.Error, "Failed to delete broadcasts: {reason}")]
-    static partial void LogFailedToDeleteBroadcastsReason(ILogger<NightlyBroadcastDeletionModule> logger, string reason);
+    static partial void LogFailedToDeleteBroadcastsReason(
+        ILogger<NightlyBroadcastDeletionModule> logger,
+        string reason);
 
     [LoggerMessage(LogLevel.Information, "{outOfDateBroadcasts} broadcasts out of date will be deleted")]
     static partial void LogBroadcastsOutOfDateWillBeDeleted(

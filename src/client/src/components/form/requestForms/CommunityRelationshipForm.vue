@@ -1,6 +1,6 @@
 <template>
   <div class="community-relationship-form">
-    <FormArea :align-actions="alignActions">
+    <FormArea v-bind="$attrs">
       <IftaFormField
         :message="validation.message('userId')"
         input-id="userInput"
@@ -9,7 +9,7 @@
         <Select
           id="userInput"
           v-model="formState.userId"
-          :disabled="props.initialState !== undefined || isSubmitting"
+          :disabled="props.relationship !== undefined || isSubmitting"
           :invalid="!validation.isValid('userId')"
           :option-label="(user: UserResponse) => user.displayName"
           :option-value="(user: UserResponse) => user.id"
@@ -38,21 +38,18 @@
         </div>
       </FormField>
       <template #actions>
-        <Button
-          :disabled="isSubmitting"
-          :loading="isSubmitting"
-          label="Save"
-          @click="submit" />
+        <slot name="actions"></slot>
       </template>
     </FormArea>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Button, Checkbox, Select, useToast } from 'primevue'
+import { Checkbox, Select } from 'primevue'
 import { type UserResponse } from '@/api/resources/usersApi.ts'
-import { onMounted, ref } from 'vue'
-import communityRelationshipsApi, {
+import { computed, onMounted, type Ref, ref } from 'vue'
+import {
+  type CommunityRelationshipRequest,
   type CommunityRelationshipResponse
 } from '@/api/resources/communityRelationshipsApi.ts'
 import FormArea from '@/components/form/FormArea.vue'
@@ -62,73 +59,86 @@ import { alwaysValid, required } from '@/validation/rules/untypedRules.ts'
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import { useAuthStore } from '@/stores/authStore.ts'
 import roles from '@/constants/roles.ts'
-import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import { useUserStore } from '@/stores/userStore.ts'
-import { showSuccessToast } from '@/utils/toastUtils.ts'
 import { useCommunityStore } from '@/stores/communityStore.ts'
+import { entitiesExceptIds } from '@/utils/arrayUtils.ts'
+import type { Result } from '@/types/result.ts'
 
 const authStore = useAuthStore()
-const userStore = useUserStore()
-const communityStore = useCommunityStore()
-const toast = useToast()
+const users = useUserStore()
+const communities = useCommunityStore()
 
-const props = withDefaults(
-  defineProps<{
-    communityId: string
-    relationshipId?: string
-    initialState?: CommunityRelationshipResponse
-    availableUsers: UserResponse[]
-    alignActions?: 'left' | 'right'
-  }>(),
-  {
-    alignActions: 'left'
+const availableUsers = computed(() => {
+  if (props.relationship) {
+    const user = users.getUser(props.relationship.userId)
+    return user ? [user] : []
   }
-)
+  const inUse = communities
+    .getRelationships(props.communityId)
+    .map((relationship) => relationship.userId)
+  return entitiesExceptIds(users.users, inUse)
+})
 
-const formState = ref({
+const props = defineProps<{
+  communityId: string
+  relationship?: CommunityRelationshipResponse
+}>()
+
+const formState: Ref<CommunityRelationshipRequest & { userId: string }> = ref({
   userId: '',
   isPerformer: false,
   isOrganizer: false
 })
-
 const validation = createFormValidation(formState, {
   userId: required(),
   isPerformer: alwaysValid(),
   isOrganizer: alwaysValid()
 })
 
-onMounted(async () => {
-  reset()
-})
-
-const reset = () => {
-  formState.value.userId = props.initialState?.userId ?? props.availableUsers[0]!.id
-  formState.value.isPerformer = props.initialState?.isPerformer ?? false
-  formState.value.isOrganizer = props.initialState?.isOrganizer ?? false
-}
-
 const isSubmitting = ref(false)
 const submit = async () => {
-  if (!validation.validate()) return
   isSubmitting.value = true
-  const result = await communityRelationshipsApi.put(
-    props.communityId,
-    formState.value.userId,
-    formState.value
-  )
+  let result: Result
+  if (props.relationship) {
+    result = await communities.updateRelationship(
+      props.communityId,
+      props.relationship.userId,
+      formState,
+      validation
+    )
+  } else {
+    result = await communities.createRelationship(
+      props.communityId,
+      formState.value.userId,
+      formState,
+      validation
+    )
+  }
   isSubmitting.value = false
-  if (tryHandleUnsuccessfulResponse(result, toast, validation)) return
-  showSuccessToast(
-    toast,
-    'Updated',
-    'Relationship',
-    userStore.getUser(formState.value.userId)?.displayName ?? ''
-  )
-  await communityStore.loadRelationshipsAsync(props.communityId)
-  emits('afterSubmit')
+  if (!result.isSuccess) return
+  reset()
+  emit('submitted')
 }
 
-const emits = defineEmits<{
-  afterSubmit: []
+const reset = () => {
+  formState.value.userId = props.relationship?.userId ?? ''
+  formState.value.isPerformer = props.relationship?.isPerformer ?? false
+  formState.value.isOrganizer = props.relationship?.isOrganizer ?? false
+}
+
+defineExpose({
+  formState,
+  validation,
+  isSubmitting,
+  submit,
+  reset
+})
+
+const emit = defineEmits<{
+  submitted: []
 }>()
+
+onMounted(() => {
+  reset()
+})
 </script>

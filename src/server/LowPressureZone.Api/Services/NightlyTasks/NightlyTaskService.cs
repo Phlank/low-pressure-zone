@@ -29,10 +29,15 @@ public sealed partial class NightlyTaskService(
         return Task.CompletedTask;
     }
 
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _isStarted = false;
+        return Task.CompletedTask;
+    }
+
     private async Task ContinuallyExecuteNightlyTasksAsync()
     {
         while (await _timer.WaitForNextTickAsync() && _isStarted)
-        {
             try
             {
                 if (_isFirstTick)
@@ -50,13 +55,6 @@ public sealed partial class NightlyTaskService(
                                                     "An exception was thrown while executing nightly tasks. Please check the logs for more details.");
                 logger.LogError(ex, "Exception thrown while executing nightly tasks");
             }
-        }
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        _isStarted = false;
-        return Task.CompletedTask;
     }
 
     [LoggerMessage(LogLevel.Information, "Nightly task service started, first run in {minutes} minutes")]

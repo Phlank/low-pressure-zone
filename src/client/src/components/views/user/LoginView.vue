@@ -2,6 +2,7 @@
   <SinglePanelViewWrapper class="login-view">
     <FormArea is-single-column>
       <IftaFormField
+        :message="validation.message('username')"
         input-id="usernameInput"
         label="Username"
         size="m">
@@ -9,9 +10,12 @@
           id="usernameInput"
           v-model:model-value="formState.username"
           :autofocus="true"
-          :disabled="isSubmitting" />
+          :disabled="isSubmitting"
+          :invalid="!validation.isValid('username')"
+          @change="validation.validateIfDirty('username')" />
       </IftaFormField>
       <IftaFormField
+        :message="validation.message('password')"
         input-id="passwordInput"
         label="Password"
         size="m">
@@ -19,18 +23,10 @@
           id="passwordInput"
           v-model:model-value="formState.password"
           :disabled="isSubmitting"
-          :feedback="false" />
+          :feedback="false"
+          :invalid="!validation.isValid('password')"
+          @change="validation.validateIfDirty('password')" />
       </IftaFormField>
-      <FormField
-        v-if="errorMessage"
-        input-id=""
-        size="m">
-        <Message
-          severity="error"
-          style="width: 100%">
-          {{ errorMessage }}
-        </Message>
-      </FormField>
       <template #actions>
         <Button
           :disabled="isSubmitting"
@@ -53,30 +49,26 @@ import { useAuthStore } from '@/stores/authStore'
 import { loginRequestRules } from '@/validation/requestRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { onKeyDown } from '@vueuse/core'
-import { Button, InputText, Message, Password, useToast } from 'primevue'
-import { reactive, ref } from 'vue'
-import authApi, { type LoginRequest } from '@/api/resources/authApi.ts'
-import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import { Button, InputText, Password } from 'primevue'
+import { type Ref, ref } from 'vue'
+import { type LoginRequest } from '@/api/resources/authApi.ts'
 import { useRouter } from 'vue-router'
 import SinglePanelViewWrapper from '@/components/layout/SinglePanelViewWrapper.vue'
 import FormArea from '@/components/form/FormArea.vue'
-import FormField from '@/components/form/FormField.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
-import { useScheduleStore } from '@/stores/scheduleStore.ts'
 
-const toast = useToast()
 const router = useRouter()
+const auth = useAuthStore()
 
-const formState: LoginRequest = reactive({
+const formState: Ref<LoginRequest> = ref({
   username: '',
   password: ''
 })
-const validationState = createFormValidation(formState, loginRequestRules)
+const validation = createFormValidation(formState, loginRequestRules)
 
 onKeyDown(KeyName.Enter, () => handleLogin())
 
 const isSubmitting = ref(false)
-const errorMessage = ref('')
 
 withDefaults(
   defineProps<{
@@ -88,28 +80,12 @@ withDefaults(
 )
 
 const handleLogin = async () => {
-  const isValid = validationState.validate()
-  if (!isValid) return
-
   isSubmitting.value = true
-  const response = await authApi.postLogin(formState)
-  if (!response.isSuccess()) {
-    isSubmitting.value = false
-    if (response.status === 403) {
-      errorMessage.value = 'Invalid credentials'
-      return
-    }
-    tryHandleUnsuccessfulResponse(response, toast)
-  }
-
-  if (response.data().requiresTwoFactor) {
-    await router.replace(Routes.TwoFactor)
-    return
-  }
-
-  await useAuthStore().load()
-  await useScheduleStore().loadDefaultSchedulesAsync()
+  const result = await auth.loginAsync(formState, validation)
   isSubmitting.value = false
-  await router.push(Routes.Schedules)
+  if (!result.isSuccess) return
+  if (result.value) {
+    await router.push(Routes.Schedules)
+  }
 }
 </script>

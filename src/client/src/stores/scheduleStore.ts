@@ -1,104 +1,192 @@
 import { defineStore } from 'pinia'
-import { computed, type Ref, ref } from 'vue'
+import { computed, type ComputedRef, type Ref, ref, watch } from 'vue'
 import schedulesApi, { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
-import timeslotsApi from '@/api/resources/timeslotsApi.ts'
+import timeslotsApi, { type TimeslotResponse } from '@/api/resources/timeslotsApi.ts'
 import { addDays, compareAsc, getTime } from 'date-fns'
+import { useRefresh } from '@/composables/useRefresh.ts'
+import {
+  useCreatePersistentItemFn,
+  useRemovePersistentItemFn,
+  useUpdatePersistentItemFn
+} from '@/utils/storeFns.ts'
+import { useCommunityStore } from '@/stores/communityStore.ts'
+import { useToast } from 'primevue'
+import { addChronologically, getEntity, getEntityMap, removeEntity } from '@/utils/arrayUtils.ts'
+import {
+  showCreateSuccessToast,
+  showDeleteSuccessToast,
+  showEditSuccessToast
+} from '@/utils/toastUtils.ts'
+import { parseDate } from '@/utils/dateUtils.ts'
+import { usePerformerStore } from '@/stores/performerStore.ts'
+import { useAuthStore } from '@/stores/authStore.ts'
+
+const DEFAULT_SCHEDULE_DAY_RANGE = 30
 
 export const useScheduleStore = defineStore('scheduleStore', () => {
-  const loadedSchedules: Ref<ScheduleResponse[]> = ref([])
-  const loadedSchedulesMap: Ref<ScheduleMap> = ref({})
+  const schedules: Ref<ScheduleResponse[]> = ref([])
+  const schedulesMap: Ref<Partial<Record<string, ScheduleResponse>>> = ref({})
+  const timeslots: ComputedRef<TimeslotResponse[]> = computed(() =>
+    schedules.value.flatMap((schedule) => schedule.timeslots)
+  )
+  const toast = useToast()
+  const performers = usePerformerStore()
+  const auth = useAuthStore()
+  const { getCommunityById } = useCommunityStore()
 
-  const defaultScheduleDayRange = 30
-
-  let loadDefaultSchedulesPromise: Promise<void> | undefined = undefined
-  const loadDefaultSchedules = async (): Promise<void> => {
-    const parameters = {
-      after: addDays(new Date(), -defaultScheduleDayRange).toISOString(),
-      before: addDays(new Date(), defaultScheduleDayRange).toISOString()
+  const { isLoading, refresh } = useRefresh(
+    schedulesApi.get,
+    (data) => {
+      schedules.value = [...data].sort((a, b) => compareAsc(a.endsAt, b.endsAt))
+      schedulesMap.value = getEntityMap(data)
+    },
+    {
+      params: {
+        after: addDays(new Date(), -DEFAULT_SCHEDULE_DAY_RANGE).toISOString(),
+        before: addDays(new Date(), DEFAULT_SCHEDULE_DAY_RANGE).toISOString()
+      }
     }
-    const response = await schedulesApi.get(parameters)
-    if (!response.isSuccess()) return
-    loadedSchedules.value = response.data().sort((a, b) => compareAsc(a.endsAt, b.endsAt))
-    loadedSchedulesMap.value = mapSchedules(response.data())
-  }
+  )
+  watch(
+    () => auth.isLoggedIn,
+    async (newVal) => {
+      if (newVal) await refresh()
+    }
+  )
 
-  const loadDefaultSchedulesAsync = async (): Promise<void> => {
-    loadDefaultSchedulesPromise ??= loadDefaultSchedules()
-    await loadDefaultSchedulesPromise
-    loadDefaultSchedulesPromise = undefined
-  }
-
-  const schedules = computed(() => loadedSchedules.value)
+  const getSchedules = computed(() => schedules.value)
 
   const upcomingSchedules = computed(() =>
-    loadedSchedules.value.filter((schedule) => getTime(schedule.endsAt) > Date.now())
+    schedules.value.filter((schedule) => getTime(schedule.endsAt) > Date.now())
   )
 
   const pastSchedules = computed(() => {
-    const schedules = loadedSchedules.value.filter(
-      (schedule) => getTime(schedule.endsAt) <= Date.now()
-    )
-    return [...schedules].reverse()
+    return schedules.value.filter((schedule) => getTime(schedule.endsAt) <= Date.now()).reverse()
   })
 
   const nextSchedule = computed(() => {
-    loadedSchedules.value.sort((a, b) => compareAsc(a.endsAt, b.endsAt))
-    return loadedSchedules.value.find((schedule) => getTime(schedule.endsAt) > Date.now())
+    schedules.value.sort((a, b) => compareAsc(a.endsAt, b.endsAt))
+    return schedules.value.find((schedule) => getTime(schedule.endsAt) > Date.now())
   })
 
-  const addSchedule = (schedule: ScheduleResponse) => {
-    loadedSchedulesMap.value[schedule.id] = schedule
-    const index = loadedSchedules.value.findIndex(
-      (loadedSchedule) => getTime(loadedSchedule.endsAt) > getTime(schedule.endsAt)
-    )
-    loadedSchedules.value.splice(index, 0, schedule)
+  const getScheduleById = (id: string): ScheduleResponse | undefined => {
+    return schedulesMap.value[id]
   }
 
-  const removeSchedule = (id: string) => {
-    const index = loadedSchedules.value.findIndex((schedule) => schedule.id === id)
-    if (index > -1) {
-      loadedSchedules.value.splice(index, 1)
-      loadedSchedulesMap.value[id] = undefined
-    }
-  }
+  const createSchedule = useCreatePersistentItemFn(
+    schedulesApi.post,
+    (id, form) => {
+      const entity: ScheduleResponse = {
+        id,
+        startsAt: form.startsAt,
+        endsAt: form.endsAt,
+        description: form.description,
+        timeslots: [],
+        community: getCommunityById(form.communityId)!,
+        isDeletable: true,
+        isEditable: true,
+        isTimeslotCreationAllowed: true
+      }
+      addChronologically(schedules.value, entity, (schedule) => schedule.startsAt)
+      schedulesMap.value[id] = entity
+      showCreateSuccessToast(toast, 'Schedule', parseDate(form.startsAt).toLocaleString())
+    },
+    toast
+  )
 
-  const updateScheduleAsync = async (id: string) => {
-    const response = await schedulesApi.getById(id)
-    if (!response.isSuccess()) return
-    const index = loadedSchedules.value.findIndex((schedule) => schedule.id === id)
-    if (index > -1) {
-      loadedSchedules.value.splice(index, 1, response.data())
-      loadedSchedulesMap.value[id] = response.data()
-    } else {
-      addSchedule(response.data())
-    }
-  }
+  const updateSchedule = useUpdatePersistentItemFn(
+    schedules,
+    schedulesApi.put,
+    (form, entity) => {
+      entity.startsAt = form.startsAt
+      entity.endsAt = form.endsAt
+      entity.description = form.description
+      entity.community = getCommunityById(form.communityId)!
+      schedules.value.sort((a, b) => compareAsc(a.startsAt, b.startsAt))
+      showEditSuccessToast(toast, 'Schedule', parseDate(form.startsAt).toLocaleString())
+    },
+    toast
+  )
 
-  const reloadTimeslotsAsync = async (scheduleId: string): Promise<void> => {
-    if (loadedSchedulesMap.value[scheduleId] === undefined) return
-    const response = await timeslotsApi.get(scheduleId)
-    if (!response.isSuccess()) return
-    loadedSchedulesMap.value[scheduleId].timeslots = response.data()
-  }
+  const removeSchedule = useRemovePersistentItemFn(
+    schedules,
+    schedulesApi.delete,
+    (entity) => {
+      removeEntity(schedules.value, entity.id)
+      schedulesMap.value[entity.id] = undefined
+      showDeleteSuccessToast(toast, 'Schedule', parseDate(entity.startsAt).toLocaleString())
+    },
+    toast
+  )
+
+  const getTimeslotById = (id: string) => getEntity(timeslots.value, id)
+
+  const createTimeslot = useCreatePersistentItemFn(
+    timeslotsApi.post,
+    (id, form) => {
+      const schedule = getEntity(schedules.value, form.scheduleId)
+      const performer = performers.getById(form.performerId)
+      if (!schedule || !performer) throw new Error('Schedule or performer not found')
+      const entity = {
+        id,
+        scheduleId: form.scheduleId,
+        performer: performer,
+        performanceType: form.performanceType,
+        name: form.name,
+        startsAt: form.startsAt,
+        endsAt: form.endsAt,
+        isEditable: true,
+        isDeletable: true,
+        uploadedFileName: form.file?.name ?? null
+      }
+      addChronologically(schedule.timeslots, entity, (timeslot) => timeslot.startsAt)
+    },
+    toast
+  )
+
+  const updateTimeslot = useUpdatePersistentItemFn(
+    timeslots,
+    timeslotsApi.put,
+    (form, entity) => {
+      entity.performanceType = form.performanceType
+      entity.name = form.name
+      entity.startsAt = form.startsAt
+      entity.endsAt = form.endsAt
+      if (form.replaceMedia && form.file) {
+        entity.uploadedFileName = form.file.name
+      }
+      entity.performer = performers.getById(form.performerId)!
+      showEditSuccessToast(toast, 'Timeslot', parseDate(entity.startsAt).toLocaleString())
+    },
+    toast
+  )
+
+  const removeTimeslot = useRemovePersistentItemFn(
+    timeslots,
+    timeslotsApi.delete,
+    (entity) => {
+      const schedule = schedulesMap.value[entity.scheduleId]
+      if (!schedule) return
+      removeEntity(schedule.timeslots, entity.id)
+      showDeleteSuccessToast(toast, 'Timeslot', parseDate(entity.startsAt).toLocaleString())
+    },
+    toast
+  )
 
   return {
+    isLoading,
+    refresh,
     nextSchedule,
-    schedules,
+    schedules: getSchedules,
     upcomingSchedules,
     pastSchedules,
-    loadDefaultSchedulesAsync,
-    reloadTimeslotsAsync,
-    addSchedule,
+    getScheduleById,
+    createSchedule,
     removeSchedule,
-    updateScheduleAsync
+    updateSchedule,
+    getTimeslotById,
+    createTimeslot,
+    updateTimeslot,
+    removeTimeslot
   }
 })
-
-type ScheduleMap = { [id: string]: ScheduleResponse | undefined }
-const mapSchedules = (schedules: ScheduleResponse[]) => {
-  const map: ScheduleMap = {}
-  schedules.forEach((schedule) => {
-    map[schedule.id] = schedule
-  })
-  return map
-}

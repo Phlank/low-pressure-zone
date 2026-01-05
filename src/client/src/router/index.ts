@@ -44,7 +44,8 @@ const router = createRouter({
           path: 'communities',
           name: 'Communities',
           component: () =>
-            import('@/components/views/dashboard/communities/DashboardCommunitiesView.vue')
+            import('@/components/views/dashboard/communities/DashboardCommunitiesView.vue'),
+          meta: { auth: true, roles: [roles.admin, roles.organizer] }
         },
         {
           path: 'performers',
@@ -101,20 +102,21 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, _, next) => {
-  if (!to.meta.auth) {
+  const authStore = useAuthStore()
+  const meta = to.meta as { auth?: boolean; roles?: Role[] }
+  if (!meta.auth) {
     next()
     return
   }
 
-  const authStore = useAuthStore()
-  await authStore.loadIfNotInitialized()
-  if (!authStore.isLoggedIn()) {
+  await authStore.initializeAsync()
+  if (!authStore.isLoggedIn) {
     next(Routes.Login)
     return
   }
 
-  const allowedRoles = (to.meta.roles ?? []) as Role[]
-  if (allowedRoles.length === 0 || authStore.isInAnySpecifiedRole(...allowedRoles)) {
+  const allowedRoles = (meta.roles ?? [])
+  if (allowedRoles.length === 0 || authStore.isInAnyRoles(...allowedRoles)) {
     next()
     return
   }

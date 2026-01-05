@@ -3,28 +3,23 @@ import type { PerformerResponse } from './performersApi.ts'
 import { sendPostXhr, sendPutXhr } from '@/api/xhrFunctions.ts'
 import type { Ref } from 'vue'
 
-const route = (scheduleId: string, timeslotId?: string) =>
-  `/schedules/${scheduleId}/timeslots${timeslotId ? '/' + timeslotId : ''}`
+const route = (id?: string) => `/timeslots${id ? '/' + id : ''}`
 
 export default {
-  get: (scheduleId: string) => sendGet<TimeslotResponse[]>(route(scheduleId)),
-  getById: (scheduleId: string, timeslotId: string) =>
-    sendGet<TimeslotResponse>(route(scheduleId, timeslotId)),
+  get: (scheduleId: string) => sendGet<TimeslotResponse[]>(route(), { scheduleId: scheduleId }),
+  getById: (timeslotId: string) => sendGet<TimeslotResponse>(route(timeslotId)),
   put: <TRequest extends TimeslotRequest>(
-    scheduleId: string,
     timeslotId: string,
     request: TRequest,
-    progressRef: Ref<number>
-  ) => sendPutXhr(route(scheduleId, timeslotId), mapRequest(request), progressRef),
-  post: <TRequest extends TimeslotRequest>(
-    scheduleId: string,
-    request: TRequest,
-    progressRef: Ref<number>
-  ) => sendPostXhr(route(scheduleId), mapRequest(request), progressRef),
-  delete: (scheduleId: string, timeslotId: string) => sendDelete(route(scheduleId, timeslotId))
+    progressRef?: Ref<number>
+  ) => sendPutXhr(route(timeslotId), mapRequest(request), progressRef),
+  post: <TRequest extends TimeslotRequest>(request: TRequest, progressRef: Ref<number> | undefined) =>
+    sendPostXhr(route(), mapRequest(request), progressRef),
+  delete: (timeslotId: string) => sendDelete(route(timeslotId))
 }
 
 export interface TimeslotRequest {
+  scheduleId: string
   performerId: string
   performanceType: PerformanceType
   startsAt: string
@@ -36,6 +31,7 @@ export interface TimeslotRequest {
 
 const mapRequest = <TRequest extends TimeslotRequest>(request: TRequest): TimeslotRequest => {
   return {
+    scheduleId: request.scheduleId,
     performerId: request.performerId,
     performanceType: request.performanceType,
     startsAt: request.startsAt,
@@ -48,6 +44,7 @@ const mapRequest = <TRequest extends TimeslotRequest>(request: TRequest): Timesl
 
 export interface TimeslotResponse {
   id: string
+  scheduleId: string
   performer: PerformerResponse
   performanceType: PerformanceType
   name: string | null

@@ -1,15 +1,15 @@
 <template>
   <div class="upcoming-schedules">
     <Skeleton
-      v-if="!isLoaded"
+      v-if="schedules.isLoading"
       height="250px" />
     <div v-else>
       <ScheduleNavigator
-        v-if="schedules.length > 0"
+        v-if="schedules.upcomingSchedules.length > 0"
         :schedules="schedules"
         @changeSchedule="handleChangeSchedule" />
       <div
-        v-if="schedules.length === 0"
+        v-if="schedules.upcomingSchedules.length === 0"
         class="upcoming-schedules__content upcoming-schedules__content--none">
         No upcoming schedule to display.
       </div>
@@ -22,7 +22,7 @@
           {{ scheduleData?.description }}
         </div>
         <DataTable
-          :loading="!isLoaded"
+          :loading="schedules.isLoading"
           :value="scheduleData!.timeslots">
           <Column
             field="start"
@@ -63,20 +63,18 @@
 
 <script lang="ts" setup>
 import { getPreviousHour, hoursBetween, isDateInTimeslot, parseDate } from '@/utils/dateUtils'
-import { Column, DataTable, Skeleton, useToast } from 'primevue'
-import { computed, type ComputedRef, inject, onMounted, ref, type Ref } from 'vue'
-import schedulesApi, { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
-import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import { Column, DataTable, Skeleton } from 'primevue'
+import { computed, type ComputedRef, inject, ref, type Ref } from 'vue'
 import ListItem from '@/components/data/ListItem.vue'
 import ScheduleNavigator from '@/components/controls/ScheduleNavigator.vue'
 import SlotTime from '@/components/controls/SlotTime.vue'
 import SlotName from '@/components/controls/SlotName.vue'
+import { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
+import { useScheduleStore } from '@/stores/scheduleStore.ts'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
-const schedules: Ref<ScheduleResponse[]> = ref([])
 const scheduleIndex: Ref<number> = ref(0)
-const isLoaded = ref(false)
-const toast = useToast()
+const schedules = useScheduleStore()
 
 interface ScheduleData {
   id: string
@@ -95,14 +93,14 @@ interface TimeslotData {
 }
 
 const handleChangeSchedule = (newId: string) => {
-  const index = schedules.value.findIndex((s) => s.id === newId)
+  const index = schedules.upcomingSchedules.findIndex((s) => s.id === newId)
   if (index === -1) return
   scheduleIndex.value = index
 }
 
 const scheduleData: ComputedRef<ScheduleData | undefined> = computed(() => {
-  if (schedules.value.length === 0) return undefined
-  const schedule = schedules.value[scheduleIndex.value]!
+  if (schedules.upcomingSchedules.length === 0) return undefined
+  const schedule = schedules.upcomingSchedules[scheduleIndex.value]!
   return {
     id: schedule.id,
     start: parseDate(schedule.startsAt),
@@ -139,15 +137,6 @@ const mapTimeslotDisplayData = (schedule: ScheduleResponse) => {
   })
   return timeslotData
 }
-
-onMounted(async () => {
-  const response = await schedulesApi.get({ after: new Date().toISOString() })
-  if (tryHandleUnsuccessfulResponse(response, toast)) return
-  if (response.isSuccess()) {
-    schedules.value = response.data().sort((a, b) => Date.parse(a.endsAt) - Date.parse(b.endsAt))
-    isLoaded.value = true
-  }
-})
 </script>
 
 <style lang="scss">

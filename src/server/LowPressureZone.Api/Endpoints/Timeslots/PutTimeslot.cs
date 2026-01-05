@@ -5,14 +5,14 @@ using LowPressureZone.Api.Services.Files;
 using LowPressureZone.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace LowPressureZone.Api.Endpoints.Schedules.Timeslots;
+namespace LowPressureZone.Api.Endpoints.Timeslots;
 
 public class PutTimeslot(DataContext dataContext, PrerecordedMixFileProcessor fileProcessor, TimeslotRules rules)
     : EndpointWithMapper<TimeslotRequest, TimeslotMapper>
 {
     public override void Configure()
     {
-        Put("/schedules/{scheduleId}/timeslots/{timeslotId}");
+        Put("/timeslots/{id}");
         AllowFormData();
         AllowFileUploads();
         Description(builder => builder.Produces(204)
@@ -21,14 +21,12 @@ public class PutTimeslot(DataContext dataContext, PrerecordedMixFileProcessor fi
 
     public override async Task HandleAsync(TimeslotRequest request, CancellationToken ct)
     {
-        var scheduleId = Route<Guid>("scheduleId");
-        var timeslotId = Route<Guid>("timeslotId");
+        var timeslotId = Route<Guid>("id");
 
         var timeslot = await dataContext.Timeslots
                                         .Include(timeslot => timeslot.Performer)
                                         .Include(timeslot => timeslot.Schedule)
-                                        .Where(timeslot => timeslot.Id == timeslotId
-                                                           && timeslot.ScheduleId == scheduleId)
+                                        .Where(timeslot => timeslot.Id == timeslotId)
                                         .FirstOrDefaultAsync(ct);
 
         if (timeslot == null)
@@ -49,14 +47,14 @@ public class PutTimeslot(DataContext dataContext, PrerecordedMixFileProcessor fi
             var updateAzuraCastResult = await fileProcessor.UpdateEnqueuedPrerecordedMixAsync(timeslotId, request, ct);
             if (updateAzuraCastResult.IsError)
                 ValidationFailures.AddRange(updateAzuraCastResult.Error);
-            
+
             ThrowIfAnyErrors();
             timeslot.AzuraCastMediaId = updateAzuraCastResult.Value;
         }
 
         Map.UpdateEntity(request, timeslot);
         _ = await dataContext.SaveChangesAsync(ct);
-        
+
         await SendNoContentAsync(ct);
     }
 }

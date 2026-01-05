@@ -12,12 +12,12 @@
       @submit="newsFormRef?.submit">
       <NewsForm
         ref="newsFormRef"
-        :initial-data="editingNewsItem"
+        :news-item="editingNewsItem"
         hide-submit
         @submitted="isDrawerVisible = false" />
     </FormDrawer>
     <DeleteDialog
-      @close="isDeleteDialogVisible = false"
+      @hide="isDeleteDialogVisible = false"
       v-model:visible="isDeleteDialogVisible"
       :is-submitting="isDeleteSubmitting"
       entity-type="News"
