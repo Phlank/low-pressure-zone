@@ -17,7 +17,7 @@
 import { onMounted, ref, watch } from 'vue'
 import ExpandableContent from '@/components/controls/ExpandableContent.vue'
 import { parseMarkdownAsync } from '@/utils/markdown.ts'
-import { useAboutSettingsStore } from '@/stores/aboutSettingsStore.ts'
+import { useAboutSettingsStore } from '@/stores/settings/aboutSettingsStore.ts'
 import { Skeleton } from 'primevue'
 
 const aboutSettings = useAboutSettingsStore()

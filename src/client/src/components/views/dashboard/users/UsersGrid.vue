@@ -3,7 +3,7 @@
     <div v-if="!isMobile">
       <DataTable
         :rows="10"
-        :value="userStore.users.filter((user) => user.registrationDate)"
+        :value="usersToDisplay"
         data-key="id"
         paginator>
         <Column
@@ -38,7 +38,7 @@
         :paginator-templat="mobilePaginatorTemplate"
         :paginator-template="mobilePaginatorTemplate"
         :rows="5"
-        :value="userStore.users.filter((user) => user.registrationDate)"
+        :value="usersToDisplay"
         data-key="id"
         paginator>
         <template #empty>
@@ -69,7 +69,7 @@
                   @click="emit('createStreamer', user)" />
               </template>
             </ListItem>
-            <Divider v-if="index !== userStore.users.length - 1" />
+            <Divider v-if="index < items.length - 1" />
           </div>
         </template>
         <template #footer>
@@ -88,7 +88,7 @@
 import ListItem from '@/components/data/ListItem.vue'
 import { parseDate } from '@/utils/dateUtils'
 import { Button, Column, DataTable, DataView, Divider } from 'primevue'
-import { inject, type Ref } from 'vue'
+import { computed, inject, type Ref } from 'vue'
 import { type UserResponse } from '@/api/resources/usersApi.ts'
 import { mobilePaginatorTemplate } from '@/constants/componentTemplates.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
@@ -98,6 +98,10 @@ import { useUserStore } from '@/stores/userStore.ts'
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const authStore = useAuthStore()
 const userStore = useUserStore()
+
+const usersToDisplay = computed(() =>
+  userStore.users.filter((user) => user.registrationDate !== null || user.isAdmin)
+)
 
 const emit = defineEmits<{
   newInvite: []

@@ -16,10 +16,10 @@ import { mobileWidth } from '@/constants/size.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
 import { isTrueString } from '@/utils/booleanUtils.ts'
 
-const authStore = useAuthStore()
+const auth = useAuthStore()
 
 onMounted(async () => {
-  await authStore.initializeAsync()
+  await auth.initializeAsync()
 })
 
 const isMobile: Ref<boolean> = ref(false)

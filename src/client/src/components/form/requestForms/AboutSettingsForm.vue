@@ -45,7 +45,7 @@ import { ref, type Ref, watch } from 'vue'
 import type { AboutSettingsRequest } from '@/api/resources/settingsApi.ts'
 import { createFormValidation } from '@/validation/types/formValidation.ts'
 import { required } from '@/validation/rules/untypedRules.ts'
-import { useAboutSettingsStore } from '@/stores/aboutSettingsStore.ts'
+import { useAboutSettingsStore } from '@/stores/settings/aboutSettingsStore.ts'
 
 const aboutSettings = useAboutSettingsStore()
 

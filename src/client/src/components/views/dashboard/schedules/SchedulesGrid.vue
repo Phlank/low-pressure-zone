@@ -65,9 +65,10 @@
             label="Create Schedule"
             @click="emit('create')" />
         </template>
-        <template #footer>
+        <template
+          #footer
+          v-if="!hideActions && isMobile">
           <Button
-            v-if="!hideActions && isMobile"
             label="Create Schedule"
             style="width: 100%"
             @click="emit('create')" />
