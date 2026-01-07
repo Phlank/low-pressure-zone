@@ -59,14 +59,11 @@ const isSubmitting = ref(false)
 const submit = async () => {
   if (!val.validate()) return
   isSubmitting.value = true
-  console.log('submitting')
   const tabs = ref([...welcomeSettings.tabs])
   const tabIndex = tabs.value.findIndex((tab) => tab.title === props.tabTitle)
   if (tabIndex === -1) {
-    console.log('pushing tab')
     tabs.value.push(state.value)
   } else {
-    console.log('updating tab at index', tabIndex)
     tabs.value[tabIndex] = state.value
   }
   const newSetting = ref({ tabs: tabs.value })
