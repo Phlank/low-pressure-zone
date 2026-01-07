@@ -74,7 +74,7 @@ withDefaults(
     redirect?: string
   }>(),
   {
-    redirect: Routes.Schedules
+    redirect: Routes.Welcome
   }
 )
 
