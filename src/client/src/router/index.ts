@@ -36,6 +36,11 @@ const router = createRouter({
       children: [
         {
           path: '',
+          name: 'Welcome',
+          component: () => import('@/components/views/dashboard/DashboardWelcomeView.vue')
+        },
+        {
+          path: 'schedules',
           name: 'Schedules',
           component: () =>
             import('@/components/views/dashboard/schedules/DashboardSchedulesView.vue')

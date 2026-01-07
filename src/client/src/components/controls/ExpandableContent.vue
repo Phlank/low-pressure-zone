@@ -43,7 +43,7 @@ useResizeObserver(document.body, () => {
 })
 
 useMutationObserver(
-  bottomElementRef.value as HTMLElement,
+  bottomElementRef,
   () => {
     recalculateHeight()
   },

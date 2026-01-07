@@ -17,9 +17,15 @@
     }
   }
 
+  div.p-menu {
+    border: none;
+  }
+
   &__left {
     @include variables.desktop {
       min-width: 30%;
+      position: sticky;
+      top: variables.$header-height;
     }
   }
 
