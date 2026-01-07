@@ -13,11 +13,6 @@
       <Column
         field="title"
         header="Title" />
-<!--      <Column header="Content">-->
-<!--        <template #body="{ data }: { data: TabContent }">-->
-<!--          <span class="ellipsis">{{ data.body }}</span>-->
-<!--        </template>-->
-<!--      </Column>-->
       <Column class="grid-action-col grid-action-col--2">
         <template #body="{ data }: { data: TabContent }">
             <GridActions
@@ -79,7 +74,7 @@ const onRowReorder = async (event: DataTableRowReorderEvent) => {
     tabs: notEmpty()
   })
   isSubmittingReorder.value = true
-  const result = await welcomeSettings.update(formRef, validation)
+  await welcomeSettings.update(formRef, validation)
   isSubmittingReorder.value = false
 }
 
@@ -106,9 +101,7 @@ const handleDelete = async (tab: TabContent) => {
     tabs: notEmpty()
   })
   isSubmittingDelete.value = true
-  const result = await welcomeSettings.update(formRef, validation)
+  await welcomeSettings.update(formRef, validation)
   isSubmittingDelete.value = false
 }
 </script>
-
-<style scoped lang="scss"></style>

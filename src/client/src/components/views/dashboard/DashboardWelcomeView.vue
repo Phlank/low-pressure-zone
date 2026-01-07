@@ -32,7 +32,7 @@ const currentTab = ref(welcomeSettings.tabs[0]?.title ?? '')
 watch(
   () => welcomeSettings.tabs,
   (newTabs) => {
-    if (!newTabs.find((tab) => tab.title === currentTab.value)) {
+    if (!newTabs.some((tab) => tab.title === currentTab.value)) {
       currentTab.value = newTabs[0]?.title ?? ''
     }
   }
