@@ -19,14 +19,14 @@ public class DeleteTimeslot(
 {
     public override void Configure()
     {
-        Delete("/timeslots/{timeslotId}");
+        Delete("/timeslots/{id:guid}");
         Description(builder => builder.Produces(204)
                                       .Produces(404));
     }
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var timeslotId = Route<Guid>("timeslotId");
+        var timeslotId = Route<Guid>("id");
         var timeslot = await dataContext.Timeslots
                                         .AsNoTracking()
                                         .Include(t => t.Performer)

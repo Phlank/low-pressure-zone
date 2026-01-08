@@ -12,6 +12,7 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     public DbSet<Performer> Performers { get; set; }
     public DbSet<Schedule> Schedules { get; set; }
     public DbSet<Setting> Settings { get; set; }
+    public DbSet<Soundclash> Soundclashes { get; set; }
     public DbSet<Timeslot> Timeslots { get; set; }
     public DbSet<News> News { get; set; }
 
@@ -33,6 +34,7 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
                     .HasIndex(nameof(Setting.Key)).IsUnique();
     }
 
-    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder) =>
-        configurationBuilder.ConfigureSmartEnum();
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+    }
 }

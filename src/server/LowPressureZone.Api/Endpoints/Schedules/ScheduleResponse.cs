@@ -1,5 +1,7 @@
-﻿using LowPressureZone.Api.Endpoints.Communities;
+﻿using System.Text.Json.Serialization;
+using LowPressureZone.Api.Endpoints.Communities;
 using LowPressureZone.Api.Endpoints.Timeslots;
+using LowPressureZone.Domain.Enums;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
@@ -14,4 +16,6 @@ public sealed class ScheduleResponse
     public required bool IsEditable { get; set; }
     public required bool IsDeletable { get; set; }
     public required bool IsTimeslotCreationAllowed { get; set; }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public required ScheduleType Type { get; set; }
 }

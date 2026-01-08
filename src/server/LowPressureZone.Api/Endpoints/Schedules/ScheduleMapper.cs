@@ -21,9 +21,10 @@ public sealed class ScheduleMapper(
         {
             Id = Guid.NewGuid(),
             CommunityId = req.CommunityId,
-            Subtitle = req.Description,
+            Description = req.Description,
             StartsAt = req.StartsAt.ToUniversalTime(),
-            EndsAt = req.EndsAt.ToUniversalTime()
+            EndsAt = req.EndsAt.ToUniversalTime(),
+            Type = req.Type
         };
 
     public async Task UpdateEntityAsync(
@@ -35,7 +36,7 @@ public sealed class ScheduleMapper(
         schedule.StartsAt = req.StartsAt;
         schedule.EndsAt = req.EndsAt;
         schedule.CommunityId = req.CommunityId;
-        schedule.Subtitle = req.Description;
+        schedule.Description = req.Description;
         if (!dataContext.ChangeTracker.HasChanges()) return;
         schedule.LastModifiedDate = DateTime.UtcNow;
         await dataContext.SaveChangesAsync(ct);
@@ -52,12 +53,13 @@ public sealed class ScheduleMapper(
             Id = schedule.Id,
             StartsAt = schedule.StartsAt,
             EndsAt = schedule.EndsAt,
-            Description = schedule.Subtitle,
+            Description = schedule.Description,
             Community = communityMapper.FromEntity(schedule.Community),
             Timeslots = schedule.Timeslots.Select(timeslotMapper.FromEntity),
             IsEditable = rules.IsEditAuthorized(schedule),
             IsDeletable = rules.IsDeleteAuthorized(schedule),
-            IsTimeslotCreationAllowed = rules.IsAddingTimeslotsAuthorized(schedule)
+            IsTimeslotCreationAllowed = rules.IsAddingTimeslotsAuthorized(schedule),
+            Type = schedule.Type
         };
     }
 }

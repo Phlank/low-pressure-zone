@@ -1,0 +1,27 @@
+using FastEndpoints;
+using LowPressureZone.Api.Extensions;
+using LowPressureZone.Domain;
+using LowPressureZone.Identity.Constants;
+
+namespace LowPressureZone.Api.Endpoints.Soundclashes;
+
+public class PostSoundclash(DataContext dataContext) : EndpointWithMapper<SoundclashRequest, SoundclashMapper>
+{
+    public override void Configure()
+    {
+        Post("/soundclashes");
+        Roles(RoleNames.Organizer, RoleNames.Admin);
+    }
+
+    public override async Task HandleAsync(SoundclashRequest req, CancellationToken ct)
+    {
+        var soundclash = Map.FromRequest(req);
+        dataContext.Soundclashes.Add(soundclash);
+        await dataContext.SaveChangesAsync(ct);
+        HttpContext.ExposeLocation();
+        await SendCreatedAtAsync<GetSoundclashById>(new
+        {
+            soundclash.Id
+        }, cancellation: ct);
+    }
+}

@@ -3,9 +3,11 @@ using FFMpegCore;
 using FluentValidation;
 using FluentValidation.Results;
 using LowPressureZone.Api.Constants;
+using LowPressureZone.Api.Constants.Errors;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Services.Audio;
 using LowPressureZone.Domain;
+using LowPressureZone.Domain.Enums;
 using LowPressureZone.Domain.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Shouldly;
@@ -51,6 +53,10 @@ public sealed class TimeslotRequestValidator : Validator<TimeslotRequest>
                 return;
             }
 
+            if (schedule.Type != ScheduleType.Hourly)
+            {
+                context.AddFailure(nameof(request.ScheduleId), TimeslotErrors.ScheduleNotCorrectType);
+            }
             if (request.StartsAt < schedule.StartsAt || request.StartsAt > schedule.EndsAt)
                 context.AddFailure(nameof(request.StartsAt), Errors.OutOfScheduleRange);
             if (request.EndsAt < schedule.StartsAt || request.EndsAt > schedule.EndsAt)
