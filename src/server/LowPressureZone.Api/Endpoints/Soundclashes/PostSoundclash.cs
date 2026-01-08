@@ -11,6 +11,8 @@ public class PostSoundclash(DataContext dataContext) : EndpointWithMapper<Soundc
     {
         Post("/soundclashes");
         Roles(RoleNames.Organizer, RoleNames.Admin);
+        Description(builder => builder.Produces(201)
+                                      .WithTags("Soundclashes"));
     }
 
     public override async Task HandleAsync(SoundclashRequest req, CancellationToken ct)

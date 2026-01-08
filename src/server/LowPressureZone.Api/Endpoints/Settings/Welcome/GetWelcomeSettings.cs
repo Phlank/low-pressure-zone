@@ -13,7 +13,7 @@ public sealed class GetWelcomeSettings(DataContext dataContext)
     {
         Get("/settings/welcome");
         Roles(RoleNames.Performer, RoleNames.Organizer, RoleNames.Admin);
-        Description(b => b.WithTags("Settings", "Welcome")
+        Description(b => b.WithTags("Settings")
                           .Produces(200));
     }
 

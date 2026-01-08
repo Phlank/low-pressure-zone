@@ -2,6 +2,23 @@
   <div class="schedule-form">
     <FormArea>
       <IftaFormField
+        :message="validation.message('type')"
+        input-id="typeInput"
+        label="Type"
+        size="m">
+        <Select
+          id="typeInput"
+          v-model:model-value="formState.type"
+          :disabled="isSubmitting || props.schedule !== undefined"
+          :invalid="!validation.isValid('type')"
+          :options="entriesToKeyValueArray(scheduleTypes)"
+          :option-label="(data) => data.value"
+          :option-value="(data) => data.key"
+          autofocus
+          @update:model-value="validation.validateIfDirty('type')">
+        </Select>
+      </IftaFormField>
+      <IftaFormField
         :message="validation.message('communityId')"
         input-id="communityInput"
         label="Community"
@@ -12,7 +29,6 @@
           :disabled="isSubmitting || props.schedule?.community.id !== undefined"
           :invalid="!validation.isValid('communityId')"
           :options="availableCommunities"
-          autofocus
           option-label="name"
           option-value="id"
           placeholder="Select an community"
@@ -85,6 +101,8 @@ import IftaFormField from '@/components/form/IftaFormField.vue'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
 import { useEntityForm } from '@/composables/useEntityForm.ts'
 import { alwaysValid } from '@/validation/rules/untypedRules.ts'
+import entriesToKeyValueArray from '@/utils/entriesToKeyValueArray.ts'
+import { scheduleTypes } from '@/constants/scheduleTypes.ts'
 
 const maxDurationMinutes = 1440
 const defaultMinutes = 60
@@ -141,6 +159,7 @@ const {
   entity: props.schedule,
   formStateInitializeFn: (schedule) => {
     const stateRef: Ref<ScheduleFormState> = ref({
+      type: schedule?.type ?? scheduleTypes.Hourly,
       communityId: schedule?.community.id ?? '',
       startTime: computed({
         get: () => parseDate(stateRef.value.startsAt),

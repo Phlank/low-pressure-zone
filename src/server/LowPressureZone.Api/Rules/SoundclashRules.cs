@@ -7,7 +7,7 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Rules;
 
-public sealed class SoundclashRules(HttpContextAccessor contextAccessor)
+public sealed class SoundclashRules(IHttpContextAccessor contextAccessor)
 {
     private ClaimsPrincipal? User => contextAccessor.GetAuthenticatedUserOrDefault();
 

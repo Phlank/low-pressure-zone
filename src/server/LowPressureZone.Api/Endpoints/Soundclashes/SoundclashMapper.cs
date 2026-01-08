@@ -27,6 +27,7 @@ public class SoundclashMapper(SoundclashRules rules, PerformerMapper performerMa
         soundclash.PerformerTwo.ShouldNotBeNull();
         return new SoundclashResponse
         {
+            Id = soundclash.Id,
             ScheduleId = soundclash.ScheduleId,
             PerformerOne = performerMapper.FromEntity(soundclash.PerformerOne),
             PerformerTwo = performerMapper.FromEntity(soundclash.PerformerTwo),

@@ -4,6 +4,7 @@ namespace LowPressureZone.Api.Endpoints.Soundclashes;
 
 public sealed class SoundclashResponse
 {
+    public required Guid Id { get; set; }
     public required Guid ScheduleId { get; set; }
     public required PerformerResponse PerformerOne { get; set; }
     public required PerformerResponse PerformerTwo { get; set; }

@@ -17,6 +17,7 @@ export default {
 }
 
 export interface ScheduleRequest {
+  type: string
   startsAt: string
   endsAt: string
   description: string
@@ -25,6 +26,7 @@ export interface ScheduleRequest {
 
 export interface ScheduleResponse {
   id: string
+  type: string
   startsAt: string
   endsAt: string
   description: string
@@ -38,6 +40,7 @@ export interface ScheduleResponse {
 // Forms will deal with dates, but we don't want to send the actual dates into the API
 const mapRequest = <TSchedule extends ScheduleRequest>(schedule: TSchedule): ScheduleRequest => {
   return {
+    type: schedule.type,
     communityId: schedule.communityId,
     startsAt: schedule.startsAt,
     endsAt: schedule.endsAt,
@@ -47,6 +50,7 @@ const mapRequest = <TSchedule extends ScheduleRequest>(schedule: TSchedule): Sch
 
 const mapResponseToRequest = (response: ScheduleResponse): ScheduleRequest => {
   return {
+    type: response.type,
     communityId: response.community.id,
     startsAt: response.startsAt,
     endsAt: response.endsAt,

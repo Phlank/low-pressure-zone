@@ -7,7 +7,7 @@ export enum Routes {
   Register = '/user/register',
   ResendInvite = '/user/resendinvite',
   Welcome = '/dashboard',
-  Schedules = '/dashboard/scheduled',
+  Schedules = '/dashboard/schedules',
   Communities = '/dashboard/communities',
   Performers = '/dashboard/performers',
   Broadcasts = '/dashboard/broadcasts',

@@ -9,7 +9,7 @@ import {
   requireAnyOtherCharacter,
   url
 } from './rules/stringRules'
-import { alwaysValid, applyRuleIf, required } from './rules/untypedRules'
+import { alwaysValid, applyRuleIf, oneOf, required } from './rules/untypedRules'
 import type { PropertyRules } from './types/propertyRules'
 import { combineRules } from './types/validationRule'
 import type { CommunityRequest } from '@/api/resources/communitiesApi.ts'
@@ -21,6 +21,7 @@ import type { InviteRequest } from '@/api/resources/invitesApi.ts'
 import type { StreamerRequest } from '@/api/resources/usersApi.ts'
 import { maxSize, mimeType } from '@/validation/rules/fileRules.ts'
 import { audioMimeTypes } from '@/constants/audioMimeTypes.ts'
+import { scheduleTypes } from '@/constants/scheduleTypes.ts'
 
 export const communityRequestRules: PropertyRules<CommunityRequest> = {
   name: combineRules(required(), maximumLength(64)),
@@ -36,6 +37,10 @@ export const scheduleRequestRules = (
   formState: ScheduleRequest
 ): PropertyRules<ScheduleRequest> => {
   return {
+    type: combineRules(
+      required(),
+      oneOf([scheduleTypes.Hourly, scheduleTypes.Soundclash], 'Invalid schedule type')
+    ),
     communityId: required(),
     startsAt: combineRules(required(), hourOnly()),
     endsAt: combineRules(
