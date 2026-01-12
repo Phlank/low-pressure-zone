@@ -1,7 +1,13 @@
 import { defineStore } from 'pinia'
 import { computed, type ComputedRef, type Ref, ref, watch } from 'vue'
-import schedulesApi, { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
-import timeslotsApi, { type TimeslotResponse } from '@/api/resources/timeslotsApi.ts'
+import schedulesApi, {
+  type ScheduleRequest,
+  type ScheduleResponse
+} from '@/api/resources/schedulesApi.ts'
+import timeslotsApi, {
+  type TimeslotRequest,
+  type TimeslotResponse
+} from '@/api/resources/timeslotsApi.ts'
 import { addDays, compareAsc, getTime } from 'date-fns'
 import { useRefresh } from '@/composables/useRefresh.ts'
 import {
@@ -20,6 +26,11 @@ import {
 import { parseDate } from '@/utils/dateUtils.ts'
 import { usePerformerStore } from '@/stores/performerStore.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
+import soundclashApi, {
+  type SoundclashRequest,
+  type SoundclashResponse
+} from '@/api/resources/soundclashApi.ts'
+import {scheduleTypes} from "@/constants/scheduleTypes.ts";
 
 const DEFAULT_SCHEDULE_DAY_RANGE = 30
 
@@ -28,6 +39,9 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
   const schedulesMap: Ref<Partial<Record<string, ScheduleResponse>>> = ref({})
   const timeslots: ComputedRef<TimeslotResponse[]> = computed(() =>
     schedules.value.flatMap((schedule) => schedule.timeslots)
+  )
+  const soundclashes: ComputedRef<SoundclashResponse[]> = computed(() =>
+    schedules.value.flatMap((schedule) => schedule.soundclashes)
   )
   const toast = useToast()
   const performers = usePerformerStore()
@@ -73,19 +87,22 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
     return schedulesMap.value[id]
   }
 
-  const createSchedule = useCreatePersistentItemFn(
+  const createSchedule = useCreatePersistentItemFn<ScheduleRequest>(
     schedulesApi.post,
     (id, form) => {
       const entity: ScheduleResponse = {
         id,
+        type: form.type,
         startsAt: form.startsAt,
         endsAt: form.endsAt,
         description: form.description,
         timeslots: [],
+        soundclashes: [],
         community: getCommunityById(form.communityId)!,
         isDeletable: true,
         isEditable: true,
-        isTimeslotCreationAllowed: true
+        isTimeslotCreationAllowed: form.type === scheduleTypes.Hourly,
+        isSoundclashCreationAllowed: form.type === scheduleTypes.Soundclash
       }
       addChronologically(schedules.value, entity, (schedule) => schedule.startsAt)
       schedulesMap.value[id] = entity
@@ -94,10 +111,11 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
     toast
   )
 
-  const updateSchedule = useUpdatePersistentItemFn(
+  const updateSchedule = useUpdatePersistentItemFn<ScheduleRequest, ScheduleResponse>(
     schedules,
     schedulesApi.put,
     (form, entity) => {
+      entity.type = form.type
       entity.startsAt = form.startsAt
       entity.endsAt = form.endsAt
       entity.description = form.description
@@ -108,7 +126,7 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
     toast
   )
 
-  const removeSchedule = useRemovePersistentItemFn(
+  const removeSchedule = useRemovePersistentItemFn<ScheduleResponse>(
     schedules,
     schedulesApi.delete,
     (entity) => {
@@ -121,7 +139,7 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
 
   const getTimeslotById = (id: string) => getEntity(timeslots.value, id)
 
-  const createTimeslot = useCreatePersistentItemFn(
+  const createTimeslot = useCreatePersistentItemFn<TimeslotRequest>(
     timeslotsApi.post,
     (id, form) => {
       const schedule = getEntity(schedules.value, form.scheduleId)
@@ -132,7 +150,7 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
         scheduleId: form.scheduleId,
         performer: performer,
         performanceType: form.performanceType,
-        name: form.name,
+        name: form.subtitle,
         startsAt: form.startsAt,
         endsAt: form.endsAt,
         isEditable: true,
@@ -140,16 +158,17 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
         uploadedFileName: form.file?.name ?? null
       }
       addChronologically(schedule.timeslots, entity, (timeslot) => timeslot.startsAt)
+      showCreateSuccessToast(toast, 'Timeslot', parseDate(entity.startsAt).toLocaleString())
     },
     toast
   )
 
-  const updateTimeslot = useUpdatePersistentItemFn(
+  const updateTimeslot = useUpdatePersistentItemFn<TimeslotRequest, TimeslotResponse>(
     timeslots,
     timeslotsApi.put,
     (form, entity) => {
       entity.performanceType = form.performanceType
-      entity.name = form.name
+      entity.subtitle = form.subtitle
       entity.startsAt = form.startsAt
       entity.endsAt = form.endsAt
       if (form.replaceMedia && form.file) {
@@ -161,7 +180,7 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
     toast
   )
 
-  const removeTimeslot = useRemovePersistentItemFn(
+  const removeTimeslot = useRemovePersistentItemFn<TimeslotResponse>(
     timeslots,
     timeslotsApi.delete,
     (entity) => {
@@ -171,6 +190,72 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
       showDeleteSuccessToast(toast, 'Timeslot', parseDate(entity.startsAt).toLocaleString())
     },
     toast
+  )
+
+  const getSoundclashById = (id: string) => getEntity(soundclashes.value, id)
+
+  const createSoundclash = useCreatePersistentItemFn<SoundclashRequest>(
+    soundclashApi.post,
+    (id, request) => {
+      const entity: SoundclashResponse = {
+        id: id,
+        scheduleId: request.scheduleId,
+        performerOne: performers.getById(request.performerOneId)!,
+        performerTwo: performers.getById(request.performerTwoId)!,
+        roundOne: request.roundOne,
+        roundTwo: request.roundTwo,
+        roundThree: request.roundThree,
+        startsAt: request.startsAt,
+        endsAt: request.endsAt,
+        isEditable: true,
+        isDeletable: true
+      }
+      addChronologically(
+        getScheduleById(entity.scheduleId)!.soundclashes,
+        entity,
+        (soundclash) => soundclash.startsAt
+      )
+      showCreateSuccessToast(
+        toast,
+        'Soundclash',
+        `${entity.performerOne.name} vs. ${entity.performerTwo.name}`
+      )
+    },
+    toast
+  )
+
+  const updateSoundclash = useUpdatePersistentItemFn<SoundclashRequest, SoundclashResponse>(
+    soundclashes,
+    soundclashApi.put,
+    (form, entity) => {
+      entity.scheduleId = form.scheduleId
+      entity.performerOne = performers.getById(form.performerOneId)!
+      entity.performerTwo = performers.getById(form.performerTwoId)!
+      entity.roundOne = form.roundOne
+      entity.roundTwo = form.roundTwo
+      entity.roundThree = form.roundThree
+      entity.startsAt = form.startsAt
+      entity.endsAt = form.endsAt
+      showEditSuccessToast(
+        toast,
+        'Soundclash',
+        `${entity.performerOne.name} vs. ${entity.performerTwo.name}`
+      )
+    },
+    toast
+  )
+
+  const deleteSoundclash = useRemovePersistentItemFn<SoundclashResponse>(
+    soundclashes,
+    soundclashApi.delete,
+    (entity) => {
+      removeEntity(getScheduleById(entity.scheduleId)?.soundclashes ?? [], entity.id)
+      showDeleteSuccessToast(
+        toast,
+        'Soundclash',
+        `${entity.performerOne.name} vs. ${entity.performerTwo.name}`
+      )
+    }
   )
 
   return {
@@ -187,6 +272,10 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
     getTimeslotById,
     createTimeslot,
     updateTimeslot,
-    removeTimeslot
+    removeTimeslot,
+    getSoundclashById,
+    createSoundclash,
+    updateSoundclash,
+    deleteSoundclash
   }
 })

@@ -6,6 +6,7 @@ export const withinRangeOf =
   (other: () => string, minMinutes: number, maxMinutes: number, msg?: string) => (arg: string) => {
     const otherTime = Date.parse(other())
     const thisTime = Date.parse(arg)
+    console.log(new Date(thisTime), new Date(otherTime))
     if (!otherTime || !thisTime) return valid // Don't unintentionally enforce required validation
     if (
       otherTime + MS_PER_MINUTE * minMinutes <= thisTime &&

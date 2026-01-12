@@ -11,7 +11,7 @@ interface UseEntityFormParameters<
 > {
   validationRules:
     | PropertyRules<TFormState>
-    | ((formState: TFormState) => PropertyRules<TFormState>)
+    | ((formState: Ref<TFormState>) => PropertyRules<TFormState>)
   formStateInitializeFn: ((entity?: TEntity) => Ref<TFormState>) | (() => Ref<TFormState>)
   entity?: TEntity
   createPersistentEntityFn?: (
@@ -74,7 +74,7 @@ export const useEntityForm = <
   else state = formStateInitializeFn()
 
   const rules =
-    typeof validationRules === 'function' ? validationRules(state.value) : validationRules
+    typeof validationRules === 'function' ? validationRules(state) : validationRules
   const val: FormValidation<TFormState> = createFormValidation(state, rules)
   const isSubmitting = ref(false)
   const progress = ref(0)

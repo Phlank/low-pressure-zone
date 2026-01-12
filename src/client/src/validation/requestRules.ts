@@ -22,6 +22,8 @@ import type { StreamerRequest } from '@/api/resources/usersApi.ts'
 import { maxSize, mimeType } from '@/validation/rules/fileRules.ts'
 import { audioMimeTypes } from '@/constants/audioMimeTypes.ts'
 import { scheduleTypes } from '@/constants/scheduleTypes.ts'
+import type { SoundclashRequest } from '@/api/resources/soundclashApi.ts'
+import type { Ref } from 'vue'
 
 export const communityRequestRules: PropertyRules<CommunityRequest> = {
   name: combineRules(required(), maximumLength(64)),
@@ -34,7 +36,7 @@ export const performerRequestRules: PropertyRules<PerformerRequest> = {
 }
 
 export const scheduleRequestRules = (
-  formState: ScheduleRequest
+  formState: Ref<ScheduleRequest>
 ): PropertyRules<ScheduleRequest> => {
   return {
     type: combineRules(
@@ -46,14 +48,14 @@ export const scheduleRequestRules = (
     endsAt: combineRules(
       required(),
       hourOnly(),
-      withinRangeOf(() => formState.startsAt, 60, 1440, '1 - 24h allowed')
+      withinRangeOf(() => formState.value.startsAt, 60, 1440, '1 - 24h allowed')
     ),
     description: alwaysValid()
   }
 }
 
 export const timeslotRequestRules = (
-  formState: TimeslotRequest
+  formState: Ref<TimeslotRequest>
 ): PropertyRules<TimeslotRequest> => {
   return {
     scheduleId: required(),
@@ -63,17 +65,34 @@ export const timeslotRequestRules = (
     endsAt: combineRules(
       required(),
       hourOnly(),
-      withinRangeOf(() => formState.startsAt, 60, 180, '1 - 3h allowed')
+      withinRangeOf(() => formState.value.startsAt, 60, 180, '1 - 3h allowed')
     ),
-    name: maximumLength(64),
+    subtitle: maximumLength(64),
     file: combineRules<File | null>(
       mimeType(audioMimeTypes, 'Allowed audio types: wav, flac, mp3, m4a, vorbis, and opus.'),
       maxSize(1024 * 1024 * 1024, 'Max file size is 1GB.'),
-      applyRuleIf(required(), () => formState.performanceType === 'Prerecorded DJ Set')
+      applyRuleIf(required(), () => formState.value.performanceType === 'Prerecorded DJ Set')
     ),
     replaceMedia: alwaysValid()
   }
 }
+
+export const soundclashRequestRules = (
+  formState: Ref<SoundclashRequest>
+): PropertyRules<SoundclashRequest> => ({
+  roundOne: combineRules(required()),
+  roundTwo: combineRules(required()),
+  roundThree: combineRules(required()),
+  performerOneId: required(),
+  performerTwoId: required(),
+  scheduleId: required(),
+  startsAt: combineRules(required(), hourOnly()),
+  endsAt: combineRules(
+    required(),
+    hourOnly(),
+    withinRangeOf(() => formState.value.startsAt, 120, 120, '2h allowed')
+  )
+})
 
 export const loginRequestRules: PropertyRules<LoginRequest> = {
   username: required(),

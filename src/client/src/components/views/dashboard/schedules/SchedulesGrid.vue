@@ -54,10 +54,13 @@
             </template>
           </Column>
         </template>
-        <template #expansion="rowProps">
+        <template #expansion="rowProps: { data: ScheduleResponse }">
+          <SoundclashGrid
+            v-if="rowProps.data.type === scheduleTypes.Soundclash"
+            :schedule="rowProps.data" />
           <TimeslotsGrid
-            :schedule="rowProps.data"
-            :disabled="false" />
+            v-if="rowProps.data.type === scheduleTypes.Hourly"
+            :schedule="rowProps.data" />
         </template>
         <template #paginatorstart>
           <Button
@@ -66,8 +69,8 @@
             @click="emit('create')" />
         </template>
         <template
-          #footer
-          v-if="!hideActions && isMobile">
+          v-if="!hideActions && isMobile"
+          #footer>
           <Button
             label="Create Schedule"
             style="width: 100%"
@@ -80,12 +83,14 @@
 
 <script lang="ts" setup>
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
-import { formatReadableTime, parseDate, parseTime } from '@/utils/dateUtils'
-import { Button, Column, DataTable } from 'primevue'
-import { computed, inject, ref, type Ref } from 'vue'
+import {formatReadableTime, parseDate, parseTime} from '@/utils/dateUtils'
+import {Button, Column, DataTable} from 'primevue'
+import {computed, inject, ref, type Ref} from 'vue'
 import TimeslotsGrid from './TimeslotsGrid.vue'
-import { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
-import { mobilePaginatorTemplate } from '@/constants/componentTemplates.ts'
+import {type ScheduleResponse} from '@/api/resources/schedulesApi.ts'
+import {mobilePaginatorTemplate} from '@/constants/componentTemplates.ts'
+import {scheduleTypes} from '@/constants/scheduleTypes.ts'
+import SoundclashGrid from "@/components/views/dashboard/schedules/SoundclashGrid.vue";
 
 const expandedRows = ref({})
 const isMobile: Ref<boolean> | undefined = inject('isMobile')

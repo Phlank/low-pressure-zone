@@ -1,18 +1,18 @@
 <template>
   <div class="two-line-data">
-    <div class="two-line-data__top">{{ top }}</div>
+    <div class="two-line-data__top">{{ above }}</div>
     <div
-      v-if="bottom"
+      v-if="below"
       class="two-line-data__bottom">
-      {{ bottom }}
+      {{ below }}
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 defineProps<{
-  top: string
-  bottom: string
+  above: string
+  below: string
 }>()
 </script>
 

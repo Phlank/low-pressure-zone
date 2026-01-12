@@ -1,6 +1,7 @@
 import { sendDelete, sendGet, sendPost, sendPut } from '../fetchFunctions'
 import type { CommunityResponse } from '@/api/resources/communitiesApi.ts'
 import type { TimeslotResponse } from '@/api/resources/timeslotsApi.ts'
+import type {SoundclashResponse} from "@/api/resources/soundclashApi.ts";
 
 const route = (scheduleId?: string) => `/schedules${scheduleId ? '/' + scheduleId : ''}`
 
@@ -32,12 +33,13 @@ export interface ScheduleResponse {
   description: string
   community: CommunityResponse
   timeslots: TimeslotResponse[]
+  soundclashes: SoundclashResponse[]
   isEditable: boolean
   isDeletable: boolean
   isTimeslotCreationAllowed: boolean
+  isSoundclashCreationAllowed: boolean
 }
 
-// Forms will deal with dates, but we don't want to send the actual dates into the API
 const mapRequest = <TSchedule extends ScheduleRequest>(schedule: TSchedule): ScheduleRequest => {
   return {
     type: schedule.type,

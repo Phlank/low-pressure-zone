@@ -1,7 +1,7 @@
 <template>
   <TwoLineData
-    :bottom="name"
-    :top="performer" />
+    :below="name"
+    :above="performer" />
 </template>
 
 <script lang="ts" setup>

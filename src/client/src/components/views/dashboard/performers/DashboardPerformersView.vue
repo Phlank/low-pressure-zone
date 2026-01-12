@@ -17,7 +17,7 @@
         </TabPanel>
         <TabPanel value="all">
           <PerformersGrid
-            :performers="performers.items"
+            :performers="performers.performers"
             @create="handleCreate"
             @delete="handleDeleteAction"
             @edit="handleEdit" />

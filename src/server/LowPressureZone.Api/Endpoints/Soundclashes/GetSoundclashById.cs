@@ -29,7 +29,7 @@ public class GetSoundclashById(DataContext dataContext) : EndpointWithoutRequest
             return;
         }
 
-        var response = Map.ToResponse(soundclash);
+        var response = Map.FromEntity(soundclash);
         await SendOkAsync(response, ct);
     }
 }

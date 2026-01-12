@@ -1,5 +1,6 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Endpoints.Communities;
+using LowPressureZone.Api.Endpoints.Soundclashes;
 using LowPressureZone.Api.Endpoints.Timeslots;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
@@ -13,6 +14,7 @@ public sealed class ScheduleMapper(
     IHttpContextAccessor accessor,
     CommunityMapper communityMapper,
     TimeslotMapper timeslotMapper,
+    SoundclashMapper soundclashMapper,
     ScheduleRules rules)
     : IRequestMapper, IResponseMapper
 {
@@ -56,9 +58,11 @@ public sealed class ScheduleMapper(
             Description = schedule.Description,
             Community = communityMapper.FromEntity(schedule.Community),
             Timeslots = schedule.Timeslots.Select(timeslotMapper.FromEntity),
+            Soundclashes = schedule.Soundclashes.Select(soundclashMapper.FromEntity),
             IsEditable = rules.IsEditAuthorized(schedule),
             IsDeletable = rules.IsDeleteAuthorized(schedule),
-            IsTimeslotCreationAllowed = rules.IsAddingTimeslotsAuthorized(schedule),
+            IsTimeslotCreationAllowed = rules.IsAddingTimeslotsAllowed(schedule),
+            IsSoundclashCreationAllowed = rules.IsAddingSoundclashesAllowed(schedule),
             Type = schedule.Type
         };
     }

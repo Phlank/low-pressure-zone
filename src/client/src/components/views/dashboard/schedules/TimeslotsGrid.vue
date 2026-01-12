@@ -17,7 +17,7 @@
         header="Performer">
         <template #body="{ data }: { data: TimeslotRow }">
           <SlotName
-            :name="data.timeslot?.name ?? ''"
+            :name="data.timeslot?.subtitle ?? ''"
             :performer="data.timeslot?.performer.name ?? ''" />
         </template>
       </Column>
@@ -102,7 +102,7 @@ import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
 import TimeslotForm from '@/components/form/requestForms/TimeslotForm.vue'
 import {
   formatReadableTime,
-  hoursBetween,
+  timesBetween,
   isDateInTimeslot,
   parseDate,
   parseTime
@@ -142,7 +142,7 @@ watch(
 
 const setupRows = () => {
   const newRows: TimeslotRow[] = []
-  const hours = hoursBetween(startDate.value, endDate.value)
+  const hours = timesBetween(startDate.value, endDate.value)
   hours.forEach((hour) => {
     const timeslot = timeslots.value?.find((timeslot) => isDateInTimeslot(hour, timeslot))
     newRows.push({

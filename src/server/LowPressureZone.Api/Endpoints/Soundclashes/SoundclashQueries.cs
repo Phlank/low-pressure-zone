@@ -8,6 +8,7 @@ public static class SoundclashQueries
     public static IQueryable<Soundclash> GetSoundclashesForResponse(this IQueryable<Soundclash> query) =>
         query.Include(sc => sc.PerformerOne)
              .Include(sc => sc.PerformerTwo)
+             .OrderBy(sc => sc.StartsAt)
              .AsNoTracking();
 
     public static IQueryable<Soundclash> GetSoundclashForUpdate(

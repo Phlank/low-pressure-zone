@@ -44,7 +44,7 @@ public sealed class TimeslotMapper(
             ScheduleId = timeslot.ScheduleId,
             StartsAt = timeslot.StartsAt,
             EndsAt = timeslot.EndsAt,
-            Name = timeslot.Subtitle,
+            Subtitle = timeslot.Subtitle,
             Performer = performerMapper.FromEntity(timeslot.Performer),
             PerformanceType = timeslot.Type,
             UploadedFileName = timeslot.UploadedFileName,

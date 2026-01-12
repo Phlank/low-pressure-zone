@@ -36,7 +36,7 @@ import { Button, Drawer } from 'primevue'
 import { computed, inject, ref, type Ref, watch } from 'vue'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
-const position = computed(() => (isMobile?.value ? 'bottom' : 'right'))
+const position = computed(() => (isMobile?.value ? 'below' : 'right'))
 
 defineProps<{
   isSubmitting: boolean | undefined

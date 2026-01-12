@@ -61,7 +61,7 @@ import FormDrawer from '@/components/form/FormDrawer.vue'
 import WelcomeSettingsTabForm from '@/components/form/requestForms/WelcomeSettingsTabForm.vue'
 import { type Ref, ref, useTemplateRef } from 'vue'
 import { createFormValidation } from '@/validation/types/formValidation.ts'
-import { notEmpty } from '@/validation/rules/arrayRules.ts'
+import { notEmptyArray } from '@/validation/rules/arrayRules.ts'
 import MarkdownContent from "@/components/controls/MarkdownContent.vue";
 
 const welcomeSettings = useWelcomeSettingsStore()
@@ -71,7 +71,7 @@ const isSubmittingReorder = ref(false)
 const onRowReorder = async (event: DataTableRowReorderEvent) => {
   const formRef = ref({ tabs: event.value })
   const validation = createFormValidation(formRef, {
-    tabs: notEmpty()
+    tabs: notEmptyArray()
   })
   isSubmittingReorder.value = true
   await welcomeSettings.update(formRef, validation)
@@ -98,7 +98,7 @@ const handleDelete = async (tab: TabContent) => {
   const tabsCopy = welcomeSettings.tabs.filter((t) => t.title !== tab.title)
   const formRef = ref({ tabs: tabsCopy })
   const validation = createFormValidation(formRef, {
-    tabs: notEmpty()
+    tabs: notEmptyArray()
   })
   isSubmittingDelete.value = true
   await welcomeSettings.update(formRef, validation)

@@ -1,7 +1,7 @@
 <template>
   <TwoLineData
-    :bottom="formatReadableTime(utcDate) + ' UTC'"
-    :top="formatReadableTime(date)"
+    :above="formatReadableTime(date)"
+    :below="formatReadableTime(utcDate) + ' UTC'"
     class="slot-time" />
 </template>
 

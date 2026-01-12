@@ -21,7 +21,7 @@ public class SoundclashMapper(SoundclashRules rules, PerformerMapper performerMa
             EndsAt = req.EndsAt.ToUniversalTime()
         };
 
-    public SoundclashResponse ToResponse(Soundclash soundclash)
+    public SoundclashResponse FromEntity(Soundclash soundclash)
     {
         soundclash.PerformerOne.ShouldNotBeNull();
         soundclash.PerformerTwo.ShouldNotBeNull();
