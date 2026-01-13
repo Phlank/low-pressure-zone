@@ -13,7 +13,7 @@ public class GetSoundclashes(DataContext dataContext)
         AllowAnonymous();
         Description(builder => builder.Produces(200)
                                       .Produces(404)
-                                      .WithTags("Soundclash"));
+                                      .WithTags("Soundclashes"));
     }
 
     public override async Task HandleAsync(GetSoundclashesRequest req, CancellationToken ct)

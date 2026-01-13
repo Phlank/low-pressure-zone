@@ -33,7 +33,7 @@ public class PutSoundclash(DataContext dataContext, SoundclashRules rules) : End
             return;
         }
 
-        if (rules.IsEditAuthorized(soundclash))
+        if (!rules.IsEditAuthorized(soundclash))
         {
             await SendUnauthorizedAsync(ct);
             return;
