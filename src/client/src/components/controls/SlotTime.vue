@@ -17,3 +17,9 @@ const utcDate = computed(() => {
   return new Date(props.date.getTime() + props.date.getTimezoneOffset() * 60 * 1000)
 })
 </script>
+
+<style lang="scss" scoped>
+.slot-time {
+  width: max-content;
+}
+</style>
