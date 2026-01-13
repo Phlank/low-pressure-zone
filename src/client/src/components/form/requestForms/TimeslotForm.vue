@@ -44,12 +44,12 @@
       </IftaFormField>
       <IftaFormField
         :message="timeslotForm.val.message('subtitle')"
-        input-id="nameInput"
+        input-id="subtitleInput"
         label="Subtitle"
         optional
         size="m">
         <InputText
-          id="nameInput"
+          id="subtitleInput"
           v-model:model-value="timeslotForm.state.value.subtitle"
           :disabled="isSubmitting"
           :invalid="!timeslotForm.val.isValid('subtitle')" />
@@ -241,7 +241,7 @@ const timeslotForm = useEntityForm<TimeslotRequest, TimeslotFormState, TimeslotR
       endsAt: entity?.endsAt ?? addHours(props.start, 1).toISOString(),
       performerId: entity?.performer.id ?? defaultStartPerformerId.value ?? '',
       performanceType: entity?.performanceType ?? PerformanceType.Live,
-      name: entity?.name ?? '',
+      subtitle: entity?.subtitle ?? '',
       file: null,
       replaceMedia: false
     })

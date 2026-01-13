@@ -3,7 +3,15 @@
     <DataTable
       :loading="schedules.isLoading"
       :value="rows">
-      <Column header="Time">
+      <template #empty>
+        No DJs have signed up for this schedule yet.
+      </template>
+      <Column>
+        <template #header>
+          <TwoLineData
+            above="Time (Local)"
+            below="Time (UTC)" />
+        </template>
         <template #body="{ data }: { data: TimeslotRow }">
           <SlotTime
             v-if="data.start"
@@ -12,7 +20,8 @@
       </Column>
       <Column
         field="timeslot.performer"
-        header="Performer">
+        header="Performer"
+        style="width: 100%">
         <template #body="{ data }: { data: TimeslotRow }">
           <ListItem v-if="data.timeslot">
             <template #left>
@@ -32,8 +41,11 @@
       </Column>
       <Column
         v-if="!isMobile"
-        field="timeslot.performanceType"
-        header="Type" />
+        header="Type">
+        <template #body="{ data }: { data: TimeslotRow }">
+          <div style="width: max-content">{{ data.timeslot?.performanceType }}</div>
+        </template>
+      </Column>
     </DataTable>
   </div>
 </template>
@@ -53,6 +65,7 @@ import {
   parseDate,
   timesBetween
 } from '@/utils/dateUtils.ts'
+import TwoLineData from '@/components/layout/TwoLineData.vue'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const schedules = useScheduleStore()

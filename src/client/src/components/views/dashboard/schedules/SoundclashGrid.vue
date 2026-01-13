@@ -1,6 +1,6 @@
 <template>
   <div class="soundclash-grid">
-    <p v-if="schedule.description">{{ schedule.description }}</p>
+    <p class="soundclash-grid__schedule-description">{{ schedule.description }}</p>
     <DataTable
       v-if="!isMobile"
       :value="rows"
@@ -30,6 +30,40 @@
         </template>
       </Column>
     </DataTable>
+    <DataView
+      v-if="isMobile"
+      :rows="rows.length"
+      :value="rows">
+      <template #list="{ items }: { items: SoundclashRow[] }">
+        <div
+          v-for="(data, index) in items"
+          :key="data.start.toISOString()"
+          class="p-mb-3">
+          <ListItem class="soundclash-grid__item">
+            <template #left>
+              <div>{{ formatReadableTime(data.start) }}</div>
+              <div>
+                {{
+                  data.soundclash
+                  ? `${data.soundclash?.performerOne.name} vs. ${data.soundclash?.performerTwo.name}`
+                  : ''
+                }}
+              </div>
+            </template>
+            <template #right>
+              <GridActions
+                :show-create="schedule.isSoundclashCreationAllowed && data.soundclash === undefined"
+                :show-delete="data.soundclash?.isDeletable"
+                :show-edit="data.soundclash?.isEditable"
+                @create="handleCreate(data)"
+                @delete="handleDelete(data)"
+                @edit="handleEdit(data)" />
+            </template>
+          </ListItem>
+          <Divider v-if="index < items.length - 1" />
+        </div>
+      </template>
+    </DataView>
     <FormDrawer
       v-if="selectedRow !== undefined"
       v-model:visible="showSoundclashForm"
@@ -44,23 +78,39 @@
         :start="selectedRow.start"
         @submitted="showSoundclashForm = false" />
     </FormDrawer>
+    <DeleteDialog
+      v-model:visible="showDeleteDialog"
+      :entity-name="
+        selectedRow?.soundclash?.performerOne.name +
+        ' vs. ' +
+        selectedRow?.soundclash?.performerTwo.name
+      "
+      :is-submitting="isDeleteSubmitting"
+      entity-type="Soundclash"
+      header="Delete Soundclash"
+      @delete="handleConfirmDelete"
+      @hide="showDeleteDialog = false" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import type { ScheduleResponse } from '@/api/resources/schedulesApi.ts'
-import { Column, DataTable } from 'primevue'
+import { Column, DataTable, DataView, Divider } from 'primevue'
 import type { SoundclashResponse } from '@/api/resources/soundclashApi.ts'
 import { inject, onMounted, type Ref, ref, useTemplateRef, watch } from 'vue'
-import { parseDate, parseTime, timesBetween } from '@/utils/dateUtils.ts'
+import { formatReadableTime, parseDate, parseTime, timesBetween } from '@/utils/dateUtils.ts'
 import SlotTime from '@/components/controls/SlotTime.vue'
 import TwoLineData from '@/components/layout/TwoLineData.vue'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import FormDrawer from '@/components/form/FormDrawer.vue'
 import SoundclashForm from '@/components/form/requestForms/SoundclashForm.vue'
+import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
+import { useScheduleStore } from '@/stores/scheduleStore.ts'
+import ListItem from '@/components/data/ListItem.vue'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const soundclashFormRef = useTemplateRef('soundclashFormRef')
+const schedules = useScheduleStore()
 
 const props = defineProps<{
   schedule: ScheduleResponse
@@ -107,13 +157,39 @@ const handleCreate = (row: SoundclashRow) => {
   selectedRow.value = row
   showSoundclashForm.value = true
 }
-
 const handleEdit = (row: SoundclashRow) => {
   selectedRow.value = row
   showSoundclashForm.value = true
 }
 
-const handleDelete = (row: SoundclashRow) => {}
+const showDeleteDialog = ref(false)
+const isDeleteSubmitting = ref(false)
+const handleDelete = (row: SoundclashRow) => {
+  selectedRow.value = row
+  showDeleteDialog.value = true
+}
+const handleConfirmDelete = async () => {
+  if (!selectedRow.value?.soundclash) return
+  isDeleteSubmitting.value = true
+  const result = await schedules.deleteSoundclash(selectedRow.value.soundclash.id)
+  showDeleteDialog.value = false
+  if (result.isSuccess) {
+    showDeleteDialog.value = false
+  }
+}
 
 onMounted(() => setupRows())
 </script>
+
+<style lang="scss" scoped>
+@use '@/assets/styles/variables';
+.soundclash-grid {
+  &__item {
+    padding: variables.$space-m 0;
+  }
+
+  &__schedule-description {
+    font-size: medium;
+  }
+}
+</style>

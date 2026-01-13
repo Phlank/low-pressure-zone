@@ -3,19 +3,33 @@
     <DataTable
       :value="rows"
       :loading="schedules.isLoading">
+      <template #empty> No soundclashes have been scheduled yet. </template>
       <Column
         field="start"
         header="Time">
         <template #body="{ data }: { data: SoundclashRow }">
-          <SlotTime :date="data.start" style="width: max-content" />
+          <SlotTime
+            :date="data.start"
+            style="width: max-content" />
         </template>
       </Column>
-      <Column field="soundclash" style="width: 100%">
+      <Column
+        field="soundclash"
+        style="width: 100%">
         <template #body="{ data }: { data: SoundclashRow }">
-          <div v-if="data.soundclash" style="text-align: center;">
-            <strong style="font-size: large">{{ data.soundclash.performerOne.name }} vs. {{ data.soundclash.performerTwo.name }}</strong>
-            <br />
-            Rounds: {{ data.soundclash.roundOne }} | {{ data.soundclash.roundTwo }} | {{ data.soundclash.roundThree }}
+          <div
+            v-if="data.soundclash"
+            style="text-align: center">
+            <div>
+              <strong style="font-size: large">
+                {{ data.soundclash.performerOne.name }} vs.
+                {{ data.soundclash.performerTwo.name }}
+              </strong>
+            </div>
+            <div>
+              {{ data.soundclash.roundOne }} | {{ data.soundclash.roundTwo }} |
+              {{ data.soundclash.roundThree }}
+            </div>
           </div>
         </template>
       </Column>

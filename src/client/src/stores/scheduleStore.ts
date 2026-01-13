@@ -145,12 +145,12 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
       const schedule = getEntity(schedules.value, form.scheduleId)
       const performer = performers.getById(form.performerId)
       if (!schedule || !performer) throw new Error('Schedule or performer not found')
-      const entity = {
+      const entity: TimeslotResponse = {
         id,
         scheduleId: form.scheduleId,
         performer: performer,
         performanceType: form.performanceType,
-        name: form.subtitle,
+        subtitle: form.subtitle,
         startsAt: form.startsAt,
         endsAt: form.endsAt,
         isEditable: true,
