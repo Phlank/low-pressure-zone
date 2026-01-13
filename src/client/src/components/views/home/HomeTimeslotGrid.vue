@@ -3,9 +3,7 @@
     <DataTable
       :loading="schedules.isLoading"
       :value="rows">
-      <Column
-        field="start"
-        header="Time">
+      <Column header="Time">
         <template #body="{ data }: { data: TimeslotRow }">
           <SlotTime
             v-if="data.start"
