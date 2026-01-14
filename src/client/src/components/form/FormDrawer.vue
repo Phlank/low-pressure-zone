@@ -1,9 +1,9 @@
 <template>
   <div class="form-drawer">
     <Drawer
-      class="form-drawer-component"
       :position="position"
       auto-z-index
+      class="form-drawer-component"
       modal
       show-close-icon
       v-bind="$attrs">
@@ -36,7 +36,9 @@ import { Button, Drawer } from 'primevue'
 import { computed, inject, ref, type Ref, watch } from 'vue'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
-const position = computed(() => (isMobile?.value ? 'bottom' : 'right'))
+const position = computed(() => {
+  return isMobile?.value ? 'bottom' : 'right'
+})
 
 defineProps<{
   isSubmitting: boolean | undefined
@@ -49,7 +51,7 @@ const height = ref('100dvh')
 watch(
   () => isMobile,
   (newVal) => {
-    if (newVal) height.value = '95dvh'
+    if (newVal) height.value = 'calc(100dvh - 2 * 5px)'
     else height.value = '100dvh'
   },
   { deep: true, immediate: true }
@@ -73,9 +75,10 @@ div.p-drawer.p-component.form-drawer-component {
   @include variables.mobile() {
     height: fit-content;
     max-height: calc(100dvh - #{variables.$space-l});
-    width: 100dvw;
-    margin: 0 variables.$space-m;
+    width: calc(100dvw - 2 * #{variables.$space-s});
+    margin: 0 variables.$space-s;
     border-radius: variables.$space-m variables.$space-m 0 0;
+    transition: transform 0.3s;
   }
 
   div.p-drawer-content {

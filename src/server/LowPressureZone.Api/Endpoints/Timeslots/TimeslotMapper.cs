@@ -14,7 +14,7 @@ public sealed class TimeslotMapper(
     public Timeslot ToEntity(TimeslotRequest req)
         => new()
         {
-            Name = req.Name?.Trim(),
+            Subtitle = req.Name?.Trim(),
             StartsAt = req.StartsAt.ToUniversalTime(),
             EndsAt = req.EndsAt.ToUniversalTime(),
             Type = req.PerformanceType.Trim(),
@@ -25,7 +25,7 @@ public sealed class TimeslotMapper(
 
     public void UpdateEntity(TimeslotRequest req, Timeslot timeslot)
     {
-        timeslot.Name = req.Name?.Trim();
+        timeslot.Subtitle = req.Name?.Trim();
         timeslot.StartsAt = req.StartsAt.ToUniversalTime();
         timeslot.EndsAt = req.EndsAt.ToUniversalTime();
         timeslot.Type = req.PerformanceType.Trim();
@@ -44,7 +44,7 @@ public sealed class TimeslotMapper(
             ScheduleId = timeslot.ScheduleId,
             StartsAt = timeslot.StartsAt,
             EndsAt = timeslot.EndsAt,
-            Name = timeslot.Name,
+            Subtitle = timeslot.Subtitle,
             Performer = performerMapper.FromEntity(timeslot.Performer),
             PerformanceType = timeslot.Type,
             UploadedFileName = timeslot.UploadedFileName,

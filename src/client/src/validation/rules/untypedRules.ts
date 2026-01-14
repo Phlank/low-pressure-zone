@@ -14,7 +14,7 @@ export const required =
     return valid
   }
 
-export const inArray =
+export const oneOf =
   <T>(arr: T[], msg: string) =>
   (arg: T) => {
     if (arr.indexOf(arg) > -1) return valid

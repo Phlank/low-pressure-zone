@@ -1,9 +1,6 @@
 ﻿<template>
   <div class="about-section">
-    <Skeleton
-      v-if="aboutSettings.isLoading"
-      style="height: 200px" />
-    <ExpandableContent v-else>
+    <ExpandableContent v-if="!aboutSettings.isLoading">
       <template #top>
         <div v-html="topHtml" />
       </template>
@@ -18,7 +15,6 @@ import { onMounted, ref, watch } from 'vue'
 import ExpandableContent from '@/components/controls/ExpandableContent.vue'
 import { parseMarkdownAsync } from '@/utils/markdown.ts'
 import { useAboutSettingsStore } from '@/stores/settings/aboutSettingsStore.ts'
-import { Skeleton } from 'primevue'
 
 const aboutSettings = useAboutSettingsStore()
 

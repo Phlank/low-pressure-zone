@@ -14,6 +14,8 @@ using LowPressureZone.Api.Endpoints.News;
 using LowPressureZone.Api.Endpoints.Performers;
 using LowPressureZone.Api.Endpoints.Schedules;
 using LowPressureZone.Api.Endpoints.Settings.About;
+using LowPressureZone.Api.Endpoints.Settings.Welcome;
+using LowPressureZone.Api.Endpoints.Soundclashes;
 using LowPressureZone.Api.Endpoints.Timeslots;
 using LowPressureZone.Api.Endpoints.Users.Invites;
 using LowPressureZone.Api.Models.Configuration;
@@ -189,6 +191,9 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton<BroadcastMapper>();
         builder.Services.AddSingleton<AboutSettingsMapper>();
         builder.Services.AddSingleton<NewsMapper>();
+        builder.Services.AddSingleton<SoundclashMapper>();
+        builder.Services.AddSingleton<AboutSettingsMapper>();
+        builder.Services.AddSingleton<WelcomeSettingsMapper>();
 
         builder.Services.AddSingleton<CommunityRules>();
         builder.Services.AddSingleton<CommunityRelationshipRules>();
@@ -196,6 +201,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton<PerformerRules>();
         builder.Services.AddSingleton<TimeslotRules>();
         builder.Services.AddSingleton<BroadcastRules>();
+        builder.Services.AddSingleton<SoundclashRules>();
     }
 
     private static MailgunSender CreateMailgunSender(this IServiceProvider services)

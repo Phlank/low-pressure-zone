@@ -24,7 +24,7 @@ export interface TimeslotRequest {
   performanceType: PerformanceType
   startsAt: string
   endsAt: string
-  name: string
+  subtitle: string
   replaceMedia: boolean | null
   file: File | null
 }
@@ -36,7 +36,7 @@ const mapRequest = <TRequest extends TimeslotRequest>(request: TRequest): Timesl
     performanceType: request.performanceType,
     startsAt: request.startsAt,
     endsAt: request.endsAt,
-    name: request.name,
+    subtitle: request.subtitle,
     file: request.file,
     replaceMedia: request.replaceMedia
   }
@@ -47,7 +47,7 @@ export interface TimeslotResponse {
   scheduleId: string
   performer: PerformerResponse
   performanceType: PerformanceType
-  name: string | null
+  subtitle: string | null
   startsAt: string
   endsAt: string
   isEditable: boolean

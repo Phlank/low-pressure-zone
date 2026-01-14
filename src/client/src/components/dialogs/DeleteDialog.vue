@@ -1,6 +1,6 @@
 <template>
   <Dialog
-    $attrs
+    v-bind="$attrs"
     :draggable="false"
     :header="header"
     class="delete-dialog"

@@ -1,8 +1,6 @@
-using LowPressureZone.Api.Models;
+using LowPressureZone.Domain.Entities.Settings;
+using TabContent = LowPressureZone.Api.Models.TabContent;
 
 namespace LowPressureZone.Api.Endpoints.Settings.Welcome;
 
-public sealed class WelcomeSettingsRequest
-{
-    public List<TabContent> Tabs { get; set; } = [];
-}
+public sealed class WelcomeSettingsRequest : WelcomeSettings;

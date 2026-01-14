@@ -38,7 +38,7 @@ public partial class PostTimeslot(
                                         .FirstAsync(ct);
         var performer = await dataContext.Performers.FirstAsync(p => p.Id == request.PerformerId, ct);
 
-        if (!scheduleRules.IsAddingTimeslotsAuthorized(schedule)
+        if (!scheduleRules.IsAddingTimeslotsAllowed(schedule)
             || !performerRules.IsTimeslotLinkAuthorized(performer))
         {
             await SendUnauthorizedAsync(ct);

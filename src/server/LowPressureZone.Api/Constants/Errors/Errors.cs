@@ -1,6 +1,6 @@
 ﻿using LowPressureZone.Identity.Constants;
 
-namespace LowPressureZone.Api.Constants;
+namespace LowPressureZone.Api.Constants.Errors;
 
 internal static class Errors
 {

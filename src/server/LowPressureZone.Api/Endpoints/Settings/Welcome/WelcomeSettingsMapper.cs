@@ -5,7 +5,7 @@ using LowPressureZone.Domain.Enums;
 
 namespace LowPressureZone.Api.Endpoints.Settings.Welcome;
 
-public class WelcomeSettingsMapper : IRequestMapper, IResponseMapper
+public sealed class WelcomeSettingsMapper : IRequestMapper, IResponseMapper
 {
     private static readonly WelcomeSettingsResponse DefaultResponse = new()
     {

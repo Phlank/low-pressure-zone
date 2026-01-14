@@ -43,19 +43,19 @@
         </Select>
       </IftaFormField>
       <IftaFormField
-        :message="timeslotForm.val.message('name')"
-        input-id="nameInput"
+        :message="timeslotForm.val.message('subtitle')"
+        input-id="subtitleInput"
         label="Subtitle"
         optional
         size="m">
         <InputText
-          id="nameInput"
-          v-model:model-value="timeslotForm.state.value.name"
+          id="subtitleInput"
+          v-model:model-value="timeslotForm.state.value.subtitle"
           :disabled="isSubmitting"
-          :invalid="!timeslotForm.val.isValid('name')" />
+          :invalid="!timeslotForm.val.isValid('subtitle')" />
       </IftaFormField>
       <IftaFormField
-        v-if="performers.items.length > 0"
+        v-if="performers.performers.length > 0"
         :message="timeslotForm.val.message('performerId')"
         input-id="performerInput"
         label="Performer"
@@ -72,7 +72,7 @@
           @change="() => timeslotForm.val.validateIfDirty('performerId')" />
       </IftaFormField>
       <IftaFormField
-        v-if="performers.items.length === 0"
+        v-if="performers.performers.length === 0"
         :message="performerForm.val.message('name')"
         input-id="performerNameInput"
         label="Performer Name"
@@ -85,7 +85,7 @@
           autofocus />
       </IftaFormField>
       <IftaFormField
-        v-if="performers.items.length === 0"
+        v-if="performers.performers.length === 0"
         :message="performerForm.val.message('url')"
         input-id="performerUrlInput"
         label="Performer URL"
@@ -241,7 +241,7 @@ const timeslotForm = useEntityForm<TimeslotRequest, TimeslotFormState, TimeslotR
       endsAt: entity?.endsAt ?? addHours(props.start, 1).toISOString(),
       performerId: entity?.performer.id ?? defaultStartPerformerId.value ?? '',
       performanceType: entity?.performanceType ?? PerformanceType.Live,
-      name: entity?.name ?? '',
+      subtitle: entity?.subtitle ?? '',
       file: null,
       replaceMedia: false
     })

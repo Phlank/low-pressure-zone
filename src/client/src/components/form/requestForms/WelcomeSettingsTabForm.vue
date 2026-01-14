@@ -34,7 +34,7 @@ import { type Ref, ref } from 'vue'
 import { required } from '@/validation/rules/untypedRules.ts'
 import { createFormValidation } from '@/validation/types/formValidation.ts'
 import { InputText, Textarea } from 'primevue'
-import { notEmpty } from '@/validation/rules/arrayRules.ts'
+import { notEmptyArray } from '@/validation/rules/arrayRules.ts'
 
 const welcomeSettings = useWelcomeSettingsStore()
 const props = defineProps<{
@@ -68,7 +68,7 @@ const submit = async () => {
   }
   const newSetting = ref({ tabs: tabs.value })
   const newSettingValidation = createFormValidation(newSetting, {
-    tabs: notEmpty()
+    tabs: notEmptyArray()
   })
   const result = await welcomeSettings.update(newSetting, newSettingValidation)
   isSubmitting.value = false

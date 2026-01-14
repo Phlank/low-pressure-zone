@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using FluentValidation;
-using LowPressureZone.Api.Constants;
+using LowPressureZone.Api.Constants.Errors;
 
 namespace LowPressureZone.Api.Extensions;
 

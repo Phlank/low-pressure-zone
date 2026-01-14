@@ -83,7 +83,7 @@ export const usePerformerStore = defineStore('performerStore', () => {
 
   return {
     isLoading: isLoading,
-    items: getPerformers,
+    performers: getPerformers,
     linkablePerformers: getLinkablePerformers,
     getById,
     create,

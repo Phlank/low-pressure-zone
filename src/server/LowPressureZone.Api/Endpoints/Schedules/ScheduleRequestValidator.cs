@@ -1,6 +1,7 @@
 ﻿using FastEndpoints;
 using FluentValidation;
 using LowPressureZone.Api.Constants;
+using LowPressureZone.Api.Constants.Errors;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Extensions;
@@ -21,7 +22,7 @@ public class ScheduleRequestValidator : Validator<ScheduleRequest>
             var id = contextAccessor.GetGuidRouteParameterOrDefault("id");
             var dataContext = Resolve<DataContext>();
 
-            if (id == default && request.StartsAt <= DateTime.UtcNow)
+            if (id == Guid.Empty && request.StartsAt <= DateTime.UtcNow)
                 context.AddFailure(nameof(request.StartsAt), Errors.TimeInPast);
 
             var community = await dataContext.Communities.FirstOrDefaultAsync(a => a.Id == request.CommunityId, ct);
@@ -45,6 +46,9 @@ public class ScheduleRequestValidator : Validator<ScheduleRequest>
 
             if (schedule != null)
             {
+                if (schedule.Type != request.Type)
+                    context.AddFailure(nameof(request.Type), "Cannot change type");
+                
                 if (schedule.Timeslots.Any(t => request.StartsAt > t.StartsAt))
                     context.AddFailure(nameof(request.StartsAt), Errors.ExcludesTimeslots);
 
