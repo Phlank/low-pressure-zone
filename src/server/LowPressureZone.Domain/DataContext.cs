@@ -33,8 +33,4 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
         modelBuilder.Entity<Setting>()
                     .HasIndex(nameof(Setting.Key)).IsUnique();
     }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-    }
 }

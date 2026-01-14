@@ -9,8 +9,6 @@ export const parseDate = (date: string | Date): Date => {
 
 export const parseTime = (date: string | Date) => parseDate(date).getTime()
 
-export const compareDateStrings = (a: string, b: string) => parseTime(b) - parseTime(a)
-
 export const setToHour = (date: Date) => {
   date.setMinutes(0)
   date.setSeconds(0)
@@ -44,7 +42,7 @@ export const isHour = (date: Date) =>
 
 export const timesBetween = (start: Date, end: Date, minutesSeparation: number = 60) => {
   const out: Date[] = []
-  let iterating = new Date(start.getTime())
+  let iterating = new Date(start)
   while (iterating.getTime() < end.getTime()) {
     if (isHour(iterating)) {
       out.push(new Date(iterating.getTime()))
@@ -98,9 +96,6 @@ export const formatDurationOption = (durationMinutes: number) => {
 }
 
 const formatTwoDigits = (value: number) => ('0' + value.toFixed(0)).slice(-2)
-
-export const formatForFilename = (date: Date) =>
-  `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}_${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}`
 
 export const isDateInTimeslot = (date: Date, timespan: { startsAt: string; endsAt: string }) => {
   const time = date.getTime()
