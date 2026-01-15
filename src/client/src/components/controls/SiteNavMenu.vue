@@ -1,5 +1,5 @@
 <template>
-  <div style="display: flex">
+  <div class="site-nav-menu" style="display: flex">
     <Button
       aria-controls="navigation-menu"
       icon="pi pi-bars"
@@ -41,11 +41,12 @@
               class="p-menu-item-link">
               <span
                 v-if="item.icon"
+                style="width: 16px; height: 16px"
                 :class="item.icon" />
               <img
                 v-if="item.iconSvg"
                 :src="item.iconSvg()"
-                style="max-width: 16px; max-height: 16px" />
+                style="width: 16px; height: 16px" />
               <span class="ml-2">{{ item.label }}</span>
             </a>
           </div>
@@ -83,6 +84,8 @@ const auth = useAuthStore()
 const discordInvite = import.meta.env.VITE_DISCORD_INVITE_LINK
 const githubUrl = import.meta.env.VITE_GITHUB_URL
 const soundcloudUrl = import.meta.env.VITE_SOUNDCLOUD_URL
+const bandcampUrl = import.meta.env.VITE_BANDCAMP_URL
+const donateUrl = import.meta.env.VITE_DONATE_URL
 const isDarkMode: Ref<boolean> = inject('isDarkMode', ref(true))
 
 const navMenuItems: MenuItem[] = [
@@ -115,13 +118,6 @@ const navMenuItems: MenuItem[] = [
     visible: () => auth.isLoggedIn
   },
   {
-    label: 'Github',
-    labelString: 'Github',
-    icon: 'pi pi-github',
-    href: githubUrl,
-    visible: true
-  },
-  {
     label: 'Chat',
     labelString: 'Chat',
     icon: 'pi pi-discord',
@@ -133,6 +129,27 @@ const navMenuItems: MenuItem[] = [
     labelString: 'Soundcloud',
     href: soundcloudUrl,
     iconSvg: () => (isDarkMode.value ? '/soundcloud-logo-white.svg' : '/soundcloud-logo-black.svg'),
+    visible: true
+  },
+  {
+    label: 'Bandcamp',
+    labelString: 'Bandcamp',
+    href: bandcampUrl,
+    iconSvg: () => (isDarkMode.value ? '/bandcamp-logo-white.svg' : '/bandcamp-logo-black.svg'),
+    visible: true
+  },
+  {
+    label: 'Github',
+    labelString: 'Github',
+    icon: 'pi pi-github',
+    href: githubUrl,
+    visible: true
+  },
+  {
+    label: 'Buy Me a Coffee',
+    labelString: 'Buy Me a Coffee',
+    href: donateUrl,
+    iconSvg: () => (isDarkMode.value ? '/bmc-logo-white.svg' : '/bmc-logo-black.svg'),
     visible: true
   }
 ]
