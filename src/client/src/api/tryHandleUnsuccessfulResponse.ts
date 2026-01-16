@@ -12,20 +12,21 @@ import type { ApiResponse } from './apiResponse'
  */
 export default <TRequest extends object, TResponse>(
   response: ApiResponse<TRequest, TResponse>,
-  toast: ToastServiceMethods,
+  toast?: ToastServiceMethods,
   validation?: FormValidation<TRequest>
 ) => {
   if (response.isSuccess()) return false
   if (tryHandleFailure(response, toast)) return true
-  if (tryHandleInvalidResponse(response, toast, validation)) return true
-  showApiStatusToast(toast, response.status)
+  if (tryHandleInvalidResponse(response, validation, toast)) return true
+  if (toast) showApiStatusToast(toast, response.status)
+  else console.error('API request failed with status ' + response.status)
   return true
 }
 
-const tryHandleInvalidResponse = <TRequest extends object, TResponse>(
+export const tryHandleInvalidResponse = <TRequest extends object, TResponse>(
   response: ApiResponse<TRequest, TResponse>,
-  toast: ToastServiceMethods,
-  validation?: FormValidation<TRequest>
+  validation?: FormValidation<TRequest>,
+  toast?: ToastServiceMethods
 ): boolean => {
   if (!response.isInvalid()) return false
   if (validation != null) {
@@ -33,24 +34,29 @@ const tryHandleInvalidResponse = <TRequest extends object, TResponse>(
   }
   const unmappedErrors = response.getValidationErrors()['generalErrors'] ?? []
   if (unmappedErrors.length > 0) {
-    toast.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: unmappedErrors.join('\n'),
-      life: 7000
-    })
+    if (toast)
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: unmappedErrors.join('\n'),
+        life: 7000
+      })
+    else console.error(unmappedErrors.join('\n'))
   }
   return true
 }
 
-const tryHandleFailure = (response: ApiResponse<object, unknown>, toast: ToastServiceMethods) => {
+const tryHandleFailure = (response: ApiResponse<object, unknown>, toast?: ToastServiceMethods) => {
   if (response.isFailure()) {
-    toast.add({
-      severity: 'error',
-      summary: 'HTTP Failure',
-      detail: 'There was an issue when sending a request to the API. Is the API operational?',
-      life: 7000
-    })
+    if (toast)
+      toast.add({
+        severity: 'error',
+        summary: 'HTTP Failure',
+        detail: 'There was an issue when sending a request to the API. Is the API operational?',
+        life: 7000
+      })
+    else
+      console.error('There was an issue when sending a request to the API. Is the API operational?')
     return true
   }
   return false

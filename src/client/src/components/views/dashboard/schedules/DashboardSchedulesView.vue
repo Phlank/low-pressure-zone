@@ -6,63 +6,89 @@
       <TabList>
         <Tab value="upcoming">Upcoming</Tab>
         <Tab value="past">Past</Tab>
-        <Tab
-          v-if="communityStore.organizableCommunities.length > 0"
-          value="create">
-          Create
-        </Tab>
       </TabList>
-      <TabPanels v-if="isLoaded">
+      <TabPanels v-if="!schedules.isLoading">
         <TabPanel value="upcoming">
-          <SchedulesGrid :schedules="scheduleStore.upcomingSchedules" />
+          <SchedulesGrid
+            :schedules="schedules.upcomingSchedules"
+            @create="handleCreate"
+            @delete="handleDeleteAction"
+            @edit="handleEdit" />
         </TabPanel>
         <TabPanel value="past">
-          <SchedulesGrid :schedules="scheduleStore.pastSchedules" />
-        </TabPanel>
-        <TabPanel
-          v-if="communityStore.organizableCommunities.length > 0"
-          value="create">
-          <h4>Create New Schedule</h4>
-          <ScheduleForm
-            ref="createForm"
-            :communities="communityStore.organizableCommunities" />
+          <SchedulesGrid
+            :schedules="schedules.pastSchedules"
+            hide-actions />
         </TabPanel>
       </TabPanels>
       <Skeleton
-        v-else
+        v-if="schedules.isLoading"
         style="height: 300px" />
+      <FormDrawer
+        v-model:visible="showFormDrawer"
+        :is-submitting="scheduleFormRef?.isSubmitting"
+        :title="editingSchedule ? 'Edit Schedule' : 'Create Schedule'"
+        @reset="scheduleFormRef?.reset"
+        @submit="scheduleFormRef?.submit">
+        <ScheduleForm
+          ref="scheduleFormRef"
+          :availableCommunities="communities.organizableCommunities"
+          :schedule="editingSchedule"
+          @submitted="showFormDrawer = false" />
+      </FormDrawer>
+      <DeleteDialog
+        v-model:visible="showDeleteDialog"
+        :entity-name="parseDate(deletingSchedule?.endsAt ?? new Date()).toLocaleString()"
+        :is-submitting="false"
+        entity-type="schedule"
+        header="Delete Schedule"
+        @delete="handleConfirmDelete"
+        @hide="showDeleteDialog = false" />
     </Tabs>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs } from 'primevue'
-import ScheduleForm from '@/components/form/requestForms/ScheduleForm.vue'
-import { onMounted, ref, type Ref } from 'vue'
+import { ref, type Ref, useTemplateRef } from 'vue'
 import SchedulesGrid from './SchedulesGrid.vue'
-import { useCommunityStore } from '@/stores/communityStore.ts'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
-import { usePerformerStore } from '@/stores/performerStore.ts'
+import FormDrawer from '@/components/form/FormDrawer.vue'
+import type { ScheduleResponse } from '@/api/resources/schedulesApi.ts'
+import ScheduleForm from '@/components/form/requestForms/ScheduleForm.vue'
+import { useCommunityStore } from '@/stores/communityStore.ts'
+import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
+import { parseDate } from '@/utils/dateUtils.ts'
 
-const scheduleStore = useScheduleStore()
-const communityStore = useCommunityStore()
-const performerStore = usePerformerStore()
-const isLoaded = ref(false)
+const schedules = useScheduleStore()
+const communities = useCommunityStore()
 const tabValue: Ref<string | number> = ref('upcoming')
 
-onMounted(async () => {
-  await load()
-  isLoaded.value = true
-})
+const showFormDrawer = ref(false)
+const editingSchedule: Ref<ScheduleResponse | undefined> = ref(undefined)
+const scheduleFormRef = useTemplateRef('scheduleFormRef')
+const handleCreate = () => {
+  editingSchedule.value = undefined
+  showFormDrawer.value = true
+}
+const handleEdit = (schedule: ScheduleResponse) => {
+  editingSchedule.value = schedule
+  showFormDrawer.value = true
+}
 
-const load = async () => {
-  const loadingPromises: Promise<unknown>[] = []
-  if (communityStore.communities.length === 0)
-    loadingPromises.push(communityStore.loadCommunitiesAsync())
-  if (scheduleStore.schedules.length === 0)
-    loadingPromises.push(scheduleStore.loadDefaultSchedulesAsync())
-  if (performerStore.performers.length === 0)
-    loadingPromises.push(performerStore.loadPerformersAsync())
-  await Promise.all(loadingPromises)
+const showDeleteDialog = ref(false)
+const isDeleteSubmitting = ref(false)
+const deletingSchedule: Ref<ScheduleResponse | undefined> = ref(undefined)
+const handleDeleteAction = (schedule: ScheduleResponse) => {
+  deletingSchedule.value = schedule
+  showDeleteDialog.value = true
+}
+const handleConfirmDelete = async () => {
+  isDeleteSubmitting.value = true
+  const result = await schedules.removeSchedule(deletingSchedule.value!.id)
+  isDeleteSubmitting.value = false
+  if (!result.isSuccess) return
+  showDeleteDialog.value = false
+  deletingSchedule.value = undefined
 }
 </script>

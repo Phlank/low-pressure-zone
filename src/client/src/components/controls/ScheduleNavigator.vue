@@ -20,8 +20,8 @@
       <Select
         id="scheduleDateInput"
         v-model:model-value="currentScheduleId"
-        :disabled="isLoading"
-        :loading="isLoading"
+        :disabled="scheduleStore.isLoading"
+        :loading="scheduleStore.isLoading"
         :options="selectOptions"
         empty-message="No upcoming schedules"
         option-label="label"
@@ -45,7 +45,7 @@
 
 <script lang="ts" setup>
 import { Button, Select } from 'primevue'
-import { computed, onMounted, type Ref, ref, watch } from 'vue'
+import { computed, type Ref, ref, watch } from 'vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import FormField from '@/components/form/FormField.vue'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
@@ -59,7 +59,6 @@ const selectOptions = computed(() =>
   }))
 )
 
-const isLoading = ref(true)
 const currentScheduleId: Ref<string | undefined> = ref(undefined)
 const hasPrevious = computed(
   () => selectOptions.value.findIndex((option) => option.value == currentScheduleId.value) > 0
@@ -82,14 +81,6 @@ const handleNextClick = () => {
   }
 }
 
-onMounted(async () => {
-  await scheduleStore.loadDefaultSchedulesAsync()
-  isLoading.value = false
-  if (scheduleStore.upcomingSchedules.length > 0) {
-    currentScheduleId.value = scheduleStore.upcomingSchedules[0]!.id
-  }
-})
-
 const emit = defineEmits<{
   changeSchedule: [string]
 }>()
@@ -97,6 +88,16 @@ const emit = defineEmits<{
 watch(currentScheduleId, (newValue) => {
   emit('changeSchedule', newValue ?? '')
 })
+
+watch(
+  () => scheduleStore.upcomingSchedules,
+  (newSchedules) => {
+    if (newSchedules.length > 0 && !currentScheduleId.value) {
+      currentScheduleId.value = newSchedules[0]!.id
+      emit('changeSchedule', currentScheduleId.value)
+    }
+  }, { immediate: true }
+)
 </script>
 
 <style lang="scss">

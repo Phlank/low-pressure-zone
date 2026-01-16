@@ -3,7 +3,8 @@
     <DataTable
       v-if="!isMobile"
       key="id"
-      :value="inviteStore.invites">
+      :value="invites.items">
+      <template #empty>No items to display.</template>
       <Column
         field="email"
         header="Email" />
@@ -21,15 +22,15 @@
         <template #body="{ data }: { data: InviteResponse }">
           <GridActions
             show-resend
-            @resend="handleResendActionClick(data)" />
+            @resend="emit('resend', data)" />
         </template>
       </Column>
     </DataTable>
     <DataView
       v-else
-      :paginator="inviteStore.invites.length > 5"
+      :paginator="invites.items.length > 5"
       :rows="5"
-      :value="inviteStore.invites"
+      :value="invites.items"
       data-key="id">
       <template #empty>
         <ListItem>
@@ -42,78 +43,38 @@
           :key="invite.id">
           <ListItem>
             <template #left>
-              <span>{{ parseDate(invite.invitedAt).toLocaleDateString() }}</span>
-              <span class="ellipsis text-s">{{ invite.email }}</span>
+              <span class="ellipsis">{{ invite.email }}</span>
+              <span class="ellipsis text-s">
+                {{ parseDate(invite.invitedAt).toLocaleDateString() }}
+              </span>
             </template>
             <template #right>
               <GridActions
                 show-resend
-                @resend="handleResendActionClick(invite)" />
+                @resend="emit('resend', invite)" />
             </template>
           </ListItem>
           <Divider v-if="index < items.length - 1" />
         </div>
       </template>
     </DataView>
-    <Dialog
-      v-model:visible="showResendDialog"
-      closable
-      header="Resend Invite"
-      modal
-      @hide="showResendDialog = false">
-      <template #default> Resend invitation to {{ resendEmail }}?</template>
-      <template #footer>
-        <Button
-          :disabled="isSending"
-          :loading="isSending"
-          label="Resend"
-          @click="handleResendInvite" />
-      </template>
-    </Dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
 import ListItem from '@/components/data/ListItem.vue'
-import { Button, Column, DataTable, DataView, Dialog, Divider, useToast } from 'primevue'
-import { inject, onMounted, ref, type Ref } from 'vue'
-import invitesApi, { type InviteResponse } from '@/api/resources/invitesApi.ts'
-import { useInviteStore } from '@/stores/useInviteStore.ts'
-import { useCommunityStore } from '@/stores/communityStore.ts'
+import { Column, DataTable, DataView, Divider } from 'primevue'
+import { inject, type Ref } from 'vue'
+import { type InviteResponse } from '@/api/resources/invitesApi.ts'
+import { useInviteStore } from '@/stores/inviteStore.ts'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
-import { showApiStatusToast } from '@/utils/toastUtils.ts'
 import { parseDate } from '@/utils/dateUtils.ts'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
-const inviteStore = useInviteStore()
-const communityStore = useCommunityStore()
-const toast = useToast()
+const invites = useInviteStore()
 
-onMounted(async () => {
-  const promises: Promise<void>[] = []
-  if (inviteStore.invites.length === 0) promises.push(inviteStore.loadInvitesAsync())
-  if (communityStore.communities.length === 0) promises.push(communityStore.loadCommunitiesAsync())
-  await Promise.all(promises)
-})
-
-const showResendDialog = ref(false)
-const resendEmail = ref('')
-const resendId = ref('')
-const isSending = ref(false)
-
-const handleResendActionClick = async (invite: InviteResponse) => {
-  showResendDialog.value = true
-  resendEmail.value = invite.email
-  resendId.value = invite.id
-}
-
-const handleResendInvite = async () => {
-  isSending.value = true
-  const response = await invitesApi.postResend(resendId.value)
-  if (!response.isSuccess()) {
-    showApiStatusToast(toast, response.status)
-  }
-  showResendDialog.value = false
-  isSending.value = false
-}
+const emit = defineEmits<{
+  resend: [InviteResponse]
+  create: []
+}>()
 </script>

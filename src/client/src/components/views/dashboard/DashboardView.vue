@@ -60,9 +60,15 @@ const router = useRouter()
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const menuItems: MenuItem[] = [
   {
+    label: 'Welcome',
+    icon: 'pi pi-home',
+    route: '/dashboard',
+    visible: true
+  },
+  {
     label: 'Schedules',
     icon: 'pi pi-calendar',
-    route: '/dashboard',
+    route: '/dashboard/schedules',
     visible: true
   },
   {
@@ -98,8 +104,8 @@ const menuItems: MenuItem[] = [
 ]
 
 onMounted(async () => {
-  await authStore.loadIfNotInitialized()
-  if (!authStore.isLoggedIn()) {
+  await authStore.initializeAsync()
+  if (!authStore.isLoggedIn) {
     await router.push('/')
   }
 })

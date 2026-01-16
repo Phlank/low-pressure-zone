@@ -16,10 +16,10 @@ import { mobileWidth } from '@/constants/size.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
 import { isTrueString } from '@/utils/booleanUtils.ts'
 
-const authStore = useAuthStore()
+const auth = useAuthStore()
 
 onMounted(async () => {
-  await authStore.loadIfNotInitialized()
+  await auth.initializeAsync()
 })
 
 const isMobile: Ref<boolean> = ref(false)
@@ -48,7 +48,7 @@ provide('isDarkMode', isDarkMode)
 @use '@/assets/styles/variables';
 
 .app {
-  min-width: 100vw;
+  width: 100%;
 
   &__toast {
     max-width: calc(100vw - 2 * #{variables.$space-l});

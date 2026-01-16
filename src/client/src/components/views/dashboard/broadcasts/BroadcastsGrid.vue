@@ -83,7 +83,12 @@ import { inject, onMounted, ref, type Ref } from 'vue'
 import { useBroadcastStore } from '@/stores/broadcastStore.ts'
 import { Column, DataTable, DataView, Divider, Skeleton } from 'primevue'
 import broadcastsApi, { type BroadcastResponse } from '@/api/resources/broadcastsApi.ts'
-import { formatDurationTimestamp, formatReadableTime, getDuration, parseDate } from '@/utils/dateUtils.ts'
+import {
+  formatDurationTimestamp,
+  formatReadableTime,
+  getDuration,
+  parseDate
+} from '@/utils/dateUtils.ts'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import { mobilePaginatorTemplate } from '@/constants/componentTemplates.ts'
 import ListItem from '@/components/data/ListItem.vue'
@@ -99,7 +104,9 @@ const formatMobileTimeInfo = (broadcast: BroadcastResponse) => {
   const date = parseDate(broadcast.start).toLocaleDateString()
   const time = formatReadableTime(parseDate(broadcast.start))
   const duration =
-    broadcast.end === null ? 'Live' : formatDurationTimestamp(getDuration(broadcast.start, broadcast.end))
+    broadcast.end === null
+      ? 'Live'
+      : formatDurationTimestamp(getDuration(broadcast.start, broadcast.end))
   return `${date} ${time} | ${duration}`
 }
 

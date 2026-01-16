@@ -8,9 +8,7 @@ public sealed class UnixTimestampDateTimeOffsetConverter : JsonConverter<DateTim
     public override DateTimeOffset Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType != JsonTokenType.Number)
-        {
             throw new JsonException($"Expected number, got {reader.TokenType}");
-        }
 
         var seconds = reader.GetInt64();
         return DateTimeOffset.FromUnixTimeSeconds(seconds);

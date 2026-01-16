@@ -19,10 +19,7 @@ public sealed partial class FormFileSaver(
 
         try
         {
-            if (File.Exists(path))
-            {
-                File.Delete(path);
-            }
+            if (File.Exists(path)) File.Delete(path);
 
             await using var fileStream = File.Create(path);
             await file.CopyToAsync(fileStream, ct);
@@ -57,7 +54,7 @@ public sealed partial class FormFileSaver(
             return Result.Err<string, string>($"Failed to delete saved file at {path}: {ex.Message}");
         }
     }
-    
+
     [LoggerMessage(LogLevel.Error, "Failed to save uploaded file: {errorMessage}")]
     static partial void LogSaveFailure(ILogger<FormFileSaver> logger, string errorMessage);
 

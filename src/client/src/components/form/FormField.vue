@@ -28,10 +28,12 @@ const props = withDefaults(
     label?: string
     message?: string
     optional?: boolean
+    displayStyle?: 'flex' | 'block'
   }>(),
   {
     size: 's',
-    optional: false
+    optional: false,
+    displayStyle: 'flex'
   }
 )
 
@@ -67,20 +69,20 @@ const computedClass = computed(() => `${baseClass} ${widthClass.value}`)
   &__message {
     width: 100%;
     text-wrap: wrap pretty;
-    line-height: 0.8rem;
-    font-size: 0.8rem;
+    line-height: 0.9rem;
+    font-size: 0.9rem;
     color: var(--p-red-500);
   }
 
   &__input {
     width: 100%;
-    display: flex;
+    display: v-bind(displayStyle);
     flex-direction: column;
     align-items: start;
     gap: variables.$space-m;
 
     div {
-      display: flex;
+      display: v-bind(displayStyle);
       gap: variables.$space-m;
     }
   }

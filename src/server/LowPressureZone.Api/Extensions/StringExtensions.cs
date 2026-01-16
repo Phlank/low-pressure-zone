@@ -12,7 +12,7 @@ public static class StringExtensions
 
     public static ValidationFailure ToValidationFailure(this string error, string? propertyName) =>
         new(propertyName, error);
-    
+
     public static IEnumerable<ValidationFailure> ToValidationFailures(
         this string error,
         string? propertyName = null) => [new(propertyName, error)];

@@ -1,10 +1,9 @@
 import { err, ok, type Result } from '@/types/result.ts'
-import objectToFormData from '@/utils/objectToFormData.ts'
 import { ApiResponse, type ValidationProblemDetails } from '@/api/apiResponse.ts'
 
 const API_URL = import.meta.env.VITE_API_URL
 
-const sendRequest = async <TRequest extends object, TResponse = never>(
+const sendRequest = async <TRequest, TResponse = void>(
   method: string,
   route: string,
   request?: TRequest | FormData
@@ -36,45 +35,37 @@ const sendRequest = async <TRequest extends object, TResponse = never>(
       headers: response.headers,
       data: data,
       // Only 400 responses will ever have problem details
-      validationProblem: validationProblem,
-      error: undefined
+      validationProblem: validationProblem
     })
   } catch (error: unknown) {
     return new ApiResponse<TRequest, TResponse>({
       status: 0,
-      error: error
+      failure: error
     })
   }
 }
 
-export const sendGet = async <TResponse = never>(route: string, params?: QueryParameters) => {
+export const sendGet = async <TResponse>(route: string, params?: QueryParameters) => {
   if (params) route += toQueryString(params)
-  return await sendRequest<never, TResponse>('GET', route)
+  return await sendRequest<void, TResponse>('GET', route)
 }
 
 export const sendPut = async <TRequest extends object>(route: string, request: TRequest) => {
-  return await sendRequest<TRequest, never>('PUT', route, request)
+  return await sendRequest<TRequest, void>('PUT', route, request)
 }
 
-export const sendPutForm = async <TRequest extends object>(route: string, request: TRequest) =>
-  sendRequest<TRequest, never>('PUT', route, objectToFormData(request))
-
-export const sendPost = async <TRequest extends object, TResponse = never>(
+export const sendPost = async <TRequest extends object, TResponse = void>(
   route: string,
   request?: TRequest
 ) => {
   return await sendRequest<TRequest, TResponse>('POST', route, request)
 }
 
-export const sendPostForm = <TRequest extends object>(route: string, request: TRequest) => {
-  return sendRequest<TRequest, never>('POST', route, objectToFormData(request))
-}
-
 export const sendDelete = async (route: string) => {
-  return await sendRequest<never, never>('DELETE', route)
+  return await sendRequest<void, void>('DELETE', route)
 }
 
-export const sendDownload = async (route: string): Promise<Result<null, null>> => {
+export const sendDownload = async (route: string): Promise<Result> => {
   try {
     const url = `${API_URL}${route}`
     const anchor = document.createElement('a')
@@ -83,9 +74,9 @@ export const sendDownload = async (route: string): Promise<Result<null, null>> =
     anchor.download = 'download'
     document.body.appendChild(anchor)
     anchor.click()
-    return ok(null)
+    return ok()
   } catch {
-    return err(null)
+    return err()
   }
 }
 

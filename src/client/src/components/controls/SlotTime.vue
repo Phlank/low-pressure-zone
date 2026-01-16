@@ -1,7 +1,7 @@
 <template>
   <TwoLineData
-    :bottom="formatReadableTime(utcDate) + ' UTC'"
-    :top="formatReadableTime(date)"
+    :above="formatReadableTime(date)"
+    :below="formatReadableTime(utcDate)"
     class="slot-time" />
 </template>
 
@@ -17,3 +17,9 @@ const utcDate = computed(() => {
   return new Date(props.date.getTime() + props.date.getTimezoneOffset() * 60 * 1000)
 })
 </script>
+
+<style lang="scss" scoped>
+.slot-time {
+  width: max-content;
+}
+</style>

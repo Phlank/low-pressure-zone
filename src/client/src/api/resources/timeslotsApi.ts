@@ -1,40 +1,42 @@
-import { sendDelete, sendGet, sendPostForm, sendPutForm } from '../fetchFunctions'
+import { sendDelete, sendGet } from '../fetchFunctions'
 import type { PerformerResponse } from './performersApi.ts'
+import { sendPostXhr, sendPutXhr } from '@/api/xhrFunctions.ts'
+import type { Ref } from 'vue'
 
-const route = (scheduleId: string, timeslotId?: string) =>
-  `/schedules/${scheduleId}/timeslots${timeslotId ? '/' + timeslotId : ''}`
+const route = (id?: string) => `/timeslots${id ? '/' + id : ''}`
 
 export default {
-  get: (scheduleId: string) => sendGet<TimeslotResponse[]>(route(scheduleId)),
-  getById: (scheduleId: string, timeslotId: string) =>
-    sendGet<TimeslotResponse>(route(scheduleId, timeslotId)),
+  get: (scheduleId: string) => sendGet<TimeslotResponse[]>(route(), { scheduleId: scheduleId }),
+  getById: (timeslotId: string) => sendGet<TimeslotResponse>(route(timeslotId)),
   put: <TRequest extends TimeslotRequest>(
-    scheduleId: string,
     timeslotId: string,
-    request: TRequest
-  ) => sendPutForm(route(scheduleId, timeslotId), mapRequest(request)),
-  post: <TRequest extends TimeslotRequest>(scheduleId: string, request: TRequest) =>
-    sendPostForm(route(scheduleId), mapRequest(request)),
-  delete: (scheduleId: string, timeslotId: string) => sendDelete(route(scheduleId, timeslotId))
+    request: TRequest,
+    progressRef?: Ref<number>
+  ) => sendPutXhr(route(timeslotId), mapRequest(request), progressRef),
+  post: <TRequest extends TimeslotRequest>(request: TRequest, progressRef: Ref<number> | undefined) =>
+    sendPostXhr(route(), mapRequest(request), progressRef),
+  delete: (timeslotId: string) => sendDelete(route(timeslotId))
 }
 
 export interface TimeslotRequest {
+  scheduleId: string
   performerId: string
   performanceType: PerformanceType
   startsAt: string
   endsAt: string
-  name: string
+  subtitle: string
   replaceMedia: boolean | null
   file: File | null
 }
 
 const mapRequest = <TRequest extends TimeslotRequest>(request: TRequest): TimeslotRequest => {
   return {
+    scheduleId: request.scheduleId,
     performerId: request.performerId,
     performanceType: request.performanceType,
     startsAt: request.startsAt,
     endsAt: request.endsAt,
-    name: request.name,
+    subtitle: request.subtitle,
     file: request.file,
     replaceMedia: request.replaceMedia
   }
@@ -42,9 +44,10 @@ const mapRequest = <TRequest extends TimeslotRequest>(request: TRequest): Timesl
 
 export interface TimeslotResponse {
   id: string
+  scheduleId: string
   performer: PerformerResponse
   performanceType: PerformanceType
-  name: string | null
+  subtitle: string | null
   startsAt: string
   endsAt: string
   isEditable: boolean

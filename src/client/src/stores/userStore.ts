@@ -1,39 +1,41 @@
 import { defineStore } from 'pinia'
 import usersApi, { type UserResponse } from '@/api/resources/usersApi.ts'
 import { computed, ref, type Ref } from 'vue'
+import { getEntity, getEntityMap} from '@/utils/arrayUtils.ts'
+import { useToast } from 'primevue'
+import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import { err, ok, type Result } from '@/types/result.ts'
+import { useRefresh } from '@/composables/useRefresh.ts'
+import { useAuthStore } from '@/stores/authStore.ts'
+import roles from '@/constants/roles.ts'
 
 export const useUserStore = defineStore('userStore', () => {
-  const loadedUsers: Ref<UserResponse[]> = ref([])
-  const loadedUserMap: Ref<UserMap> = ref({})
+  const users: Ref<UserResponse[]> = ref([])
+  const userMap: Ref<Partial<Record<string, UserResponse>>> = ref({})
+  const toast = useToast()
+  const auth = useAuthStore()
 
-  let loadUsersPromise: Promise<void> | undefined = undefined
+  useRefresh(
+    usersApi.get,
+    (data) => {
+      users.value = data
+      userMap.value = getEntityMap(users.value)
+    },
+    { permissionFn: () => auth.isInAnyRoles(roles.admin, roles.organizer) }
+  )
 
-  const loadUsers = async () => {
-    const response = await usersApi.get()
-    if (!response.isSuccess()) {
-      console.log(JSON.stringify(response))
-      return
-    }
-    loadedUsers.value = response.data()
-    const userMap: UserMap = {}
-    loadedUsers.value.forEach((user) => {
-      userMap[user.id] = user
-    })
-    loadedUserMap.value = userMap
+  const getUser = (id: string) => userMap.value[id]
+
+  const makeStreamer = async (id: string): Promise<Result> => {
+    const entity = getEntity(users.value, id)
+    if (!entity || entity.isStreamer) return err()
+    const response = await usersApi.createStreamer(id)
+    if (tryHandleUnsuccessfulResponse(response, toast)) return err()
+    entity.isStreamer = true
+    return ok()
   }
 
-  const loadUsersAsync = async () => {
-    loadUsersPromise ??= loadUsers()
-    await loadUsersPromise
-    loadUsersPromise = undefined
-  }
+  const getUsers = computed(() => users.value)
 
-  const getUser = (id: string) => {
-    return loadedUserMap.value[id]
-  }
-  const users = computed(() => loadedUsers.value)
-
-  return { users, getUser, loadUsersAsync }
+  return { users: getUsers, getUser, makeStreamer }
 })
-
-type UserMap = Record<string, UserResponse>

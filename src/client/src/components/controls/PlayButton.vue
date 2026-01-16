@@ -43,7 +43,7 @@
 import { Button, Slider, useToast } from 'primevue'
 import { computed, onMounted, type Ref, ref, watch } from 'vue'
 import clamp from '@/utils/clamp.ts'
-import { useResizeObserver, useThrottleFn } from '@vueuse/core'
+import { useDebounceFn, useResizeObserver } from '@vueuse/core'
 import { useStreamStore } from '@/stores/streamStore.ts'
 import delay from '@/utils/delay.ts'
 
@@ -80,12 +80,12 @@ const stopAudio = () => {
       try {
         audio.src = '' // This will always fail (on purpose), so catch it and ignore it.
       } catch (e) {
-        console.log(e)
+        console.error(e)
       }
       audio = undefined
     }
   } catch (error) {
-    console.log(JSON.stringify(error))
+    console.error(JSON.stringify(error))
   }
 }
 
@@ -190,41 +190,31 @@ const buttonElement = ref(null)
 useResizeObserver(buttonElement, () => updateTextScrollingBehavior())
 watch(
   () => streamStore.status,
-  (newStatus, oldStatus) => {
-    if (newStatus.name !== oldStatus.name || newStatus.listenerCount !== oldStatus.listenerCount) {
-      setTimeout(() => {
-        updateTextScrollingBehavior()
-      })
-    }
-  }
+  () => setTimeout(() => updateTextScrollingBehavior())
 )
 
-const updateTextScrollingBehavior = useThrottleFn(
-  () => {
-    const artistTextWidth = document
-      .getElementsByClassName('play-button__content__text-area__now-playing')[0]!
-      .getBoundingClientRect().width
-    const statusTextWidth = document
-      .getElementsByClassName('play-button__content__text-area__status')[0]!
-      .getBoundingClientRect().width
-    textWidth.value = Math.max(artistTextWidth, statusTextWidth)
-    buttonWidth.value = document
-      .getElementsByClassName('play-button__play-element')[0]!
-      .getBoundingClientRect().width
-    let translateWidth = Math.round(
-      clamp(textWidth.value - buttonWidth.value + buttonPadding + playIconWidth + centerMargin, 0)
-    )
-    if (Math.abs(translateWidth) < 5) {
-      translateWidth = 0
-    } else {
-      translateWidth = -translateWidth
-    }
-    nameTranslateWidth.value = translateWidth
-  },
-  75,
-  true,
-  false
-)
+const updateTextScrollingBehavior = useDebounceFn(async () => {
+  const artistTextWidth = document
+    .getElementsByClassName('play-button__content__text-area__now-playing')[0]!
+    .getBoundingClientRect().width
+  const statusTextWidth = document
+    .getElementsByClassName('play-button__content__text-area__status')[0]!
+    .getBoundingClientRect().width
+  textWidth.value = Math.max(artistTextWidth, statusTextWidth)
+  await delay(100)
+  buttonWidth.value = document
+    .getElementsByClassName('play-button__play-element')[0]!
+    .getBoundingClientRect().width
+  let translateWidth = Math.round(
+    clamp(artistTextWidth - buttonWidth.value + buttonPadding + playIconWidth + centerMargin, 0)
+  )
+  if (Math.abs(translateWidth) < 5) {
+    translateWidth = 0
+  } else {
+    translateWidth = -translateWidth
+  }
+  nameTranslateWidth.value = translateWidth
+}, 200)
 
 const volumeSliderAmount = ref(100)
 const volume = computed(() => volumeSliderAmount.value / 100)

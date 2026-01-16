@@ -16,16 +16,17 @@ namespace LowPressureZone.Adapter.AzuraCast.Clients;
 public sealed class AzuraCastClient(
     IHttpClientFactory clientFactory,
     IOptions<AzuraCastClientConfiguration> options,
-    [FromKeyedServices("AzuraCastSftpClient")] ISftpClient sftpClient,
+    [FromKeyedServices("AzuraCastSftpClient")]
+    ISftpClient sftpClient,
     ILogger<AzuraCastClient> logger)
     : IAzuraCastClient
 {
-    private readonly string _stationId = options.Value.StationId;
-    
     private static readonly JsonSerializerOptions JsonSerializerOptions = new()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
+
+    private readonly string _stationId = options.Value.StationId;
 
     private HttpClient Client => clientFactory.CreateClient("AzuraCastHttpClient");
 
@@ -54,7 +55,7 @@ public sealed class AzuraCastClient(
 
         return Result.Ok<IReadOnlyCollection<StationStreamer>, HttpResponseMessage>(content);
     }
-    
+
     public async Task<Result<StationStreamer, HttpResponseMessage>> GetStreamerAsync(int streamerId)
     {
         var response = await Client.GetAsync(StreamerEndpoint(streamerId));
@@ -148,7 +149,7 @@ public sealed class AzuraCastClient(
 
         return await UploadMediaViaSftpAsync(fileStream, targetFilePath);
     }
-    
+
     public async Task<Result<string, string>> UploadMediaViaSftpAsync(FileStream fileStream, string targetFilePath)
     {
         if (!sftpClient.IsConnected)
@@ -186,11 +187,11 @@ public sealed class AzuraCastClient(
         var response = await Client.GetAsync($"{FilesEndpoint(mediaId)}");
         if (!response.IsSuccessStatusCode)
             return Result.Err<StationMedia, HttpResponseMessage>(response);
-        
+
         var content = await response.Content.ReadFromJsonAsync<StationMedia>();
         if (content is null)
             return Result.Err<StationMedia, HttpResponseMessage>(response);
-        
+
         return Result.Ok<StationMedia, HttpResponseMessage>(content);
     }
 
@@ -213,7 +214,7 @@ public sealed class AzuraCastClient(
 
         return Result.Ok<IEnumerable<StationFileListItem>, HttpResponseMessage>(content);
     }
-    
+
     public async Task<Result<bool, HttpResponseMessage>> PutMediaAsync(int mediaId, StationMediaRequest mediaRequest)
     {
         var result = await Client.PutAsJsonAsync(FilesEndpoint(mediaId), mediaRequest, JsonSerializerOptions);
@@ -222,7 +223,7 @@ public sealed class AzuraCastClient(
 
         return Result.Ok<bool, HttpResponseMessage>(true);
     }
-    
+
     public async Task<Result<bool, HttpResponseMessage>> DeleteMediaAsync(int mediaId)
     {
         var result = await Client.DeleteAsync(FilesEndpoint(mediaId));
@@ -231,7 +232,7 @@ public sealed class AzuraCastClient(
 
         return Result.Ok<bool, HttpResponseMessage>(true);
     }
-    
+
     public async Task<Result<StationPlaylist, HttpResponseMessage>> GetPlaylistAsync(int playlistId)
     {
         var response = await Client.GetAsync(PlaylistsEndpoint(playlistId));
@@ -263,7 +264,7 @@ public sealed class AzuraCastClient(
 
         return Result.Ok<int, HttpResponseMessage>(content.Id);
     }
-    
+
     public async Task<Result<bool, HttpResponseMessage>> PutPlaylistAsync(StationPlaylist playlist)
     {
         var id = playlist.Id;
@@ -280,7 +281,7 @@ public sealed class AzuraCastClient(
 
         return Result.Ok<bool, HttpResponseMessage>(true);
     }
-    
+
     public async Task<Result<bool, HttpResponseMessage>> DeletePlaylistAsync(int playlistId)
     {
         var result = await Client.DeleteAsync(PlaylistsEndpoint(playlistId));

@@ -2,6 +2,14 @@
 
 div.p-panel {
   border-style: none;
+
+  div.p-panel-content-container {
+    display: flex;
+
+    div.p-panel-content-wrapper {
+      width: 100%;
+    }
+  }
 }
 
 div.p-datepicker-minute-picker {
@@ -16,4 +24,16 @@ th.p-datatable-column-sorted {
 
 div.p-dialog.p-component {
   width: min(600px, calc(100vw - 2 * #{variables.$space-l}));
+}
+
+div.p-drawer {
+  border-style: none none none solid;
+
+  @include variables.mobile() {
+    border-style: solid none none none;
+  }
+}
+
+.p-progressbar-determinate .p-progressbar-value {
+  transition: width 0.1s ease-in-out !important;
 }

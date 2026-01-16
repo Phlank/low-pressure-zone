@@ -6,8 +6,12 @@ export enum Routes {
   TwoFactor = '/user/twofactor',
   Register = '/user/register',
   ResendInvite = '/user/resendinvite',
-  Schedules = '/dashboard',
+  Welcome = '/dashboard',
+  Schedules = '/dashboard/schedules',
   Communities = '/dashboard/communities',
   Performers = '/dashboard/performers',
-  Broadcasts = '/dashboard/broadcasts'
+  Broadcasts = '/dashboard/broadcasts',
+  Admin = '/admin',
+  ContentAreas = '/admin/contentareas',
+  News = '/admin/news'
 }

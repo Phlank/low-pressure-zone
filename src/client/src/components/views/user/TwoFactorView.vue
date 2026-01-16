@@ -11,7 +11,7 @@
         </Message>
       </FormField>
       <IftaFormField
-        :message="errorMessage"
+        :message="validation.message('code')"
         input-id="codeInput"
         label="Code"
         size="m">
@@ -19,7 +19,7 @@
           id="codeInput"
           v-model:model-value="formState.code"
           :autofocus="true"
-          :invalid="errorMessage !== ''" />
+          :invalid="!validation.isValid('code')" />
       </IftaFormField>
       <FormField input-id="rememberBrowserInput">
         <div style="display: flex; flex-direction: column; align-items: center; width: 100%">
@@ -46,50 +46,43 @@
 <script lang="ts" setup>
 import { KeyName } from '@/constants/keys'
 import { Routes } from '@/router/routes'
-import { useAuthStore } from '@/stores/authStore'
 import { onKeyDown } from '@vueuse/core'
 import { Button, Checkbox, InputText, Message } from 'primevue'
-import { reactive, ref } from 'vue'
-import authApi from '@/api/resources/authApi.ts'
+import { type Ref, ref } from 'vue'
+import { type TwoFactorRequest } from '@/api/resources/authApi.ts'
 import FormArea from '@/components/form/FormArea.vue'
 import FormField from '@/components/form/FormField.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
-import { useRouter } from 'vue-router'
 import SinglePanelViewWrapper from '@/components/layout/SinglePanelViewWrapper.vue'
-import { useScheduleStore } from '@/stores/scheduleStore.ts'
-
-const router = useRouter()
-
-const formState = reactive({
-  code: '',
-  rememberClient: false
-})
+import { createFormValidation } from '@/validation/types/formValidation.ts'
+import { alwaysValid, required } from '@/validation/rules/untypedRules.ts'
+import { useAuthStore } from '@/stores/authStore.ts'
 
 onKeyDown(KeyName.Enter, () => handleVerify())
 
-const isSubmitting = ref(false)
-const errorMessage = ref('')
+const formState: Ref<TwoFactorRequest> = ref({
+  code: '',
+  rememberClient: false
+})
+const validation = createFormValidation(formState, {
+  code: required(),
+  rememberClient: alwaysValid()
+})
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     redirect?: string
   }>(),
   {
-    redirect: Routes.Schedules
+    redirect: Routes.Welcome
   }
 )
 
+const isSubmitting = ref(false)
+const auth = useAuthStore()
 const handleVerify = async () => {
   isSubmitting.value = true
-  const response = await authApi.postTwoFactor(formState)
-  if (!response.isSuccess()) {
-    errorMessage.value = 'Invalid code'
-    isSubmitting.value = false
-    return
-  }
-
-  await useAuthStore().load()
-  await useScheduleStore().loadDefaultSchedulesAsync()
-  await router.push(props.redirect)
+  await auth.twoFactorLoginAsync(formState, validation)
+  isSubmitting.value = false
 }
 </script>

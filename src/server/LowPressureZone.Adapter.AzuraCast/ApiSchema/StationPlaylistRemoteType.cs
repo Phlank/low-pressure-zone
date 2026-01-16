@@ -7,8 +7,10 @@ public enum StationPlaylistRemoteType
 {
     [JsonStringEnumMemberName("stream")]
     Stream,
+
     [JsonStringEnumMemberName("playlist")]
     Playlist,
+
     [JsonStringEnumMemberName("other")]
     Other
 }

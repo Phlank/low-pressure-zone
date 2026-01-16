@@ -7,7 +7,7 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Rules;
 
-public class TimeslotRules(IHttpContextAccessor contextAccessor)
+public sealed class TimeslotRules(IHttpContextAccessor contextAccessor)
 {
     private ClaimsPrincipal? User => contextAccessor.GetAuthenticatedUserOrDefault();
 

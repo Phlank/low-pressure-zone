@@ -7,6 +7,7 @@ public enum StationPlaylistSource
 {
     [JsonStringEnumMemberName("songs")]
     Songs,
+
     [JsonStringEnumMemberName("remote_url")]
     RemoteUrl
 }
