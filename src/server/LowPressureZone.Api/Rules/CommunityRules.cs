@@ -7,7 +7,7 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Rules;
 
-public class CommunityRules(IHttpContextAccessor contextAccessor)
+public sealed class CommunityRules(IHttpContextAccessor contextAccessor)
 {
     private ClaimsPrincipal? User => contextAccessor.GetAuthenticatedUserOrDefault();
 

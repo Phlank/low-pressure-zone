@@ -11,6 +11,6 @@ public sealed class Community : BaseEntity
     public required string Url { get; set; }
 
     public bool IsDeleted { get; set; }
-    public ICollection<Schedule> Schedules { get; } = [];
-    public ICollection<CommunityRelationship> Relationships { get; } = [];
+    public ICollection<Schedule> Schedules { get; init; } = [];
+    public ICollection<CommunityRelationship> Relationships { get; init; } = [];
 }

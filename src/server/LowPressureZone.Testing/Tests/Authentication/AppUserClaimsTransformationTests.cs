@@ -1,12 +1,12 @@
 ﻿using System.Security.Claims;
 using LowPressureZone.Api.Authentication;
-using LowPressureZone.Api.Test.Infrastructure.Factories;
-using LowPressureZone.Api.Test.Infrastructure.Fixtures;
+using LowPressureZone.Testing.Infrastructure.Factories;
+using LowPressureZone.Testing.Infrastructure.Fixtures;
 using Shouldly;
 using Xunit;
-using Data = LowPressureZone.Api.Test.Tests.AppUserClaimsTransformationTestsData;
+using TestData = LowPressureZone.Testing.Tests.Authentication.AppUserClaimsTransformationTestsData;
 
-namespace LowPressureZone.Api.Test.Tests;
+namespace LowPressureZone.Testing.Tests.Authentication;
 
 [Collection("DatabaseQueryTests")]
 public sealed class AppUserClaimsTransformationTests(DatabaseFixture databaseFixture)
@@ -17,7 +17,7 @@ public sealed class AppUserClaimsTransformationTests(DatabaseFixture databaseFix
     public async Task TransformAsync_DoesNotChangePrincipal_WhenNoNameIdentifierClaim()
     {
         // Arrange
-        var principal = new ClaimsPrincipalBuilder().Build();
+        var principal = ClaimsPrincipalFactory.Create();
 
         // Act
         await Transformation.TransformAsync(principal);
@@ -30,9 +30,7 @@ public sealed class AppUserClaimsTransformationTests(DatabaseFixture databaseFix
     public async Task TransformAsync_AddsCheckedClaim_WhenNameIdentifierClaimPresent()
     {
         // Arrange
-        var principal = new ClaimsPrincipalBuilder()
-                        .WithUserId(Guid.NewGuid().ToString())
-                        .Build();
+        var principal = ClaimsPrincipalFactory.Create(userId: Guid.NewGuid());
 
         // Act
         await Transformation.TransformAsync(principal);
@@ -45,14 +43,12 @@ public sealed class AppUserClaimsTransformationTests(DatabaseFixture databaseFix
     public async Task TransformAsync_DoesNotAddRoles_WhenCheckedClaimPresent()
     {
         // Arrange
-        var principal = new ClaimsPrincipalBuilder()
-                        .WithUserId(Data.OrganizerUserId.ToString())
-                        .WithClaimsCheckedClaim()
-                        .Build();
-        
+        var principal = ClaimsPrincipalFactory.Create(userId: TestData.OrganizerUserId,
+                                                      additionalClaimsChecked: true);
+
         // Act
         await Transformation.TransformAsync(principal);
-        
+
         // Assert
         principal.Claims.ShouldNotContain(claim => claim.Type == ClaimTypes.Role);
     }
@@ -61,52 +57,46 @@ public sealed class AppUserClaimsTransformationTests(DatabaseFixture databaseFix
     public async Task TransformAsync_AddsOrganizerRole_WhenUserIsOrganizer()
     {
         // Arrange
-        var principal = new ClaimsPrincipalBuilder()
-                        .WithUserId(Data.OrganizerUserId.ToString())
-                        .Build();
-        
+        var principal = ClaimsPrincipalFactory.Create(userId: TestData.OrganizerUserId);
+
         // Act
         await Transformation.TransformAsync(principal);
-        
+
         // Assert
         principal.Claims.ShouldContain(claim => claim.Type == ClaimTypes.Role
-                                             && claim.Value == "Organizer");
+                                                && claim.Value == "Organizer");
         principal.Claims.ShouldNotContain(claim => claim.Type == ClaimTypes.Role
                                                    && claim.Value == "Performer");
     }
-    
+
     [Fact]
     public async Task TransformAsync_AddsPerformerRole_WhenUserIsPerformer()
     {
         // Arrange
-        var principal = new ClaimsPrincipalBuilder()
-                        .WithUserId(Data.PerformerUserId.ToString())
-                        .Build();
-        
+        var principal = ClaimsPrincipalFactory.Create(userId: TestData.PerformerUserId);
+
         // Act
         await Transformation.TransformAsync(principal);
-        
+
         // Assert
         principal.Claims.ShouldNotContain(claim => claim.Type == ClaimTypes.Role
-                                                && claim.Value == "Organizer");
+                                                   && claim.Value == "Organizer");
         principal.Claims.ShouldContain(claim => claim.Type == ClaimTypes.Role
-                                                   && claim.Value == "Performer");
+                                                && claim.Value == "Performer");
     }
-    
+
     [Fact]
     public async Task TransformAsync_AddsBothRoles_WhenUserIsInBothRoles()
     {
         // Arrange
-        var principal = new ClaimsPrincipalBuilder()
-                        .WithUserId(Data.OrganizerPerformerUserId.ToString())
-                        .Build();
-        
+        var principal = ClaimsPrincipalFactory.Create(userId: TestData.OrganizerPerformerUserId);
+
         // Act
         await Transformation.TransformAsync(principal);
-        
+
         // Assert
         principal.Claims.ShouldContain(claim => claim.Type == ClaimTypes.Role
-                                                   && claim.Value == "Organizer");
+                                                && claim.Value == "Organizer");
         principal.Claims.ShouldContain(claim => claim.Type == ClaimTypes.Role
                                                 && claim.Value == "Performer");
     }

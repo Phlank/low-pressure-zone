@@ -1,7 +1,7 @@
-using LowPressureZone.Api.Test.Infrastructure.Fixtures;
+using LowPressureZone.Testing.Infrastructure.Fixtures;
 using Xunit;
 
-namespace LowPressureZone.Api.Test.Collections;
+namespace LowPressureZone.Testing.Collections;
 
 [CollectionDefinition("DatabaseQueryTests")]
 public class DatabaseQueryTestCollection : ICollectionFixture<DatabaseFixture> {}
