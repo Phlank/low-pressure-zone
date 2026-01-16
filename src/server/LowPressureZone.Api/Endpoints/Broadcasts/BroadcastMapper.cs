@@ -4,7 +4,7 @@ using LowPressureZone.Api.Rules;
 
 namespace LowPressureZone.Api.Endpoints.Broadcasts;
 
-public class BroadcastMapper(BroadcastRules rules) : IResponseMapper
+public sealed class BroadcastMapper(BroadcastRules rules) : IResponseMapper
 {
     public BroadcastResponse FromEntity(StationStreamerBroadcast broadcast)
         => new()

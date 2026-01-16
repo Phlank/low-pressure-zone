@@ -32,4 +32,10 @@
         <ProjectReference Include="..\LowPressureZone.Adapter.AzuraCast\LowPressureZone.Adapter.AzuraCast.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="Microsoft.AspNetCore.Authentication.Abstractions">
+        <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.aspnetcore.app.ref\9.0.11\ref\net9.0\Microsoft.AspNetCore.Authentication.Abstractions.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>
