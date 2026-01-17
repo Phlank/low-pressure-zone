@@ -32,6 +32,8 @@ public class IdentityContext(DbContextOptions<IdentityContext> options)
         if (!users.Any())
         {
             var seedData = GetSeedData();
+            if (seedData is null) 
+                return;
             var hasher = new PasswordHasher<AppUser>();
             var user = new AppUser
             {
@@ -74,6 +76,8 @@ public class IdentityContext(DbContextOptions<IdentityContext> options)
         if (!await users.AnyAsync(ct))
         {
             var seedData = GetSeedData();
+            if (seedData is null)
+                return;
             var hasher = new PasswordHasher<AppUser>();
             var user = new AppUser
             {
@@ -145,19 +149,14 @@ public class IdentityContext(DbContextOptions<IdentityContext> options)
         await context.SaveChangesAsync(ct);
     }
 
-    private static IdentitySeedData GetSeedData()
+    private static IdentitySeedData? GetSeedData()
     {
         var config = new ConfigurationBuilder().AddJsonFile("appsettings.json")
                                                .AddJsonFile("appsettings.Development.json", true)
                                                .AddJsonFile("appsettings.Production.json", true)
+                                               .AddEnvironmentVariables()
                                                .Build();
         var section = config.GetSection("SeedData:Identity");
-        return section.Get<IdentitySeedData>() ?? new IdentitySeedData
-        {
-            AdminDisplayName = "Admin",
-            AdminUsername = "admin",
-            AdminEmail = "email@none.com",
-            AdminPassword = "ChangeMe123!"
-        };
+        return section.Get<IdentitySeedData>();
     }
 }
