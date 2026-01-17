@@ -101,7 +101,7 @@ public class IdentityContext(DbContextOptions<IdentityContext> options)
             user.PasswordHash = passwordHash;
             users.Add(user);
 
-            var adminRole = roles.First(r => r.Name == RoleNames.Admin);
+            var adminRole = await roles.FirstAsync(r => r.Name == RoleNames.Admin, ct);
             var userRoles = context.Set<IdentityUserRole<Guid>>();
             userRoles.Add(new IdentityUserRole<Guid>
             {
