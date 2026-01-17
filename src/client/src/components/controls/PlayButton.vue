@@ -259,6 +259,8 @@ $text-translate-amount: v-bind(nameTranslateWidthPx);
     calc(30px + 28px + 10px + 46px + 10px + #{$text-width})
   );
 
+  filter: drop-shadow(0px 0px 0.5rem rgba(0, 0, 0, 0.8));
+
   &__buttons {
     width: 100%;
     display: flex;
