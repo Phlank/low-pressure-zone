@@ -16,14 +16,14 @@ public class GetStreamerPassword(UserManager<AppUser> userManager, IAzuraCastCli
     {
         if (User.Identity?.Name is null)
         {
-            await SendUnauthorizedAsync(ct);
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 
         var user = await userManager.FindByNameAsync(User.Identity.Name);
         if (user is null)
         {
-            await SendUnauthorizedAsync(ct);
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 
@@ -34,6 +34,6 @@ public class GetStreamerPassword(UserManager<AppUser> userManager, IAzuraCastCli
         {
             Password = generateResult.Value
         };
-        await SendOkAsync(response, ct);
+        await Send.OkAsync(response, ct);
     }
 }

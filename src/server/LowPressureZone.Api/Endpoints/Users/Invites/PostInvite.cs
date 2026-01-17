@@ -56,6 +56,6 @@ public class PostInvite(
             IsPerformer = request.IsPerformer
         });
         await dataContext.SaveChangesAsync(ct);
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }

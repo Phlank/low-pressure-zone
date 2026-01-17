@@ -41,7 +41,7 @@ public partial class PostTimeslot(
         if (!scheduleRules.IsAddingTimeslotsAllowed(schedule)
             || !performerRules.IsTimeslotLinkAuthorized(performer))
         {
-            await SendUnauthorizedAsync(ct);
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 
@@ -72,7 +72,7 @@ public partial class PostTimeslot(
         dataContext.Timeslots.Add(timeslot);
         await dataContext.SaveChangesAsync(ct);
         HttpContext.ExposeLocation();
-        await SendCreatedAtAsync<GetTimeslotById>(new
+        await Send.CreatedAtAsync<GetTimeslotById>(new
         {
             timeslot.Id
         }, Response, cancellation: ct);

@@ -22,6 +22,6 @@ public sealed class GetAboutSettings(DataContext dataContext)
                                        .Where(setting => setting.Key == SettingKey.AboutContent)
                                        .FirstOrDefaultAsync(ct);
         var mappedResponse = Map.ToResponse(setting);
-        await SendOkAsync(mappedResponse, ct);
+        await Send.OkAsync(mappedResponse, ct);
     }
 }

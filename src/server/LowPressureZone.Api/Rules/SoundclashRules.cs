@@ -15,6 +15,7 @@ public sealed class SoundclashRules(IHttpContextAccessor contextAccessor)
     {
         soundclash.Schedule.ShouldNotBeNull();
         soundclash.Schedule.Community.ShouldNotBeNull();
+        soundclash.Schedule.Community.Relationships.ShouldNotBeNull();
         
         if (User == null) return false;
         if (soundclash.EndsAt < DateTime.UtcNow) return false;
@@ -26,6 +27,10 @@ public sealed class SoundclashRules(IHttpContextAccessor contextAccessor)
 
     public bool IsDeleteAuthorized(Soundclash soundclash)
     {
+        soundclash.Schedule.ShouldNotBeNull();
+        soundclash.Schedule.Community.ShouldNotBeNull();
+        soundclash.Schedule.Community.Relationships.ShouldNotBeNull();
+        
         if (User == null) return false;
         if (soundclash.StartsAt < DateTime.UtcNow) return false;
         if (User.IsInRole(RoleNames.Admin)) return true;

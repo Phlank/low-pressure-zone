@@ -22,7 +22,7 @@ public class GetSoundclashes(DataContext dataContext)
                                                  .AnyAsync(schedule => schedule.Id == req.ScheduleId, ct);
         if (!doesScheduleExist)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
@@ -31,6 +31,6 @@ public class GetSoundclashes(DataContext dataContext)
                                             .Where(soundclash => soundclash.ScheduleId == req.ScheduleId)
                                             .ToListAsync(ct);
         var response = soundclashes.Select(Map.FromEntity);
-        await SendOkAsync(response, ct);
+        await Send.OkAsync(response, ct);
     }
 }

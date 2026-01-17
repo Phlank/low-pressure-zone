@@ -5,7 +5,7 @@ using LowPressureZone.Identity.Constants;
 
 namespace LowPressureZone.Api.Rules;
 
-public class BroadcastRules(IHttpContextAccessor contextAccessor)
+public sealed class BroadcastRules(IHttpContextAccessor contextAccessor)
 {
     private ClaimsPrincipal? User => contextAccessor.GetAuthenticatedUserOrDefault();
 

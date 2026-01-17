@@ -31,17 +31,17 @@ public class DeleteSchedule(DataContext dataContext, ScheduleRules rules) : Endp
                                         .FirstOrDefaultAsync(ct);
         if (schedule == null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         if (!rules.IsDeleteAuthorized(schedule))
         {
-            await SendUnauthorizedAsync(ct);
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 
         await dataContext.Schedules.Where(s => s.Id == id).ExecuteDeleteAsync(ct);
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }

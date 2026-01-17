@@ -20,7 +20,7 @@ public sealed class PostCommunity(DataContext dataContext) : EndpointWithMapper<
         dataContext.Communities.Add(community);
         await dataContext.SaveChangesAsync(ct);
         HttpContext.ExposeLocation();
-        await SendCreatedAtAsync<GetCommunities>(new
+        await Send.CreatedAtAsync<GetCommunities>(new
         {
             community.Id
         }, Response, cancellation: ct);

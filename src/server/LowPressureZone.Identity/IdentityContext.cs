@@ -17,72 +17,146 @@ public class IdentityContext(DbContextOptions<IdentityContext> options)
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSeeding((context, _) =>
         {
-            Console.WriteLine($"{nameof(IdentityContext)}: Seeding db.");
-            var roles = context.Set<AppRole>();
-            foreach (var roleName in RoleNames.DatabaseRoles)
-            {
-                Console.WriteLine($"{nameof(IdentityContext)}: Checking for {roleName} role.");
-                if (roles.Any(r => r.Name == roleName)) continue;
-                Console.WriteLine($"{nameof(IdentityContext)}: Did not find {roleName} role. Adding {roleName} role.");
-                roles.Add(new AppRole
-                {
-                    Id = Guid.NewGuid(),
-                    Name = roleName,
-                    NormalizedName = roleName.ToUpperInvariant(),
-                    ConcurrencyStamp = Guid.NewGuid().ToString()
-                });
-            }
-
-            context.SaveChanges();
-
-            var users = context.Set<AppUser>();
-            if (!users.Any())
-            {
-                Console.WriteLine($"{nameof(IdentityContext)}: No users found. Seeding admin user.");
-                var seedData = GetSeedData();
-                var hasher = new PasswordHasher<AppUser>();
-                var user = new AppUser
-                {
-                    Id = Guid.NewGuid(),
-                    AccessFailedCount = 0,
-                    ConcurrencyStamp = Guid.NewGuid().ToString(),
-                    Email = seedData.AdminEmail,
-                    NormalizedEmail = seedData.AdminEmail.ToUpperInvariant().Normalize(),
-                    EmailConfirmed = true,
-                    LockoutEnabled = false,
-                    LockoutEnd = null,
-                    PhoneNumber = null,
-                    PhoneNumberConfirmed = false,
-                    SecurityStamp = Guid.NewGuid().ToString(),
-                    TwoFactorEnabled = true,
-                    DisplayName = seedData.AdminDisplayName,
-                    UserName = seedData.AdminUsername,
-                    NormalizedUserName = seedData.AdminUsername.ToUpperInvariant().Normalize()
-                };
-                var passwordHash = hasher.HashPassword(user, seedData.AdminPassword);
-                user.PasswordHash = passwordHash;
-                users.Add(user);
-
-                var adminRole = roles.First(r => r.Name == RoleNames.Admin);
-                var userRoles = context.Set<IdentityUserRole<Guid>>();
-                userRoles.Add(new IdentityUserRole<Guid>
-                {
-                    UserId = user.Id,
-                    RoleId = adminRole.Id
-                });
-            }
-
-            context.SaveChanges();
+            Seed_AddRoles(context);
+            Seed_AddAdminUser(context);
+        }).UseAsyncSeeding(async (context, _, ct) =>
+        {
+            await Seed_AddRolesAsync(context, ct);
+            await Seed_AddAdminUserAsync(context, ct);
         });
 
-    private static IdentitySeedData GetSeedData()
+    private static void Seed_AddAdminUser(DbContext context)
+    {
+        var users = context.Set<AppUser>();
+        var roles = context.Set<AppRole>();
+        if (!users.Any())
+        {
+            var seedData = GetSeedData();
+            if (seedData is null) 
+                return;
+            var hasher = new PasswordHasher<AppUser>();
+            var user = new AppUser
+            {
+                Id = Guid.NewGuid(),
+                AccessFailedCount = 0,
+                ConcurrencyStamp = Guid.NewGuid().ToString(),
+                Email = seedData.AdminEmail,
+                NormalizedEmail = seedData.AdminEmail.ToUpperInvariant().Normalize(),
+                EmailConfirmed = true,
+                LockoutEnabled = false,
+                LockoutEnd = null,
+                PhoneNumber = null,
+                PhoneNumberConfirmed = false,
+                SecurityStamp = Guid.NewGuid().ToString(),
+                TwoFactorEnabled = true,
+                DisplayName = seedData.AdminDisplayName,
+                UserName = seedData.AdminUsername,
+                NormalizedUserName = seedData.AdminUsername.ToUpperInvariant().Normalize()
+            };
+            var passwordHash = hasher.HashPassword(user, seedData.AdminPassword);
+            user.PasswordHash = passwordHash;
+            users.Add(user);
+
+            var adminRole = roles.First(r => r.Name == RoleNames.Admin);
+            var userRoles = context.Set<IdentityUserRole<Guid>>();
+            userRoles.Add(new IdentityUserRole<Guid>
+            {
+                UserId = user.Id,
+                RoleId = adminRole.Id
+            });
+        }
+
+        context.SaveChanges();
+    }
+    
+    private static async Task Seed_AddAdminUserAsync(DbContext context, CancellationToken ct)
+    {
+        var users = context.Set<AppUser>();
+        var roles = context.Set<AppRole>();
+        if (!await users.AnyAsync(ct))
+        {
+            var seedData = GetSeedData();
+            if (seedData is null)
+                return;
+            var hasher = new PasswordHasher<AppUser>();
+            var user = new AppUser
+            {
+                Id = Guid.NewGuid(),
+                AccessFailedCount = 0,
+                ConcurrencyStamp = Guid.NewGuid().ToString(),
+                Email = seedData.AdminEmail,
+                NormalizedEmail = seedData.AdminEmail.ToUpperInvariant().Normalize(),
+                EmailConfirmed = true,
+                LockoutEnabled = false,
+                LockoutEnd = null,
+                PhoneNumber = null,
+                PhoneNumberConfirmed = false,
+                SecurityStamp = Guid.NewGuid().ToString(),
+                TwoFactorEnabled = true,
+                DisplayName = seedData.AdminDisplayName,
+                UserName = seedData.AdminUsername,
+                NormalizedUserName = seedData.AdminUsername.ToUpperInvariant().Normalize()
+            };
+            var passwordHash = hasher.HashPassword(user, seedData.AdminPassword);
+            user.PasswordHash = passwordHash;
+            users.Add(user);
+
+            var adminRole = await roles.FirstAsync(r => r.Name == RoleNames.Admin, ct);
+            var userRoles = context.Set<IdentityUserRole<Guid>>();
+            userRoles.Add(new IdentityUserRole<Guid>
+            {
+                UserId = user.Id,
+                RoleId = adminRole.Id
+            });
+        }
+
+        await context.SaveChangesAsync(ct);
+    }
+
+    private static void Seed_AddRoles(DbContext context)
+    {
+        var roles = context.Set<AppRole>();
+        foreach (var roleName in RoleNames.DatabaseRoles)
+        {
+            if (roles.Any(r => r.Name == roleName)) continue;
+            roles.Add(new AppRole
+            {
+                Id = Guid.NewGuid(),
+                Name = roleName,
+                NormalizedName = roleName.ToUpperInvariant(),
+                ConcurrencyStamp = Guid.NewGuid().ToString()
+            });
+        }
+
+        context.SaveChanges();
+    }
+
+    private static async Task Seed_AddRolesAsync(DbContext context, CancellationToken ct)
+    {
+        var roles = context.Set<AppRole>();
+        foreach (var roleName in RoleNames.DatabaseRoles)
+        {
+            if (await roles.AnyAsync(r => r.Name == roleName, ct)) continue;
+            roles.Add(new AppRole
+            {
+                Id = Guid.NewGuid(),
+                Name = roleName,
+                NormalizedName = roleName.ToUpperInvariant(),
+                ConcurrencyStamp = Guid.NewGuid().ToString()
+            });
+        }
+
+        await context.SaveChangesAsync(ct);
+    }
+
+    private static IdentitySeedData? GetSeedData()
     {
         var config = new ConfigurationBuilder().AddJsonFile("appsettings.json")
                                                .AddJsonFile("appsettings.Development.json", true)
                                                .AddJsonFile("appsettings.Production.json", true)
+                                               .AddEnvironmentVariables()
                                                .Build();
-        var section = config.GetRequiredSection("SeedData:Identity");
-        return section.Get<IdentitySeedData>() ??
-               throw new InvalidOperationException("Seed data missing from configuration.");
+        var section = config.GetSection("SeedData:Identity");
+        return section.Get<IdentitySeedData>();
     }
 }

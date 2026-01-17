@@ -25,20 +25,20 @@ public class PostResendInvite(
         var invite = identityContext.Invitations.FirstOrDefault(invitation => invitation.Id == id);
         if (invite == null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         var user = await userManager.FindByIdAsync(invite.UserId.ToString());
         if (user == null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         await userManager.SendWelcomeEmail(user, emailService);
         invite.LastSentDate = DateTime.UtcNow;
         await identityContext.SaveChangesAsync(ct);
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }

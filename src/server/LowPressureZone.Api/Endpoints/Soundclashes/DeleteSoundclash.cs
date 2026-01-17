@@ -27,19 +27,19 @@ public class DeleteSoundclash(DataContext dataContext, SoundclashRules rules) : 
                                           .FirstOrDefaultAsync(ct);
         if (soundclash is null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         if (!rules.IsDeleteAuthorized(soundclash))
         {
-            await SendUnauthorizedAsync(ct);
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 
         await dataContext.Soundclashes
                          .Where(item => item.Id == id)
                          .ExecuteDeleteAsync(ct);
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }

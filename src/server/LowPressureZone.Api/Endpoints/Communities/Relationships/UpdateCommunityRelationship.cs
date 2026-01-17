@@ -33,21 +33,21 @@ public class UpdateCommunityRelationship(
         if (!await dataContext.Communities.AnyAsync(community => community.Id == communityId, ct)
             || !await identityContext.Users.AnyAsync(user => user.Id == userId, ct))
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         var user = await userManager.FindByIdAsync(userId.ToString());
         if (user == null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         var roles = await userManager.GetRolesAsync(user);
         if (roles.Contains(RoleNames.Admin))
         {
-            await SendForbiddenAsync(ct);
+            await Send.ForbiddenAsync(ct);
             return;
         }
 
@@ -62,7 +62,7 @@ public class UpdateCommunityRelationship(
 
         if (!communityRules.IsOrganizingAuthorized(community))
         {
-            await SendUnauthorizedAsync(ct);
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 
@@ -74,14 +74,14 @@ public class UpdateCommunityRelationship(
         if (existing != null)
         {
             await Map.UpdateEntityAsync(request, existing, ct);
-            await SendNoContentAsync(ct);
+            await Send.NoContentAsync(ct);
             return;
         }
 
         await dataContext.AddAsync(Map.ToEntity(request), ct);
         await dataContext.SaveChangesAsync(ct);
         HttpContext.ExposeLocation();
-        await SendCreatedAtAsync<GetCommunityRelationshipById>(new
+        await Send.CreatedAtAsync<GetCommunityRelationshipById>(new
         {
             communityId,
             userId

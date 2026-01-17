@@ -12,6 +12,6 @@ public class GetLogout(SignInManager<AppUser> signInManager) : EndpointWithoutRe
     public override async Task HandleAsync(CancellationToken ct)
     {
         await signInManager.SignOutAsync();
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }

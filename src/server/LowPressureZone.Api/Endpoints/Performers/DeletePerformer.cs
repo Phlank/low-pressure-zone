@@ -22,13 +22,13 @@ public class DeletePerformer(DataContext dataContext, PerformerRules rules) : En
 
         if (performer == null || performer.IsDeleted)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         if (!rules.IsDeleteAuthorized(performer))
         {
-            await SendUnauthorizedAsync(ct);
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 
@@ -38,6 +38,6 @@ public class DeletePerformer(DataContext dataContext, PerformerRules rules) : En
         await dataContext.Timeslots
                          .Where(timeslot => timeslot.PerformerId == performer.Id && timeslot.StartsAt > DateTime.UtcNow)
                          .ExecuteDeleteAsync(ct);
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }
