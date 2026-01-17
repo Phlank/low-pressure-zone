@@ -22,11 +22,11 @@ public class GetNewsById(DataContext dataContext) : EndpointWithoutRequest<NewsR
                                         .FirstOrDefaultAsync(news => news.Id == id, ct);
         if (newsItem == null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         var response = Map.FromEntity(newsItem);
-        await SendOkAsync(response, ct);
+        await Send.OkAsync(response, ct);
     }
 }

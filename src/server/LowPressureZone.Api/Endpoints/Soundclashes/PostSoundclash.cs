@@ -29,7 +29,7 @@ public class PostSoundclash(DataContext dataContext, ScheduleRules scheduleRules
 
         if (!scheduleRules.IsAddingSoundclashesAllowed(schedule))
         {
-            await SendUnauthorizedAsync(ct);
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 
@@ -37,7 +37,7 @@ public class PostSoundclash(DataContext dataContext, ScheduleRules scheduleRules
         dataContext.Soundclashes.Add(soundclash);
         await dataContext.SaveChangesAsync(ct);
         HttpContext.ExposeLocation();
-        await SendCreatedAtAsync<GetSoundclashById>(new
+        await Send.CreatedAtAsync<GetSoundclashById>(new
         {
             soundclash.Id
         }, cancellation: ct);

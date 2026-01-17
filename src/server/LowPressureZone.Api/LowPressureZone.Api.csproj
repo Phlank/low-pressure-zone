@@ -10,9 +10,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FastEndpoints" Version="6.2.0"/>
-        <PackageReference Include="FastEndpoints.Security" Version="6.2.0"/>
-        <PackageReference Include="FastEndpoints.Swagger" Version="6.2.0"/>
+        <PackageReference Include="FastEndpoints" Version="7.2.0" />
+        <PackageReference Include="FastEndpoints.Generator" Version="7.2.0">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="FastEndpoints.Security" Version="7.2.0" />
+        <PackageReference Include="FastEndpoints.Swagger" Version="7.2.0" />
         <PackageReference Include="FFMpegCore" Version="5.4.0"/>
         <PackageReference Include="FluentEmail.Mailgun" Version="3.0.2"/>
         <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="9.0.7"/>
@@ -30,12 +34,6 @@
         <ProjectReference Include="..\LowPressureZone.Domain\LowPressureZone.Domain.csproj"/>
         <ProjectReference Include="..\LowPressureZone.Identity\LowPressureZone.Identity.csproj"/>
         <ProjectReference Include="..\LowPressureZone.Adapter.AzuraCast\LowPressureZone.Adapter.AzuraCast.csproj"/>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="Microsoft.AspNetCore.Authentication.Abstractions">
-        <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.aspnetcore.app.ref\9.0.11\ref\net9.0\Microsoft.AspNetCore.Authentication.Abstractions.dll</HintPath>
-      </Reference>
     </ItemGroup>
 
 </Project>

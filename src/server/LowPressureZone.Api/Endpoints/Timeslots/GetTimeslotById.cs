@@ -25,11 +25,11 @@ public class GetTimeslotById : EndpointWithoutRequest<TimeslotResponse, Timeslot
                                         .FirstOrDefaultAsync(ct);
         if (timeslot == null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         var response = Map.FromEntity(timeslot);
-        await SendOkAsync(response, ct);
+        await Send.OkAsync(response, ct);
     }
 }

@@ -35,13 +35,13 @@ public class DeleteTimeslot(
 
         if (timeslot == null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         if (!rules.IsDeleteAuthorized(timeslot))
         {
-            await SendUnauthorizedAsync(ct);
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 
@@ -59,6 +59,6 @@ public class DeleteTimeslot(
         }
 
         await dataContext.Timeslots.Where(t => t.Id == timeslotId).ExecuteDeleteAsync(ct);
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }

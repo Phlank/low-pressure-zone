@@ -28,7 +28,7 @@ public class PostSchedule(DataContext dataContext, CommunityRules communityRules
 
         if (!communityRules.IsOrganizingAuthorized(community))
         {
-            await SendUnauthorizedAsync(ct);
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 
@@ -37,7 +37,7 @@ public class PostSchedule(DataContext dataContext, CommunityRules communityRules
         DataContext.Schedules.Add(schedule);
         await DataContext.SaveChangesAsync(ct);
         HttpContext.ExposeLocation();
-        await SendCreatedAtAsync<GetScheduleById>(new
+        await Send.CreatedAtAsync<GetScheduleById>(new
         {
             schedule.Id
         }, Response, cancellation: ct);

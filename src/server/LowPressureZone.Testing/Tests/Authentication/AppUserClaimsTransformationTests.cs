@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.ComponentModel;
+using System.Security.Claims;
 using LowPressureZone.Api.Authentication;
 using LowPressureZone.Testing.Infrastructure.Factories;
 using LowPressureZone.Testing.Infrastructure.Fixtures;
@@ -8,7 +9,8 @@ using TestData = LowPressureZone.Testing.Tests.Authentication.AppUserClaimsTrans
 
 namespace LowPressureZone.Testing.Tests.Authentication;
 
-[Collection("DatabaseQueryTests")]
+[Collection("Database Query Tests")]
+[Trait("Category", "Database")]
 public sealed class AppUserClaimsTransformationTests(DatabaseFixture databaseFixture)
 {
     private AppUserClaimsTransformation Transformation => new(databaseFixture.DataContext);

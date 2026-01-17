@@ -36,6 +36,6 @@ public class GetCommunityRelationships(DataContext dataContext, IdentityContext 
                                                  Map.FromEntity(relationship, displayNames[relationship.UserId],
                                                                 userRelationship))
                                      .OrderBy(response => response.DisplayName);
-        await SendOkAsync(responses, ct);
+        await Send.OkAsync(responses, ct);
     }
 }

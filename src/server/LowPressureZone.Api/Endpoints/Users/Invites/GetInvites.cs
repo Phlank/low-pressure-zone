@@ -37,6 +37,6 @@ public class GetInvites(IdentityContext identityContext, DataContext dataContext
         var responses = invites.Where(invitation => userCommunities.ContainsKey(invitation.UserId))
                                .Select(invitation => Map.FromEntity(invitation, userCommunities[invitation.UserId]));
 
-        await SendOkAsync(responses, ct);
+        await Send.OkAsync(responses, ct);
     }
 }

@@ -1,6 +1,7 @@
 using LowPressureZone.Domain;
 using LowPressureZone.Identity;
 using LowPressureZone.Testing.Tests.Authentication;
+using LowPressureZone.Testing.Tests.Endpoints.Communities;
 using Microsoft.EntityFrameworkCore;
 using Testcontainers.PostgreSql;
 using Xunit;
@@ -9,7 +10,7 @@ using Xunit;
 
 namespace LowPressureZone.Testing.Infrastructure.Fixtures;
 
-[Collection("DatabaseQueryTests")]
+[Collection("Database Query Tests")]
 public class DatabaseFixture : IAsyncLifetime
 {
     private readonly PostgreSqlContainer _container = new PostgreSqlBuilder("postgres:16-alpine").Build();
@@ -60,6 +61,7 @@ public class DatabaseFixture : IAsyncLifetime
             throw new InvalidOperationException("DataContext is not initialized.");
 
         _dataContext.AddRange(AppUserClaimsTransformationTestsData.Communities);
+        _dataContext.AddRange(CommunityRequestValidatorTestsData.Communities);
 
         await _dataContext.SaveChangesAsync();
     }

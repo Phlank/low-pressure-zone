@@ -28,6 +28,6 @@ public class GetSchedules(DataContext dataContext, ScheduleRules rules)
         var schedules = await scheduleQuery.ToListAsync(ct);
         schedules.RemoveAll(rules.IsHiddenFromApi);
 
-        await SendOkAsync(schedules.Select(Map.FromEntity), ct);
+        await Send.OkAsync(schedules.Select(Map.FromEntity), ct);
     }
 }

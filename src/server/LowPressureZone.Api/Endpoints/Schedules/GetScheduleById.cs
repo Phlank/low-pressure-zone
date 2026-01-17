@@ -25,10 +25,10 @@ public class GetScheduleById(DataContext dataContext, ScheduleRules rules)
 
         if (schedule == null || rules.IsHiddenFromApi(schedule))
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
-        await SendOkAsync(Map.FromEntity(schedule), ct);
+        await Send.OkAsync(Map.FromEntity(schedule), ct);
     }
 }

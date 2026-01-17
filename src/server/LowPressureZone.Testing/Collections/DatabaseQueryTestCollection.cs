@@ -3,5 +3,5 @@ using Xunit;
 
 namespace LowPressureZone.Testing.Collections;
 
-[CollectionDefinition("DatabaseQueryTests")]
+[CollectionDefinition("Database Query Tests")]
 public class DatabaseQueryTestCollection : ICollectionFixture<DatabaseFixture> {}

@@ -20,6 +20,6 @@ public class GetConnectionInfo(StreamingInfoService streamingInfoService)
             Map.FromEntity(infoResult.Value.Live),
             Map.FromEntity(infoResult.Value.Test)
         ];
-        await SendOkAsync(responses, ct);
+        await Send.OkAsync(responses, ct);
     }
 }

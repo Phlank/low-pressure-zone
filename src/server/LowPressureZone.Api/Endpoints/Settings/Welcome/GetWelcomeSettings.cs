@@ -22,6 +22,6 @@ public sealed class GetWelcomeSettings(DataContext dataContext)
         var setting = await dataContext.Settings
                                        .FirstOrDefaultAsync(setting => setting.Key == SettingKey.WelcomeContent, ct);
         var response = Map.ToResponse(setting);
-        await SendOkAsync(response, ct);
+        await Send.OkAsync(response, ct);
     }
 }

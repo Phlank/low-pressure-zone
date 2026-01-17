@@ -60,6 +60,6 @@ public class PostResetPassword(UserManager<AppUser> userManager) : Endpoint<Post
 
         await userManager.RemovePasswordAsync(user);
         await userManager.AddPasswordAsync(user, req.Password);
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }

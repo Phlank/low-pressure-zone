@@ -25,7 +25,7 @@ public class PutNews(DataContext dataContext) : EndpointWithMapper<NewsRequest, 
                                                   .FirstOrDefaultAsync(news => news.Id == id, ct);
         if (persistentNewsItem == null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 

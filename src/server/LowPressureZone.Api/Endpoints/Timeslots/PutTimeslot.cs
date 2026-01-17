@@ -31,13 +31,13 @@ public class PutTimeslot(DataContext dataContext, PrerecordedMixFileProcessor fi
 
         if (timeslot == null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         if (!rules.IsEditAuthorized(timeslot))
         {
-            await SendUnauthorizedAsync(ct);
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 
@@ -55,6 +55,6 @@ public class PutTimeslot(DataContext dataContext, PrerecordedMixFileProcessor fi
         Map.UpdateEntity(request, timeslot);
         _ = await dataContext.SaveChangesAsync(ct);
 
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }

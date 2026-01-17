@@ -2,7 +2,9 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using FakeItEasy;
+using LowPressureZone.Testing.Infrastructure.Fixtures;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace LowPressureZone.Testing.Infrastructure.Factories;
 
@@ -11,7 +13,8 @@ public static class HttpContextFactory
     public static (HttpContext, IHttpContextAccessor) Create(
         ClaimsPrincipal? user = null,
         string? path = null,
-        string? method = null)
+        string? method = null,
+        IServiceCollection? services = null)
     {
         var context = new DefaultHttpContext();
         var accessor = A.Fake<IHttpContextAccessor>();
@@ -25,6 +28,11 @@ public static class HttpContextFactory
 
         if (method is not null)
             context.Request.Method = method;
+
+        if (services is not null)
+            context.RequestServices = services.BuildServiceProvider();
+        else
+            context.RequestServices = new ServiceCollection().BuildServiceProvider();
 
         return (context, accessor);
     }

@@ -21,7 +21,7 @@ public class PostNews(DataContext dataContext) : EndpointWithMapper<NewsRequest,
         await dataContext.News.AddAsync(newsItem, ct);
         await dataContext.SaveChangesAsync(ct);
         HttpContext.ExposeLocation();
-        await SendCreatedAtAsync<GetNewsById>(new
+        await Send.CreatedAtAsync<GetNewsById>(new
         {
             newsItem.Id
         }, Response, cancellation: ct);

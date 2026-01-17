@@ -21,6 +21,6 @@ public class GetNews(DataContext dataContext) : EndpointWithoutRequest<IEnumerab
                                          .OrderByDescending(news => news.CreatedDate)
                                          .ToListAsync(ct);
         var responses = newsItems.Select(Map.FromEntity);
-        await SendOkAsync(responses, ct);
+        await Send.OkAsync(responses, ct);
     }
 }

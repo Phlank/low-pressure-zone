@@ -29,13 +29,13 @@ public class PutSoundclash(DataContext dataContext, SoundclashRules rules) : End
         
         if (soundclash == null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         if (!rules.IsEditAuthorized(soundclash))
         {
-            await SendUnauthorizedAsync(ct);
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 
@@ -50,6 +50,6 @@ public class PutSoundclash(DataContext dataContext, SoundclashRules rules) : End
         soundclash.LastModifiedDate = mapped.LastModifiedDate;
 
         await dataContext.SaveChangesAsync(ct);
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }

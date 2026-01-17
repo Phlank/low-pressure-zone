@@ -112,6 +112,6 @@ public class PostRegister(
         invitation.RegistrationDate = DateTime.UtcNow;
         await identityContext.SaveChangesAsync(ct);
 
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }

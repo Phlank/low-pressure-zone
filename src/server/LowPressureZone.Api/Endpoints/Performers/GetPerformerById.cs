@@ -23,11 +23,11 @@ public sealed class GetPerformerById(DataContext dataContext)
                                          .FirstOrDefaultAsync(ct);
         if (performer == null || PerformerRules.IsHiddenFromApi(performer))
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         var response = Map.FromEntity(performer);
-        await SendOkAsync(response, ct);
+        await Send.OkAsync(response, ct);
     }
 }

@@ -19,7 +19,7 @@ public class GetTimeslots(DataContext dataContext)
     {
         if (!await dataContext.HasAsync<Schedule>(req.ScheduleId, ct))
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
@@ -29,6 +29,6 @@ public class GetTimeslots(DataContext dataContext)
                                          .Where(timeslot => timeslot.ScheduleId == req.ScheduleId)
                                          .OrderBy(timeslot => timeslot.StartsAt)
                                          .ToListAsync(ct);
-        await SendOkAsync(timeslots.Select(Map.FromEntity), ct);
+        await Send.OkAsync(timeslots.Select(Map.FromEntity), ct);
     }
 }

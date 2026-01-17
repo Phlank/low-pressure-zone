@@ -18,6 +18,6 @@ public class GetStreamStatus(IStreamStatusService streamStatusService)
         var status = streamStatusService.Status;
         ArgumentNullException.ThrowIfNull(status);
         var response = Map.FromEntity(status);
-        await SendOkAsync(response, ct);
+        await Send.OkAsync(response, ct);
     }
 }

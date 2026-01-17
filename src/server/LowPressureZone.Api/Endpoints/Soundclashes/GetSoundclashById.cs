@@ -25,11 +25,11 @@ public class GetSoundclashById(DataContext dataContext) : EndpointWithoutRequest
         
         if (soundclash is null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         var response = Map.FromEntity(soundclash);
-        await SendOkAsync(response, ct);
+        await Send.OkAsync(response, ct);
     }
 }

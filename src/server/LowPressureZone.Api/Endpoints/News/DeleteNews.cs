@@ -24,10 +24,10 @@ public class DeleteNews(DataContext dataContext) : EndpointWithoutRequest
                                             .ExecuteDeleteAsync(ct);
         if (countDeleted == 0)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }

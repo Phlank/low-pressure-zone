@@ -33,6 +33,6 @@ public class PutWelcomeSettings(DataContext dataContext)
         }
 
         await dataContext.SaveChangesAsync(ct);
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }
