@@ -33,7 +33,6 @@ public sealed class BroadcastRulesTests
     public void IsDownloadable_ReturnsFalse_WhenRecordingDoesNotExist()
     {
         // Arrange
-        // Arrange
         var (_, accessor) = HttpContextFactory.Create();
         var broadcast = new StationStreamerBroadcast();
 
