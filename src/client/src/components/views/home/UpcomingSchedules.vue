@@ -18,7 +18,7 @@
         class="upcoming-schedules__content">
         <h3 v-if="schedule !== undefined && schedule.name !== ''">{{ schedule?.name }}</h3>
         <div
-          v-if="schedule?.description !== ''"
+          v-if="schedule !== undefined && schedule.description !== ''"
           class="upcoming-schedules__content__description">
           {{ schedule.description }}
         </div>
