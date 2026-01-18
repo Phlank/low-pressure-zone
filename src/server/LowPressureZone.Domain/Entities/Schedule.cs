@@ -5,6 +5,7 @@ namespace LowPressureZone.Domain.Entities;
 
 public sealed class Schedule : BaseEntity, IDateTimeRange
 {
+    public required string Name { get; set; }
     public required string Description { get; set; }
     public required Guid CommunityId { get; set; }
     public Community Community { get; init; } = null!;

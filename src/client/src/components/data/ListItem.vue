@@ -2,19 +2,40 @@
   <div
     class="list-item"
     @click="emit('click')">
-    <div class="list-item__left">
+    <div :class="leftClass">
       <slot name="left"></slot>
     </div>
-    <div class="list-item__right">
+    <div :class="rightClass">
       <slot name="right"></slot>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue'
+
 const emit = defineEmits<{
   click: []
 }>()
+
+const props = withDefaults(
+  defineProps<{
+    hideOverflowLeft?: boolean
+    hideOverflowRight?: boolean
+  }>(),
+  {
+    hideOverflowLeft: true,
+    hideOverflowRight: false
+  }
+)
+
+const leftClass = computed(() =>
+  props.hideOverflowLeft ? 'list-item__left list-item__left--no-overflow' : 'list-item__left'
+)
+
+const rightClass = computed(() =>
+  props.hideOverflowRight ? 'list-item__right list-item__right--no-overflow' : 'list-item__right'
+)
 </script>
 
 <style lang="scss">
@@ -33,17 +54,31 @@ const emit = defineEmits<{
   &__left {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
 
-    span {
+    &--no-overflow {
       overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+
+      span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
   }
 
   &__right {
-    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+
+    &--no-overflow {
+      overflow: hidden;
+
+      span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
   }
 }
 </style>

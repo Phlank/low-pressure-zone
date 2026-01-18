@@ -13,10 +13,16 @@ public class ScheduleRequestValidator : Validator<ScheduleRequest>
 {
     public ScheduleRequestValidator(IHttpContextAccessor contextAccessor)
     {
+        RuleFor(request => request.StartsAt).GreaterThanOrEqualTo(DateTimeOffset.UtcNow)
+                                            .WithMessage(Errors.TimeInPast);
         RuleFor(request => request.EndsAt).GreaterThanOrEqualTo(request => request.StartsAt.AddHours(1))
                                           .WithMessage(Errors.MinDuration(1))
                                           .LessThanOrEqualTo(request => request.StartsAt.AddHours(24))
                                           .WithMessage(Errors.MaxDuration(24));
+        RuleFor(request => request.Name).NotEmpty()
+                                        .WithMessage(Errors.Required)
+                                        .MaximumLength(64)
+                                        .WithMessage(Errors.MaxLength(64));
         RuleFor(request => request).CustomAsync(async (request, context, ct) =>
         {
             var id = contextAccessor.GetGuidRouteParameterOrDefault("id");

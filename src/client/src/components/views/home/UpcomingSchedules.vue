@@ -16,8 +16,9 @@
       <div
         v-else
         class="upcoming-schedules__content">
+        <h3 v-if="schedule !== undefined && schedule.name !== ''">{{ schedule?.name }}</h3>
         <div
-          v-if="schedule?.description"
+          v-if="schedule?.description !== ''"
           class="upcoming-schedules__content__description">
           {{ schedule.description }}
         </div>
@@ -61,7 +62,7 @@ const schedule = computed(() => schedules.getScheduleById(currentId.value))
     text-align: center;
 
     &__description {
-      padding: variables.$space-l 0;
+      padding: 0 0 variables.$space-l 0;
     }
   }
 }

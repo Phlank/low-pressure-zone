@@ -11,6 +11,7 @@ public static class ScheduleFactory
         Community? community = null,
         DateTimeOffset? startsAt = null,
         DateTimeOffset? endsAt = null,
+        string? name = null,
         string? description = null,
         ScheduleType? type = null) =>
         new()
@@ -20,7 +21,8 @@ public static class ScheduleFactory
             Community = community ?? null!,
             StartsAt = startsAt ?? DateTimeOffset.UtcNow,
             EndsAt = endsAt ?? DateTimeOffset.UtcNow.AddHours(1),
-            Description = description ?? "Test Schedule",
+            Name = name ?? "Test Schedule",
+            Description = description ?? "Test Schedule Description",
             Type = type ?? ScheduleType.Hourly
         };
 }

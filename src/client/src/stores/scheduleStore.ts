@@ -95,6 +95,7 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
         type: form.type,
         startsAt: form.startsAt,
         endsAt: form.endsAt,
+        name: form.name,
         description: form.description,
         timeslots: [],
         soundclashes: [],
@@ -118,6 +119,7 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
       entity.type = form.type
       entity.startsAt = form.startsAt
       entity.endsAt = form.endsAt
+      entity.name = form.name
       entity.description = form.description
       entity.community = getCommunityById(form.communityId)!
       schedules.value.sort((a, b) => compareAsc(a.startsAt, b.startsAt))

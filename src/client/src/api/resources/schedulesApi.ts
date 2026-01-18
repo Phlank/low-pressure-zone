@@ -21,6 +21,7 @@ export interface ScheduleRequest {
   type: string
   startsAt: string
   endsAt: string
+  name: string
   description: string
   communityId: string
 }
@@ -30,6 +31,7 @@ export interface ScheduleResponse {
   type: string
   startsAt: string
   endsAt: string
+  name: string
   description: string
   community: CommunityResponse
   timeslots: TimeslotResponse[]
@@ -46,6 +48,7 @@ const mapRequest = <TSchedule extends ScheduleRequest>(schedule: TSchedule): Sch
     communityId: schedule.communityId,
     startsAt: schedule.startsAt,
     endsAt: schedule.endsAt,
+    name: schedule.name,
     description: schedule.description
   }
 }
@@ -56,6 +59,7 @@ const mapResponseToRequest = (response: ScheduleResponse): ScheduleRequest => {
     communityId: response.community.id,
     startsAt: response.startsAt,
     endsAt: response.endsAt,
+    name: response.name,
     description: response.description
   }
 }
