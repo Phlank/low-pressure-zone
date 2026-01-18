@@ -22,6 +22,7 @@ public sealed class ScheduleMapper(
         => new()
         {
             Id = Guid.NewGuid(),
+            Name = req.Name,
             CommunityId = req.CommunityId,
             Description = req.Description,
             StartsAt = req.StartsAt.ToUniversalTime(),
@@ -35,6 +36,7 @@ public sealed class ScheduleMapper(
         CancellationToken ct = default)
     {
         var dataContext = accessor.Resolve<DataContext>();
+        schedule.Name = req.Name;
         schedule.StartsAt = req.StartsAt;
         schedule.EndsAt = req.EndsAt;
         schedule.CommunityId = req.CommunityId;
@@ -55,6 +57,7 @@ public sealed class ScheduleMapper(
             Id = schedule.Id,
             StartsAt = schedule.StartsAt,
             EndsAt = schedule.EndsAt,
+            Name = schedule.Name,
             Description = schedule.Description,
             Community = communityMapper.FromEntity(schedule.Community),
             Timeslots = schedule.Timeslots.Select(timeslotMapper.FromEntity),

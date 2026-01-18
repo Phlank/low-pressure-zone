@@ -2,6 +2,18 @@
   <div class="schedule-form">
     <FormArea>
       <IftaFormField
+        :message="validation.message('name')"
+        input-id="nameInput"
+        label="Name"
+        size="m">
+        <InputText
+          id="nameInput"
+          v-model:model-value="formState.name"
+          :disabled="isSubmitting"
+          :invalid="!validation.isValid('name')"
+          @update:model-value="validation.validateIfDirty('name')" />
+      </IftaFormField>
+      <IftaFormField
         :message="validation.message('type')"
         input-id="typeInput"
         label="Type"
@@ -11,9 +23,9 @@
           v-model:model-value="formState.type"
           :disabled="isSubmitting || props.schedule !== undefined"
           :invalid="!validation.isValid('type')"
-          :options="entriesToKeyValueArray(scheduleTypes)"
           :option-label="(data) => data.value"
           :option-value="(data) => data.key"
+          :options="entriesToKeyValueArray(scheduleTypes)"
           autofocus
           @update:model-value="validation.validateIfDirty('type')">
         </Select>
@@ -89,7 +101,7 @@
 </template>
 
 <script lang="ts" setup>
-import { DatePicker, Select, Textarea } from 'primevue'
+import { DatePicker, Select, Textarea, InputText } from 'primevue'
 import { computed, onMounted, type Ref, ref } from 'vue'
 import { MS_PER_MINUTE } from '@/constants/times'
 import { minimumDate, parseDate } from '@/utils/dateUtils'
@@ -168,6 +180,7 @@ const {
         }
       }),
       startsAt: schedule?.startsAt ?? resetStartTime.toISOString(),
+      name: schedule?.name ?? '',
       description: schedule?.description ?? '',
       endTime: computed({
         get: () => parseDate(stateRef.value.endsAt),
