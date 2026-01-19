@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Core;
 
@@ -43,4 +44,5 @@ public interface IAzuraCastClient
 
     Task<Result<bool, HttpResponseMessage>> PutPlaylistAsync(StationPlaylist playlist);
     Task<Result<bool, HttpResponseMessage>> DeletePlaylistAsync(int playlistId);
+    Task<Result<bool, HttpResponseMessage>> PostBroadcastingAction(BroadcastingActionType actionType);
 }
