@@ -27,7 +27,7 @@
         </Column>
         <template #footer>
           <Button
-            v-if="authStore.isInAnyRoles(Roles.organizer, Roles.admin)"
+            v-if="authStore.isInAnyRoles(roles.organizer, roles.admin)"
             label="Invite New User"
             @click="emit('newInvite')" />
         </template>
@@ -74,7 +74,7 @@
         </template>
         <template #footer>
           <Button
-            v-if="authStore.isInAnyRoles(Roles.organizer, Roles.admin)"
+            v-if="authStore.isInAnyRoles(roles.organizer, roles.admin)"
             label="Invite New User"
             style="width: 100%"
             @click="emit('newInvite')" />
@@ -92,7 +92,7 @@ import { computed, inject, type Ref } from 'vue'
 import { type UserResponse } from '@/api/resources/usersApi.ts'
 import { mobilePaginatorTemplate } from '@/constants/componentTemplates.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
-import Roles from '@/constants/roles.ts'
+import { roles } from '@/constants/roles.ts'
 import { useUserStore } from '@/stores/userStore.ts'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
