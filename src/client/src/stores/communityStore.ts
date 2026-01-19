@@ -11,7 +11,7 @@ import communityRelationshipsApi, {
 import { useToast } from 'primevue'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
-import roles from '@/constants/roles.ts'
+import { type Role, roles } from '@/constants/roles.ts'
 import { err, ok, type Result } from '@/types/result.ts'
 import type { ApiResponse } from '@/api/apiResponse.ts'
 import { getEntity, removeEntity } from '@/utils/arrayUtils.ts'
@@ -171,6 +171,22 @@ export const useCommunityStore = defineStore('communityStore', () => {
     return ok()
   }
 
+  const isInRelationshipRole = (communityId: string, role: Role): boolean => {
+    const communityRoles = getCommunityRoles(communityId, auth.user.id)
+    return communityRoles.includes(role)
+  }
+
+  const getCommunityRoles = (communityId: string, userId: string): Role[] => {
+    const userRelationship = getRelationships(communityId).find(
+      (rel) => rel.userId === userId
+    )
+    if (userRelationship === undefined) return []
+    const userRoles: Role[] = []
+    if (userRelationship.isOrganizer) userRoles.push(roles.organizer)
+    if (userRelationship.isPerformer) userRoles.push(roles.performer)
+    return userRoles
+  }
+
   const getIsLoading = computed(() => isLoading.value)
 
   return {
@@ -187,6 +203,8 @@ export const useCommunityStore = defineStore('communityStore', () => {
     createRelationship,
     updateRelationship,
     removeRelationship,
+    getCommunityRoles,
+    isInRelationshipRole,
     isLoading: getIsLoading
   }
 })

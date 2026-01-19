@@ -41,7 +41,14 @@ export const isHour = (date: Date) =>
   date.getMinutes() === 0 && date.getSeconds() === 0 && date.getMilliseconds() === 0
 
 export const timesBetween = (start: Date, end: Date, minutesSeparation: number = 60) => {
+  if (parseTime(end) < parseTime(start)) throw new Error('End date must be after start date')
+
   const out: Date[] = []
+  if (start.getTime() === end.getTime()) {
+    out.push(start)
+    return out
+  }
+
   let iterating = new Date(start)
   while (iterating.getTime() < end.getTime()) {
     if (isHour(iterating)) {

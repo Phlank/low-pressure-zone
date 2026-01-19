@@ -50,6 +50,7 @@ const props = withDefaults(
     showDelete?: boolean
     showInfo?: boolean
     showResend?: boolean
+    showClipboard?: boolean
     disabled?: boolean
   }>(),
   {
@@ -59,6 +60,7 @@ const props = withDefaults(
     showDelete: false,
     showInfo: false,
     showResend: false,
+    showClipboard: false,
     disabled: false
   }
 )
@@ -70,6 +72,7 @@ const visibleActions = computed(() => {
   if (props.showCreate) actions.push(gridActions.create)
   if (props.showDownload) actions.push(gridActions.download)
   if (props.showEdit) actions.push(gridActions.edit)
+  if (props.showClipboard) actions.push(gridActions.clipboard)
   if (props.showDelete) actions.push(gridActions.delete)
   if (props.showInfo) actions.push(gridActions.info)
   if (props.showResend) actions.push(gridActions.resend)

@@ -1,7 +1,7 @@
 import { useAuthStore } from '@/stores/authStore'
 import { createRouter, createWebHistory } from 'vue-router'
 import { Routes } from './routes'
-import roles, { type Role } from '@/constants/roles.ts'
+import { roles, type Role } from '@/constants/roles.ts'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

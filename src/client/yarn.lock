@@ -402,6 +402,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@date-fns/tz@npm:^1.4.1":
+  version: 1.4.1
+  resolution: "@date-fns/tz@npm:1.4.1"
+  checksum: 10c0/9033fdc4682fe3d4d147625ce04fa88a8792653594e2de8d5a438c8f3bfc0990ee28fe773f91cac6810b06d818b5b281ae0608752ba8337257d0279ded3f019a
+  languageName: node
+  linkType: hard
+
 "@dual-bundle/import-meta-resolve@npm:^4.2.1":
   version: 4.2.1
   resolution: "@dual-bundle/import-meta-resolve@npm:4.2.1"
@@ -3423,6 +3430,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "low-pressure-zone@workspace:."
   dependencies:
+    "@date-fns/tz": "npm:^1.4.1"
     "@primevue/core": "npm:^4.5.4"
     "@primevue/themes": "npm:^4.5.4"
     "@tsconfig/node-lts": "npm:^24.0.0"
