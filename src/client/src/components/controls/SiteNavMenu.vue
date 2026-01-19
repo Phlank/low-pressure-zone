@@ -77,7 +77,7 @@ import { Button, Menu } from 'primevue'
 import type { MenuItem } from 'primevue/menuitem'
 import { inject, onMounted, ref, type Ref, useTemplateRef } from 'vue'
 import { RouterLink } from 'vue-router'
-import roles from '@/constants/roles.ts'
+import { roles } from '@/constants/roles.ts'
 
 const navMenuRef = useTemplateRef('navMenuRef')
 const auth = useAuthStore()

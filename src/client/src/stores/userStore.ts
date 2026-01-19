@@ -7,7 +7,7 @@ import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.t
 import { err, ok, type Result } from '@/types/result.ts'
 import { useRefresh } from '@/composables/useRefresh.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
-import roles from '@/constants/roles.ts'
+import { roles } from '@/constants/roles.ts'
 
 export const useUserStore = defineStore('userStore', () => {
   const users: Ref<UserResponse[]> = ref([])

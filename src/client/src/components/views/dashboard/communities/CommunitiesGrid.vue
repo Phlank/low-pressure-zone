@@ -82,7 +82,7 @@ import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import ListItem from '@/components/data/ListItem.vue'
 import { type CommunityResponse } from '@/api/resources/communitiesApi.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
-import roles from '@/constants/roles.ts'
+import { roles } from '@/constants/roles.ts'
 import { useCommunityStore } from '@/stores/communityStore.ts'
 import { mobilePaginatorTemplate } from '@/constants/componentTemplates.ts'
 

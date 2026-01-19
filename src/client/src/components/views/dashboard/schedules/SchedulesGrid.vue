@@ -44,13 +44,18 @@
           <!-- Only show the action col for grids with schedules in the future -->
           <Column
             v-if="showActionColumn"
-            :class="'grid-action-col' + isMobile ? 'grid-action-col--1' : 'grid-action-col--2'">
+            :class="gridActionColClass">
             <template #body="{ data }: { data: ScheduleResponse }">
               <GridActions
                 :show-delete="data.isDeletable"
                 :show-edit="data.isEditable"
+                :show-clipboard="
+                  communities.getCommunityRoles(data.community.id).includes(roles.organizer) ||
+                  auth.isInRole(roles.admin)
+                "
                 @delete="emit('delete', data)"
-                @edit="emit('edit', data)" />
+                @edit="emit('edit', data)"
+                @clipboard="copyToClipboard(scheduleToRedditMarkdown(data))" />
             </template>
           </Column>
         </template>
@@ -83,15 +88,22 @@
 
 <script lang="ts" setup>
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
-import {formatReadableTime, parseDate, parseTime} from '@/utils/dateUtils'
-import {Button, Column, DataTable} from 'primevue'
-import {computed, inject, ref, type Ref} from 'vue'
+import { formatReadableTime, parseDate, parseTime } from '@/utils/dateUtils'
+import { Button, Column, DataTable } from 'primevue'
+import { computed, inject, ref, type Ref } from 'vue'
 import TimeslotsGrid from './TimeslotsGrid.vue'
-import {type ScheduleResponse} from '@/api/resources/schedulesApi.ts'
-import {mobilePaginatorTemplate} from '@/constants/componentTemplates.ts'
-import {scheduleTypes} from '@/constants/scheduleTypes.ts'
-import SoundclashGrid from "@/components/views/dashboard/schedules/SoundclashGrid.vue";
+import { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
+import { mobilePaginatorTemplate } from '@/constants/componentTemplates.ts'
+import { scheduleTypes } from '@/constants/scheduleTypes.ts'
+import SoundclashGrid from '@/components/views/dashboard/schedules/SoundclashGrid.vue'
+import { useCommunityStore } from '@/stores/communityStore.ts'
+import { roles } from '@/constants/roles.ts'
+import copyToClipboard from '@/utils/copyToClipboard.ts'
+import { scheduleToRedditMarkdown } from '@/utils/markdown.ts'
+import { useAuthStore } from '@/stores/authStore.ts'
 
+const communities = useCommunityStore()
+const auth = useAuthStore()
 const expandedRows = ref({})
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 
@@ -119,6 +131,10 @@ const emit = defineEmits<{
   edit: [schedule: ScheduleResponse]
   delete: [schedule: ScheduleResponse]
 }>()
+
+const gridActionColClass = computed(() => {
+  return 'grid-action-col ' + (isMobile?.value === true ? 'grid-action-col--1' : 'grid-action-col--3')
+})
 </script>
 
 <style lang="scss">
