@@ -1,7 +1,6 @@
 ﻿<template>
   <div class="dashboard-broadcasts-view">
-    <BroadcastsGrid
-      :show-streamer-name="authStore.isInAnyRoles(Roles.admin, Roles.organizer)" />
+    <BroadcastsGrid :show-streamer-name="authStore.isInAnyRoles(roles.admin, roles.organizer)" />
   </div>
 </template>
 
@@ -10,7 +9,7 @@ import { onMounted } from 'vue'
 import { useBroadcastStore } from '@/stores/broadcastStore.ts'
 import BroadcastsGrid from '@/components/views/dashboard/broadcasts/BroadcastsGrid.vue'
 import { useAuthStore } from '@/stores/authStore.ts'
-import Roles from '@/constants/roles.ts'
+import { roles } from '@/constants/roles.ts'
 
 const authStore = useAuthStore()
 const broadcastStore = useBroadcastStore()
