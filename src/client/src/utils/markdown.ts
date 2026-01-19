@@ -4,8 +4,7 @@ import type { ScheduleResponse } from '@/api/resources/schedulesApi.ts'
 import { getPublicSlotHours, getSlotForTime } from '@/utils/scheduleUtils.ts'
 import { TZDate } from '@date-fns/tz'
 import ianaTimezones from '@/constants/ianaTimezones.ts'
-import type {TimeslotResponse} from "@/api/resources/timeslotsApi.ts";
-import {formatReadableTime} from "@/utils/dateUtils.ts";
+import { formatReadableTime } from '@/utils/dateUtils.ts'
 
 export const parseMarkdownAsync = async (markdown: string): Promise<string> => {
   const parsed = await marked.parse(markdown)
@@ -62,15 +61,11 @@ export const scheduleToRedditMarkdown = (schedule: ScheduleResponse) => {
     const eastern = formatReadableTime(new TZDate(row.start, ianaTimezones.Eastern))
     const uk = formatReadableTime(new TZDate(row.start, ianaTimezones.UK))
     let rowMarkdown = `| ${pacific} | ${eastern} | ${uk} |`
-    if (row.title !== '')
-      rowMarkdown += ` **${row.title}** |`
-    else
-      rowMarkdown += '  |'
+    if (row.title !== '') rowMarkdown += ` **${row.title}** |`
+    else rowMarkdown += '  |'
     if (shouldUseDetails) {
-      if (row.subtitle !== '')
-        rowMarkdown += ` *${row.subtitle}* |`
-      else
-        rowMarkdown += '  |'
+      if (row.subtitle !== '') rowMarkdown += ` *${row.subtitle}* |`
+      else rowMarkdown += '  |'
     }
     rowsMarkdown.push(rowMarkdown)
   })
@@ -81,7 +76,6 @@ export const scheduleToRedditMarkdown = (schedule: ScheduleResponse) => {
 const getRowsForRedditMarkdownSchedule = (schedule: ScheduleResponse) => {
   const rows: { start: Date; title: string; subtitle: string }[] = []
   const hours = getPublicSlotHours(schedule)
-  console.log(hours)
 
   hours.forEach((hour) => {
     const slot = getSlotForTime(schedule, hour)
