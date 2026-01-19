@@ -182,8 +182,8 @@ export const useCommunityStore = defineStore('communityStore', () => {
     )
     if (userRelationship === undefined) return []
     const userRoles: Role[] = []
-    if (userRelationship.isOrganizer) userRoles.push(roles.organizer as Role)
-    if (userRelationship.isPerformer) userRoles.push(roles.performer as Role)
+    if (userRelationship.isOrganizer) userRoles.push(roles.organizer)
+    if (userRelationship.isPerformer) userRoles.push(roles.performer)
     return userRoles
   }
 

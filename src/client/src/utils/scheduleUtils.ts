@@ -9,16 +9,14 @@ export const getPublicSlotHours = (schedule: ScheduleResponse): Date[] => {
   const isHourly = schedule.type === scheduleTypes.Hourly
 
   let startFirst: Date
-  if (schedule.soundclashes?.length ?? 0 > 0)
-    startFirst = parseDate(schedule.soundclashes[0]!.startsAt)
-  else if (schedule.timeslots?.length ?? 0 > 0)
-    startFirst = parseDate(schedule.timeslots[0]!.startsAt)
+  if (schedule.soundclashes?.length > 0) startFirst = parseDate(schedule.soundclashes[0]!.startsAt)
+  else if (schedule.timeslots?.length > 0) startFirst = parseDate(schedule.timeslots[0]!.startsAt)
   else startFirst = parseDate(schedule.startsAt)
 
   let endLast: Date
-  if (schedule.soundclashes?.length ?? 0 > 0)
+  if (schedule.soundclashes?.length > 0) {
     endLast = parseDate(schedule.soundclashes[schedule.soundclashes.length - 1]!.endsAt)
-  else if (schedule.timeslots?.length ?? 0 > 0)
+  } else if (schedule.timeslots?.length > 0)
     endLast = parseDate(schedule.timeslots[schedule.timeslots.length - 1]!.endsAt)
   else endLast = parseDate(schedule.endsAt)
 

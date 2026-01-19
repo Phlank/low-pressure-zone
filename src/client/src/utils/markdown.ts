@@ -61,11 +61,11 @@ export const scheduleToRedditMarkdown = (schedule: ScheduleResponse) => {
     const eastern = formatReadableTime(new TZDate(row.start, ianaTimezones.Eastern))
     const uk = formatReadableTime(new TZDate(row.start, ianaTimezones.UK))
     let rowMarkdown = `| ${pacific} | ${eastern} | ${uk} |`
-    if (row.title !== '') rowMarkdown += ` **${row.title}** |`
-    else rowMarkdown += '  |'
+    if (row.title === '') rowMarkdown += '  |'
+    else rowMarkdown += ` **${row.title}** |`
     if (shouldUseDetails) {
-      if (row.subtitle !== '') rowMarkdown += ` *${row.subtitle}* |`
-      else rowMarkdown += '  |'
+      if (row.subtitle === '') rowMarkdown += '  |'
+      else rowMarkdown += ` *${row.subtitle}* |`
     }
     rowsMarkdown.push(rowMarkdown)
   })
