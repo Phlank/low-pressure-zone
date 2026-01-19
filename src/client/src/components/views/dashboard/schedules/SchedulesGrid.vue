@@ -47,15 +47,15 @@
             :class="gridActionColClass">
             <template #body="{ data }: { data: ScheduleResponse }">
               <GridActions
-                :show-delete="data.isDeletable"
-                :show-edit="data.isEditable"
                 :show-clipboard="
-                  communities.getCommunityRoles(data.community.id).includes(roles.organizer) ||
+                  communities.isInRelationshipRole(data.community.id, roles.organizer) ||
                   auth.isInRole(roles.admin)
                 "
+                :show-delete="data.isDeletable"
+                :show-edit="data.isEditable"
+                @clipboard="handleClipboard(data)"
                 @delete="emit('delete', data)"
-                @edit="emit('edit', data)"
-                @clipboard="copyToClipboard(scheduleToRedditMarkdown(data))" />
+                @edit="emit('edit', data)" />
             </template>
           </Column>
         </template>
@@ -89,7 +89,7 @@
 <script lang="ts" setup>
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import { formatReadableTime, parseDate, parseTime } from '@/utils/dateUtils'
-import { Button, Column, DataTable } from 'primevue'
+import { Button, Column, DataTable, useToast } from 'primevue'
 import { computed, inject, ref, type Ref } from 'vue'
 import TimeslotsGrid from './TimeslotsGrid.vue'
 import { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
@@ -104,6 +104,7 @@ import { useAuthStore } from '@/stores/authStore.ts'
 
 const communities = useCommunityStore()
 const auth = useAuthStore()
+const toast = useToast()
 const expandedRows = ref({})
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 
@@ -133,8 +134,21 @@ const emit = defineEmits<{
 }>()
 
 const gridActionColClass = computed(() => {
-  return 'grid-action-col ' + (isMobile?.value === true ? 'grid-action-col--1' : 'grid-action-col--3')
+  return (
+    'grid-action-col ' + (isMobile?.value === true ? 'grid-action-col--1' : 'grid-action-col--3')
+  )
 })
+
+const handleClipboard = (schedule: ScheduleResponse) => {
+  const markdown = scheduleToRedditMarkdown(schedule)
+  copyToClipboard(markdown)
+  toast.add({
+    summary: 'Copied to Clipboard',
+    detail: 'Schedule markdown has been copied to your clipboard.',
+    severity: 'success',
+    life: 3000
+  })
+}
 </script>
 
 <style lang="scss">

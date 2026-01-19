@@ -171,9 +171,14 @@ export const useCommunityStore = defineStore('communityStore', () => {
     return ok()
   }
 
-  const getCommunityRoles = (communityId: string): Role[] => {
+  const isInRelationshipRole = (communityId: string, role: Role): boolean => {
+    const communityRoles = getCommunityRoles(communityId, auth.user.id)
+    return communityRoles.includes(role)
+  }
+
+  const getCommunityRoles = (communityId: string, userId: string): Role[] => {
     const userRelationship = getRelationships(communityId).find(
-      (rel) => rel.userId === auth.user.id
+      (rel) => rel.userId === userId
     )
     if (userRelationship === undefined) return []
     const userRoles: Role[] = []
@@ -199,6 +204,7 @@ export const useCommunityStore = defineStore('communityStore', () => {
     updateRelationship,
     removeRelationship,
     getCommunityRoles,
+    isInRelationshipRole,
     isLoading: getIsLoading
   }
 })

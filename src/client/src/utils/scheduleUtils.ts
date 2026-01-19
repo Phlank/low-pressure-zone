@@ -17,15 +17,15 @@ export const getPublicSlotHours = (schedule: ScheduleResponse): Date[] => {
 
   let endLast: Date
   if (schedule.soundclashes?.length ?? 0 > 0)
-    endLast = parseDate(schedule.soundclashes[0]!.startsAt)
+    endLast = parseDate(schedule.soundclashes[schedule.soundclashes.length - 1]!.endsAt)
   else if (schedule.timeslots?.length ?? 0 > 0)
     endLast = parseDate(schedule.timeslots[schedule.timeslots.length - 1]!.endsAt)
   else endLast = parseDate(schedule.endsAt)
 
   const hours = timesBetween(startFirst, endLast, isHourly ? 60 : 120)
-  if (startFirst > parseDate(schedule.startsAt))
+  if (startFirst.getTime() !== parseTime(schedule.startsAt))
     hours.unshift(addHours(startFirst, isHourly ? -1 : -2))
-  if (endLast < parseDate(schedule.endsAt)) hours.push(addHours(endLast, isHourly ? 1 : 2))
+  if (endLast < parseDate(schedule.endsAt)) hours.push(endLast)
   return hours
 }
 

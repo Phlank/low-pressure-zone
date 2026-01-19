@@ -4,6 +4,8 @@ import type { ScheduleResponse } from '@/api/resources/schedulesApi.ts'
 import { getPublicSlotHours, getSlotForTime } from '@/utils/scheduleUtils.ts'
 import { TZDate } from '@date-fns/tz'
 import ianaTimezones from '@/constants/ianaTimezones.ts'
+import type {TimeslotResponse} from "@/api/resources/timeslotsApi.ts";
+import {formatReadableTime} from "@/utils/dateUtils.ts";
 
 export const parseMarkdownAsync = async (markdown: string): Promise<string> => {
   const parsed = await marked.parse(markdown)
@@ -51,16 +53,25 @@ export const scheduleToRedditMarkdown = (schedule: ScheduleResponse) => {
   const rowsMarkdown: string[] = []
   const shouldUseDetails = rows.some((row) => row.subtitle !== '')
   if (shouldUseDetails) {
-    titleRow += ' Details |'
+    titleRow += ` ${schedule.type === 'Hourly' ? 'Details' : 'Rounds'} |`
     separatorRow += '---|'
   }
 
   rows.forEach((row) => {
-    const pacific = new TZDate(row.start, ianaTimezones.Pacific).toLocaleTimeString()
-    const eastern = new TZDate(row.start, ianaTimezones.Eastern).toLocaleTimeString()
-    const uk = new TZDate(row.start, ianaTimezones.UK).toLocaleTimeString()
-    let rowMarkdown = `| ${pacific} | ${eastern} | ${uk} | ${row.title} |`
-    if (shouldUseDetails) rowMarkdown += ` ${row.subtitle} |`
+    const pacific = formatReadableTime(new TZDate(row.start, ianaTimezones.Pacific))
+    const eastern = formatReadableTime(new TZDate(row.start, ianaTimezones.Eastern))
+    const uk = formatReadableTime(new TZDate(row.start, ianaTimezones.UK))
+    let rowMarkdown = `| ${pacific} | ${eastern} | ${uk} |`
+    if (row.title !== '')
+      rowMarkdown += ` **${row.title}** |`
+    else
+      rowMarkdown += '  |'
+    if (shouldUseDetails) {
+      if (row.subtitle !== '')
+        rowMarkdown += ` *${row.subtitle}* |`
+      else
+        rowMarkdown += '  |'
+    }
     rowsMarkdown.push(rowMarkdown)
   })
 
@@ -70,6 +81,8 @@ export const scheduleToRedditMarkdown = (schedule: ScheduleResponse) => {
 const getRowsForRedditMarkdownSchedule = (schedule: ScheduleResponse) => {
   const rows: { start: Date; title: string; subtitle: string }[] = []
   const hours = getPublicSlotHours(schedule)
+  console.log(hours)
+
   hours.forEach((hour) => {
     const slot = getSlotForTime(schedule, hour)
     if (slot === undefined) {
