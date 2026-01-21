@@ -4,6 +4,8 @@
     <ConfirmDialog
       v-model:visible="isResendDialogVisible"
       header="Resend Invite"
+      :isSubmitting="isSending"
+      text="Are you sure you want to resend this invite email?"
       @close="isResendDialogVisible = false"
       @confirm="handleResendConfirm" />
   </div>
@@ -14,13 +16,14 @@ import type { InviteResponse } from '@/api/resources/invitesApi.ts'
 import { useInviteStore } from '@/stores/inviteStore.ts'
 import { ref } from 'vue'
 import InvitesGrid from '@/components/views/dashboard/users/InvitesGrid.vue'
-import { ConfirmDialog } from 'primevue'
+import ConfirmDialog from '@/components/dialogs/ConfirmDialog.vue'
 
 const invites = useInviteStore()
 
 const isResendDialogVisible = ref(false)
 const selectedInvite = ref<InviteResponse | null>(null)
 const handleResendAction = async (invite: InviteResponse) => {
+  console.log('Resend invite clicked')
   isResendDialogVisible.value = true
   selectedInvite.value = invite
 }
