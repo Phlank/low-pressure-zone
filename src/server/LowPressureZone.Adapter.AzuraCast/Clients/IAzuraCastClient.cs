@@ -15,6 +15,10 @@ public interface IAzuraCastClient
 
     Task<Result<bool, HttpResponseMessage>> PutStreamerAsync(StationStreamer streamer);
 
+    Task<Result<bool, HttpResponseMessage>> DisableStreamerAsync(int streamerId);
+
+    Task<Result<bool, HttpResponseMessage>> EnableStreamerAsync(int streamerId);
+
     Task<Result<IReadOnlyCollection<StationStreamerBroadcast>, HttpResponseMessage>> GetBroadcastsAsync(
         int? streamerId = null);
 
@@ -43,4 +47,5 @@ public interface IAzuraCastClient
 
     Task<Result<bool, HttpResponseMessage>> PutPlaylistAsync(StationPlaylist playlist);
     Task<Result<bool, HttpResponseMessage>> DeletePlaylistAsync(int playlistId);
+    Task<Result<bool, HttpResponseMessage>> PostBroadcastingAction(BroadcastingActionType actionType);
 }

@@ -1,37 +1,32 @@
 ﻿import broadcastsApi, { type BroadcastResponse } from '@/api/resources/broadcastsApi.ts'
 import { computed, type ComputedRef, type Ref, ref } from 'vue'
 import { defineStore } from 'pinia'
+import { useRefresh } from '@/composables/useRefresh.ts'
+import {useToast} from "primevue";
+import tryHandleUnsuccessfulResponse from "@/api/tryHandleUnsuccessfulResponse.ts";
 import { err, ok, type Result } from '@/types/result.ts'
 
 export const useBroadcastStore = defineStore('broadcastStore', () => {
-  const loadedBroadcasts: Ref<BroadcastResponse[] | undefined> = ref(undefined)
-  const broadcasts: ComputedRef<BroadcastResponse[]> = computed(() => loadedBroadcasts.value ?? [])
+  const loadedBroadcasts: Ref<BroadcastResponse[]> = ref([])
+  const broadcasts: ComputedRef<BroadcastResponse[]> = computed(() => loadedBroadcasts.value)
+  const toast = useToast()
 
-  let loadBroadcastsPromise: Promise<Result<BroadcastResponse[], string>> | undefined = undefined
-  const loadBroadcasts = async () => {
-    const response = await broadcastsApi.get()
-    if (!response.isSuccess()) {
-      return err<BroadcastResponse[], string>('Failed to load broadcasts')
-    }
-    loadedBroadcasts.value = response.data()
-    return ok<BroadcastResponse[], string>(response.data())
-  }
+  const { refresh, isLoading } = useRefresh(broadcastsApi.get, (data) => {
+    loadedBroadcasts.value = data
+  })
 
-  const load = async () => {
-    loadBroadcastsPromise ??= loadBroadcasts()
-    return await loadBroadcastsPromise
-  }
-
-  const loadIfNotInitialized = async () => {
-    if (loadedBroadcasts.value === undefined) {
-      return load()
-    }
-    return ok<BroadcastResponse[], string>(loadedBroadcasts.value)
+  const disconnectAsync = async (disableMinutes?: number): Promise<Result> => {
+    const response = await broadcastsApi.disconnect({ disableMinutes: disableMinutes })
+    if (tryHandleUnsuccessfulResponse(response, toast)) return err()
+    if (loadedBroadcasts.value[0])
+      loadedBroadcasts.value[0].isDisconnectable = false
+    return ok()
   }
 
   return {
-    load,
-    loadIfNotInitialized,
-    broadcasts
+    refresh,
+    isLoading,
+    broadcasts,
+    disconnectAsync
   }
 })

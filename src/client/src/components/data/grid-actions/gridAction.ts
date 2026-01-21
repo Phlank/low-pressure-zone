@@ -6,6 +6,7 @@ export interface GridActionEmits {
   info: []
   resend: []
   clipboard: []
+  disconnect: []
 }
 
 export interface GridAction {
@@ -57,5 +58,11 @@ export const gridActions = {
     icon: 'pi pi-clipboard',
     severity: 'secondary',
     emit: 'clipboard'
+  } as GridAction,
+  disconnect: {
+    name: 'Disconnect',
+    icon: 'pi pi-eject',
+    severity: 'danger',
+    emit: 'disconnect'
   } as GridAction
 }

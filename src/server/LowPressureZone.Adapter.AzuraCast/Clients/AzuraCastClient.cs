@@ -106,6 +106,28 @@ public sealed class AzuraCastClient(
                    ? Result.Err<bool, HttpResponseMessage>(result)
                    : Result.Ok<bool, HttpResponseMessage>(true);
     }
+    
+    public async Task<Result<bool, HttpResponseMessage>> DisableStreamerAsync(int streamerId)
+    {
+        var streamerResult = await GetStreamerAsync(streamerId);
+        if (streamerResult.IsError)
+            return Result.Err<bool, HttpResponseMessage>(streamerResult.Error);
+
+        var streamer = streamerResult.Value;
+        streamer.IsActive = false;
+        return await PutStreamerAsync(streamer);
+    }
+    
+    public async Task<Result<bool, HttpResponseMessage>> EnableStreamerAsync(int streamerId)
+    {
+        var streamerResult = await GetStreamerAsync(streamerId);
+        if (streamerResult.IsError)
+            return Result.Err<bool, HttpResponseMessage>(streamerResult.Error);
+
+        var streamer = streamerResult.Value;
+        streamer.IsActive = true;
+        return await PutStreamerAsync(streamer);
+    }
 
     public async Task<Result<IReadOnlyCollection<StationStreamerBroadcast>, HttpResponseMessage>> GetBroadcastsAsync(
         int? streamerId = null)
@@ -314,4 +336,16 @@ public sealed class AzuraCastClient(
     private string FilesEndpoint(int? id = null) => id is null
                                                         ? $"/api/station/{_stationId}/files"
                                                         : $"/api/station/{_stationId}/file/{id}";
+
+    private string BroadcastingActionEndpoint(BroadcastingActionType action) =>
+        $"/api/station/{_stationId}/backend/{action.ActionPath}";
+
+    public async Task<Result<bool, HttpResponseMessage>> PostBroadcastingAction(BroadcastingActionType actionType)
+    {
+        var result = await Client.PostAsync(BroadcastingActionEndpoint(actionType), null);
+        if (!result.IsSuccessStatusCode)
+            return Result.Err<bool, HttpResponseMessage>(result);
+
+        return Result.Ok<bool, HttpResponseMessage>(true);
+    }
 }

@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using FastEndpoints;
 using FastEndpoints.Swagger;
+using Hangfire;
 using LowPressureZone.Api.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
@@ -29,6 +30,10 @@ app.UseCors("Frontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseStaticFiles();
+if (app.Environment.IsDevelopment())
+{
+    app.UseHangfireDashboard();
+}
 app.UseFastEndpoints(config =>
 {
     config.Endpoints.RoutePrefix = "api";

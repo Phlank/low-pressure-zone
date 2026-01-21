@@ -63,6 +63,7 @@ const schedule = computed(() => schedules.getScheduleById(currentId.value))
 
     &__description {
       padding: 0 0 variables.$space-l 0;
+      text-align: left;
     }
   }
 }

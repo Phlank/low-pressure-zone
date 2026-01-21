@@ -47,20 +47,22 @@ const props = withDefaults(
     showCreate?: boolean
     showDownload?: boolean
     showEdit?: boolean
+    showClipboard?: boolean
     showDelete?: boolean
     showInfo?: boolean
     showResend?: boolean
-    showClipboard?: boolean
+    showDisconnect?: boolean
     disabled?: boolean
   }>(),
   {
     showCreate: false,
     showDownload: false,
     showEdit: false,
+    showClipboard: false,
     showDelete: false,
     showInfo: false,
     showResend: false,
-    showClipboard: false,
+    showDisconnect: false,
     disabled: false
   }
 )
@@ -76,6 +78,7 @@ const visibleActions = computed(() => {
   if (props.showDelete) actions.push(gridActions.delete)
   if (props.showInfo) actions.push(gridActions.info)
   if (props.showResend) actions.push(gridActions.resend)
+  if (props.showDisconnect) actions.push(gridActions.disconnect)
   return actions
 })
 
