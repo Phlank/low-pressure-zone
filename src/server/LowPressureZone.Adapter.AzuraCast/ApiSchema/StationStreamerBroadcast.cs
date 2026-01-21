@@ -1,6 +1,6 @@
 ﻿namespace LowPressureZone.Adapter.AzuraCast.ApiSchema;
 
-public class StationStreamerBroadcast
+public sealed class StationStreamerBroadcast
 {
     public int Id { get; set; }
     public DateTime TimestampStart { get; set; }

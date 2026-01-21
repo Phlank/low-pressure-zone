@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Core;
 
@@ -15,6 +14,10 @@ public interface IAzuraCastClient
     Task<Result<int, HttpResponseMessage>> PostStreamerAsync(string username, string password, string displayName);
 
     Task<Result<bool, HttpResponseMessage>> PutStreamerAsync(StationStreamer streamer);
+
+    Task<Result<bool, HttpResponseMessage>> DisableStreamerAsync(int streamerId);
+
+    Task<Result<bool, HttpResponseMessage>> EnableStreamerAsync(int streamerId);
 
     Task<Result<IReadOnlyCollection<StationStreamerBroadcast>, HttpResponseMessage>> GetBroadcastsAsync(
         int? streamerId = null);

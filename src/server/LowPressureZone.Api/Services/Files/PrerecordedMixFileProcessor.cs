@@ -82,13 +82,10 @@ public sealed class PrerecordedMixFileProcessor(
         if (uploadResult.IsError)
             return Result.Err<int>(uploadResult.Error.ToValidationFailure(nameof(request.File)));
 
-        var uploadedFileResult = await Retry.RetryAsync(10,
-                                                        1000,
+        var uploadedFileResult = await Retry.RetryAsync(async () => await GetUploadedFileAsync(azuraCastFilePath),
                                                         result => result.IsError
                                                                   || (result.IsSuccess
-                                                                      && result.Value.Media is not null),
-                                                        async () => await GetUploadedFileAsync(azuraCastFilePath),
-                                                        ct);
+                                                                      && result.Value.Media is not null), 1000, 10, ct);
         if (uploadedFileResult.IsError)
             return Result.Err<int>(uploadedFileResult.Error.ToValidationFailure(nameof(request.File)));
 
@@ -160,13 +157,10 @@ public sealed class PrerecordedMixFileProcessor(
             if (uploadResult.IsError)
                 return Result.Err<int>(uploadResult.Error.ToValidationFailures(nameof(request.File)));
 
-            var uploadedFileResult = await Retry.RetryAsync(10,
-                                                            1000,
+            var uploadedFileResult = await Retry.RetryAsync(async () => await GetUploadedFileAsync(azuraCastFilePath),
                                                             result => result.IsError
                                                                       || (result.IsSuccess
-                                                                          && result.Value.Media is not null),
-                                                            async () => await GetUploadedFileAsync(azuraCastFilePath),
-                                                            ct);
+                                                                          && result.Value.Media is not null), 1000, 10, ct);
             if (uploadedFileResult.IsError)
                 return Result.Err<int>(uploadedFileResult.Error.ToValidationFailures(nameof(request.File)));
 

@@ -45,6 +45,7 @@
       - '8149:2022'
       - '8005:8005'
       - '8025:8025'
+      - '8030:8030'
     environment:
       LANG: en_US.UTF-8
       AZURACAST_DC_REVISION: 14

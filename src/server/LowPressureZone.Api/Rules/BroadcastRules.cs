@@ -14,4 +14,10 @@ public sealed class BroadcastRules(IHttpContextAccessor contextAccessor)
 
     public bool IsDeletable(StationStreamerBroadcast broadcast)
         => User is not null && User.IsInRole(RoleNames.Admin);
+
+    public bool IsDisconnectable(StationStreamerBroadcast broadcast) =>
+        User is not null 
+        && (User.IsInRole(RoleNames.Admin) 
+            || User.IsInRole(RoleNames.Organizer)) 
+        && broadcast.TimestampEnd is null;
 }

@@ -106,6 +106,28 @@ public sealed class AzuraCastClient(
                    ? Result.Err<bool, HttpResponseMessage>(result)
                    : Result.Ok<bool, HttpResponseMessage>(true);
     }
+    
+    public async Task<Result<bool, HttpResponseMessage>> DisableStreamerAsync(int streamerId)
+    {
+        var streamerResult = await GetStreamerAsync(streamerId);
+        if (streamerResult.IsError)
+            return Result.Err<bool, HttpResponseMessage>(streamerResult.Error);
+
+        var streamer = streamerResult.Value;
+        streamer.IsActive = false;
+        return await PutStreamerAsync(streamer);
+    }
+    
+    public async Task<Result<bool, HttpResponseMessage>> EnableStreamerAsync(int streamerId)
+    {
+        var streamerResult = await GetStreamerAsync(streamerId);
+        if (streamerResult.IsError)
+            return Result.Err<bool, HttpResponseMessage>(streamerResult.Error);
+
+        var streamer = streamerResult.Value;
+        streamer.IsActive = true;
+        return await PutStreamerAsync(streamer);
+    }
 
     public async Task<Result<IReadOnlyCollection<StationStreamerBroadcast>, HttpResponseMessage>> GetBroadcastsAsync(
         int? streamerId = null)

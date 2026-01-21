@@ -14,6 +14,7 @@ public sealed class BroadcastMapper(BroadcastRules rules) : IResponseMapper
             BroadcastId = broadcast.Id,
             StreamerId = broadcast.Streamer?.Id,
             StreamerDisplayName = broadcast.Streamer?.DisplayName,
-            IsDownloadable = rules.IsDownloadable(broadcast)
+            IsDownloadable = rules.IsDownloadable(broadcast),
+            IsDisconnectable = rules.IsDisconnectable(broadcast)
         };
 }

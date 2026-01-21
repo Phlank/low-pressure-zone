@@ -1,20 +1,14 @@
 ﻿<template>
   <div class="dashboard-broadcasts-view">
+    <p>Broadcasts are automatically deleted after two weeks to prevent running out of storage on the radio server.</p>
     <BroadcastsGrid :show-streamer-name="authStore.isInAnyRoles(roles.admin, roles.organizer)" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from 'vue'
-import { useBroadcastStore } from '@/stores/broadcastStore.ts'
 import BroadcastsGrid from '@/components/views/dashboard/broadcasts/BroadcastsGrid.vue'
 import { useAuthStore } from '@/stores/authStore.ts'
 import { roles } from '@/constants/roles.ts'
 
 const authStore = useAuthStore()
-const broadcastStore = useBroadcastStore()
-
-onMounted(async () => {
-  await broadcastStore.loadIfNotInitialized()
-})
 </script>

@@ -4,6 +4,8 @@ using FastEndpoints;
 using FastEndpoints.Swagger;
 using FluentEmail.Core.Interfaces;
 using FluentEmail.Mailgun;
+using Hangfire;
+using Hangfire.PostgreSql;
 using LowPressureZone.Adapter.AzuraCast.Extensions;
 using LowPressureZone.Api.Authentication;
 using LowPressureZone.Api.Converters;
@@ -86,6 +88,7 @@ public static class WebApplicationBuilderExtensions
         builder.AddAzuraCast();
         builder.AddEndpointServices();
         builder.AddDatabases();
+        builder.AddHangfire();
         builder.ConfigureAndAddIdentity();
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddFastEndpoints();
@@ -126,6 +129,17 @@ public static class WebApplicationBuilderExtensions
             options.UseNpgsql(dataConnectionString);
             if (builder.Environment.IsDevelopment()) options.EnableSensitiveDataLogging();
         });
+    }
+
+    private static void AddHangfire(this WebApplicationBuilder builder)
+    {
+        // Use the main database for hangfire, it stores its data in a separate schema
+        var hangfireConnectionString = builder.Configuration.GetConnectionString("Data");
+        builder.Services.AddHangfire(config =>
+        {
+            config.UsePostgreSqlStorage(pgsqlConfig => pgsqlConfig.UseNpgsqlConnection(hangfireConnectionString));
+        });
+        builder.Services.AddHangfireServer();
     }
 
     private static void ConfigureAndAddIdentity(this WebApplicationBuilder builder)

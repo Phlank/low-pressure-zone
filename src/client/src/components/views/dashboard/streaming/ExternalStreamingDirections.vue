@@ -79,11 +79,11 @@
       src="@/assets/stream-setup-img/butt-log-update.png" />
     <p>
       View your stream metadata at the
-      <a href="https://lowpressurezone.com:8443">test stream info page.</a>
+      <a href="http://lowpressurezone.com:8000">test stream info page.</a>
     </p>
     <p>
       Take a listen on your phone to the sound you're sending on the
-      <a href="https://lowpressurezone.com:8443/test">audio page.</a>
+      <a href="http://lowpressurezone.com:8000/off-air">audio page.</a>
     </p>
     <img
       alt="Icecast debug page"
