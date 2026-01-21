@@ -3,19 +3,19 @@
     <Button
       :loading="isPasswordLoading"
       icon="pi pi-key"
-      label="Get Password"
+      :label="useType === 'live' ? 'Get Stream Password' : 'Get Stream Test Password'"
       @click="handleGetPassword" />
     <Dialog
       v-model:visible="showPasswordDialog"
       :draggable="false"
-      :header="useType === 'live' ? 'New Password' : 'Test Password'"
+      :header="useType === 'live' ? 'New Streaming Password' : 'Test Stream Password'"
       modal>
       <template #default>
         <InputText
           :value="password"
           readonly
           style="width: 100%; margin-bottom: 1rem" />
-        <div v-if="useType === 'live'">Your old streaming password has been replaced.</div>
+        <p v-if="useType === 'live'">Your old streaming password has been replaced. This does not replace your password for logging into the Low Pressure Zone website.</p>
       </template>
       <template #footer>
         <div class="stream-information__modal-footer">
