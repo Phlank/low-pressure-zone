@@ -34,7 +34,7 @@ public class PostDisconnectBroadcast(IAzuraCastClient client) : Endpoint<PostDis
     private async Task DisableStreamer(int minutes)
     {
         var broadcastsResult = await client.GetBroadcastsAsync();
-        var currentBroadcast = broadcastsResult.Value.FirstOrDefault(bool (broadcast) => broadcast.TimestampEnd is null);
+        var currentBroadcast = broadcastsResult.Value.FirstOrDefault(broadcast => broadcast.TimestampEnd is null);
         if (currentBroadcast is null)
             ThrowError("No broadcast is currently active.");
 
@@ -50,7 +50,8 @@ public class PostDisconnectBroadcast(IAzuraCastClient client) : Endpoint<PostDis
         {
             var timespan = TimeSpan.FromMinutes(minutes);
             var enableTime = DateTimeOffset.UtcNow.Add(timespan);
-            BackgroundJob.Schedule(() => client.EnableStreamerAsync(streamerId.Value), enableTime);
+            BackgroundJob.Schedule<IAzuraCastClient>(azuraCast => azuraCast.EnableStreamerAsync(streamerId.Value),
+                                                     enableTime);
         }
     }
 }

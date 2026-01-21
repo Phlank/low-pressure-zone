@@ -12,13 +12,4 @@ internal static class TaskUtilities
                                 (int)Math.Clamp(ResponseDelayMs - elapsed.TotalMilliseconds, 1, ResponseDelayMs));
         return Task.Delay(wait);
     }
-
-    public static void DeferDelayedExecution<T>(Func<Task<T>> task, TimeSpan delay)
-    {
-        _ = Task.Run(async () =>
-        {
-            await Task.Delay(delay);
-            await task();
-        });
-    }
 }
