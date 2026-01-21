@@ -55,7 +55,7 @@
           :invalid="!timeslotForm.val.isValid('subtitle')" />
       </IftaFormField>
       <IftaFormField
-        v-if="performers.performers.length > 0"
+        v-if="performers.linkablePerformers.length > 0"
         :message="timeslotForm.val.message('performerId')"
         input-id="performerInput"
         label="Performer"
@@ -72,7 +72,7 @@
           @change="() => timeslotForm.val.validateIfDirty('performerId')" />
       </IftaFormField>
       <IftaFormField
-        v-if="performers.performers.length === 0"
+        v-if="performers.linkablePerformers.length === 0"
         :message="performerForm.val.message('name')"
         input-id="performerNameInput"
         label="Performer Name"
@@ -85,7 +85,7 @@
           autofocus />
       </IftaFormField>
       <IftaFormField
-        v-if="performers.performers.length === 0"
+        v-if="performers.linkablePerformers.length === 0"
         :message="performerForm.val.message('url')"
         input-id="performerUrlInput"
         label="Performer URL"
