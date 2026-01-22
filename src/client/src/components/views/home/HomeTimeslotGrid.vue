@@ -3,19 +3,13 @@
     <DataTable
       :loading="schedules.isLoading"
       :value="rows">
-      <template #empty>
-        No DJs have signed up for this schedule yet.
-      </template>
-      <Column>
-        <template #header>
-          <TwoLineData
-            above="Time (Local)"
-            below="Time (UTC)" />
-        </template>
+      <template #empty> No DJs have signed up for this schedule yet. </template>
+      <Column header="Time">
         <template #body="{ data }: { data: TimeslotRow }">
           <SlotTime
             v-if="data.start"
-            :date="data.start" />
+            :date="data.start"
+            style="width: max-content" />
         </template>
       </Column>
       <Column
@@ -50,7 +44,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import SlotName from '@/components/controls/SlotName.vue'
 import SlotTime from '@/components/controls/SlotTime.vue'
 import { Column, DataTable } from 'primevue'
@@ -65,7 +59,6 @@ import {
   parseDate,
   timesBetween
 } from '@/utils/dateUtils.ts'
-import TwoLineData from '@/components/layout/TwoLineData.vue'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const schedules = useScheduleStore()

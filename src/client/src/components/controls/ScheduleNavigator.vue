@@ -145,7 +145,7 @@ watch(
   justify-content: center;
 
   &__date-field {
-    width: 390px;
+    width: min(calc(100dvw - 2 * #{variables.$space-m} - 2 * #{variables.$space-l} - 64px), 390px);
     gap: 0 !important;
 
     @media (max-width: 450px) {
