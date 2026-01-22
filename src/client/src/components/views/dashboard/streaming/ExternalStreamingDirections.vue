@@ -27,8 +27,12 @@
     <StreamPasswordButton use-type="test" />
     <br />
     <img
-      alt="Butt settings"
-      src="@/assets/stream-setup-img/butt-server-settings.png" />
+      alt="Add a server in Butt"
+      src="/stream-instructions/butt-add-server.png" />
+    <br/>
+    <img
+      alt="Butt test server settings setup"
+      src="/stream-instructions/butt-test-server-settings.png" />
     <h4>Stream info</h4>
     <p>
       Under Stream Infos, hit Add. This will open up another window. Configure it as follows, and
@@ -36,7 +40,7 @@
     </p>
     <img
       alt="Butt stream info"
-      src="@/assets/stream-setup-img/butt-stream-infos.png" />
+      src="/stream-instructions/butt-stream-infos.png" />
     <h4>Audio settings</h4>
     <p>
       Next, in the settings window, select the Audio tab. Here, under Primary Audio Device, select
@@ -45,7 +49,7 @@
     </p>
     <img
       alt="Shows the fields to set for the audio tab for Butt"
-      src="@/assets/stream-setup-img/butt-audio-device.png" />
+      src="/stream-instructions/butt-audio-device.png" />
     <Message severity="warn">
       You should use MP3 for the encoding. Vorbis or Opus will still work, but will require
       re-encoding on the server, resulting in quality loss. 256kbps is the minimum bitrate we use
@@ -61,7 +65,7 @@
     </p>
     <img
       alt="Audio meter in Butt"
-      src="@/assets/stream-setup-img/butt-sound-check.png" />
+      src="/stream-instructions/butt-sound-check.png" />
     <p>
       You want this to be higher when you're playing music, but you don't want it to be at 0 (0 =
       all the way to the right, in the red), otherwise you'll clip. I try to get my peaks down to a
@@ -76,7 +80,7 @@
     </p>
     <img
       alt="Butt log update on successful stream connection"
-      src="@/assets/stream-setup-img/butt-log-update.png" />
+      src="/stream-instructions/butt-log-update.png" />
     <p>
       View your stream metadata at the
       <a href="http://lowpressurezone.com:8000">test stream info page.</a>
@@ -87,7 +91,7 @@
     </p>
     <img
       alt="Icecast debug page"
-      src="@/assets/stream-setup-img/broadcasting-debug-test.png" />
+      src="/stream-instructions/broadcasting-debug-test.png" />
     <p>
       If everything is sounding good, go ahead and stop the stream with the square button next to
       the play button in Butt.

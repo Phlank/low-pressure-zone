@@ -4,11 +4,11 @@
       <DataTable
         :expanded-rows="expandedRows"
         :paginator-template="isMobile ? mobilePaginatorTemplate : undefined"
-        :rows="isMobile ? 5 : 10"
+        :rows="isMobile ? undefined : 10"
         :value="schedules"
         class="schedules-grid__table"
         data-key="id"
-        paginator>
+        :paginator="!isMobile">
         <template #empty> No items to display.</template>
         <template>
           <Column
