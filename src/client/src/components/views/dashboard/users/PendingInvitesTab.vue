@@ -23,7 +23,6 @@ const invites = useInviteStore()
 const isResendDialogVisible = ref(false)
 const selectedInvite = ref<InviteResponse | null>(null)
 const handleResendAction = async (invite: InviteResponse) => {
-  console.log('Resend invite clicked')
   isResendDialogVisible.value = true
   selectedInvite.value = invite
 }

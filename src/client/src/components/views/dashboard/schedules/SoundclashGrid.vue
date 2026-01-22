@@ -140,7 +140,6 @@ const setupRows = () => {
     })
   })
   rows.value = newRows
-  console.log(rows)
 }
 
 watch(
