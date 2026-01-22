@@ -75,7 +75,7 @@ const menuItems: MenuItem[] = [
     label: 'Communities',
     icon: 'pi pi-globe',
     route: '/dashboard/communities',
-    visible: true
+    visible: () => authStore.isInRole(roles.admin) || authStore.isInRole(roles.organizer)
   },
   {
     label: 'Performers',

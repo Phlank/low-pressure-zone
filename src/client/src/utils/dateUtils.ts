@@ -1,4 +1,3 @@
-import { formatDate } from '@vueuse/core'
 import {addMinutes} from "date-fns";
 
 export const parseDate = (date: string | Date): Date => {
@@ -41,7 +40,7 @@ export const isHour = (date: Date) =>
   date.getMinutes() === 0 && date.getSeconds() === 0 && date.getMilliseconds() === 0
 
 export const timesBetween = (start: Date, end: Date, minutesSeparation: number = 60) => {
-  if (parseTime(end) < parseTime(start)) throw new Error('End date must be after start date')
+  if (parseTime(end) < parseTime(start)) throw new Error(`End date must be after start date: ${end} <= ${start}`)
 
   const out: Date[] = []
   if (start.getTime() === end.getTime()) {
@@ -71,12 +70,11 @@ export const minimumDate = (...dates: Date[]) => {
   return new Date(minimum)
 }
 
-const readableFormat = 'h:mm A'
 export const formatReadableTime = (date: Date | string) => {
   if (typeof date === 'string') {
-    return formatDate(parseDate(date), readableFormat)
+    date = parseDate(date)
   }
-  return formatDate(date, readableFormat)
+  return date.toLocaleTimeString([], { hour: "numeric", minute: '2-digit' })
 }
 
 export const getDuration = (start: Date | string, end: Date | string) => {

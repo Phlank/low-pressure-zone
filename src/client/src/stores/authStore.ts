@@ -70,10 +70,7 @@ export const useAuthStore = defineStore('authStore', () => {
     formState: Ref<TwoFactorRequest>,
     validation: FormValidation<TwoFactorRequest>
   ): Promise<Result<LoginOutcome>> => {
-    console.log('2fa')
-    console.log(isLoggedIn.value)
     if (isLoggedIn.value) return err()
-    console.log('2fa')
     if (!validation.validate()) return err()
     const response = await authApi.postTwoFactor(formState.value)
     if (response.status === 403 || response.status === 401) {

@@ -61,7 +61,6 @@ const rows: Ref<SoundclashRow[]> = ref([])
 const setupRows = () => {
   const newRows: SoundclashRow[] = []
   if (!schedule.value || schedule.value.soundclashes.length === 0) {
-    console.log('No rows')
     rows.value = newRows
     return
   }
@@ -72,7 +71,6 @@ const setupRows = () => {
   if (startFirst > parseDate(schedule.value.startsAt)) hours.unshift(addHours(startFirst, -2))
   if (endLast < parseDate(schedule.value.endsAt)) hours.push(endLast)
 
-  console.log('Hours:', hours)
   hours.forEach((hour) => {
     const soundclash = soundclashes.find(
       (sc) => parseDate(sc.startsAt).getTime() === hour.getTime()
@@ -87,8 +85,7 @@ const setupRows = () => {
 
 watch(
   () => schedule.value,
-  (newValue) => {
-    console.log(newValue?.soundclashes)
+  () => {
     setupRows()
   },
   { immediate: true, deep: true }

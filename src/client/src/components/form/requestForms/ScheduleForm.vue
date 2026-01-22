@@ -208,7 +208,6 @@ defineExpose({
 })
 
 const handleStartTimeChange = (value: Date) => {
-  console.log(value)
   formState.value.startTime = value
   if (formState.value.endTime < formState.value.startTime) {
     formState.value.endTime = new Date(value.getTime() + defaultMinutes * MS_PER_MINUTE)

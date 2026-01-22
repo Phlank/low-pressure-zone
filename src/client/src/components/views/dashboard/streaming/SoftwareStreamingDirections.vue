@@ -15,7 +15,7 @@
     </p>
     <img
       alt="Alternately, press Ctrl+P"
-      src="@/assets/stream-setup-img/mixxx-preferences.png" />
+      src="/stream-instructions/mixxx-preferences.png" />
     <p>
       From here, find the Live Broadcasting section on the left-side navigation of the Preferences
       menu. In here, you will set up the connection and stream info. Set the first sections up to
@@ -25,7 +25,7 @@
     <br />
     <img
       alt="How to locate the Live Broadcasting section, and the first set of items available"
-      src="@/assets/stream-setup-img/mixxx-broadcasting-test-1.png" />
+      src="/stream-instructions/mixxx-broadcasting-test-1.png" />
     <Message severity="warn">
       Unless you are streaming from Traktor, you should use MP3 for the encoding. Vorbis or Opus
       will still work, but will require re-encoding on the server, resulting in quality loss.
@@ -39,7 +39,7 @@
     </p>
     <img
       alt="Directions for starting the broadcast stream"
-      src="@/assets/stream-setup-img/mixxx-broadcasting-test-3.png" />
+      src="/stream-instructions/mixxx-broadcasting-test-3.png" />
     <p>
       Navigate to the
       <a href="https://lowpressurezone.com:8443/">test stream status page.</a> You should see your
@@ -47,7 +47,7 @@
     </p>
     <img
       alt="Broadcasting debug test"
-      src="@/assets/stream-setup-img/broadcasting-debug-test.png" />
+      src="/stream-instructions/broadcasting-debug-test.png" />
     <p>
       On your phone, navigate to the
       <a href="https://lowpressurezone.com:8443/test">test audio page.</a> Listen for a moment and
