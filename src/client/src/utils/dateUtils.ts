@@ -1,4 +1,3 @@
-import { formatDate } from '@vueuse/core'
 import {addMinutes} from "date-fns";
 
 export const parseDate = (date: string | Date): Date => {
