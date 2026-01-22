@@ -25,6 +25,6 @@ public sealed class GetCommunities(DataContext dataContext, CommunityRules rules
         communities.RemoveAll(rules.IsHiddenFromApi);
 
         var responses = communities.Select(Map.FromEntity);
-        await SendOkAsync(responses, ct);
+        await Send.OkAsync(responses, ct);
     }
 }

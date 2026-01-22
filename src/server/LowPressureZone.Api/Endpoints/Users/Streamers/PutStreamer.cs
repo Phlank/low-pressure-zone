@@ -15,14 +15,14 @@ public class PutStreamer(UserManager<AppUser> userManager, IAzuraCastClient clie
         var user = await userManager.GetUserAsync(User);
         if (user?.StreamerId is null)
         {
-            await SendUnauthorizedAsync(ct);
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 
         var streamerResult = await userManager.GetStreamerAsync(user, client);
         if (!streamerResult.IsSuccess)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
@@ -31,6 +31,6 @@ public class PutStreamer(UserManager<AppUser> userManager, IAzuraCastClient clie
         var updateResult = await client.PutStreamerAsync(streamerRequest);
         if (!updateResult.IsSuccess) ThrowError("Could not update broadcast information");
 
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }

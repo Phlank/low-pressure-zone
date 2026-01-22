@@ -32,10 +32,12 @@ const props = withDefaults(
     header?: string
     isSingleColumn?: boolean
     alignActions?: 'left' | 'right'
+    maxColumns?: number
   }>(),
   {
     isSingleColumn: false,
-    alignActions: 'left'
+    alignActions: 'left',
+    maxColumns: 99
   }
 )
 
@@ -43,21 +45,28 @@ const useSingleColumn = computed(() => props.isSingleColumn || width.value <= 40
 
 onMounted(() => {
   if (formAreaRef.value) {
-    width.value = formAreaRef.value.offsetWidth
+    width.value = Math.min(formAreaRef.value.offsetWidth, maxWidthFromColumns.value)
   }
 })
 
 useResizeObserver(formAreaRef, (entries) => {
   const entry = entries[0]
-  width.value = entry!.contentRect.width
+  width.value = Math.min(entry!.contentRect.width, maxWidthFromColumns.value)
 })
 
 const columnWidth = 80
+const gapWidth = 20
 const columns = computed(() => {
   if (width.value <= mobileWidth - 40) {
-    return clamp(Math.floor(width.value / columnWidth), 1, 4)
+    return clamp(Math.floor(width.value / (columnWidth + gapWidth)), 1, 4)
   }
-  return clamp(Math.floor(width.value / columnWidth), 1, 99)
+  return clamp(Math.floor(width.value / (columnWidth + gapWidth)), 1, props.maxColumns ?? 99)
+})
+const maxWidthFromColumns = computed(() => {
+  return (columnWidth + gapWidth) * props.maxColumns
+})
+const maxWidthFromColumnsPx = computed(() => {
+  return maxWidthFromColumns.value + 'px'
 })
 const widthPx = computed(() => {
   if (width.value <= mobileWidth - 40) {
@@ -75,7 +84,7 @@ const actionColumnSpan = computed(() => `span ${columns.value <= 4 ? 1 : 2}`)
 
 .form-area {
   &__fields {
-    width: min(v-bind(widthPx), 100%);
+    width: min(v-bind(widthPx), 100%, v-bind(maxWidthFromColumnsPx));
     display: grid;
     grid-template-columns: v-bind(gridColsStyle);
     column-gap: variables.$space-l;
@@ -102,6 +111,10 @@ const actionColumnSpan = computed(() => `span ${columns.value <= 4 ? 1 : 2}`)
       &--xl {
         grid-column: span min(8, v-bind(columns));
       }
+
+      &--full {
+        grid-column: span v-bind(columns);
+      }
     }
 
     &--single-column {
@@ -112,7 +125,7 @@ const actionColumnSpan = computed(() => `span ${columns.value <= 4 ? 1 : 2}`)
   }
 
   &__actions {
-    width: min(v-bind(widthPx), 100%);
+    width: min(v-bind(widthPx), 100%, v-bind(maxWidthFromColumnsPx));
     display: grid;
     grid-template-columns: v-bind(gridColsStyle);
     direction: v-bind(actionColumnDirection);

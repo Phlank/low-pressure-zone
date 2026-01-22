@@ -21,13 +21,13 @@ public sealed partial class MediaAnalyzer(ILogger<MediaAnalyzer> logger)
         {
             LogOtherException(logger, filePath, ex.Message);
         }
-        
+
         return Result.Err<IMediaAnalysis>("Failed to analyze media file.");
     }
 
     [LoggerMessage(LogLevel.Error, "FFMpegException while analyzing media file at {filePath}: {errorMessage}")]
     static partial void LogAnalysisException(ILogger<MediaAnalyzer> logger, string filePath, string errorMessage);
-    
+
     [LoggerMessage(LogLevel.Error, "Exception while analyzing media file at {filePath}: {errorMessage}")]
     static partial void LogOtherException(ILogger<MediaAnalyzer> logger, string filePath, string errorMessage);
 }

@@ -18,14 +18,48 @@
       input-id="scheduleDateInput"
       label="Schedule">
       <Select
+        style="gap: 0"
         id="scheduleDateInput"
-        v-model:model-value="currentScheduleId"
-        :disabled="isLoading"
-        :loading="isLoading"
+        class="schedule-navigator__date-field"
+        v-model:model-value="currentSchedule"
+        :disabled="scheduleStore.isLoading"
+        :loading="scheduleStore.isLoading"
         :options="selectOptions"
         empty-message="No upcoming schedules"
-        option-label="label"
-        option-value="value" />
+        overlay-class="schedule-navigator__date-field__overlay">
+        <template #value="{ value }: { value: ScheduleResponse | undefined }">
+          <ListItem
+            v-if="value !== undefined"
+            :hide-overflow-left="false"
+            hide-overflow-right
+            style="min-height: fit-content">
+            <template #left>
+              <TwoLineData
+                :above="parseDate(value.startsAt).toLocaleDateString()"
+                :below="value.community.name" />
+            </template>
+            <template #right>
+              <span>{{ value.name }}</span>
+            </template>
+          </ListItem>
+        </template>
+        <template #option="{ option }: { option: ScheduleResponse | undefined }">
+          <ListItem
+            v-if="option !== undefined"
+            :hide-overflow-left="false"
+            hide-overflow-right
+            style="min-height: fit-content">
+            <template #left>
+              <TwoLineData
+                :above="parseDate(option.startsAt).toLocaleDateString()"
+                :below="option.community.name" />
+            </template>
+            <template #right>
+              <span>{{ option.name }}</span>
+            </template>
+          </ListItem>
+        </template>
+      </Select>
     </IftaFormField>
     <FormField
       class="schedule-navigator__button"
@@ -45,58 +79,59 @@
 
 <script lang="ts" setup>
 import { Button, Select } from 'primevue'
-import { computed, onMounted, type Ref, ref, watch } from 'vue'
+import { computed, type Ref, ref, watch } from 'vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import FormField from '@/components/form/FormField.vue'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
+import type { ScheduleResponse } from '@/api/resources/schedulesApi.ts'
+import ListItem from '@/components/data/ListItem.vue'
+import { parseDate } from '@/utils/dateUtils.ts'
+import TwoLineData from '@/components/layout/TwoLineData.vue'
 
 const scheduleStore = useScheduleStore()
 
-const selectOptions = computed(() =>
-  scheduleStore.upcomingSchedules.map((schedule) => ({
-    label: `${new Date(schedule.startsAt).toLocaleDateString()} - ${schedule.community.name}`,
-    value: schedule.id
-  }))
-)
+const selectOptions = computed(() => scheduleStore.upcomingSchedules)
+const currentSchedule: Ref<ScheduleResponse | undefined> = ref(undefined)
 
-const isLoading = ref(true)
-const currentScheduleId: Ref<string | undefined> = ref(undefined)
 const hasPrevious = computed(
-  () => selectOptions.value.findIndex((option) => option.value == currentScheduleId.value) > 0
+  () => selectOptions.value.findIndex((option) => option == currentSchedule.value) > 0
 )
 const handlePreviousClick = () => {
   if (hasPrevious.value) {
-    const index = selectOptions.value.findIndex((option) => option.value == currentScheduleId.value)
-    currentScheduleId.value = selectOptions.value[index - 1]!.value
+    const index = selectOptions.value.findIndex((option) => option == currentSchedule.value)
+    currentSchedule.value = selectOptions.value[index - 1]!
   }
 }
 const hasNext = computed(
   () =>
-    selectOptions.value.findIndex((option) => option.value == currentScheduleId.value) <
+    selectOptions.value.findIndex((option) => option == currentSchedule.value) <
     selectOptions.value.length - 1
 )
 const handleNextClick = () => {
   if (hasNext.value) {
-    const index = selectOptions.value.findIndex((option) => option.value == currentScheduleId.value)
-    currentScheduleId.value = selectOptions.value[index + 1]!.value
+    const index = selectOptions.value.findIndex((option) => option == currentSchedule.value)
+    currentSchedule.value = selectOptions.value[index + 1]!
   }
 }
-
-onMounted(async () => {
-  await scheduleStore.loadDefaultSchedulesAsync()
-  isLoading.value = false
-  if (scheduleStore.upcomingSchedules.length > 0) {
-    currentScheduleId.value = scheduleStore.upcomingSchedules[0]!.id
-  }
-})
 
 const emit = defineEmits<{
   changeSchedule: [string]
 }>()
 
-watch(currentScheduleId, (newValue) => {
-  emit('changeSchedule', newValue ?? '')
+watch(currentSchedule, (newValue) => {
+  emit('changeSchedule', newValue?.id ?? '')
 })
+
+watch(
+  () => scheduleStore.upcomingSchedules,
+  (newSchedules) => {
+    if (newSchedules.length > 0 && !currentSchedule.value) {
+      currentSchedule.value = newSchedules[0]!
+      emit('changeSchedule', currentSchedule.value.id)
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <style lang="scss">
@@ -110,9 +145,10 @@ watch(currentScheduleId, (newValue) => {
   justify-content: center;
 
   &__date-field {
-    width: 275px;
+    width: min(calc(100dvw - 2 * #{variables.$space-m} - 2 * #{variables.$space-l} - 64px), 390px);
+    gap: 0 !important;
 
-    @media (max-width: 416px) {
+    @media (max-width: 450px) {
       width: calc(100dvw - 2 * #{variables.$space-m} - 2 * #{variables.$space-l});
 
       .p-select-label {
@@ -122,13 +158,27 @@ watch(currentScheduleId, (newValue) => {
         text-overflow: ellipsis;
       }
     }
+
+    &__two-line-data {
+      gap: 0 !important;
+    }
+
+    &__overlay {
+      min-width: unset !important;
+      max-width: min(calc(100dvw - 2 * #{variables.$space-m} - 2 * #{variables.$space-l}), 390px);
+      position: absolute !important;
+    }
   }
 
   &__button {
     width: 32px;
-    @media (max-width: 416px) {
+    @media (max-width: 450px) {
       display: none;
     }
+  }
+
+  div.two-line-data {
+    gap: 0;
   }
 }
 </style>

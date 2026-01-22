@@ -67,6 +67,6 @@ public class GetVerifyToken(UserManager<AppUser> userManager, IdentityContext id
             return;
         }
 
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }

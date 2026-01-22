@@ -5,7 +5,7 @@ using LowPressureZone.Identity.Constants;
 
 namespace LowPressureZone.Api.Rules;
 
-public class BroadcastRules(IHttpContextAccessor contextAccessor)
+public sealed class BroadcastRules(IHttpContextAccessor contextAccessor)
 {
     private ClaimsPrincipal? User => contextAccessor.GetAuthenticatedUserOrDefault();
 
@@ -14,4 +14,10 @@ public class BroadcastRules(IHttpContextAccessor contextAccessor)
 
     public bool IsDeletable(StationStreamerBroadcast broadcast)
         => User is not null && User.IsInRole(RoleNames.Admin);
+
+    public bool IsDisconnectable(StationStreamerBroadcast broadcast) =>
+        User is not null 
+        && (User.IsInRole(RoleNames.Admin) 
+            || User.IsInRole(RoleNames.Organizer)) 
+        && broadcast.TimestampEnd is null;
 }

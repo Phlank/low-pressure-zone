@@ -18,6 +18,6 @@ public sealed class GetPerformers(DataContext dataContext)
                                           .ToListAsync(ct);
         performers.RemoveAll(PerformerRules.IsHiddenFromApi);
         var responses = performers.Select(Map.FromEntity);
-        await SendOkAsync(responses, ct);
+        await Send.OkAsync(responses, ct);
     }
 }

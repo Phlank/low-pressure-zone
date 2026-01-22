@@ -6,7 +6,7 @@ using LowPressureZone.Identity.Extensions;
 
 namespace LowPressureZone.Api.Rules;
 
-public class PerformerRules(IHttpContextAccessor contextAccessor)
+public sealed class PerformerRules(IHttpContextAccessor contextAccessor)
 {
     private ClaimsPrincipal? User => contextAccessor.GetAuthenticatedUserOrDefault();
 

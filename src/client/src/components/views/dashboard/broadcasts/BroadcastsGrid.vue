@@ -1,9 +1,9 @@
 ﻿<template>
   <div class="broadcasts-grid">
-    <div v-if="!isMobile && !isLoading">
+    <div v-if="!isMobile && !broadcasts.isLoading">
       <DataTable
         :rows="10"
-        :value="broadcastStore.broadcasts"
+        :value="broadcasts.broadcasts"
         data-key="broadcastId"
         paginator>
         <Column
@@ -28,22 +28,26 @@
         <Column class="grid-action-col grid-action-col--2">
           <template #body="{ data }: { data: BroadcastResponse }">
             <GridActions
+              :show-disconnect="data.isDisconnectable"
               :show-download="data.isDownloadable"
+              @disconnect="handleDisconnectAction"
               @download="handleDownloadClicked(data)" />
           </template>
         </Column>
       </DataTable>
     </div>
     <DataView
-      v-if="isMobile && !isLoading"
-      :paginator="broadcastStore.broadcasts.length > 5"
+      v-if="isMobile && !broadcasts.isLoading"
+      :paginator="broadcasts.broadcasts.length > 5"
       :paginator-template="mobilePaginatorTemplate"
       :rows="5"
-      :value="broadcastStore.broadcasts"
+      :value="broadcasts.broadcasts"
       data-key="broadcastId">
       <template #empty>
         <ListItem>
-          <template #left>{{ isLoading ? 'Loading...' : 'No items to display' }}</template>
+          <template #left>{{
+            broadcasts.isLoading ? 'Loading...' : 'No items to display'
+          }}</template>
         </ListItem>
       </template>
       <template #list="{ items }: { items: BroadcastResponse[] }">
@@ -73,22 +77,45 @@
       </template>
     </DataView>
     <Skeleton
-      v-if="isLoading"
+      v-if="broadcasts.isLoading"
       style="height: 300px" />
+    <Dialog
+      v-model:visible="showDisconnectDialog"
+      header="Disconnect Streamer"
+      modal
+      :draggable="false">
+      <p>
+        Most DJ software will automatically try to reconnect when disconnected. So, the DJ's
+        streaming account must be disabled for a time. How long should that be?
+      </p>
+      <template #footer>
+        <Button outlined label="None" @click="handleDisconnect()" />
+        <Button outlined label="5 Minutes" @click="handleDisconnect(5)" />
+        <Button outlined label="1 Hour" @click="handleDisconnect(60)" />
+        <Button outlined label="24 Hours" @click="handleDisconnect(1440)" />
+        <Button outlined label="Indefinitely" @click="handleDisconnect(0)" />
+      </template>
+    </Dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { inject, onMounted, ref, type Ref } from 'vue'
+import { inject, ref, type Ref } from 'vue'
 import { useBroadcastStore } from '@/stores/broadcastStore.ts'
-import { Column, DataTable, DataView, Divider, Skeleton } from 'primevue'
+import { Column, DataTable, DataView, Divider, Skeleton, useToast, Dialog, Button } from 'primevue'
 import broadcastsApi, { type BroadcastResponse } from '@/api/resources/broadcastsApi.ts'
-import { formatDurationTimestamp, formatReadableTime, getDuration, parseDate } from '@/utils/dateUtils.ts'
+import {
+  formatDurationTimestamp,
+  formatReadableTime,
+  getDuration,
+  parseDate
+} from '@/utils/dateUtils.ts'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import { mobilePaginatorTemplate } from '@/constants/componentTemplates.ts'
 import ListItem from '@/components/data/ListItem.vue'
 
-const broadcastStore = useBroadcastStore()
+const toast = useToast()
+const broadcasts = useBroadcastStore()
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 
 defineProps<{
@@ -99,7 +126,9 @@ const formatMobileTimeInfo = (broadcast: BroadcastResponse) => {
   const date = parseDate(broadcast.start).toLocaleDateString()
   const time = formatReadableTime(parseDate(broadcast.start))
   const duration =
-    broadcast.end === null ? 'Live' : formatDurationTimestamp(getDuration(broadcast.start, broadcast.end))
+    broadcast.end === null
+      ? 'Live'
+      : formatDurationTimestamp(getDuration(broadcast.start, broadcast.end))
   return `${date} ${time} | ${duration}`
 }
 
@@ -107,11 +136,21 @@ const handleDownloadClicked = (broadcast: BroadcastResponse) => {
   broadcastsApi.download(broadcast.streamerId ?? 0, broadcast.broadcastId)
 }
 
-const isLoading = ref(true)
-onMounted(async () => {
-  await broadcastStore.loadIfNotInitialized()
-  isLoading.value = false
-})
+const showDisconnectDialog = ref(false)
+const handleDisconnectAction = () => {
+  showDisconnectDialog.value = true
+}
+
+const handleDisconnect = async (disableMinutes?: number) => {
+  const result = await broadcasts.disconnectAsync(disableMinutes)
+  if (!result.isSuccess) return
+  toast.add({
+    severity: 'success',
+    summary: 'Disconnected',
+    detail: 'Streamer disconnected successfully.'
+  })
+  showDisconnectDialog.value = false
+}
 </script>
 
 <style lang="scss">

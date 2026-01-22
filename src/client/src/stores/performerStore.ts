@@ -1,85 +1,93 @@
 import { defineStore } from 'pinia'
-import type { PerformerResponse } from '@/api/resources/performersApi.ts'
+import type { PerformerRequest, PerformerResponse } from '@/api/resources/performersApi.ts'
 import performersApi from '@/api/resources/performersApi.ts'
 import { computed, type Ref, ref } from 'vue'
+import { useToast } from 'primevue'
+import { addAlphabetically, getEntityMap, removeEntity } from '@/utils/arrayUtils.ts'
+import {
+  useCreatePersistentItemFn,
+  useRemovePersistentItemFn,
+  useUpdatePersistentItemFn
+} from '@/utils/storeFns.ts'
+import { useRefresh } from '@/composables/useRefresh.ts'
+import {
+  showCreateSuccessToast,
+  showDeleteSuccessToast,
+  showEditSuccessToast
+} from '@/utils/toastUtils.ts'
+import { useAuthStore } from '@/stores/authStore.ts'
 
 export const usePerformerStore = defineStore('performerStore', () => {
-  const loadedPerformers: Ref<PerformerResponse[]> = ref([])
-  const loadedPerformersMap: Ref<PerformerMap> = ref({})
+  const performers: Ref<PerformerResponse[]> = ref([])
+  const performersMap = ref(getEntityMap(performers.value))
+  const toast = useToast()
+  const auth = useAuthStore()
 
-  let loadPerformersPromise: Promise<void> | undefined
-  const loadPerformers = async () => {
-    const response = await performersApi.get()
-    if (!response.isSuccess()) {
-      console.log(JSON.stringify(response))
-      return
-    }
-    loadedPerformers.value = response.data()
-    loadedPerformersMap.value = createMap(response.data())
-  }
-
-  const loadPerformersAsync = async () => {
-    loadPerformersPromise ??= loadPerformers()
-    await loadPerformersPromise
-    loadPerformersPromise = undefined
-  }
-
-  const performers = computed(() => loadedPerformers.value)
-  const linkablePerformers = computed(() =>
-    loadedPerformers.value.filter((performer) => performer.isLinkableToTimeslot)
+  const { isLoading } = useRefresh(
+    performersApi.get,
+    (data) => {
+      performers.value = data
+      performersMap.value = getEntityMap(performers.value)
+    },
+    { permissionFn: () => auth.isLoggedIn }
   )
 
-  const get = (id: string) => loadedPerformersMap.value[id]
+  const getById = (id: string) => performersMap.value[id]
 
-  const add = (performer: PerformerResponse) => {
-    // Performers are ordered alphabetically from the API by name
-    // When inserting, need to keep this order
-    // This finds the index of the first item that has higher alphabetic value
-    // If there is none, inserts at the end of the array
-    const alphabeticalIndex = loadedPerformers.value.findIndex(
-      (loadedPerformer) => loadedPerformer.name.toLowerCase() > performer.name.toLowerCase()
-    )
-    if (alphabeticalIndex > -1) {
-      loadedPerformers.value.splice(alphabeticalIndex, 0, performer)
-    } else {
-      loadedPerformers.value.push(performer)
-    }
-  }
+  const create = useCreatePersistentItemFn(
+    performersApi.post,
+    (id, form) => {
+      const performer: PerformerResponse = {
+        id: id,
+        ...form,
+        isDeletable: true,
+        isEditable: true,
+        isLinkableToTimeslot: true
+      }
+      addAlphabetically(performers.value, performer, (item) => item.name)
+      performersMap.value[performer.id] = performer
+      showCreateSuccessToast(toast, 'Performer', form.name)
+    },
+    toast
+  )
 
-  const remove = (id: string) => {
-    const index = loadedPerformers.value.findIndex((performer) => performer.id === id)
-    if (index > -1) {
-      loadedPerformers.value.splice(index, 1)
-    }
-  }
+  const update = useUpdatePersistentItemFn<PerformerRequest, PerformerResponse>(
+    performers,
+    performersApi.put,
+    (form, entity) => {
+      entity.url = form.url
+      if (entity.name !== form.name) {
+        entity.name = form.name
+        performers.value.sort((a, b) => a.name.localeCompare(b.name))
+      }
+      showEditSuccessToast(toast, 'Performer', form.name)
+    },
+    toast
+  )
 
-  const updateAsync = async (id: string) => {
-    const response = await performersApi.getById(id)
-    if (!response.isSuccess()) return
-    const index = loadedPerformers.value.findIndex((performer) => performer.id === id)
-    if (index > -1) {
-      loadedPerformers.value.splice(index, 1, response.data())
-    } else {
-      add(response.data())
-    }
-  }
+  const remove = useRemovePersistentItemFn(
+    performers,
+    performersApi.delete,
+    (entity) => {
+      performersMap.value[entity.id] = undefined
+      removeEntity(performers.value, entity.id)
+      showDeleteSuccessToast(toast, 'Performer', entity.name)
+    },
+    toast
+  )
+
+  const getPerformers = computed(() => performers.value)
+  const getLinkablePerformers = computed(() =>
+    performers.value.filter((performer) => performer.isLinkableToTimeslot)
+  )
 
   return {
-    performers,
-    linkablePerformers,
-    loadPerformersAsync,
-    get,
-    add,
-    remove,
-    updateAsync
+    isLoading: isLoading,
+    performers: getPerformers,
+    linkablePerformers: getLinkablePerformers,
+    getById,
+    create,
+    update,
+    remove
   }
 })
-
-type PerformerMap = { [key: string]: PerformerResponse }
-const createMap = (performers: PerformerResponse[]): PerformerMap => {
-  const map: PerformerMap = {}
-  for (const performer of performers) {
-    map[performer.id] = performer
-  }
-  return map
-}

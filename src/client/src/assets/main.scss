@@ -7,8 +7,8 @@
 
 @font-face {
   font-family: 'Nunito Sans';
-  font-stretch: 100%; /* Note that font-stretch is a % of normal width */
-  font-style: normal; /* See note below */
+  font-stretch: 100%;
+  font-style: normal;
   font-weight: 400;
   src: url('fonts/Nunito_Sans.woff2') format('woff2');
 }
@@ -24,11 +24,18 @@ body {
   overflow: hidden;
   background-image: url(./bg-invert.jpg);
   background-attachment: fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
   font-family: 'Nunito Sans', 'Helvetica Neue', sans-serif;
   text-rendering: optimizeLegibility;
   overflow-y: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+}
+
+#app {
+  width: 100%;
 }
 
 body.dark-mode-toggle {
@@ -44,10 +51,6 @@ body.dark-mode-toggle {
   .app {
     overflow-x: hidden;
   }
-}
-
-p {
-  font-size: 0.9rem;
 }
 
 .desktop-only {

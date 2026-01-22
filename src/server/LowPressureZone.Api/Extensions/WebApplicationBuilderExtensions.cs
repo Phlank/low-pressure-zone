@@ -4,15 +4,21 @@ using FastEndpoints;
 using FastEndpoints.Swagger;
 using FluentEmail.Core.Interfaces;
 using FluentEmail.Mailgun;
+using Hangfire;
+using Hangfire.PostgreSql;
 using LowPressureZone.Adapter.AzuraCast.Extensions;
 using LowPressureZone.Api.Authentication;
 using LowPressureZone.Api.Converters;
 using LowPressureZone.Api.Endpoints.Broadcasts;
 using LowPressureZone.Api.Endpoints.Communities;
 using LowPressureZone.Api.Endpoints.Communities.Relationships;
+using LowPressureZone.Api.Endpoints.News;
 using LowPressureZone.Api.Endpoints.Performers;
 using LowPressureZone.Api.Endpoints.Schedules;
-using LowPressureZone.Api.Endpoints.Schedules.Timeslots;
+using LowPressureZone.Api.Endpoints.Settings.About;
+using LowPressureZone.Api.Endpoints.Settings.Welcome;
+using LowPressureZone.Api.Endpoints.Soundclashes;
+using LowPressureZone.Api.Endpoints.Timeslots;
 using LowPressureZone.Api.Endpoints.Users.Invites;
 using LowPressureZone.Api.Models.Configuration;
 using LowPressureZone.Api.Models.Configuration.Streaming;
@@ -41,6 +47,13 @@ namespace LowPressureZone.Api.Extensions;
 
 public static class WebApplicationBuilderExtensions
 {
+    private static readonly Action<CookieAuthenticationOptions> ConfigureDevelopmentCookieOptions = options =>
+    {
+        options.Cookie.SameSite = SameSiteMode.None;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.HttpOnly = true;
+    };
+
     public static void ConfigureWebApi(this WebApplicationBuilder builder)
     {
         var services = builder.Services;
@@ -50,7 +63,7 @@ public static class WebApplicationBuilderExtensions
             options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
-        
+
         services.Configure<IcecastConfiguration>(builder.Configuration.GetSection(IcecastConfiguration.Name));
         services.Configure<StreamingConfiguration>(builder.Configuration.GetSection(StreamingConfiguration.Name));
         services.Configure<EmailServiceConfiguration>(builder.Configuration.GetSection(EmailServiceConfiguration.Name));
@@ -69,43 +82,37 @@ public static class WebApplicationBuilderExtensions
             });
         });
     }
-    
+
     public static void AddApiServices(this WebApplicationBuilder builder)
     {
         builder.AddAzuraCast();
         builder.AddEndpointServices();
         builder.AddDatabases();
+        builder.AddHangfire();
         builder.ConfigureAndAddIdentity();
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddFastEndpoints();
-        
+
         builder.Services.AddSingleton<ISender, MailgunSender>(serviceProvider => serviceProvider.CreateMailgunSender());
         builder.Services.AddSingleton<EmailService>();
-        
+
         builder.Services.AddSingleton<MediaAnalyzer>();
         builder.Services.AddSingleton<Mp3Processor>();
         builder.Services.AddSingleton<UriService>();
-        
+
         builder.Services.AddSingleton<FormFileSaver>();
-        
+
         builder.Services.AddSingleton<IStreamStatusService, AzuraCastStatusService>();
         builder.Services.AddScoped<StreamingInfoService>();
-        
+
         builder.Services.AddSingleton<PrerecordedMixCleanupService>();
         builder.Services.AddScoped<PrerecordedMixFileProcessor>();
         builder.Services.AddScoped<TimeslotRequestToAzuraCastPlaylistConverter>();
-        
+
         builder.Services.AddSingleton<NightlyBroadcastDeletionModule>();
         builder.Services.AddSingleton<NightlyPrerecordedMixCleanupModule>();
         builder.Services.AddHostedService<NightlyTaskService>();
     }
-    
-    private static readonly Action<CookieAuthenticationOptions> ConfigureDevelopmentCookieOptions = options =>
-    {
-        options.Cookie.SameSite = SameSiteMode.None;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.HttpOnly = true;
-    };
 
     private static void AddDatabases(this WebApplicationBuilder builder)
     {
@@ -122,6 +129,17 @@ public static class WebApplicationBuilderExtensions
             options.UseNpgsql(dataConnectionString);
             if (builder.Environment.IsDevelopment()) options.EnableSensitiveDataLogging();
         });
+    }
+
+    private static void AddHangfire(this WebApplicationBuilder builder)
+    {
+        // Use the main database for hangfire, it stores its data in a separate schema
+        var hangfireConnectionString = builder.Configuration.GetConnectionString("Data");
+        builder.Services.AddHangfire(config =>
+        {
+            config.UsePostgreSqlStorage(pgsqlConfig => pgsqlConfig.UseNpgsqlConnection(hangfireConnectionString));
+        });
+        builder.Services.AddHangfireServer();
     }
 
     private static void ConfigureAndAddIdentity(this WebApplicationBuilder builder)
@@ -185,6 +203,11 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton<TimeslotMapper>();
         builder.Services.AddSingleton<InviteMapper>();
         builder.Services.AddSingleton<BroadcastMapper>();
+        builder.Services.AddSingleton<AboutSettingsMapper>();
+        builder.Services.AddSingleton<NewsMapper>();
+        builder.Services.AddSingleton<SoundclashMapper>();
+        builder.Services.AddSingleton<AboutSettingsMapper>();
+        builder.Services.AddSingleton<WelcomeSettingsMapper>();
 
         builder.Services.AddSingleton<CommunityRules>();
         builder.Services.AddSingleton<CommunityRelationshipRules>();
@@ -192,6 +215,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton<PerformerRules>();
         builder.Services.AddSingleton<TimeslotRules>();
         builder.Services.AddSingleton<BroadcastRules>();
+        builder.Services.AddSingleton<SoundclashRules>();
     }
 
     private static MailgunSender CreateMailgunSender(this IServiceProvider services)
@@ -208,9 +232,6 @@ public static class WebApplicationBuilderExtensions
         if (temporaryFilePath is null)
             throw new InvalidOperationException("Temporary file path is not configured.");
 
-        if (!Directory.Exists(temporaryFilePath))
-        {
-            Directory.CreateDirectory(temporaryFilePath);
-        }
+        if (!Directory.Exists(temporaryFilePath)) Directory.CreateDirectory(temporaryFilePath);
     }
 }

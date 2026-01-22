@@ -1,8 +1,8 @@
 ﻿<template>
   <Dialog
+    v-bind="$attrs"
     :draggable="false"
     :header="header"
-    :visible="visible"
     class="confirm-dialog"
     modal
     @hide="emit('close')"
@@ -26,17 +26,11 @@
 <script lang="ts" setup>
 import { Button, Dialog } from 'primevue'
 
-withDefaults(
-  defineProps<{
-    visible: boolean
-    isSubmitting: boolean
-    text: string
-    header?: string
-  }>(),
-  {
-    header: 'Confirm Action'
-  }
-)
+defineProps<{
+  isSubmitting: boolean
+  text: string
+  header?: string
+}>()
 
 const emit = defineEmits<{
   close: []

@@ -18,21 +18,7 @@ public class GetSchedules(DataContext dataContext, ScheduleRules rules)
 
     public override async Task HandleAsync(GetSchedulesRequest req, CancellationToken ct)
     {
-        IQueryable<Schedule> scheduleQuery = dataContext.Schedules
-                                                        .AsNoTracking()
-                                                        .AsSplitQuery()
-                                                        .OrderBy(schedule => schedule.StartsAt)
-                                                        .Include(schedule => schedule.Community)
-                                                        .ThenInclude(community =>
-                                                                         community.Relationships.Where(relationship =>
-                                                                                                           relationship
-                                                                                                               .UserId ==
-                                                                                                           User
-                                                                                                               .GetIdOrDefault()))
-                                                        .Include(schedule =>
-                                                                     schedule.Timeslots.OrderBy(timeslot => timeslot
-                                                                                                    .StartsAt))
-                                                        .ThenInclude(timeslot => timeslot.Performer);
+        IQueryable<Schedule> scheduleQuery = dataContext.Schedules.GetSchedulesForResponse(User.GetIdOrDefault());
 
         if (req.Before.HasValue)
             scheduleQuery = scheduleQuery.Where(s => s.EndsAt < req.Before.Value.ToUniversalTime());
@@ -42,6 +28,6 @@ public class GetSchedules(DataContext dataContext, ScheduleRules rules)
         var schedules = await scheduleQuery.ToListAsync(ct);
         schedules.RemoveAll(rules.IsHiddenFromApi);
 
-        await SendOkAsync(schedules.Select(Map.FromEntity), ct);
+        await Send.OkAsync(schedules.Select(Map.FromEntity), ct);
     }
 }

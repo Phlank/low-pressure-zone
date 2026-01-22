@@ -52,7 +52,7 @@ import { Menu, Panel } from 'primevue'
 import type { MenuItem } from 'primevue/menuitem'
 import { inject, onMounted, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
-import roles from '@/constants/roles.ts'
+import { roles } from '@/constants/roles.ts'
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -60,16 +60,22 @@ const router = useRouter()
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const menuItems: MenuItem[] = [
   {
+    label: 'Welcome',
+    icon: 'pi pi-home',
+    route: '/dashboard',
+    visible: true
+  },
+  {
     label: 'Schedules',
     icon: 'pi pi-calendar',
-    route: '/dashboard',
+    route: '/dashboard/schedules',
     visible: true
   },
   {
     label: 'Communities',
     icon: 'pi pi-globe',
     route: '/dashboard/communities',
-    visible: true
+    visible: () => authStore.isInRole(roles.admin) || authStore.isInRole(roles.organizer)
   },
   {
     label: 'Performers',
@@ -98,8 +104,8 @@ const menuItems: MenuItem[] = [
 ]
 
 onMounted(async () => {
-  await authStore.loadIfNotInitialized()
-  if (!authStore.isLoggedIn()) {
+  await authStore.initializeAsync()
+  if (!authStore.isLoggedIn) {
     await router.push('/')
   }
 })

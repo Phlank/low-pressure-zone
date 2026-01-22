@@ -23,10 +23,10 @@ public static class AzuraCastWebApplicationBuilderExtensions
         {
             if (!key.Equals("AzuraCastSftpClient"))
                 throw new ArgumentException($"Unsupported key '{key}' for ISftpClient registration.");
-            
+
             var configuration = provider.GetRequiredService<IOptions<AzuraCastClientConfiguration>>().Value;
-            return new SftpClient(configuration.SftpHost, 
-                                  configuration.SftpPort, 
+            return new SftpClient(configuration.SftpHost,
+                                  configuration.SftpPort,
                                   configuration.SftpUser,
                                   configuration.SftpPassword);
         });

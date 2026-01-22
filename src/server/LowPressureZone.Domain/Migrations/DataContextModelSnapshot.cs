@@ -87,6 +87,31 @@ namespace LowPressureZone.Domain.Migrations
                     b.ToTable("CommunityRelationships");
                 });
 
+            modelBuilder.Entity("LowPressureZone.Domain.Entities.News", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("LastModifiedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("News");
+                });
+
             modelBuilder.Entity("LowPressureZone.Domain.Entities.Performer", b =>
                 {
                     b.Property<Guid>("Id")
@@ -132,18 +157,25 @@ namespace LowPressureZone.Domain.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTimeOffset>("EndsAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTimeOffset>("StartsAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Subtitle")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -156,6 +188,83 @@ namespace LowPressureZone.Domain.Migrations
                         .IsUnique();
 
                     b.ToTable("Schedules");
+                });
+
+            modelBuilder.Entity("LowPressureZone.Domain.Entities.Settings.Setting", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Key")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("LastModifiedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.ToTable("Settings");
+                });
+
+            modelBuilder.Entity("LowPressureZone.Domain.Entities.Soundclash", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("EndsAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("LastModifiedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("PerformerOneId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("PerformerTwoId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("RoundOne")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("RoundThree")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("RoundTwo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ScheduleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("StartsAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PerformerOneId");
+
+                    b.HasIndex("PerformerTwoId");
+
+                    b.HasIndex("ScheduleId");
+
+                    b.ToTable("Soundclashes");
                 });
 
             modelBuilder.Entity("LowPressureZone.Domain.Entities.Timeslot", b =>
@@ -176,10 +285,6 @@ namespace LowPressureZone.Domain.Migrations
                     b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Name")
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
-
                     b.Property<Guid>("PerformerId")
                         .HasColumnType("uuid");
 
@@ -188,6 +293,10 @@ namespace LowPressureZone.Domain.Migrations
 
                     b.Property<DateTimeOffset>("StartsAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Subtitle")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -235,6 +344,33 @@ namespace LowPressureZone.Domain.Migrations
                     b.Navigation("Community");
                 });
 
+            modelBuilder.Entity("LowPressureZone.Domain.Entities.Soundclash", b =>
+                {
+                    b.HasOne("LowPressureZone.Domain.Entities.Performer", "PerformerOne")
+                        .WithMany()
+                        .HasForeignKey("PerformerOneId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LowPressureZone.Domain.Entities.Performer", "PerformerTwo")
+                        .WithMany()
+                        .HasForeignKey("PerformerTwoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LowPressureZone.Domain.Entities.Schedule", "Schedule")
+                        .WithMany("Soundclashes")
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PerformerOne");
+
+                    b.Navigation("PerformerTwo");
+
+                    b.Navigation("Schedule");
+                });
+
             modelBuilder.Entity("LowPressureZone.Domain.Entities.Timeslot", b =>
                 {
                     b.HasOne("LowPressureZone.Domain.Entities.Performer", "Performer")
@@ -268,6 +404,8 @@ namespace LowPressureZone.Domain.Migrations
 
             modelBuilder.Entity("LowPressureZone.Domain.Entities.Schedule", b =>
                 {
+                    b.Navigation("Soundclashes");
+
                     b.Navigation("Timeslots");
                 });
 #pragma warning restore 612, 618

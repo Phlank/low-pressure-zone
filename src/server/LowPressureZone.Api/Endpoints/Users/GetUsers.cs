@@ -36,6 +36,6 @@ public class GetUsers(IdentityContext identityContext) : EndpointWithoutRequest<
                                                     .ToListAsync(ct);
 
         if (!User.IsInRole(RoleNames.Admin)) responses = responses.Where(response => !response.IsAdmin);
-        await SendOkAsync(responses, ct);
+        await Send.OkAsync(responses, ct);
     }
 }

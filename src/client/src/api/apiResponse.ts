@@ -1,26 +1,26 @@
 import httpStatus from '@/constants/httpStatus.ts'
 
-interface ApiResponseParameters<TRequest, TResponse> {
+interface ApiResponseParameters<TRequest = void, TResponse = void> {
   readonly status: number
   readonly headers?: Headers
   readonly data?: TResponse
   readonly validationProblem?: ValidationProblemDetails<TRequest>
-  readonly error?: unknown
+  readonly failure?: unknown
 }
 
-export class ApiResponse<TRequest, TResponse> {
+export class ApiResponse<TRequest = void, TResponse = void> {
   readonly status: number
   readonly headers?: Headers
   readonly body?: TResponse
   readonly validationProblem?: ValidationProblemDetails<TRequest>
-  readonly error?: unknown
+  readonly failure?: unknown
 
   constructor(parameters: ApiResponseParameters<TRequest, TResponse>) {
     this.status = parameters.status
     this.headers = parameters.headers
     this.body = parameters.data
     this.validationProblem = parameters.validationProblem
-    this.error = parameters.error
+    this.failure = parameters.failure
   }
 
   /**

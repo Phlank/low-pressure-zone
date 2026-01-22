@@ -22,14 +22,14 @@ public partial class PostLinkStreamer(IAzuraCastClient client, UserManager<AppUs
         var user = await userManager.FindByIdAsync(userId.ToString());
         if (user is null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         var createResult = await userManager.LinkToNewStreamer(user, client);
         if (createResult.IsSuccess)
         {
-            await SendNoContentAsync(ct);
+            await Send.NoContentAsync(ct);
             return;
         }
 
@@ -38,7 +38,7 @@ public partial class PostLinkStreamer(IAzuraCastClient client, UserManager<AppUs
         var linkResult = await userManager.LinkToExistingStreamer(user, client);
         if (linkResult.IsSuccess)
         {
-            await SendNoContentAsync(ct);
+            await Send.NoContentAsync(ct);
             return;
         }
 

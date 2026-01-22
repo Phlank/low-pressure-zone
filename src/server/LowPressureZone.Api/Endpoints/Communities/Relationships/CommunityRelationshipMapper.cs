@@ -6,7 +6,7 @@ using LowPressureZone.Domain.Entities;
 
 namespace LowPressureZone.Api.Endpoints.Communities.Relationships;
 
-public class CommunityRelationshipMapper(IHttpContextAccessor contextAccessor, CommunityRelationshipRules rules)
+public sealed class CommunityRelationshipMapper(IHttpContextAccessor contextAccessor, CommunityRelationshipRules rules)
     : IRequestMapper, IResponseMapper
 {
     public CommunityRelationship ToEntity(CommunityRelationshipRequest request)

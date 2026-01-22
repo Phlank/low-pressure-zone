@@ -7,8 +7,8 @@ import streamApi, {
 import delay from '@/utils/delay.ts'
 
 export const useStreamStore = defineStore('streamStore', () => {
-  const statusRef = ref<StreamStatusResponse>(defaultStreamStatus)
-  const status = computed(() => statusRef.value)
+  const status = ref<StreamStatusResponse>(defaultStreamStatus)
+  const getStatus = computed(() => status.value)
 
   let isStarted = false
   const startPolling = () => {
@@ -43,10 +43,10 @@ export const useStreamStore = defineStore('streamStore', () => {
     if (isTitleUpdatingStarted) return
 
     isTitleUpdatingStarted = true
-    updateSiteTitle(status.value)
+    updateSiteTitle(getStatus.value)
   }
 
-  watch(status, (newStatus) => {
+  watch(getStatus, (newStatus) => {
     updateSiteTitle(newStatus)
   })
 
@@ -65,20 +65,20 @@ export const useStreamStore = defineStore('streamStore', () => {
 
   const updateStatus = (newStatus: StreamStatusResponse) => {
     if (
-      newStatus.isLive !== statusRef.value?.isLive ||
-      newStatus.isOnline !== statusRef.value?.isOnline ||
-      (newStatus.name ?? 'Unknown') !== statusRef.value?.name ||
-      newStatus.listenUrl !== statusRef.value?.listenUrl ||
-      newStatus.isStatusStale !== statusRef.value?.isStatusStale ||
-      newStatus.type !== statusRef.value?.type ||
-      newStatus.listenerCount !== statusRef.value?.listenerCount
+      newStatus.isLive !== status.value?.isLive ||
+      newStatus.isOnline !== status.value?.isOnline ||
+      (newStatus.name ?? 'Unknown') !== status.value?.name ||
+      newStatus.listenUrl !== status.value?.listenUrl ||
+      newStatus.isStatusStale !== status.value?.isStatusStale ||
+      newStatus.type !== status.value?.type ||
+      newStatus.listenerCount !== status.value?.listenerCount
     ) {
-      statusRef.value = newStatus
+      status.value = newStatus
     }
   }
 
   return {
-    status,
+    status: getStatus,
     startPolling,
     stopPolling,
     startTitleUpdating,

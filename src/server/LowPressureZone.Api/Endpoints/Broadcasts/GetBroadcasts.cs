@@ -17,7 +17,7 @@ public class GetBroadcasts(UserManager<AppUser> userManager, IAzuraCastClient cl
         var user = await userManager.GetUserAsync(User);
         if (user?.StreamerId is null)
         {
-            await SendForbiddenAsync(ct);
+            await Send.ForbiddenAsync(ct);
             return;
         }
 
@@ -34,6 +34,6 @@ public class GetBroadcasts(UserManager<AppUser> userManager, IAzuraCastClient cl
         var responses = broadcasts.OrderByDescending(broadcast => broadcast.TimestampStart)
                                   .Select(Map.FromEntity);
 
-        await SendOkAsync(responses, ct);
+        await Send.OkAsync(responses, ct);
     }
 }

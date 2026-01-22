@@ -1,10 +1,12 @@
-import { formatDate } from '@vueuse/core'
+import {addMinutes} from "date-fns";
 
-export const parseDate = (dateString: string) => new Date(Date.parse(dateString))
+export const parseDate = (date: string | Date): Date => {
+  if (date instanceof Date)
+    return date
+  return new Date(Date.parse(date))
+}
 
-export const parseTime = (dateString: string) => parseDate(dateString).getTime()
-
-export const compareDateStrings = (a: string, b: string) => parseTime(b) - parseTime(a)
+export const parseTime = (date: string | Date) => parseDate(date).getTime()
 
 export const setToHour = (date: Date) => {
   date.setMinutes(0)
@@ -12,8 +14,8 @@ export const setToHour = (date: Date) => {
   date.setMilliseconds(0)
 }
 
-export const getNextHour = (date: Date) => {
-  const newDate = new Date(date)
+export const getNextHour = (date?: Date) => {
+  const newDate = date ? new Date(date) : new Date()
   setToNextHour(newDate)
   return newDate
 }
@@ -37,14 +39,21 @@ export const setToPreviousHour = (date: Date) => {
 export const isHour = (date: Date) =>
   date.getMinutes() === 0 && date.getSeconds() === 0 && date.getMilliseconds() === 0
 
-export const hoursBetween = (start: Date, end: Date) => {
+export const timesBetween = (start: Date, end: Date, minutesSeparation: number = 60) => {
+  if (parseTime(end) < parseTime(start)) throw new Error(`End date must be after start date: ${end} <= ${start}`)
+
   const out: Date[] = []
-  const iterating = new Date(start.getTime())
+  if (start.getTime() === end.getTime()) {
+    out.push(start)
+    return out
+  }
+
+  let iterating = new Date(start)
   while (iterating.getTime() < end.getTime()) {
     if (isHour(iterating)) {
       out.push(new Date(iterating.getTime()))
     }
-    setToNextHour(iterating)
+    iterating = addMinutes(iterating, minutesSeparation)
   }
   return out
 }
@@ -61,12 +70,11 @@ export const minimumDate = (...dates: Date[]) => {
   return new Date(minimum)
 }
 
-const readableFormat = 'h:mm A'
 export const formatReadableTime = (date: Date | string) => {
   if (typeof date === 'string') {
-    return formatDate(parseDate(date), readableFormat)
+    date = parseDate(date)
   }
-  return formatDate(date, readableFormat)
+  return date.toLocaleTimeString([], { hour: "numeric", minute: '2-digit' })
 }
 
 export const getDuration = (start: Date | string, end: Date | string) => {
@@ -94,10 +102,7 @@ export const formatDurationOption = (durationMinutes: number) => {
 
 const formatTwoDigits = (value: number) => ('0' + value.toFixed(0)).slice(-2)
 
-export const formatForFilename = (date: Date) =>
-  `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}_${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}`
-
-export const isDateInTimeslot = (date: Date, timespan: { startsAt: string, endsAt: string }) => {
+export const isDateInTimeslot = (date: Date, timespan: { startsAt: string; endsAt: string }) => {
   const time = date.getTime()
   const startsAt = parseTime(timespan.startsAt)
   const endsAt = parseTime(timespan.endsAt)

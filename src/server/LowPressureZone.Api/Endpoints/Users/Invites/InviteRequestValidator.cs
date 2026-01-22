@@ -1,6 +1,7 @@
 ﻿using FastEndpoints;
 using FluentValidation;
 using LowPressureZone.Api.Constants;
+using LowPressureZone.Api.Constants.Errors;
 using LowPressureZone.Domain;
 using LowPressureZone.Identity;
 using Microsoft.EntityFrameworkCore;

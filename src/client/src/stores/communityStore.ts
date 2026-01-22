@@ -1,147 +1,210 @@
-import communitiesApi, { type CommunityResponse } from '@/api/resources/communitiesApi'
+import communitiesApi, {
+  type CommunityRequest,
+  type CommunityResponse
+} from '@/api/resources/communitiesApi'
 import { defineStore } from 'pinia'
 import { computed, type Ref, ref } from 'vue'
 import communityRelationshipsApi, {
+  type CommunityRelationshipRequest,
   type CommunityRelationshipResponse
 } from '@/api/resources/communityRelationshipsApi.ts'
+import { useToast } from 'primevue'
+import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
+import { useAuthStore } from '@/stores/authStore.ts'
+import { type Role, roles } from '@/constants/roles.ts'
+import { err, ok, type Result } from '@/types/result.ts'
+import type { ApiResponse } from '@/api/apiResponse.ts'
+import { getEntity, removeEntity } from '@/utils/arrayUtils.ts'
+import type { FormValidation } from '@/validation/types/formValidation.ts'
+import { showSuccessToast } from '@/utils/toastUtils.ts'
+import { useUserStore } from '@/stores/userStore.ts'
+import { useRefresh } from '@/composables/useRefresh.ts'
 
 export const useCommunityStore = defineStore('communityStore', () => {
-  const loadedCommunities: Ref<CommunityResponse[]> = ref([])
-  const loadedCommunityRelationships: Ref<RelationshipMap> = ref({})
+  const communities: Ref<CommunityResponse[]> = ref([])
+  const relationships: Ref<Record<string, CommunityRelationshipResponse[]>> = ref({})
+  const toast = useToast()
+  const auth = useAuthStore()
+  const users = useUserStore()
 
-  let loadCommunitiesPromise: Promise<void> | undefined = undefined
-  const loadCommunities = async () => {
-    const response = await communitiesApi.get()
-    if (!response.isSuccess()) {
-      console.log(JSON.stringify(response.error))
-      return
+  const { isLoading } = useRefresh(
+    communitiesApi.get,
+    (data) => {
+      communities.value = data
+      refreshRelationships().then(() => {})
+    },
+    { permissionFn: () => auth.isLoggedIn }
+  )
+
+  const refreshRelationships = async () => {
+    if (!auth.isInAnyRoles(roles.admin, roles.organizer)) return
+    const userCommunities = communities.value.filter((community) => community.isOrganizable)
+    const relationshipPromises: Promise<ApiResponse<void, CommunityRelationshipResponse[]>>[] = []
+    for (const community of userCommunities) {
+      relationshipPromises.push(communityRelationshipsApi.get(community.id))
     }
-    loadedCommunities.value = response.data()
-  }
-
-  const loadCommunitiesAsync = async () => {
-    loadCommunitiesPromise ??= loadCommunities()
-    await loadCommunitiesPromise
-    loadCommunitiesPromise = undefined
-  }
-
-  const communities = computed(() => loadedCommunities.value)
-
-  const relatedCommunities = computed(() =>
-    communities.value.filter((community) => community.isPerformable ?? community.isOrganizable)
-  )
-
-  const organizableCommunities = computed(() =>
-    communities.value.filter((community) => community.isOrganizable)
-  )
-
-  const performableCommunities = computed(() =>
-    communities.value.filter((community) => community.isPerformable)
-  )
-
-  const removeCommunity = (id: string) => {
-    const index = loadedCommunities.value.findIndex((community) => community.id === id)
-    if (index > -1) {
-      loadedCommunities.value.splice(index, 1)
+    await Promise.all(relationshipPromises)
+    for (const relationshipPromise of relationshipPromises) {
+      const response = await relationshipPromise
+      if (tryHandleUnsuccessfulResponse(response, toast)) continue
+      if (response.data().length === 0) continue
+      relationships.value[response.data()[0]!.communityId] = response.data()
     }
   }
 
   const getCommunity = (id: string) => communities.value.find((community) => community.id === id)
+  const getCommunities = computed(() => communities.value)
+  const getRelatedCommunities = computed(() =>
+    communities.value.filter((community) => community.isPerformable || community.isOrganizable)
+  )
+  const getOrganizableCommunities = computed(() =>
+    communities.value.filter((community) => community.isOrganizable)
+  )
+  const getPerformableCommunities = computed(() =>
+    communities.value.filter((community) => community.isPerformable)
+  )
 
-  const addCommunity = (community: CommunityResponse) => {
-    const alphabeticalIndex = loadedCommunities.value.findIndex(
-      (loadedCommunity) => loadedCommunity.name.toLowerCase() > community.name.toLowerCase()
-    )
-    if (alphabeticalIndex > -1) {
-      loadedCommunities.value.splice(alphabeticalIndex, 0, community)
-    } else {
-      loadedCommunities.value.push(community)
+  const createCommunity = async (
+    formState: Ref<CommunityRequest>,
+    validation: FormValidation<CommunityRequest>
+  ): Promise<Result> => {
+    if (!validation.validate()) return err()
+    const response = await communitiesApi.post(formState.value)
+    if (tryHandleUnsuccessfulResponse(response, toast, validation)) return err()
+    const entity: CommunityResponse = {
+      id: response.getCreatedId(),
+      ...formState.value,
+      isEditable: true,
+      isOrganizable: true,
+      isPerformable: true,
+      isDeletable: true
     }
+    communities.value.unshift(entity)
+    showSuccessToast(toast, 'Created', 'Community', formState.value.name)
+    return ok()
   }
 
-  const updateCommunityAsync = async (id: string) => {
-    const response = await communitiesApi.getById(id)
-    if (!response.isSuccess()) return
-    const index = loadedCommunities.value.findIndex((community) => community.id === id)
-    if (index > -1) {
-      loadedCommunities.value.splice(index, 1, response.data())
-    } else {
-      addCommunity(response.data())
+  const updateCommunity = async (
+    id: string,
+    formState: Ref<CommunityRequest>,
+    validation: FormValidation<CommunityRequest>
+  ): Promise<Result> => {
+    if (!validation.validate()) return err()
+    const response = await communitiesApi.put(id, formState.value)
+    if (tryHandleUnsuccessfulResponse(response, toast)) return err()
+    const entity = getEntity(communities.value, id)
+    if (!entity) return err()
+    entity.name = formState.value.name
+    entity.url = formState.value.url
+    return ok()
+  }
+
+  const removeCommunity = async (id: string): Promise<Result> => {
+    const response = await communitiesApi.delete(id)
+    if (tryHandleUnsuccessfulResponse(response, toast)) return err()
+    const name = getEntity(communities.value, id)?.name
+    showSuccessToast(toast, 'Deleted', 'Community', name)
+    removeEntity(communities.value, id)
+    relationships.value[id] = []
+    return ok()
+  }
+
+  const getRelationships = (communityId: string) => relationships.value[communityId] ?? []
+  const getRelationship = (communityId: string, userId: string) =>
+    relationships.value[communityId]?.find((relationship) => relationship.userId === userId)
+
+  const createRelationship = async (
+    communityId: string,
+    userId: string,
+    formState: Ref<CommunityRelationshipRequest>,
+    validation: FormValidation<CommunityRelationshipRequest>
+  ): Promise<Result> => {
+    const existingEntity = getRelationship(communityId, userId)
+    if (existingEntity) return err()
+    if (!validation.validate()) return err()
+    const response = await communityRelationshipsApi.put(communityId, userId, formState.value)
+    if (tryHandleUnsuccessfulResponse(response, toast, validation)) return err()
+    const user = users.getUser(userId)
+    const entity: CommunityRelationshipResponse = {
+      userId: userId,
+      communityId: communityId,
+      ...formState.value,
+      isEditable: true,
+      displayName: user?.displayName ?? ''
     }
+    relationships.value[communityId] ??= []
+    relationships.value[communityId].unshift(entity)
+    showSuccessToast(toast, 'Created', 'Community Relationship', user?.displayName)
+    return ok()
   }
-
-  const loadRelationshipsPromises: RelationshipPromiseMap = {}
-  const loadRelationships = async (communityId: string) => {
-    const response = await communityRelationshipsApi.get(communityId)
-    if (!response.isSuccess()) {
-      console.log(JSON.stringify(response.error))
-      return
-    }
-    loadedCommunityRelationships.value[communityId] = response.data()
+  const updateRelationship = async (
+    communityId: string,
+    userId: string,
+    formState: Ref<CommunityRelationshipRequest>,
+    validation: FormValidation<CommunityRelationshipRequest>
+  ): Promise<Result> => {
+    if (!validation.validate()) return err()
+    const response = await communityRelationshipsApi.put(communityId, userId, formState.value)
+    if (tryHandleUnsuccessfulResponse(response, toast, validation)) return err()
+    const entity = getRelationship(communityId, userId)
+    if (!entity) return err()
+    entity.isOrganizer = formState.value.isOrganizer
+    entity.isPerformer = formState.value.isPerformer
+    showSuccessToast(toast, 'Updated', 'Community Relationship')
+    return ok()
   }
-
-  const loadRelationshipsAsync = async (communityId: string) => {
-    loadRelationshipsPromises[communityId] ??= loadRelationships(communityId)
-    await loadRelationshipsPromises[communityId]
-    loadRelationshipsPromises[communityId] = undefined
-  }
-
-  const getRelationships = (communityId: string) =>
-    loadedCommunityRelationships.value[communityId] ?? []
-
-  const addRelationship = (communityId: string, relationship: CommunityRelationshipResponse) => {
-    if (loadedCommunityRelationships.value[communityId] === undefined) return
-    const alphabeticalIndex = loadedCommunityRelationships.value[communityId].findIndex(
-      (loadedRelationship) =>
-        loadedRelationship.displayName.toLowerCase() > relationship.displayName.toLowerCase()
-    )
-    if (alphabeticalIndex > -1) {
-      loadedCommunityRelationships.value[communityId].splice(alphabeticalIndex, 0, relationship)
-    } else {
-      loadedCommunityRelationships.value[communityId].push(relationship)
-    }
-  }
-
-  const removeRelationship = (communityId: string, userId: string) => {
-    if (loadedCommunityRelationships.value[communityId] === undefined) return
-    const index = loadedCommunityRelationships.value[communityId]?.findIndex(
+  const removeRelationship = async (communityId: string, userId: string): Promise<Result> => {
+    const entity = getRelationship(communityId, userId)
+    if (!entity) return err()
+    const response = await communityRelationshipsApi.put(communityId, userId, {
+      isOrganizer: false,
+      isPerformer: false
+    })
+    if (tryHandleUnsuccessfulResponse(response, toast)) return err()
+    showSuccessToast(toast, 'Deleted', 'Community Relationship', entity.displayName)
+    const index = relationships.value[communityId]!.findIndex(
       (relationship) => relationship.userId === userId
     )
-    if (index === -1) return
-    loadedCommunityRelationships.value[communityId].splice(index, 1)
+    if (index === -1) return err()
+    relationships.value[communityId]?.splice(index, 1)
+    showSuccessToast(toast, 'Deleted', 'Community Relationship', entity.displayName)
+    return ok()
   }
 
-  const updateRelationshipAsync = async (communityId: string, userId: string) => {
-    if (loadedCommunityRelationships.value[communityId] === undefined) return
-    const response = await communityRelationshipsApi.getById(communityId, userId)
-    if (!response.isSuccess()) return
-    const index = loadedCommunityRelationships.value[communityId]?.findIndex(
-      (relationship) => relationship.userId === userId
-    )
-    if (index === -1) {
-      addRelationship(communityId, response.data())
-      return
-    }
-    loadedCommunityRelationships.value[communityId].splice(index, 1, response.data())
+  const isInRelationshipRole = (communityId: string, role: Role): boolean => {
+    const communityRoles = getCommunityRoles(communityId, auth.user.id)
+    return communityRoles.includes(role)
   }
+
+  const getCommunityRoles = (communityId: string, userId: string): Role[] => {
+    const userRelationship = getRelationships(communityId).find(
+      (rel) => rel.userId === userId
+    )
+    if (userRelationship === undefined) return []
+    const userRoles: Role[] = []
+    if (userRelationship.isOrganizer) userRoles.push(roles.organizer)
+    if (userRelationship.isPerformer) userRoles.push(roles.performer)
+    return userRoles
+  }
+
+  const getIsLoading = computed(() => isLoading.value)
 
   return {
-    loadCommunitiesAsync,
-    communities,
-    relatedCommunities,
-    organizableCommunities,
-    performableCommunities,
-    getCommunity,
+    communities: getCommunities,
+    getCommunityById: getCommunity,
+    relatedCommunities: getRelatedCommunities,
+    organizableCommunities: getOrganizableCommunities,
+    performableCommunities: getPerformableCommunities,
+    createCommunity,
+    updateCommunity,
     removeCommunity,
-    addCommunity,
-    updateCommunityAsync,
-    loadRelationshipsAsync,
     getRelationships,
-    addRelationship,
+    getRelationship,
+    createRelationship,
+    updateRelationship,
     removeRelationship,
-    updateRelationshipAsync
+    getCommunityRoles,
+    isInRelationshipRole,
+    isLoading: getIsLoading
   }
 })
-
-type RelationshipMap = Record<string, CommunityRelationshipResponse[] | undefined>
-type RelationshipPromiseMap = Record<string, Promise<void> | undefined>

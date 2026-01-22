@@ -1,6 +1,7 @@
 ﻿using FastEndpoints;
 using FluentValidation;
 using LowPressureZone.Api.Constants;
+using LowPressureZone.Api.Constants.Errors;
 
 namespace LowPressureZone.Api.Endpoints.Users.TwoFactor;
 

@@ -26,13 +26,13 @@ public class DeleteCommunity(DataContext dataContext, CommunityRules rules) : En
 
         if (community == null || community.IsDeleted)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
         if (!rules.IsDeleteAuthorized(community))
         {
-            await SendUnauthorizedAsync(ct);
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 
@@ -40,6 +40,6 @@ public class DeleteCommunity(DataContext dataContext, CommunityRules rules) : En
         community.IsDeleted = true;
         community.LastModifiedDate = DateTime.UtcNow;
         await dataContext.SaveChangesAsync(ct);
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }

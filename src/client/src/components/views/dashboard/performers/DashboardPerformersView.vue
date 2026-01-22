@@ -4,57 +4,90 @@
       v-model:value="tabValue"
       scrollable>
       <TabList>
-        <Tab value="0"> Mine</Tab>
-        <Tab value="1"> All</Tab>
-        <Tab value="2"> Create</Tab>
+        <Tab value="mine">Mine</Tab>
+        <Tab value="all"> All</Tab>
       </TabList>
-      <TabPanels v-if="isLoaded">
-        <TabPanel value="0">
-          <div class="performers-dashboard__linked">
-            <h4>Your Performers</h4>
-            <PerformersGrid
-              v-if="performerStore.linkablePerformers.length > 0"
-              :performers="performerStore.linkablePerformers" />
-            <div v-else>
-              <p>You do not currently have any linked performers.</p>
-              <Button
-                label="Create Performer"
-                @click="tabValue = '2'" />
-            </div>
-          </div>
+      <TabPanels v-if="!performers.isLoading">
+        <TabPanel value="mine">
+          <PerformersGrid
+            :performers="performers.linkablePerformers"
+            @create="handleCreate"
+            @delete="handleDeleteAction"
+            @edit="handleEdit" />
         </TabPanel>
-        <TabPanel value="1">
-          <div class="performers-dashboard__all">
-            <h4>All Performers</h4>
-            <PerformersGrid :performers="performerStore.performers" />
-          </div>
-        </TabPanel>
-        <TabPanel value="2">
-          <CreatePerformer />
+        <TabPanel value="all">
+          <PerformersGrid
+            :performers="performers.performers"
+            @create="handleCreate"
+            @delete="handleDeleteAction"
+            @edit="handleEdit" />
         </TabPanel>
       </TabPanels>
     </Tabs>
+    <FormDrawer
+      v-model:visible="showPerformerForm"
+      :is-submitting="performerFormRef?.isSubmitting"
+      :title="editingPerformer ? `Edit Performer - ${editingPerformer.name}` : 'Create Performer'"
+      @reset="performerFormRef?.reset()"
+      @submit="performerFormRef?.submit()">
+      <PerformerForm
+        ref="performerFormRef"
+        :performer="editingPerformer"
+        hide-actions
+        @submitted="showPerformerForm = false" />
+    </FormDrawer>
+    <DeleteDialog
+      v-model:visible="showDeleteDialog"
+      :entity-name="deletingPerformer?.name"
+      :is-submitting="isDeleteSubmitting"
+      entity-type="Performer"
+      header="Delete Performer"
+      @delete="handleDeleteConfirm" />
     <Skeleton
-      v-show="!isLoaded"
+      v-if="performers.isLoading"
       style="height: 300px" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Button, Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs } from 'primevue'
-import { onMounted, ref, type Ref } from 'vue'
-import CreatePerformer from './CreatePerformer.vue'
+import { Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs } from 'primevue'
+import { ref, type Ref, useTemplateRef } from 'vue'
 import PerformersGrid from './PerformersGrid.vue'
 import { usePerformerStore } from '@/stores/performerStore.ts'
+import PerformerForm from '@/components/form/requestForms/PerformerForm.vue'
+import FormDrawer from '@/components/form/FormDrawer.vue'
+import type { PerformerResponse } from '@/api/resources/performersApi.ts'
+import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
 
-const performerStore = usePerformerStore()
-const tabValue: Ref<string | number> = ref('0')
-const isLoaded = ref(false)
+const performers = usePerformerStore()
+const tabValue: Ref<string | number> = ref('mine')
+const performerFormRef = useTemplateRef('performerFormRef')
 
-onMounted(async () => {
-  if (performerStore.performers.length === 0) {
-    await performerStore.loadPerformersAsync()
-  }
-  isLoaded.value = true
-})
+const showPerformerForm = ref(false)
+const editingPerformer: Ref<PerformerResponse | undefined> = ref(undefined)
+const handleCreate = () => {
+  editingPerformer.value = undefined
+  showPerformerForm.value = true
+}
+const handleEdit = (performer: PerformerResponse) => {
+  editingPerformer.value = performer
+  showPerformerForm.value = true
+}
+
+const showDeleteDialog = ref(false)
+const deletingPerformer: Ref<PerformerResponse | undefined> = ref(undefined)
+const isDeleteSubmitting = ref(false)
+const handleDeleteAction = (performer: PerformerResponse) => {
+  deletingPerformer.value = performer
+  showDeleteDialog.value = true
+}
+const handleDeleteConfirm = async () => {
+  if (!deletingPerformer.value) return
+  isDeleteSubmitting.value = true
+  const result = await performers.remove(deletingPerformer.value.id)
+  isDeleteSubmitting.value = false
+  if (!result.isSuccess) return
+  showDeleteDialog.value = false
+  deletingPerformer.value = undefined
+}
 </script>

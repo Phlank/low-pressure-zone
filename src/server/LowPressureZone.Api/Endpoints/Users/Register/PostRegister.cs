@@ -4,6 +4,7 @@ using FluentEmail.Core;
 using FluentValidation.Results;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Constants;
+using LowPressureZone.Api.Constants.Errors;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Api.Utilities;
@@ -111,6 +112,6 @@ public class PostRegister(
         invitation.RegistrationDate = DateTime.UtcNow;
         await identityContext.SaveChangesAsync(ct);
 
-        await SendNoContentAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }

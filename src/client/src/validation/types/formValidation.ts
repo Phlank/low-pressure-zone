@@ -128,3 +128,8 @@ export const createFormValidation = <TForm extends object>(
   formState: TForm | Ref<TForm>,
   rules: PropertyRules<TForm>
 ): FormValidation<TForm> => new FormValidationImplementation<TForm>(formState, rules)
+
+export const createFormValidationRef = <TForm extends object>(
+  formState: TForm | Ref<TForm>,
+  rules: PropertyRules<TForm>
+) => ref(new FormValidationImplementation(formState, rules))

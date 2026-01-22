@@ -1,5 +1,5 @@
 <template>
-  <div style="display: flex">
+  <div class="site-nav-menu" style="display: flex">
     <Button
       aria-controls="navigation-menu"
       icon="pi pi-bars"
@@ -12,7 +12,6 @@
       ref="navMenuRef"
       :model="navMenuItems"
       :popup="true">
-      <!-- https://primevue.org/menu/#router -->
       <template #item="{ item, props }">
         <div>
           <RouterLink
@@ -42,11 +41,12 @@
               class="p-menu-item-link">
               <span
                 v-if="item.icon"
+                style="width: 16px; height: 16px"
                 :class="item.icon" />
               <img
                 v-if="item.iconSvg"
                 :src="item.iconSvg()"
-                style="max-width: 16px; max-height: 16px" />
+                style="width: 16px; height: 16px" />
               <span class="ml-2">{{ item.label }}</span>
             </a>
           </div>
@@ -72,89 +72,50 @@
 </template>
 
 <script lang="ts" setup>
-import { Routes } from '@/router/routes'
 import { useAuthStore } from '@/stores/authStore'
 import { Button, Menu } from 'primevue'
 import type { MenuItem } from 'primevue/menuitem'
-import { computed, inject, onMounted, ref, type Ref, useTemplateRef } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
-import authApi from '@/api/resources/authApi.ts'
+import { inject, onMounted, ref, type Ref, useTemplateRef } from 'vue'
+import { RouterLink } from 'vue-router'
+import { roles } from '@/constants/roles.ts'
 
-const router = useRouter()
 const navMenuRef = useTemplateRef('navMenuRef')
-const authStore = useAuthStore()
+const auth = useAuthStore()
 const discordInvite = import.meta.env.VITE_DISCORD_INVITE_LINK
 const githubUrl = import.meta.env.VITE_GITHUB_URL
 const soundcloudUrl = import.meta.env.VITE_SOUNDCLOUD_URL
+const bandcampUrl = import.meta.env.VITE_BANDCAMP_URL
+const donateUrl = import.meta.env.VITE_DONATE_URL
 const isDarkMode: Ref<boolean> = inject('isDarkMode', ref(true))
 
-const navMenuItems = computed(() => {
-  if (authStore.isLoggedIn()) {
-    return loggedInNavMenuItems
-  } else {
-    return loggedOutNavMenuItems
-  }
-})
-
-const loggedInNavMenuItems: MenuItem[] = [
-  {
-    label: 'Dashboard',
-    labelString: 'Dashboard',
-    icon: 'pi pi-cog',
-    route: '/dashboard',
-    visible: true
-  },
-  {
-    label: 'Logout',
-    labelString: 'Logout',
-    icon: 'pi pi-sign-out',
-    callback: async () => {
-      await authStore.loadIfNotInitialized()
-      if (authStore.isLoggedIn()) {
-        await authApi.getLogout()
-      }
-      await authStore.load()
-      await router.push(Routes.Home)
-    },
-    visible: true
-  },
-  {
-    label: 'Github',
-    labelString: 'Github',
-    icon: 'pi pi-github',
-    href: githubUrl,
-    visible: true
-  },
-  {
-    label: 'Chat',
-    labelString: 'Chat',
-    icon: 'pi pi-discord',
-    href: discordInvite,
-    visible: () => window.innerWidth < 240
-  },
-  {
-    label: 'Soundcloud',
-    labelString: 'Soundcloud',
-    href: soundcloudUrl,
-    iconSvg: () => (isDarkMode.value ? '/soundcloud-logo-white.svg' : '/soundcloud-logo-black.svg'),
-    visible: true
-  }
-]
-
-const loggedOutNavMenuItems: MenuItem[] = [
+const navMenuItems: MenuItem[] = [
   {
     label: 'Login',
     labelString: 'Login',
     icon: 'pi pi-sign-in',
     route: '/user/login',
-    visible: true
+    visible: () => !auth.isLoggedIn
   },
   {
-    label: 'Github',
-    labelString: 'Github',
-    icon: 'pi pi-github',
-    href: githubUrl,
-    visible: true
+    label: 'Dashboard',
+    labelString: 'Dashboard',
+    icon: 'pi pi-cog',
+    route: '/dashboard',
+    visible: () => auth.isLoggedIn
+  },
+  {
+    label: 'Admin',
+    labelString: 'Admin',
+    icon: 'pi pi-sliders-h',
+    route: '/admin',
+    visible: () => auth.isInRole(roles.admin)
+  },
+  {
+    label: 'Logout',
+    labelString: 'Logout',
+    icon: 'pi pi-sign-out',
+    callback: async () => await auth.logoutAsync(),
+    visible: () => auth.isLoggedIn
   },
   {
     label: 'Chat',
@@ -169,11 +130,31 @@ const loggedOutNavMenuItems: MenuItem[] = [
     href: soundcloudUrl,
     iconSvg: () => (isDarkMode.value ? '/soundcloud-logo-white.svg' : '/soundcloud-logo-black.svg'),
     visible: true
+  },
+  {
+    label: 'Bandcamp',
+    labelString: 'Bandcamp',
+    href: bandcampUrl,
+    iconSvg: () => (isDarkMode.value ? '/bandcamp-logo-white.svg' : '/bandcamp-logo-black.svg'),
+    visible: true
+  },
+  {
+    label: 'Github',
+    labelString: 'Github',
+    icon: 'pi pi-github',
+    href: githubUrl,
+    visible: true
+  },
+  {
+    label: 'Buy Me a Coffee',
+    labelString: 'Buy Me a Coffee',
+    href: donateUrl,
+    iconSvg: () => (isDarkMode.value ? '/bmc-logo-white.svg' : '/bmc-logo-black.svg'),
+    visible: true
   }
 ]
-
 onMounted(async () => {
-  await authStore.loadIfNotInitialized()
+  await auth.initializeAsync()
 })
 
 const toggleMenu = (event: MouseEvent) => {

@@ -37,7 +37,7 @@ public class GetCommunityRelationshipById(DataContext dataContext, IdentityConte
 
         if (requestRelationship == null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 
@@ -47,6 +47,6 @@ public class GetCommunityRelationshipById(DataContext dataContext, IdentityConte
                                                .Select(user => user.DisplayName)
                                                .FirstOrDefaultAsync(ct);
         displayName.ShouldNotBeNull();
-        await SendOkAsync(Map.FromEntity(requestRelationship, displayName, userRelationship), ct);
+        await Send.OkAsync(Map.FromEntity(requestRelationship, displayName, userRelationship), ct);
     }
 }

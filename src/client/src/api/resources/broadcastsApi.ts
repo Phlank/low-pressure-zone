@@ -1,4 +1,4 @@
-﻿import { sendDownload, sendGet, toQueryString } from '@/api/fetchFunctions.ts'
+﻿import { sendDownload, sendGet, sendPost, toQueryString } from '@/api/fetchFunctions.ts'
 
 const route = () => `/broadcasts`
 
@@ -7,10 +7,12 @@ export default {
   download: (streamerId: number, broadcastId: number) =>
     sendDownload(
       `${route()}/download${toQueryString({
-        streamerId: streamerId ?? 0,
-        broadcastId: broadcastId ?? 0
+        streamerId: streamerId,
+        broadcastId: broadcastId
       })}`
-    )
+    ),
+  disconnect: (request: DisconnectBroadcastRequest) =>
+    sendPost<DisconnectBroadcastRequest>(`${route()}/disconnect`, request)
 }
 
 export interface BroadcastResponse {
@@ -20,5 +22,9 @@ export interface BroadcastResponse {
   start: string
   end: string | null
   isDownloadable: boolean
-  isDeletable: boolean
+  isDisconnectable: boolean
+}
+
+export interface DisconnectBroadcastRequest {
+  disableMinutes?: number | null
 }

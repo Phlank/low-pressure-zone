@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Authentication;
 
-public class AppUserClaimsTransformation(DataContext dataContext) : IClaimsTransformation
+public sealed class AppUserClaimsTransformation(DataContext dataContext) : IClaimsTransformation
 {
     private const string AdditionalClaimsCheckedClaimType = "AdditionalClaimsChecked";
 
@@ -20,13 +20,20 @@ public class AppUserClaimsTransformation(DataContext dataContext) : IClaimsTrans
             return principal;
 
         var identity = new ClaimsIdentity();
-        var isOrganizer = await dataContext.CommunityRelationships
-                                           .AnyAsync(relationship => relationship.IsOrganizer
-                                                                     && relationship.UserId ==
-                                                                     principal.GetIdOrDefault());
-        identity.AddClaim(new Claim(AdditionalClaimsCheckedClaimType, "true"));
-        if (isOrganizer)
+        var relationshipRoles = await dataContext.CommunityRelationships
+                                           .Where(relationship => relationship.UserId == principal.GetIdOrDefault())
+                                           .Select(relationship => new
+                                                       { relationship.IsOrganizer, relationship.IsPerformer })
+                                           .ToListAsync();
+        
+        if (relationshipRoles.Any(role => role.IsOrganizer))
             identity.AddClaim(new Claim(ClaimTypes.Role, RoleNames.Organizer));
+        
+        if (relationshipRoles.Any(role => role.IsPerformer))
+            identity.AddClaim(new Claim(ClaimTypes.Role, RoleNames.Performer));
+        
+        identity.AddClaim(new Claim(AdditionalClaimsCheckedClaimType, "true"));
+        
         principal.AddIdentity(identity);
         return principal;
     }

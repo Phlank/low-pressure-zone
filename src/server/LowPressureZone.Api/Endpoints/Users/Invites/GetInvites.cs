@@ -29,12 +29,14 @@ public class GetInvites(IdentityContext identityContext, DataContext dataContext
         var userCommunities = await dataContext.CommunityRelationships
                                                .AsNoTracking()
                                                .Where(relationship => userIds.Contains(relationship.UserId))
-                                               .ToDictionaryAsync(relationship => relationship.UserId,
-                                                                  relationship => relationship.CommunityId, ct);
+                                               .GroupBy(relationship => relationship.UserId)
+                                               .ToDictionaryAsync(grouping => grouping.Key,
+                                                                  grouping =>
+                                                                      grouping.Select(group => group.CommunityId), ct);
 
         var responses = invites.Where(invitation => userCommunities.ContainsKey(invitation.UserId))
                                .Select(invitation => Map.FromEntity(invitation, userCommunities[invitation.UserId]));
 
-        await SendOkAsync(responses, ct);
+        await Send.OkAsync(responses, ct);
     }
 }
