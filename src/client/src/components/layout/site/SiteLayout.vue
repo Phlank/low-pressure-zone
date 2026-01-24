@@ -22,11 +22,11 @@
 </template>
 
 <script lang="ts" setup>
-import {RouterView} from 'vue-router'
+import { RouterView } from 'vue-router'
 import SiteFooter from './SiteFooter.vue'
 import SiteHeader from './SiteHeader.vue'
-import {computed, inject, ref, type Ref, useTemplateRef} from 'vue'
-import {useResizeObserver} from '@vueuse/core'
+import { computed, inject, ref, type Ref, useTemplateRef } from 'vue'
+import { useResizeObserver } from '@vueuse/core'
 
 const header = useTemplateRef('header')
 const footer = useTemplateRef('footer')
