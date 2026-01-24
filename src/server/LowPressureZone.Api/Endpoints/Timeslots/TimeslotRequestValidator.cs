@@ -27,8 +27,8 @@ public sealed class TimeslotRequestValidator : Validator<TimeslotRequest>
         RuleFor(request => request.StartsAt).GreaterThan(DateTime.UtcNow).WithMessage(Errors.TimeInPast);
         RuleFor(request => request.EndsAt).GreaterThan(request => request.StartsAt);
 
-        RuleFor(request => request.Name).MaximumLength(64)
-                                        .WithMessage(Errors.MaxLength(64));
+        RuleFor(request => request.Subtitle).MaximumLength(64)
+                                            .WithMessage(Errors.MaxLength(64));
 
         RuleFor(t => t).CustomAsync(async (request, context, ct) =>
         {
