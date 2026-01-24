@@ -14,7 +14,7 @@ public sealed class TimeslotMapper(
     public Timeslot ToEntity(TimeslotRequest req)
         => new()
         {
-            Subtitle = req.Name?.Trim(),
+            Subtitle = req.Subtitle?.Trim(),
             StartsAt = req.StartsAt.ToUniversalTime(),
             EndsAt = req.EndsAt.ToUniversalTime(),
             Type = req.PerformanceType.Trim(),
@@ -25,7 +25,7 @@ public sealed class TimeslotMapper(
 
     public void UpdateEntity(TimeslotRequest req, Timeslot timeslot)
     {
-        timeslot.Subtitle = req.Name?.Trim();
+        timeslot.Subtitle = req.Subtitle?.Trim();
         timeslot.StartsAt = req.StartsAt.ToUniversalTime();
         timeslot.EndsAt = req.EndsAt.ToUniversalTime();
         timeslot.Type = req.PerformanceType.Trim();

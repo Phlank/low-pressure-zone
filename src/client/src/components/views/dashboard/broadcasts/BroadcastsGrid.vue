@@ -65,7 +65,9 @@
             </template>
             <template #right>
               <GridActions
+                :show-disconnect="broadcast.isDisconnectable"
                 :show-download="broadcast.isDownloadable"
+                @disconnect="handleDisconnectAction"
                 @download="handleDownloadClicked(broadcast)" />
             </template>
           </ListItem>
@@ -81,37 +83,47 @@
       style="height: 300px" />
     <Dialog
       v-model:visible="showDisconnectDialog"
+      :draggable="false"
       header="Disconnect Streamer"
-      modal
-      :draggable="false">
+      modal>
       <p>
         Most DJ software will automatically try to reconnect when disconnected. So, the DJ's
         streaming account must be disabled for a time. How long should that be?
       </p>
       <template #footer>
-        <Button outlined label="None" @click="handleDisconnect()" />
-        <Button outlined label="5 Minutes" @click="handleDisconnect(5)" />
-        <Button outlined label="1 Hour" @click="handleDisconnect(60)" />
-        <Button outlined label="24 Hours" @click="handleDisconnect(1440)" />
-        <Button outlined label="Indefinitely" @click="handleDisconnect(0)" />
+        <Button
+          label="None"
+          outlined
+          @click="handleDisconnect()" />
+        <Button
+          label="5 Minutes"
+          outlined
+          @click="handleDisconnect(5)" />
+        <Button
+          label="1 Hour"
+          outlined
+          @click="handleDisconnect(60)" />
+        <Button
+          label="24 Hours"
+          outlined
+          @click="handleDisconnect(1440)" />
+        <Button
+          label="Indefinitely"
+          outlined
+          @click="handleDisconnect(0)" />
       </template>
     </Dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { inject, ref, type Ref } from 'vue'
-import { useBroadcastStore } from '@/stores/broadcastStore.ts'
-import { Column, DataTable, DataView, Divider, Skeleton, useToast, Dialog, Button } from 'primevue'
-import broadcastsApi, { type BroadcastResponse } from '@/api/resources/broadcastsApi.ts'
-import {
-  formatDurationTimestamp,
-  formatReadableTime,
-  getDuration,
-  parseDate
-} from '@/utils/dateUtils.ts'
+import {inject, ref, type Ref} from 'vue'
+import {useBroadcastStore} from '@/stores/broadcastStore.ts'
+import {Button, Column, DataTable, DataView, Dialog, Divider, Skeleton, useToast} from 'primevue'
+import broadcastsApi, {type BroadcastResponse} from '@/api/resources/broadcastsApi.ts'
+import {formatDurationTimestamp, formatReadableTime, getDuration, parseDate} from '@/utils/dateUtils.ts'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
-import { mobilePaginatorTemplate } from '@/constants/componentTemplates.ts'
+import {mobilePaginatorTemplate} from '@/constants/componentTemplates.ts'
 import ListItem from '@/components/data/ListItem.vue'
 
 const toast = useToast()

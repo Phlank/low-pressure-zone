@@ -25,9 +25,9 @@ public sealed class TimeslotRequestToAzuraCastPlaylistConverter(DataContext data
                                                            && schedule.EndsAt >= source.EndsAt)
                                         .FirstAsync(ct);
 
-        var title = string.IsNullOrWhiteSpace(source.Name)
+        var title = string.IsNullOrWhiteSpace(source.Subtitle)
                         ? schedule.StartsAt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
-                        : source.Name;
+                        : source.Subtitle;
 
         var playlistEnd = source.EndsAt.AddMinutes(5);
 
