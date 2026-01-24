@@ -65,7 +65,9 @@
             </template>
             <template #right>
               <GridActions
+                :show-disconnect="broadcast.isDisconnectable"
                 :show-download="broadcast.isDownloadable"
+                @disconnect="handleDisconnectAction"
                 @download="handleDownloadClicked(broadcast)" />
             </template>
           </ListItem>
@@ -89,11 +91,26 @@
         streaming account must be disabled for a time. How long should that be?
       </p>
       <template #footer>
-        <Button outlined label="None" @click="handleDisconnect()" />
-        <Button outlined label="5 Minutes" @click="handleDisconnect(5)" />
-        <Button outlined label="1 Hour" @click="handleDisconnect(60)" />
-        <Button outlined label="24 Hours" @click="handleDisconnect(1440)" />
-        <Button outlined label="Indefinitely" @click="handleDisconnect(0)" />
+        <Button
+          outlined
+          label="None"
+          @click="handleDisconnect()" />
+        <Button
+          outlined
+          label="5 Minutes"
+          @click="handleDisconnect(5)" />
+        <Button
+          outlined
+          label="1 Hour"
+          @click="handleDisconnect(60)" />
+        <Button
+          outlined
+          label="24 Hours"
+          @click="handleDisconnect(1440)" />
+        <Button
+          outlined
+          label="Indefinitely"
+          @click="handleDisconnect(0)" />
       </template>
     </Dialog>
   </div>
