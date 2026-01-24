@@ -1,9 +1,12 @@
 <template>
   <div class="site-layout">
     <SiteHeader
-      class="site-layout__header"
       id="siteHeader"
-      ref="header" />
+      ref="header"
+      class="site-layout__header" />
+    <div
+      v-if="isMobile"
+      class="site-layout__header-space" />
     <div class="content-and-footer">
       <main class="site-layout__view">
         <RouterView class="site-layout__content" />
@@ -39,6 +42,7 @@ useResizeObserver(footer, (entries) => {
   footerHeight.value = entry.contentRect.height + 12 * 2 // padding
 })
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
+const headerPosition = computed(() => (!isMobile?.value ? 'sticky' : 'fixed'))
 const footerPosition = computed(() => (!isMobile?.value ? 'sticky' : 'fixed'))
 </script>
 
@@ -67,13 +71,17 @@ const footerPosition = computed(() => (!isMobile?.value ? 'sticky' : 'fixed'))
     width: 100%;
     margin-bottom: variables.$space-m;
     font-size: 1.2rem;
-    position: sticky;
+    position: v-bind(headerPosition);
     top: 0;
     z-index: 100;
     border-top: 0;
     border-left: 0;
     border-right: 0;
     border-radius: 0;
+  }
+
+  &__header-space {
+    height: var(--header-height);
   }
 
   &__view {
