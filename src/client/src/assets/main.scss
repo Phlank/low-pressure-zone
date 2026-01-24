@@ -32,15 +32,23 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   width: 100%;
-}
 
-#app {
-  width: 100%;
+  .drop-shadow {
+    filter: drop-shadow(0 0 0.5rem variables.$drop-shadow-color-light);
+  }
 }
 
 body.dark-mode-toggle {
   background-color: #222;
   background-image: url(./bg.jpg);
+
+  .drop-shadow {
+    filter: drop-shadow(0 0 0.5rem variables.$drop-shadow-color-dark);
+  }
+}
+
+#app {
+  width: 100%;
 }
 
 .header {
