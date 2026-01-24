@@ -1,5 +1,5 @@
 <template>
-  <div class="play-button">
+  <div class="play-button drop-shadow">
     <div class="play-button__buttons">
       <Button
         ref="buttonElement"
@@ -258,8 +258,6 @@ $text-translate-amount: v-bind(nameTranslateWidthPx);
     calc(100dvw - 2 * #{variables.$space-l}),
     calc(30px + 28px + 10px + 46px + 10px + #{$text-width})
   );
-
-  filter: drop-shadow(0px 0px 0.5rem rgba(0, 0, 0, 0.8));
 
   &__buttons {
     width: 100%;
