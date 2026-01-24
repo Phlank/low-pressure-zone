@@ -55,7 +55,7 @@
           :invalid="!timeslotForm.val.isValid('subtitle')" />
       </IftaFormField>
       <IftaFormField
-        v-if="performers.linkablePerformers.length > 0"
+        v-if="selectablePerformers.length > 0"
         :message="timeslotForm.val.message('performerId')"
         input-id="performerInput"
         label="Performer"
@@ -63,16 +63,16 @@
         <Select
           id="performerInput"
           v-model:model-value="timeslotForm.state.value.performerId"
-          :disabled="isSubmitting"
+          :disabled="isSubmitting || selectablePerformers.length === 1"
           :invalid="!timeslotForm.val.isValid('performerId')"
-          :options="performers.linkablePerformers"
+          :options="selectablePerformers"
           autofocus
           option-label="name"
           option-value="id"
           @change="() => timeslotForm.val.validateIfDirty('performerId')" />
       </IftaFormField>
       <IftaFormField
-        v-if="performers.linkablePerformers.length === 0"
+        v-if="selectablePerformers.length === 0"
         :message="performerForm.val.message('name')"
         input-id="performerNameInput"
         label="Performer Name"
@@ -85,7 +85,7 @@
           autofocus />
       </IftaFormField>
       <IftaFormField
-        v-if="performers.linkablePerformers.length === 0"
+        v-if="selectablePerformers.length === 0"
         :message="performerForm.val.message('url')"
         input-id="performerUrlInput"
         label="Performer URL"
@@ -214,6 +214,14 @@ const props = defineProps<{
 const defaultStartPerformerId = computed(() => {
   if (performers.linkablePerformers.length === 1) return performers.linkablePerformers[0]!.id
   return undefined
+})
+
+const selectablePerformers = computed(() => {
+  // If editing a timeslot with a non-linkable performer, only allow them in the list
+  if (props.timeslot && !props.timeslot.performer.isLinkableToTimeslot) {
+    return [props.timeslot.performer]
+  }
+  return performers.linkablePerformers
 })
 
 type TimeslotFormState = TimeslotRequest & {

@@ -16,6 +16,7 @@ public sealed class TimeslotRules(IHttpContextAccessor contextAccessor)
         timeslot.Performer.ShouldNotBeNull();
         if (User == null) return false;
         if (timeslot.StartsAt < DateTime.UtcNow) return false;
+        if (User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Organizer)) return true;
         return timeslot.Performer.LinkedUserIds.Contains(User.GetIdOrDefault());
     }
 
@@ -24,7 +25,7 @@ public sealed class TimeslotRules(IHttpContextAccessor contextAccessor)
         timeslot.Performer.ShouldNotBeNull();
         if (User == null) return false;
         if (timeslot.StartsAt < DateTime.UtcNow) return false;
-        if (User.IsInRole(RoleNames.Admin)) return true;
+        if (User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Organizer)) return true;
         return timeslot.Performer.LinkedUserIds.Contains(User.GetIdOrDefault());
     }
 }
