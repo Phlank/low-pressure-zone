@@ -165,7 +165,7 @@ watch(
 
     &__overlay {
       min-width: unset !important;
-      max-width: min(calc(100dvw - 2 * #{variables.$space-m} - 2 * #{variables.$space-l}), 390px);
+      width: min(calc(100dvw - 2 * #{variables.$space-m} - 2 * #{variables.$space-l}), 390px);
       position: absolute !important;
     }
   }
