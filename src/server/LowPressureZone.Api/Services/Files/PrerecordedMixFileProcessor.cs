@@ -228,9 +228,9 @@ public sealed class PrerecordedMixFileProcessor(
                                              .Where(performer => performer.Id == request.PerformerId)
                                              .Select(performer => performer.Name)
                                              .FirstAsync(ct);
-        var title = string.IsNullOrWhiteSpace(request.Name)
+        var title = string.IsNullOrWhiteSpace(request.Subtitle)
                         ? scheduleStart.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
-                        : request.Name;
+                        : request.Subtitle;
         return new SimpleAudioMetadata(title,
                                        performerName);
     }
