@@ -39,7 +39,7 @@ export const useRefresh = <TResponse, TParams = void>(
 
   const autoRefresh = async () => {
     // noinspection InfiniteLoopJS
-    while (isAutoRefreshing.value) {
+    while (true) {
       await delay(options?.autoRefreshInterval ?? DEFAULT_AUTO_REFRESH_INTERVAL)
       if (isAutoRefreshing.value) await refresh()
     }
@@ -57,8 +57,7 @@ export const useRefresh = <TResponse, TParams = void>(
     if (newVal) {
       refresh().then(() => {
         isLoading.value = false
-        if (options?.useAutoRefresh) {
-          isAutoRefreshing.value = true
+        if (isAutoRefreshing.value) {
           autoRefresh().then(() => {})
         }
       })
