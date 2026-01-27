@@ -14,17 +14,6 @@ export const setToHour = (date: Date) => {
   date.setMilliseconds(0)
 }
 
-export const getNextHour = (date?: Date) => {
-  const newDate = date ? new Date(date) : new Date()
-  setToNextHour(newDate)
-  return newDate
-}
-
-export const setToNextHour = (date: Date) => {
-  date.setHours(date.getHours() + 1)
-  setToHour(date)
-}
-
 export const getPreviousHour = (date: Date) => {
   const newDate = new Date(date)
   setToPreviousHour(newDate)
