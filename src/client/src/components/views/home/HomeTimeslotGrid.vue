@@ -53,7 +53,6 @@ import { useScheduleStore } from '@/stores/scheduleStore.ts'
 import { computed, inject, ref, type Ref, watch } from 'vue'
 import type { TimeslotResponse } from '@/api/resources/timeslotsApi.ts'
 import {
-  getNextHour,
   getPreviousHour,
   isDateInTimeslot,
   parseDate,
@@ -84,7 +83,7 @@ const setupRows = () => {
   const endLast = parseDate(timeslots[schedule.value.timeslots.length - 1]!.endsAt)
   const hours = timesBetween(startFirst, endLast, 60)
   if (startFirst > parseDate(schedule.value.startsAt)) hours.unshift(getPreviousHour(startFirst))
-  if (endLast < parseDate(schedule.value.endsAt)) hours.push(getNextHour(endLast))
+  if (endLast < parseDate(schedule.value.endsAt)) hours.push(endLast)
 
   hours.forEach((hour) => {
     const timeslot = timeslots.find((timeslot) => isDateInTimeslot(hour, timeslot))
