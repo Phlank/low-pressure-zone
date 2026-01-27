@@ -4,37 +4,27 @@ import streamApi, {
   defaultStreamStatus,
   type StreamStatusResponse
 } from '@/api/resources/streamApi.ts'
-import delay from '@/utils/delay.ts'
+import { useRefresh } from '@/composables/useRefresh.ts'
 
 export const useStreamStore = defineStore('streamStore', () => {
   const status = ref<StreamStatusResponse>(defaultStreamStatus)
   const getStatus = computed(() => status.value)
 
-  let isStarted = false
-  const startPolling = () => {
-    if (isStarted) return
-    isStarted = true
-    pollStream().then(() => {})
-  }
+  const { isAutoRefreshing } = useRefresh(streamApi.getStatus, (data) => updateStatus(data), {
+    autoRefreshInterval: 5000
+  })
 
-  const pollStream = async () => {
-    while (isStarted) {
-      try {
-        const response = await streamApi.getStatus()
-        if (response.isSuccess()) {
-          updateStatus(response?.data())
-        }
-      } catch (error) {
-        console.error(error)
-      } finally {
-        await delay(5000)
-      }
-    }
-  }
-
-  const stopPolling = () => {
-    if (isStarted) {
-      isStarted = false
+  const updateStatus = (newStatus: StreamStatusResponse) => {
+    if (
+      newStatus.isLive !== status.value?.isLive ||
+      newStatus.isOnline !== status.value?.isOnline ||
+      (newStatus.name ?? 'Unknown') !== status.value?.name ||
+      newStatus.listenUrl !== status.value?.listenUrl ||
+      newStatus.isStatusStale !== status.value?.isStatusStale ||
+      newStatus.type !== status.value?.type ||
+      newStatus.listenerCount !== status.value?.listenerCount
+    ) {
+      status.value = newStatus
     }
   }
 
@@ -63,24 +53,9 @@ export const useStreamStore = defineStore('streamStore', () => {
     document.title = 'Low Pressure Zone'
   }
 
-  const updateStatus = (newStatus: StreamStatusResponse) => {
-    if (
-      newStatus.isLive !== status.value?.isLive ||
-      newStatus.isOnline !== status.value?.isOnline ||
-      (newStatus.name ?? 'Unknown') !== status.value?.name ||
-      newStatus.listenUrl !== status.value?.listenUrl ||
-      newStatus.isStatusStale !== status.value?.isStatusStale ||
-      newStatus.type !== status.value?.type ||
-      newStatus.listenerCount !== status.value?.listenerCount
-    ) {
-      status.value = newStatus
-    }
-  }
-
   return {
     status: getStatus,
-    startPolling,
-    stopPolling,
+    isAutoRefreshing,
     startTitleUpdating,
     stopTitleUpdating
   }
