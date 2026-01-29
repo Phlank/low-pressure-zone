@@ -34,9 +34,9 @@
     volumes:
       - pgadmin-data:/var/lib/pgadmin
   
-  azuracast-web:
-    container_name: azuracast
-    image: "ghcr.io/azuracast/azuracast:0.23.1"
+  azuracast-0.23.2:
+    container_name: azuracast-0.23.2
+    image: "ghcr.io/azuracast/azuracast:0.23.2"
     labels:
       - "com.centurylinklabs.watchtower.scope=azuracast"
     ports:
