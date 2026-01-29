@@ -41,7 +41,7 @@
 
 <script lang="ts" setup>
 import { Button, Slider, useToast } from 'primevue'
-import { computed, onMounted, type Ref, ref, watch } from 'vue'
+import { computed, type Ref, ref, watch } from 'vue'
 import clamp from '@/utils/clamp.ts'
 import { useDebounceFn, useResizeObserver } from '@vueuse/core'
 import { useStreamStore } from '@/stores/streamStore.ts'
@@ -240,10 +240,6 @@ const toggleVolumeSlider = () => {
     showVolumeSlider.value = !isDisplayed
   }, 100)
 }
-
-onMounted(() => {
-  streamStore.startPolling()
-})
 </script>
 
 <style lang="scss">
