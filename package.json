@@ -10,6 +10,6 @@
     "docker-stop": "docker compose -f ./tools/docker/docker-compose.yml down",
     "docker-clean": "docker compose -f ./tools/docker/docker-compose.yml down -v",
     "start-api": "dotnet watch run --project ./src/server/LowPressureZone.Api/LowPressureZone.Api.csproj",
-    "deploy-prod": "./tools/deploy-client.sh && ./tools/docker/deploy-server.sh"
+    "deploy-prod": "./tools/deploy-client.sh && ./tools/deploy-server.sh"
   }
 }
