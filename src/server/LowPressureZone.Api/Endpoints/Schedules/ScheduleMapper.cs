@@ -27,7 +27,8 @@ public sealed class ScheduleMapper(
             Description = req.Description,
             StartsAt = req.StartsAt.ToUniversalTime(),
             EndsAt = req.EndsAt.ToUniversalTime(),
-            Type = req.Type
+            Type = req.Type,
+            IsOrganizersOnly = req.IsOrganizersOnly
         };
 
     public async Task UpdateEntityAsync(

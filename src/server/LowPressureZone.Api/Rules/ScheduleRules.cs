@@ -67,6 +67,8 @@ public sealed class ScheduleRules(IHttpContextAccessor contextAccessor)
         var isUserAdminOrOrganizer =
             User != null && (User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Organizer));
         var isScheduleInPast = schedule.EndsAt < DateTime.UtcNow;
-        return isScheduleInPast && !isUserAdminOrOrganizer;
+        return !isUserAdminOrOrganizer
+               && (isScheduleInPast
+                   || schedule.IsOrganizersOnly);
     }
 }
