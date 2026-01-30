@@ -31,22 +31,6 @@ public sealed class ScheduleMapper(
             IsOrganizersOnly = req.IsOrganizersOnly
         };
 
-    public async Task UpdateEntityAsync(
-        ScheduleRequest req,
-        Schedule schedule,
-        CancellationToken ct = default)
-    {
-        var dataContext = accessor.Resolve<DataContext>();
-        schedule.Name = req.Name;
-        schedule.StartsAt = req.StartsAt;
-        schedule.EndsAt = req.EndsAt;
-        schedule.CommunityId = req.CommunityId;
-        schedule.Description = req.Description;
-        if (!dataContext.ChangeTracker.HasChanges()) return;
-        schedule.LastModifiedDate = DateTime.UtcNow;
-        await dataContext.SaveChangesAsync(ct);
-    }
-
     public ScheduleResponse FromEntity(Schedule schedule)
     {
         schedule.Community.ShouldNotBeNull();
@@ -67,6 +51,7 @@ public sealed class ScheduleMapper(
             IsDeletable = rules.IsDeleteAuthorized(schedule),
             IsTimeslotCreationAllowed = rules.IsAddingTimeslotsAllowed(schedule),
             IsSoundclashCreationAllowed = rules.IsAddingSoundclashesAllowed(schedule),
+            IsOrganizersOnly = schedule.IsOrganizersOnly,
             Type = schedule.Type
         };
     }

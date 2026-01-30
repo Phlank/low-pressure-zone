@@ -18,23 +18,11 @@
 
 <script lang="ts" setup>
 import FormField from '@/components/form/FormField.vue'
-import type { FieldSize } from '@/components/form/fieldSize.ts'
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
 import { IftaLabel } from 'primevue'
+import { type FormFieldProps, formFieldPropsDefaults } from '@/components/form/formFieldProps.ts'
 
-withDefaults(
-  defineProps<{
-    size?: FieldSize
-    label: string
-    inputId: string
-    message?: string
-    optional?: boolean
-  }>(),
-  {
-    size: 's',
-    message: ''
-  }
-)
+withDefaults(defineProps<FormFieldProps>(), formFieldPropsDefaults)
 </script>
 
 <style lang="scss">
