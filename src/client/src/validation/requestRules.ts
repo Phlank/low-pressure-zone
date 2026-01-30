@@ -51,7 +51,8 @@ export const scheduleRequestRules = (
       withinRangeOf(() => formState.value.startsAt, 60, 1440, '1 - 24h allowed')
     ),
     name: combineRules(required(), maximumLength(64)),
-    description: alwaysValid()
+    description: alwaysValid(),
+    isOrganizersOnly: alwaysValid()
   }
 }
 
