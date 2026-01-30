@@ -25,7 +25,7 @@ public sealed class PerformerMapper(IHttpContextAccessor contextAccessor, Perfor
             Url = request.Url?.Trim(),
             CreatedDate = DateTime.UtcNow,
             LastModifiedDate = DateTime.UtcNow,
-            LinkedUserIds = [User.GetIdOrDefault()]
+            LinkedUserId = User.GetIdOrDefault()
         };
     }
 

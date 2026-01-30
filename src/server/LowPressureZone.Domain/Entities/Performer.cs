@@ -10,7 +10,7 @@ public sealed class Performer : BaseEntity
     [MaxLength(256)]
     public required string? Url { get; set; }
 
-    public required ICollection<Guid> LinkedUserIds { get; set; } = [];
+    public required Guid LinkedUserId { get; set; }
 
     public ICollection<Timeslot> Timeslots { get; set; } = [];
     public bool IsDeleted { get; set; }
