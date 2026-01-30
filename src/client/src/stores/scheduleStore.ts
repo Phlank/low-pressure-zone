@@ -102,6 +102,7 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
         community: getCommunityById(form.communityId)!,
         isDeletable: true,
         isEditable: true,
+        isOrganizersOnly: form.isOrganizersOnly,
         isTimeslotCreationAllowed: form.type === scheduleTypes.Hourly,
         isSoundclashCreationAllowed: form.type === scheduleTypes.Soundclash
       }
@@ -121,6 +122,7 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
       entity.endsAt = form.endsAt
       entity.name = form.name
       entity.description = form.description
+      entity.isOrganizersOnly = form.isOrganizersOnly
       entity.community = getCommunityById(form.communityId)!
       schedules.value.sort((a, b) => compareAsc(a.startsAt, b.startsAt))
       showEditSuccessToast(toast, 'Schedule', parseDate(form.startsAt).toLocaleString())
