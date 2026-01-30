@@ -19,23 +19,9 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue'
-import type { FieldSize } from '@/components/form/fieldSize.ts'
+import { type FormFieldProps, formFieldPropsDefaults } from '@/components/form/formFieldProps.ts'
 
-const props = withDefaults(
-  defineProps<{
-    inputId?: string
-    size?: FieldSize
-    label?: string
-    message?: string
-    optional?: boolean
-    displayStyle?: 'flex' | 'block'
-  }>(),
-  {
-    size: 's',
-    optional: false,
-    displayStyle: 'flex'
-  }
-)
+const props = withDefaults(defineProps<FormFieldProps>(), formFieldPropsDefaults)
 
 const baseClass = 'form-field'
 const widthClass = computed(() => `${baseClass}--${props.size}`)
@@ -76,13 +62,13 @@ const computedClass = computed(() => `${baseClass} ${widthClass.value}`)
 
   &__input {
     width: 100%;
-    display: v-bind(displayStyle);
+    display: flex;
     flex-direction: column;
     align-items: start;
     gap: variables.$space-m;
 
     div {
-      display: v-bind(displayStyle);
+      display: flex;
       gap: variables.$space-m;
     }
   }

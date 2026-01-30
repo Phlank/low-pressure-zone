@@ -91,7 +91,7 @@ const actionColumnSpan = computed(() => `span ${columns.value <= 4 ? 1 : 2}`)
     column-width: v-bind(columnWidth);
     direction: ltr;
 
-    .form-field {
+    .form-field, .inline-form-field {
       &--xs {
         grid-column: span min(2, v-bind(columns));
       }

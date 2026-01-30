@@ -20,6 +20,7 @@ public sealed class ScheduleResponse
     public required bool IsDeletable { get; set; }
     public required bool IsTimeslotCreationAllowed { get; set; }
     public required bool IsSoundclashCreationAllowed { get; set; }
+    public required bool IsOrganizersOnly { get; set; }
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required ScheduleType Type { get; set; }
 }

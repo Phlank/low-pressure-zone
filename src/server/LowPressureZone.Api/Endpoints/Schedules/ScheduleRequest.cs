@@ -13,4 +13,5 @@ public sealed class ScheduleRequest : IDateTimeRange
     public required DateTimeOffset EndsAt { get; set; }
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required ScheduleType Type { get; set; }
+    public required bool IsOrganizersOnly { get; set; }
 }

@@ -497,11 +497,79 @@ public sealed class ScheduleRulesTests
     }
 
     [Fact]
-    public void IsHiddenFromApi_ReturnsFalse_WhenScheduleIsNotInPast()
+    public void IsHiddenFromApi_ReturnsFalse_WhenScheduleIsNotInPast_AndScheduleIsNotOrganizersOnly()
     {
         // Arrange
         var (_, accessor) = HttpContextFactory.Create();
         var schedule = ScheduleFactory.Create(endsAt: DateTimeOffset.UtcNow.TopOfHour(1),
+                                              isOrganizersOnly: false,
+                                              community: CommunityFactory.Create());
+
+        // Act
+        var result = Rules(accessor).IsHiddenFromApi(schedule);
+
+        // Assert
+        result.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void IsHiddenFromApi_ReturnsTrue_WhenScheduleIsNotInPast_AndScheduleIsOrganizersOnly_AndUserIsAnonymous()
+    {
+        // Arrange
+        var (_, accessor) = HttpContextFactory.Create();
+        var schedule = ScheduleFactory.Create(endsAt: DateTimeOffset.UtcNow.TopOfHour(1),
+                                              isOrganizersOnly: true,
+                                              community: CommunityFactory.Create());
+
+        // Act
+        var result = Rules(accessor).IsHiddenFromApi(schedule);
+
+        // Assert
+        result.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void IsHiddenFromApi_ReturnsTrue_WhenScheduleIsNotInPast_AndScheduleIsOrganizersOnly_AndUserIsNotAdminOrOrganizer()
+    {
+        // Arrange
+        var principal = ClaimsPrincipalFactory.Create(userId: Guid.NewGuid());
+        var (_, accessor) = HttpContextFactory.Create(user: principal);
+        var schedule = ScheduleFactory.Create(endsAt: DateTimeOffset.UtcNow.TopOfHour(1),
+                                              isOrganizersOnly: true,
+                                              community: CommunityFactory.Create());
+
+        // Act
+        var result = Rules(accessor).IsHiddenFromApi(schedule);
+
+        // Assert
+        result.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void IsHiddenFromApi_ReturnsFalse_WhenScheduleIsNotInPast_AndScheduleIsOrganizersOnly_AndUserIsAdmin()
+    {
+        // Arrange
+        var principal = ClaimsPrincipalFactory.Create(userId: Guid.NewGuid(), roles: [RoleNames.Admin]);
+        var (_, accessor) = HttpContextFactory.Create(user: principal);
+        var schedule = ScheduleFactory.Create(endsAt: DateTimeOffset.UtcNow.TopOfHour(1),
+                                              isOrganizersOnly: true,
+                                              community: CommunityFactory.Create());
+
+        // Act
+        var result = Rules(accessor).IsHiddenFromApi(schedule);
+
+        // Assert
+        result.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void IsHiddenFromApi_ReturnsFalse_WhenScheduleIsNotInPast_AndScheduleIsOrganizersOnly_AndUserIsOrganizerRole()
+    {
+        // Arrange
+        var principal = ClaimsPrincipalFactory.Create(userId: Guid.NewGuid(), roles: [RoleNames.Organizer]);
+        var (_, accessor) = HttpContextFactory.Create(user: principal);
+        var schedule = ScheduleFactory.Create(endsAt: DateTimeOffset.UtcNow.TopOfHour(1),
+                                              isOrganizersOnly: true,
                                               community: CommunityFactory.Create());
 
         // Act

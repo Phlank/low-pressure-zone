@@ -46,8 +46,6 @@
           placeholder="Select an community"
           @update:model-value="validation.validateIfDirty('communityId')" />
       </IftaFormField>
-    </FormArea>
-    <FormArea>
       <IftaFormField
         :message="validation.message('startsAt')"
         input-id="startTimeInput"
@@ -81,8 +79,6 @@
           show-time
           @update:model-value="validation.validateIfDirty('endsAt')" />
       </IftaFormField>
-    </FormArea>
-    <FormArea :align-actions="alignActions">
       <IftaFormField
         :message="validation.message('description')"
         input-id="descriptionInput"
@@ -96,12 +92,20 @@
           :invalid="!validation.isValid('description')"
           auto-resize />
       </IftaFormField>
+      <InlineFormField
+        label="Visible to Organizers Only"
+        input-id="isOrganizersOnlyInput"
+        size="xs">
+        <ToggleSwitch
+          input-id="isOrganizersOnlyInput"
+          v-model="formState.isOrganizersOnly" />
+      </InlineFormField>
     </FormArea>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { DatePicker, Select, Textarea, InputText } from 'primevue'
+import { DatePicker, Select, Textarea, InputText, ToggleSwitch } from 'primevue'
 import { computed, onMounted, type Ref, ref } from 'vue'
 import { MS_PER_MINUTE } from '@/constants/times'
 import { minimumDate, parseDate } from '@/utils/dateUtils'
@@ -115,6 +119,7 @@ import { useEntityForm } from '@/composables/useEntityForm.ts'
 import { alwaysValid } from '@/validation/rules/untypedRules.ts'
 import entriesToKeyValueArray from '@/utils/entriesToKeyValueArray.ts'
 import { scheduleTypes } from '@/constants/scheduleTypes.ts'
+import InlineFormField from '@/components/form/InlineFormField.vue'
 
 const maxDurationMinutes = 1440
 const defaultMinutes = 60
@@ -190,7 +195,8 @@ const {
       }),
       endsAt:
         schedule?.endsAt ??
-        new Date(resetStartTime.getTime() + defaultMinutes * MS_PER_MINUTE).toISOString()
+        new Date(resetStartTime.getTime() + defaultMinutes * MS_PER_MINUTE).toISOString(),
+      isOrganizersOnly: schedule?.isOrganizersOnly ?? false
     })
     return stateRef
   },
