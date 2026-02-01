@@ -16,27 +16,26 @@
           :options="availableUsers"
           autofocus />
       </IftaFormField>
-      <FormField
-        input-id="rolesInput"
-        label="Roles"
-        size="m">
-        <div>
-          <Checkbox
-            id="isPerformerInput"
-            v-model:model-value="formState.isPerformer"
-            :disabled="isSubmitting"
-            binary />
-          <label for="isPerformerInput">Performer</label>
-        </div>
-        <div v-if="authStore.isInRole(roles.admin)">
-          <Checkbox
-            id="isOrganizerInput"
-            v-model:model-value="formState.isOrganizer"
-            :disabled="isSubmitting"
-            binary />
-          <label for="isOrganizerInput">Organizer</label>
-        </div>
-      </FormField>
+      <InlineFormField
+        :message="validation.message('isPerformer')"
+        input-id="isPerformerInput"
+        label="Performer"
+        size="xs">
+        <ToggleSwitch
+          v-model="formState.isPerformer"
+          :disabled="isSubmitting"
+          input-id="isPerformerInput" />
+      </InlineFormField>
+      <InlineFormField
+        :message="validation.message('isOrganizer')"
+        input-id="isOrganizerInput"
+        label="Organizer"
+        size="xs">
+        <ToggleSwitch
+          v-model="formState.isOrganizer"
+          :disabled="isSubmitting || !authStore.isInRole(roles.admin)"
+          input-id="isOrganizerInput" />
+      </InlineFormField>
       <template #actions>
         <slot name="actions"></slot>
       </template>
@@ -45,7 +44,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Checkbox, Select } from 'primevue'
+import { Select, ToggleSwitch } from 'primevue'
 import { type UserResponse } from '@/api/resources/usersApi.ts'
 import { computed, onMounted, type Ref, ref } from 'vue'
 import {
@@ -53,7 +52,6 @@ import {
   type CommunityRelationshipResponse
 } from '@/api/resources/communityRelationshipsApi.ts'
 import FormArea from '@/components/form/FormArea.vue'
-import FormField from '@/components/form/FormField.vue'
 import { createFormValidation } from '@/validation/types/formValidation.ts'
 import { alwaysValid, required } from '@/validation/rules/untypedRules.ts'
 import IftaFormField from '@/components/form/IftaFormField.vue'
@@ -63,6 +61,7 @@ import { useUserStore } from '@/stores/userStore.ts'
 import { useCommunityStore } from '@/stores/communityStore.ts'
 import { entitiesExceptIds } from '@/utils/arrayUtils.ts'
 import type { Result } from '@/types/result.ts'
+import InlineFormField from '@/components/form/InlineFormField.vue'
 
 const authStore = useAuthStore()
 const users = useUserStore()

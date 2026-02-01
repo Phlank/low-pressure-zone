@@ -25,29 +25,28 @@
           option-value="id"
           @update:model-value="val.validateIfDirty('communityId')" />
       </IftaFormField>
-      <FormField
-        input-id="rolesInput"
-        label="Roles"
-        size="l">
-        <div class="checkbox-area">
-          <div class="checkbox-area__item">
-            <Checkbox
-              id="isPerformerInput"
-              v-model="state.isPerformer"
-              binary
-              name="isPerformer" />
-            <label for="isPerformerInput">Performer</label>
-          </div>
-          <div class="checkbox-area__item">
-            <Checkbox
-              id="isOrganizerInput"
-              v-model="state.isOrganizer"
-              binary
-              name="isOrganizer" />
-            <label for="isOrganizerInput">Organizer</label>
-          </div>
-        </div>
-      </FormField>
+      <InlineFormField
+        :message="val.message('isPerformer')"
+        input-id="isPerformerInput"
+        label="Performer"
+        size="xs">
+        <ToggleSwitch
+          v-model="state.isPerformer"
+          :invalid="!val.isValid('isPerformer')"
+          input-id="isPerformerInput"
+          @update:model-value="val.validateIfDirty('isPerformer')" />
+      </InlineFormField>
+      <InlineFormField
+        :message="val.message('isOrganizer')"
+        input-id="isOrganizerInput"
+        label="Organizer"
+        size="xs">
+        <ToggleSwitch
+          v-model="state.isOrganizer"
+          :invalid="!val.isValid('isOrganizer')"
+          input-id="isOrganizerInput"
+          @update:model-value="val.validateIfDirty('isOrganizer')" />
+      </InlineFormField>
       <template #actions>
         <slot name="actions"></slot>
       </template>
@@ -56,15 +55,15 @@
 </template>
 
 <script lang="ts" setup>
-import { Checkbox, InputText, Select } from 'primevue'
+import { InputText, Select, ToggleSwitch } from 'primevue'
 import FormArea from '@/components/form/FormArea.vue'
-import FormField from '@/components/form/FormField.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import { useCommunityStore } from '@/stores/communityStore.ts'
 import { computed, ref } from 'vue'
 import { inviteRequestRules } from '@/validation/requestRules.ts'
 import { useInviteStore } from '@/stores/inviteStore.ts'
 import { useEntityForm } from '@/composables/useEntityForm.ts'
+import InlineFormField from '@/components/form/InlineFormField.vue'
 
 const communityStore = useCommunityStore()
 const invites = useInviteStore()
