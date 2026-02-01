@@ -21,17 +21,13 @@
           :autofocus="true"
           :invalid="!validation.isValid('code')" />
       </IftaFormField>
-      <FormField input-id="rememberBrowserInput">
-        <div style="display: flex; flex-direction: column; align-items: center; width: 100%">
-          <div class="checkbox-area__item">
-            <Checkbox
-              id="rememberBrowserInput"
-              v-model="formState.rememberClient"
-              binary />
-            <span>Remember Browser</span>
-          </div>
-        </div>
-      </FormField>
+      <InlineFormField
+        input-id="rememberBrowserInput"
+        label="Remember Browser">
+        <ToggleSwitch
+          v-model="formState.rememberClient"
+          input-id="rememberBrowserInput" />
+      </InlineFormField>
       <template #actions>
         <Button
           :disabled="isSubmitting"
@@ -47,7 +43,7 @@
 import { KeyName } from '@/constants/keys'
 import { Routes } from '@/router/routes'
 import { onKeyDown } from '@vueuse/core'
-import { Button, Checkbox, InputText, Message } from 'primevue'
+import { Button, InputText, Message, ToggleSwitch } from 'primevue'
 import { type Ref, ref } from 'vue'
 import { type TwoFactorRequest } from '@/api/resources/authApi.ts'
 import FormArea from '@/components/form/FormArea.vue'
@@ -57,6 +53,7 @@ import SinglePanelViewWrapper from '@/components/layout/SinglePanelViewWrapper.v
 import { createFormValidation } from '@/validation/types/formValidation.ts'
 import { alwaysValid, required } from '@/validation/rules/untypedRules.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
+import InlineFormField from '@/components/form/InlineFormField.vue'
 
 onKeyDown(KeyName.Enter, () => handleVerify())
 
