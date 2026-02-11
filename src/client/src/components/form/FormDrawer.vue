@@ -3,8 +3,8 @@
     <Drawer
       :position="position"
       auto-z-index
+      block-scroll
       class="form-drawer-component"
-      modal
       show-close-icon
       v-bind="$attrs">
       <template #header>
@@ -33,7 +33,7 @@
 
 <script lang="ts" setup>
 import { Button, Drawer } from 'primevue'
-import { computed, inject, ref, type Ref, watch } from 'vue'
+import { computed, inject, type Ref } from 'vue'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const position = computed(() => {
@@ -46,16 +46,6 @@ defineProps<{
 }>()
 
 const emit = defineEmits(['submit', 'reset'])
-
-const height = ref('100dvh')
-watch(
-  () => isMobile,
-  (newVal) => {
-    if (newVal) height.value = 'calc(100dvh - 2 * 5px)'
-    else height.value = '100dvh'
-  },
-  { deep: true, immediate: true }
-)
 </script>
 
 <style lang="scss">
@@ -75,8 +65,7 @@ div.p-drawer.p-component.form-drawer-component {
   @include variables.mobile() {
     height: fit-content;
     max-height: calc(100dvh - #{variables.$space-l});
-    width: calc(100dvw - 2 * #{variables.$space-s});
-    margin: 0 variables.$space-s;
+    width: 100dvw;
     border-radius: variables.$space-m variables.$space-m 0 0;
     transition: transform 0.3s;
   }
