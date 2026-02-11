@@ -47,6 +47,10 @@ body.dark-mode-toggle {
   }
 }
 
+body:has(.p-drawer-mask) {
+  overflow: hidden !important;
+}
+
 #app {
   width: 100%;
 }

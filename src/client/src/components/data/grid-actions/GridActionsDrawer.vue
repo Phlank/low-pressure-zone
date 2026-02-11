@@ -2,6 +2,7 @@
   <Drawer
     v-model:visible="visible"
     :show-close-icon="false"
+    block-scroll
     class="grid-actions-drawer"
     position="bottom">
     <div class="buttons">
