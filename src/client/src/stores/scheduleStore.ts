@@ -30,7 +30,7 @@ import soundclashApi, {
   type SoundclashRequest,
   type SoundclashResponse
 } from '@/api/resources/soundclashApi.ts'
-import {scheduleTypes} from "@/constants/scheduleTypes.ts";
+import { scheduleTypes } from '@/constants/scheduleTypes.ts'
 
 const DEFAULT_SCHEDULE_DAY_RANGE = 30
 
@@ -56,8 +56,7 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
     },
     {
       params: {
-        after: addDays(new Date(), -DEFAULT_SCHEDULE_DAY_RANGE).toISOString(),
-        before: addDays(new Date(), DEFAULT_SCHEDULE_DAY_RANGE).toISOString()
+        after: addDays(new Date(), -DEFAULT_SCHEDULE_DAY_RANGE).toISOString()
       }
     }
   )
