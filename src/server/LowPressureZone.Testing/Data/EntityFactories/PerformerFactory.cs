@@ -15,7 +15,7 @@ public static class PerformerFactory
             Id = id ?? Guid.Empty,
             Name = name ?? "Test Performer",
             Url = url ?? "https://testperformer.com",
-            LinkedUserIds = userId is not null ? [userId.Value] : [],
+            LinkedUserId = userId ?? Guid.NewGuid(),
             IsDeleted = isDeleted
         };
 }

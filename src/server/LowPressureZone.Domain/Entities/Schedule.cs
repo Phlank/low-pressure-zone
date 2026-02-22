@@ -14,4 +14,5 @@ public sealed class Schedule : BaseEntity, IDateTimeRange
     public required DateTimeOffset StartsAt { get; set; }
     public required DateTimeOffset EndsAt { get; set; }
     public required ScheduleType Type { get; init; }
+    public required bool IsOrganizersOnly { get; set; }
 }

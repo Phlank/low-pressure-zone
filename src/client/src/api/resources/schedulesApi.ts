@@ -24,6 +24,7 @@ export interface ScheduleRequest {
   name: string
   description: string
   communityId: string
+  isOrganizersOnly: boolean
 }
 
 export interface ScheduleResponse {
@@ -40,6 +41,7 @@ export interface ScheduleResponse {
   isDeletable: boolean
   isTimeslotCreationAllowed: boolean
   isSoundclashCreationAllowed: boolean
+  isOrganizersOnly: boolean
 }
 
 const mapRequest = <TSchedule extends ScheduleRequest>(schedule: TSchedule): ScheduleRequest => {
@@ -49,7 +51,8 @@ const mapRequest = <TSchedule extends ScheduleRequest>(schedule: TSchedule): Sch
     startsAt: schedule.startsAt,
     endsAt: schedule.endsAt,
     name: schedule.name,
-    description: schedule.description
+    description: schedule.description,
+    isOrganizersOnly: schedule.isOrganizersOnly
   }
 }
 
@@ -60,6 +63,7 @@ const mapResponseToRequest = (response: ScheduleResponse): ScheduleRequest => {
     startsAt: response.startsAt,
     endsAt: response.endsAt,
     name: response.name,
-    description: response.description
+    description: response.description,
+    isOrganizersOnly: response.isOrganizersOnly
   }
 }

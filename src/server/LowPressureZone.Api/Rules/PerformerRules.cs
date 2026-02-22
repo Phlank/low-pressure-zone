@@ -14,7 +14,7 @@ public sealed class PerformerRules(IHttpContextAccessor contextAccessor)
     {
         if (performer.IsDeleted) return false;
         if (User == null) return false;
-        return performer.LinkedUserIds.Contains(User.GetIdOrDefault());
+        return performer.LinkedUserId == User.GetIdOrDefault();
     }
 
     public bool IsEditAuthorized(Performer performer)
@@ -22,7 +22,7 @@ public sealed class PerformerRules(IHttpContextAccessor contextAccessor)
         if (performer.IsDeleted) return false;
         if (User == null) return false;
         if (User.IsInRole(RoleNames.Admin)) return true;
-        return performer.LinkedUserIds.Contains(User.GetIdOrDefault());
+        return performer.LinkedUserId == User.GetIdOrDefault();
     }
 
     public bool IsDeleteAuthorized(Performer performer)
@@ -30,7 +30,7 @@ public sealed class PerformerRules(IHttpContextAccessor contextAccessor)
         if (performer.IsDeleted) return false;
         if (User == null) return false;
         if (User.IsInRole(RoleNames.Admin)) return true;
-        return performer.LinkedUserIds.Contains(User.GetIdOrDefault());
+        return performer.LinkedUserId == User.GetIdOrDefault();
     }
 
     public static bool IsHiddenFromApi(Performer entity)

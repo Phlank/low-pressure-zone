@@ -5,45 +5,66 @@ hosting strong performers. Think of it as an online version of you and your frie
 than an online version of a concert. The name comes from a [Clubroot song](https://www.youtube.com/watch?v=0nctcPI-_nI)
 that I used to use as a set opener.
 
-## Why I built this
+## Table of Contents
 
-When I was in college for Computer Science, the /r/realdubstep subreddit started the online radio site ClouwdNine so
-that subreddit members could DJ and chat with one another. Over time, the site grew significantly and larger events were
-held. In the early days of C9, I stumbled across it and started performing there before I had ever DJ'd a live show. The
-site maintainer couldn't make contributions to the site as often as they wished, and allowed me to improve the site.
+- [History](#history)
+- [Technical information](#technical-information)
+    - [Top level](#top-level)
+    - [Client](#client)
+    - [Server](#server)
+- [Contributing](#contributing)
 
-I was given SSH access to the server (something I can't believe even to this day) and I started a git repository for the
-site's code. Over time, I made many contributions. The site was a home for me, a third space that shaped many
-experiences of my life since I found it. However, I had to leave C9 behind to go and live some of my own life's stories
-in 2016. The last shows on C9 took place in 2017 after a script for automating google sheets scheduling stopped working.
+## History
 
-The tech stack of C9 was messy, built on Wordpress, Google Sheets, some cronjobs, a few python scripts, and some really
-bad javascript. I built Low Pressure Zone as a successor to C9, another third space for myself and (hopefully) many
-others to bring more life into their communities.
+Around ~2012 or so, some members of the /r/realdubstep subreddit took it upon themselves to set up weekly streaming
+events for community members to participate in (subreddit get-togethers, basically). This was called C9 (or Clouwdnine)
+and was run through a simple website. People would show up in the chat, one person would send audio and people would
+listen directly from the server.
+
+Eventually this gained traction and people wanted to do more than just the weekly shows, so they set up a soundclash
+event. Two DJs/producers would take turns streaming audio over an hour and a half, spinning for three rounds, 15 minutes
+each per round. After each round, there would be a vote in the chat and by the end of it you had a "winner" of that
+soundclash. This caught the attention of FatKidOnFire, which eventually led to a soundclash event between C9 and FKOF.
+
+I discovered C9 in 2013 and after becoming involved in the community, I was given the chance to contribute to the site.
+The site was a home for me, a third space that shaped many experiences of my life since I found it. However, I had to
+leave C9 behind in 2016. The last shows on C9 took place in 2017 after a script for automating Google Sheets scheduling
+stopped working.
+
+Low Pressure Zone is the successor to Clouwdnine, and is built with the same spirit of community in mind. I wanted to
+create a space where people can share their productions, discover new tunes, and connect with others who share their
+passion for soundsystem culture music.
 
 ## Technical information
 
-Low Pressure Zone is a web application deployed through Digital Ocean. The server is a VPS which, alongside a managed
-database, serves all consumers of the application. The VPS hosts the static client files, the site API, and an Icecast
-instance where DJs can test their stream setup and audio quality. Another VPS
-hosts [AzuraCast](https://www.azuracast.com/), an all-in-one open-source online radio solution. The extensive API of
-AzuraCast will help to power many site features and integrations in the future.
+Low Pressure Zone is a web application. The server is a VPS which, alongside a managed database, serves all consumers of
+the application. The VPS hosts the static client files, the site API, and an Icecast instance where DJs can test their
+stream setup and audio quality. Another VPS hosts AzuraCast, the main radio portion of the site.
 
-### Tech stack
+### Top level
 
-The browser client is a Typescript/VueJS frontend built and deployed statically. Yarn is used for package management,
-and Vite is used as the development server.
+The top level of the repository contains a `package.json` that is used for executing different repository commands. In
+the `tools` folder are a couple of deployment scripts to be run on the VPS when upgrading, and a `docker` directory
+containing all the needed volume directories and environment setup for the app. A `docker-compose.yml` file makes
+setting up the app for development straightforward. These tools can all be accessed simply at the top level using the
+provided `npm run` commands in the top-level `package.json` file.
 
-The web API is a C#/AspNetCore application managing identity and data.
+### Client
 
-Nginx serves the static content and reverse-proxies API requests to the .NET app's Kestrel server. SSL certificates are
-managed through Certbot.
+The client is a VueJS application written using Typescript and SCSS. The client app is held in the `src/client` folder,
+with separate directories for API functions, UI components, composable functions, stores, utility functions, and
+validation. The components are organized by use case; shared components reside in one of the subdirectories there, while
+all route-specific components are held in `src/components/views`. Packages are managed with Yarn 4. PrimeVue is used as
+a component library, with a custom form layout and validation setup used for making form management simpler.
 
-### Deployment
+### Server
 
-Scripts are executed on the VPS manually to deploy changes in the software to the consumers. Especially now in the early
-stages of the app, I don't see a need to containerize the whole setup. However, when I eventually do, I will be setting
-up a CI/CD pipeline for it.
+The server component is a .NET application utilizing AspNetCore. The API services the client app,
+including identity management, scheduling, news, and prerecorded DJ set uploads. The API also holds some admin-specific
+endpoints used for disconnecting DJs from the radio and doing other management of the AzuraCast deployment.
+
+FastEndpoints is used for building out API endpoints. Entity Framework Core is used for database interaction and
+migrations. Hangfire is used to manage scheduled and delayed tasks.
 
 ## Contributing
 

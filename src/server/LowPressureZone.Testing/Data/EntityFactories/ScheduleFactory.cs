@@ -13,7 +13,8 @@ public static class ScheduleFactory
         DateTimeOffset? endsAt = null,
         string? name = null,
         string? description = null,
-        ScheduleType? type = null) =>
+        ScheduleType? type = null,
+        bool? isOrganizersOnly = null) =>
         new()
         {
             Id = id ?? Guid.Empty,
@@ -23,6 +24,7 @@ public static class ScheduleFactory
             EndsAt = endsAt ?? DateTimeOffset.UtcNow.AddHours(1),
             Name = name ?? "Test Schedule",
             Description = description ?? "Test Schedule Description",
-            Type = type ?? ScheduleType.Hourly
+            Type = type ?? ScheduleType.Hourly,
+            IsOrganizersOnly = isOrganizersOnly ?? false
         };
 }

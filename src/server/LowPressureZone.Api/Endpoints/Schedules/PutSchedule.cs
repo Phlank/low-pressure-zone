@@ -20,13 +20,8 @@ public class PutSchedule(DataContext dataContext, ScheduleRules rules)
     public override async Task HandleAsync(ScheduleRequest req, CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        var schedule = await dataContext.Schedules
-                                        .AsSplitQuery()
-                                        .Include(schedule => schedule.Community)
-                                        .ThenInclude(community => community.Relationships)
-                                        .Where(schedule => schedule.Id == id)
-                                        .FirstOrDefaultAsync(ct);
-        if (schedule == null)
+        var schedule = await dataContext.Schedules.FirstOrDefaultAsync(schedule => schedule.Id == id, ct);
+        if (schedule is null)
         {
             await Send.NotFoundAsync(ct);
             return;
@@ -38,7 +33,15 @@ public class PutSchedule(DataContext dataContext, ScheduleRules rules)
             return;
         }
 
-        await Map.UpdateEntityAsync(req, schedule, ct);
+        schedule.Name = req.Name;
+        schedule.StartsAt = req.StartsAt;
+        schedule.EndsAt = req.EndsAt;
+        schedule.CommunityId = req.CommunityId;
+        schedule.Description = req.Description;
+        schedule.IsOrganizersOnly = req.IsOrganizersOnly;
+        schedule.LastModifiedDate = DateTime.UtcNow;
+        await dataContext.SaveChangesAsync(ct);
+
         await Send.NoContentAsync(ct);
     }
 }

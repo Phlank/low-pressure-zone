@@ -17,7 +17,7 @@ public sealed class TimeslotRules(IHttpContextAccessor contextAccessor)
         if (User == null) return false;
         if (timeslot.StartsAt < DateTime.UtcNow) return false;
         if (User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Organizer)) return true;
-        return timeslot.Performer.LinkedUserIds.Contains(User.GetIdOrDefault());
+        return timeslot.Performer.LinkedUserId == User.GetIdOrDefault();
     }
 
     public bool IsDeleteAuthorized(Timeslot timeslot)
@@ -26,6 +26,6 @@ public sealed class TimeslotRules(IHttpContextAccessor contextAccessor)
         if (User == null) return false;
         if (timeslot.StartsAt < DateTime.UtcNow) return false;
         if (User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Organizer)) return true;
-        return timeslot.Performer.LinkedUserIds.Contains(User.GetIdOrDefault());
+        return timeslot.Performer.LinkedUserId == User.GetIdOrDefault();
     }
 }

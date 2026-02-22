@@ -91,7 +91,7 @@ const actionColumnSpan = computed(() => `span ${columns.value <= 4 ? 1 : 2}`)
     column-width: v-bind(columnWidth);
     direction: ltr;
 
-    .form-field {
+    .form-field, .inline-form-field {
       &--xs {
         grid-column: span min(2, v-bind(columns));
       }
@@ -118,8 +118,18 @@ const actionColumnSpan = computed(() => `span ${columns.value <= 4 ? 1 : 2}`)
     }
 
     &--single-column {
+      grid-template-columns: repeat(4, 1fr);
       div.form-field {
         grid-column: span 4;
+      }
+
+      div.inline-form-field {
+        grid-column: span 4;
+        align-items: center;
+
+        &--xs {
+          grid-column: span 2;
+        }
       }
     }
   }
