@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>9d2c548d-3c62-4409-9c65-fe1fa2b047b1</UserSecretsId>
@@ -18,12 +18,13 @@
         <PackageReference Include="FastEndpoints.Security" Version="7.2.0" />
         <PackageReference Include="FastEndpoints.Swagger" Version="7.2.0" />
         <PackageReference Include="FFMpegCore" Version="5.4.0"/>
-        <PackageReference Include="FluentEmail.Mailgun" Version="3.0.2"/>
-        <PackageReference Include="Hangfire.AspNetCore" Version="1.8.22" />
-        <PackageReference Include="Hangfire.Core" Version="1.8.22" />
-        <PackageReference Include="Hangfire.PostgreSql" Version="1.20.13" />
-        <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="9.0.7"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.7">
+        <PackageReference Include="Hangfire.AspNetCore" Version="1.8.23" />
+        <PackageReference Include="Hangfire.Core" Version="1.8.23" />
+        <PackageReference Include="Hangfire.PostgreSql" Version="1.21.1" />
+        <PackageReference Include="jcamp.FluentEmail.Mailgun" Version="4.0.0" />
+        <PackageReference Include="jcamp.FluentEmail.Smtp" Version="4.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="10.0.3"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.3">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

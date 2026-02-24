@@ -1,9 +1,8 @@
-﻿using System.Text.Json;
+﻿using System.Globalization;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using FastEndpoints;
 using FastEndpoints.Swagger;
-using FluentEmail.Core.Interfaces;
-using FluentEmail.Mailgun;
 using Hangfire;
 using Hangfire.PostgreSql;
 using LowPressureZone.Adapter.AzuraCast.Extensions;
@@ -39,7 +38,6 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using NightlyBroadcastDeletionModule = LowPressureZone.Api.Services.NightlyTasks.NightlyBroadcastDeletionModule;
 using NightlyTaskService = LowPressureZone.Api.Services.NightlyTasks.NightlyTaskService;
 
@@ -93,7 +91,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddFastEndpoints();
 
-        builder.Services.AddSingleton<ISender, MailgunSender>(serviceProvider => serviceProvider.CreateMailgunSender());
+        builder.AddFluentEmail();
         builder.Services.AddSingleton<EmailService>();
 
         builder.Services.AddSingleton<MediaAnalyzer>();
@@ -137,7 +135,9 @@ public static class WebApplicationBuilderExtensions
         var hangfireConnectionString = builder.Configuration.GetConnectionString("Data");
         builder.Services.AddHangfire(config =>
         {
-            config.UsePostgreSqlStorage(pgsqlConfig => pgsqlConfig.UseNpgsqlConnection(hangfireConnectionString));
+            config.UsePostgreSqlStorage(pgsqlConfig =>
+                                            pgsqlConfig
+                                                .UseNpgsqlConnection(hangfireConnectionString));
         });
         builder.Services.AddHangfireServer();
     }
@@ -218,10 +218,30 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton<SoundclashRules>();
     }
 
-    private static MailgunSender CreateMailgunSender(this IServiceProvider services)
+    private static void AddFluentEmail(this WebApplicationBuilder builder)
     {
-        var options = services.GetRequiredService<IOptions<EmailServiceConfiguration>>();
-        return new MailgunSender(options.Value.MailgunDomain, options.Value.MailgunApiKey);
+        var mailpitConnectionString = builder.Configuration.GetConnectionString("mailpit");
+        if (mailpitConnectionString is not null)
+        {
+            var split = mailpitConnectionString.Split(":");
+            var host = split[1].Trim('/');
+            var port = Convert.ToInt32(split[2], CultureInfo.InvariantCulture);
+            builder.Services
+                   .AddFluentEmail("noreply@lowpressurezone.com", "Low Pressure Zone")
+                   .AddSmtpSender(host, port);
+        }
+        else
+        {
+            var mailgunApiConfigKey =
+                $"{EmailServiceConfiguration.Name}__{nameof(EmailServiceConfiguration.MailgunApiKey)}";
+            var mailgunDomainConfigKey =
+                $"{EmailServiceConfiguration.Name}__{nameof(EmailServiceConfiguration.MailgunDomain)}";
+            var mailgunApiKey = builder.Configuration.GetValue<string>(mailgunApiConfigKey);
+            var mailgunDomain = builder.Configuration.GetValue<string>(mailgunDomainConfigKey);
+            builder.Services
+                   .AddFluentEmail("noreply@lowpressurezone.com", "Low Pressure Zone")
+                   .AddMailGunSender(mailgunDomain, mailgunApiKey);
+        }
     }
 
     public static void CreateFileLocations(this WebApplicationBuilder builder)

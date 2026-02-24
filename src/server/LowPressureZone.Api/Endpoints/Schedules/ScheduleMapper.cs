@@ -11,7 +11,6 @@ using Shouldly;
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
 public sealed class ScheduleMapper(
-    IHttpContextAccessor accessor,
     CommunityMapper communityMapper,
     TimeslotMapper timeslotMapper,
     SoundclashMapper soundclashMapper,
