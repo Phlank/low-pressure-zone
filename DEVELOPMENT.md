@@ -78,3 +78,7 @@ To ensure database information was seeded correctly, we will log into the applic
 2. On the AppHost dashboard, open the mailpit dashboard in a new tab using the http URL listed for the `mailpit`
    resource. You should see an email for the two-factor authentication token needed to complete login. Use this token to
    complete the login on the web client tab.
+
+### Credentials for other development services
+
+- AzuraCast: `none@email.com`, `SecretSauce1!`
