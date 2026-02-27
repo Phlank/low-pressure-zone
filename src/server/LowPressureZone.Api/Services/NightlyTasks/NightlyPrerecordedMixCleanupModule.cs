@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Services.NightlyTasks;
 
-public sealed class NightlyPrerecordedMixCleanupModule(
+public sealed partial class NightlyPrerecordedMixCleanupModule(
     IServiceProvider services,
     PrerecordedMixCleanupService cleanupService,
     ILogger<NightlyPrerecordedMixCleanupModule> logger)
@@ -24,8 +24,7 @@ public sealed class NightlyPrerecordedMixCleanupModule(
                                                                        && timeslot.EndsAt <= CutoffTime)
                                                     .ToListAsync();
 
-        logger.LogInformation("Deleting media and playlists for {TimeslotCount} past timeslots",
-                              prerecordedTimeslots.Count);
+        LogDeletingMediaAndPlaylistsForTimeslotCountPastTimeslots(logger, prerecordedTimeslots.Count);
         foreach (var timeslot in prerecordedTimeslots)
         {
             var mediaId = timeslot.AzuraCastMediaId!.Value;
@@ -47,4 +46,7 @@ public sealed class NightlyPrerecordedMixCleanupModule(
         await dataContext.SaveChangesAsync();
         logger.LogInformation("Finished deleting media and playlists for past prerecorded timeslots");
     }
+
+    [LoggerMessage(LogLevel.Information, "Deleting media and playlists for {timeslotCount} past timeslots")]
+    static partial void LogDeletingMediaAndPlaylistsForTimeslotCountPastTimeslots(ILogger<NightlyPrerecordedMixCleanupModule> logger, int timeslotCount);
 }

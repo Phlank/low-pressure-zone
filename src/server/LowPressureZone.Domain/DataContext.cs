@@ -1,5 +1,6 @@
 ﻿using LowPressureZone.Domain.Entities;
 using LowPressureZone.Domain.Entities.Settings;
+using LowPressureZone.Domain.Extensions;
 using Microsoft.EntityFrameworkCore;
 using SmartEnum.EFCore;
 
@@ -32,5 +33,12 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
 
         modelBuilder.Entity<Setting>()
                     .HasIndex(nameof(Setting.Key)).IsUnique();
+    }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        if (optionsBuilder.IsConfigured) return;
+        
+        optionsBuilder.ConfigureDomainSeeding();
     }
 }

@@ -12,6 +12,8 @@ public sealed class AzuraCastStatusService(
 {
     private readonly Lock _statusLock = new();
     private readonly PeriodicTimer _timer = new(TimeSpan.FromSeconds(5));
+    
+    public Models.Stream.StreamStatus? Status { get; private set; }
 
     public void Dispose() => _timer.Dispose();
 
@@ -28,8 +30,6 @@ public sealed class AzuraCastStatusService(
         IsStarted = false;
         return Task.CompletedTask;
     }
-
-    public Models.Stream.StreamStatus? Status { get; private set; }
 
     public bool IsStarted { get; private set; }
 

@@ -1,12 +1,25 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.0.11222.15 d18.0
+VisualStudioVersion = 18.0.11222.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LowPressureZone.Api", "src\server\LowPressureZone.Api\LowPressureZone.Api.csproj", "{48DEA454-FC95-4F1D-871D-933869F68AA2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LowPressureZone.Domain", "src\server\LowPressureZone.Domain\LowPressureZone.Domain.csproj", "{B4E91084-5580-4846-9252-0B2892EAABCF}"
 EndProject
+
+				private static async Task RunDomainMigrationsAsync(IServiceScope scope, CancellationToken cancellationToken)
+				{
+								
+								var strategy = dataContext.Database.CreateExecutionStrategy();
+								await strategy.ExecuteAsync(async () => { await dataContext.Database.MigrateAsync(cancellationToken); });
+				}
+
+				private static async Task RunIdentityMigrationsAsync(IServiceScope scope, CancellationToken cancellationToken)
+				{
+								var strategy = identityContext.Database.CreateExecutionStrategy();
+								await strategy.ExecuteAsync(async () => { await identityContext.Database.MigrateAsync(cancellationToken); });
+				}
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LowPressureZone.Identity", "src\server\LowPressureZone.Identity\LowPressureZone.Identity.csproj", "{2E0E7FEF-AAC3-4CBD-912D-B7F5331D8C6C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
@@ -18,6 +31,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		LowPressureZone.sln.DotSettings = LowPressureZone.sln.DotSettings
 		package.json = package.json
 		README.md = README.md
+		DEVELOPMENT.md = DEVELOPMENT.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LowPressureZone.Adapter.AzuraCast", "src\server\LowPressureZone.Adapter.AzuraCast\LowPressureZone.Adapter.AzuraCast.csproj", "{21F2D6ED-C3B5-411D-AF05-9FA5C6FB5CE9}"
@@ -33,6 +47,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LowPressureZone.Testing", "src\server\LowPressureZone.Testing\LowPressureZone.Testing.csproj", "{5DEF3DA9-DCB9-4C29-921B-52AEA5F9D053}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4. Tests", "4. Tests", "{2E2C54E2-972F-4583-BB87-A5B5606D397D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LowPressureZone.Aspire", "src\server\LowPressureZone.Aspire\LowPressureZone.Aspire.csproj", "{66F83131-6ACD-4067-BDE4-8B788DBFDCED}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0. Development Runtime", "0. Development Runtime", "{BD16DBED-7A26-43B3-A844-1ADF1321285C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LowPressureZone.Aspire.Migrations", "src\server\LowPressureZone.Aspire.Migrations\LowPressureZone.Aspire.Migrations.csproj", "{559DF07D-BE6D-4C9B-9C90-1C81146C40F7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LowPressureZone.Aspire.ServiceDefaults", "src\server\LowPressureZone.Aspire.ServiceDefaults\LowPressureZone.Aspire.ServiceDefaults.csproj", "{41881D9F-8A28-427D-84B2-48FDA7630CD1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -116,6 +138,42 @@ Global
 		{5DEF3DA9-DCB9-4C29-921B-52AEA5F9D053}.Release|x64.Build.0 = Release|Any CPU
 		{5DEF3DA9-DCB9-4C29-921B-52AEA5F9D053}.Release|x86.ActiveCfg = Release|Any CPU
 		{5DEF3DA9-DCB9-4C29-921B-52AEA5F9D053}.Release|x86.Build.0 = Release|Any CPU
+		{66F83131-6ACD-4067-BDE4-8B788DBFDCED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66F83131-6ACD-4067-BDE4-8B788DBFDCED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66F83131-6ACD-4067-BDE4-8B788DBFDCED}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{66F83131-6ACD-4067-BDE4-8B788DBFDCED}.Debug|x64.Build.0 = Debug|Any CPU
+		{66F83131-6ACD-4067-BDE4-8B788DBFDCED}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{66F83131-6ACD-4067-BDE4-8B788DBFDCED}.Debug|x86.Build.0 = Debug|Any CPU
+		{66F83131-6ACD-4067-BDE4-8B788DBFDCED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66F83131-6ACD-4067-BDE4-8B788DBFDCED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66F83131-6ACD-4067-BDE4-8B788DBFDCED}.Release|x64.ActiveCfg = Release|Any CPU
+		{66F83131-6ACD-4067-BDE4-8B788DBFDCED}.Release|x64.Build.0 = Release|Any CPU
+		{66F83131-6ACD-4067-BDE4-8B788DBFDCED}.Release|x86.ActiveCfg = Release|Any CPU
+		{66F83131-6ACD-4067-BDE4-8B788DBFDCED}.Release|x86.Build.0 = Release|Any CPU
+		{559DF07D-BE6D-4C9B-9C90-1C81146C40F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{559DF07D-BE6D-4C9B-9C90-1C81146C40F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{559DF07D-BE6D-4C9B-9C90-1C81146C40F7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{559DF07D-BE6D-4C9B-9C90-1C81146C40F7}.Debug|x64.Build.0 = Debug|Any CPU
+		{559DF07D-BE6D-4C9B-9C90-1C81146C40F7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{559DF07D-BE6D-4C9B-9C90-1C81146C40F7}.Debug|x86.Build.0 = Debug|Any CPU
+		{559DF07D-BE6D-4C9B-9C90-1C81146C40F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{559DF07D-BE6D-4C9B-9C90-1C81146C40F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{559DF07D-BE6D-4C9B-9C90-1C81146C40F7}.Release|x64.ActiveCfg = Release|Any CPU
+		{559DF07D-BE6D-4C9B-9C90-1C81146C40F7}.Release|x64.Build.0 = Release|Any CPU
+		{559DF07D-BE6D-4C9B-9C90-1C81146C40F7}.Release|x86.ActiveCfg = Release|Any CPU
+		{559DF07D-BE6D-4C9B-9C90-1C81146C40F7}.Release|x86.Build.0 = Release|Any CPU
+		{41881D9F-8A28-427D-84B2-48FDA7630CD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41881D9F-8A28-427D-84B2-48FDA7630CD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41881D9F-8A28-427D-84B2-48FDA7630CD1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{41881D9F-8A28-427D-84B2-48FDA7630CD1}.Debug|x64.Build.0 = Debug|Any CPU
+		{41881D9F-8A28-427D-84B2-48FDA7630CD1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{41881D9F-8A28-427D-84B2-48FDA7630CD1}.Debug|x86.Build.0 = Debug|Any CPU
+		{41881D9F-8A28-427D-84B2-48FDA7630CD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41881D9F-8A28-427D-84B2-48FDA7630CD1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41881D9F-8A28-427D-84B2-48FDA7630CD1}.Release|x64.ActiveCfg = Release|Any CPU
+		{41881D9F-8A28-427D-84B2-48FDA7630CD1}.Release|x64.Build.0 = Release|Any CPU
+		{41881D9F-8A28-427D-84B2-48FDA7630CD1}.Release|x86.ActiveCfg = Release|Any CPU
+		{41881D9F-8A28-427D-84B2-48FDA7630CD1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -127,6 +185,9 @@ Global
 		{21F2D6ED-C3B5-411D-AF05-9FA5C6FB5CE9} = {21C27C36-5628-47D2-A6B4-21A4748CEE6A}
 		{6F15A668-3BE3-469D-9983-87CD9936BF61} = {C8CE0E2B-370A-43AB-888A-65BF960BA18B}
 		{5DEF3DA9-DCB9-4C29-921B-52AEA5F9D053} = {2E2C54E2-972F-4583-BB87-A5B5606D397D}
+		{66F83131-6ACD-4067-BDE4-8B788DBFDCED} = {BD16DBED-7A26-43B3-A844-1ADF1321285C}
+		{559DF07D-BE6D-4C9B-9C90-1C81146C40F7} = {BD16DBED-7A26-43B3-A844-1ADF1321285C}
+		{41881D9F-8A28-427D-84B2-48FDA7630CD1} = {BD16DBED-7A26-43B3-A844-1ADF1321285C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E01F24AA-56EC-4C41-A7A6-82A3D36C4C70}

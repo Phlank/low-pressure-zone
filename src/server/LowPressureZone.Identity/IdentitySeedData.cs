@@ -1,6 +1,6 @@
 ﻿namespace LowPressureZone.Identity;
 
-public class IdentitySeedData
+public sealed class IdentitySeedData
 {
     public required string AdminDisplayName { get; set; }
     public required string AdminUsername { get; set; }
