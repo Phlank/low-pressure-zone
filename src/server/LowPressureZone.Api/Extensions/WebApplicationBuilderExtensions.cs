@@ -222,12 +222,12 @@ public static class WebApplicationBuilderExtensions
         var mailpitConnectionString = builder.Configuration.GetConnectionString("mailpit");
         if (mailpitConnectionString is not null)
         {
-            var split = mailpitConnectionString.Split(":");
-            var host = split[1].Trim('/');
-            var port = Convert.ToInt32(split[2], CultureInfo.InvariantCulture);
+            // Format is Endpoint={SmtpUrl}
+            var uriPart = mailpitConnectionString.Split('=')[1];
+            Uri url = new(uriPart);
             builder.Services
                    .AddFluentEmail("noreply@lowpressurezone.com", "Low Pressure Zone")
-                   .AddSmtpSender(host, port);
+                   .AddSmtpSender(url.Host, url.Port);
         }
         else
         {

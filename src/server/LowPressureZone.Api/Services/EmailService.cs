@@ -12,7 +12,7 @@ namespace LowPressureZone.Api.Services;
 public sealed class EmailService(
     IOptions<EmailServiceConfiguration> options,
     UriService uriService,
-    IFluentEmail email,
+    IFluentEmailFactory emailFactory,
     ILogger<EmailService> logger)
 {
     private static readonly Action<ILogger, string, Exception?> LogEmailFailure =
@@ -21,11 +21,13 @@ public sealed class EmailService(
 
     private async Task<Result<SendResponse, SendResponse>> SendAsync(string toAddress, string subject, string body)
     {
-        var sendResponse = await email.SetFrom(options.Value.FromAddress)
-                                      .To(toAddress)
-                                      .Subject(subject)
-                                      .Body(body)
-                                      .SendAsync();
+        var email = emailFactory.Create()
+                                .SetFrom(options.Value.FromAddress)
+                                .To(toAddress)
+                                .Subject(subject)
+                                .Body(body);
+        var sendResponse = await email.SendAsync();
+
         if (sendResponse.Successful)
             return Result.Ok<SendResponse, SendResponse>(sendResponse);
 
