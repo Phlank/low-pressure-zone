@@ -1,0 +1,193 @@
+###############################################################################
+#
+#  Media (MIME) types and the extensions that represent them.
+#
+#  The format of this file is a media type on the left and zero or more
+#  filename extensions on the right.  Programs using this file will map
+#  files ending with those extensions to the associated type.
+#
+#  This file is part of the "media-types" package.  Please report a bug using
+#  the "reportbug" command of the "reportbug" package if you would like new
+#  types or extensions to be added.
+#
+#  The reason that all types are managed by the media-types package instead
+#  allowing individual packages to install types in much the same way as they
+#  add entries in to the mailcap file is so these types can be referenced by
+#  other programs (such as a web server) even if the specific support package
+#  for that type is not installed.
+#
+#  Users can add their own types if they wish by creating a ".mime.types"
+#  file in their home directory.  Definitions included there will take
+#  precedence over those listed here.
+#
+###############################################################################
+
+audio/1d-interleaved-parityfec
+audio/32kadpcm					726
+audio/3gpp
+audio/3gpp2
+audio/aac					adts aac ass
+audio/ac3					ac3
+audio/AMR					amr AMR
+audio/AMR-WB					awb AWB
+audio/amr-wb+
+audio/annodex					axa
+audio/aptx
+audio/asc					acn
+audio/ATRAC-ADVANCED-LOSSLESS			aal
+audio/ATRAC-X					atx
+audio/ATRAC3					at3 aa3 omg
+audio/basic					au snd
+audio/BV16
+audio/BV32
+audio/clearmode
+audio/CN
+audio/csound					csd orc sco
+audio/DAT12
+audio/dls					dls
+audio/dsr-es201108
+audio/dsr-es202050
+audio/dsr-es202211
+audio/dsr-es202212
+audio/DV
+audio/DVI4
+audio/eac3
+audio/encaprtp
+audio/EVRC					evc
+audio/EVRC-QCP					qcp QCP
+audio/EVRC0
+audio/EVRC1
+audio/EVRCB					evb
+audio/EVRCB0
+audio/EVRCB1
+audio/EVRCNW					enw
+audio/EVRCNW0
+audio/EVRCNW1
+audio/EVRCWB					evw
+audio/EVRCWB0
+audio/EVRCWB1
+audio/EVS
+audio/example
+audio/flac					flac
+audio/flexfec
+audio/fwdred
+audio/G711-0
+audio/G719
+audio/G722
+audio/G7221
+audio/G723
+audio/G726-16
+audio/G726-24
+audio/G726-32
+audio/G726-40
+audio/G728
+audio/G729
+audio/G7291
+audio/G729D
+audio/G729E
+audio/GSM
+audio/GSM-EFR
+audio/GSM-HR-08
+audio/iLBC					lbc
+audio/ip-mr_v2.5
+audio/L16					l16
+audio/L20
+audio/L24
+audio/L8
+audio/LPC
+audio/MELP
+audio/MELP1200
+audio/MELP2400
+audio/MELP600
+audio/mhas					mhas
+audio/mobile-xmf				mxmf
+audio/mp4					m4a
+audio/MP4A-LATM
+audio/MPA
+audio/mpa-robust
+audio/mpeg					mpga mpega mp1 mp2 mp3
+audio/mpeg4-generic
+audio/mpegurl					m3u
+audio/ogg					oga ogg opus spx
+audio/opus
+audio/parityfec
+audio/PCMA
+audio/PCMA-WB
+audio/PCMU
+audio/PCMU-WB
+audio/prs.sid					sid psid
+audio/QCELP
+audio/raptorfec
+audio/RED
+audio/rtp-enc-aescm128
+audio/rtp-midi
+audio/rtploopback
+audio/rtx
+audio/scip
+audio/SMV					smv
+audio/SMV-QCP
+audio/SMV0
+audio/sofa					sofa
+audio/sp-midi					mid
+audio/speex
+audio/t140c
+audio/t38
+audio/telephone-event
+audio/TETRA_ACELP
+audio/TETRA_ACELP_BB
+audio/tone
+audio/TSVCIS
+audio/UEMCLIP
+audio/ulpfec
+audio/usac					loas xhe
+audio/VDVI
+audio/VMR-WB
+audio/vnd.3gpp.iufp
+audio/vnd.4SB
+audio/vnd.audiokoz				koz
+audio/vnd.CELP
+audio/vnd.cisco.nse
+audio/vnd.cmles.radio-events
+audio/vnd.cns.anp1
+audio/vnd.cns.inf1
+audio/vnd.dece.audio				uva uvva
+audio/vnd.digital-winds				eol
+audio/vnd.dlna.adts
+audio/vnd.dolby.heaac.1
+audio/vnd.dolby.heaac.2
+audio/vnd.dolby.mlp				mlp
+audio/vnd.dolby.mps
+audio/vnd.dolby.pl2
+audio/vnd.dolby.pl2x
+audio/vnd.dolby.pl2z
+audio/vnd.dolby.pulse.1
+audio/vnd.dra
+audio/vnd.dts					dts
+audio/vnd.dts.hd				dtshd
+audio/vnd.dts.uhd
+audio/vnd.dvb.file
+audio/vnd.everad.plj				plj
+audio/vnd.hns.audio
+audio/vnd.lucent.voice				lvp
+audio/vnd.ms-playready.media.pya		pya
+audio/vnd.nokia.mobile-xmf
+audio/vnd.nortel.vbk				vbk
+audio/vnd.nuera.ecelp4800			ecelp4800
+audio/vnd.nuera.ecelp7470			ecelp7470
+audio/vnd.nuera.ecelp9600			ecelp9600
+audio/vnd.octel.sbc
+audio/vnd.presonus.multitrack			multitrack
+audio/vnd.rhetorex.32kadpcm
+audio/vnd.rip					rip
+audio/vnd.sealedmedia.softseal.mpeg		smp3 smp s1m
+audio/vnd.vmx.cvsd
+audio/vorbis
+audio/vorbis-config
+audio/x-aiff					aif aiff aifc
+audio/x-gsm					gsm
+audio/x-ms-wax					wax
+audio/x-ms-wma					wma
+audio/x-pn-realaudio				ra rm ram
+audio/x-scpls					pls
+audio/x-sd2					sd2
+audio/x-wav					wav

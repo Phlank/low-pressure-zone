@@ -61,8 +61,7 @@ public static class WebApplicationBuilderExtensions
             options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
-
-        services.Configure<IcecastConfiguration>(builder.Configuration.GetSection(IcecastConfiguration.Name));
+        
         services.Configure<StreamingConfiguration>(builder.Configuration.GetSection(StreamingConfiguration.Name));
         services.Configure<EmailServiceConfiguration>(builder.Configuration.GetSection(EmailServiceConfiguration.Name));
         services.Configure<UrlConfiguration>(builder.Configuration.GetSection(UrlConfiguration.Name));
