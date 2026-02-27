@@ -34,7 +34,7 @@ coverage
 .vs/
 bin/
 obj/
-appsettings*json
+appsettings.*.json
 
 # Local environment files
 .idea/.idea.LowPressureZone/.idea/copilot**

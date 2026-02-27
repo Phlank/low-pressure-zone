@@ -4,8 +4,8 @@
   "description": "Handles development dependencies and deployment.",
   "scripts": {
     "deploy-prod": "./tools/deploy-client.sh && ./tools/deploy-server.sh",
-    "initialize-mounts": "node -e \"const p=process.platform; const cmd=p==='win32'?'npm run initialize-mounts:windows':'npm run initialize-mounts:linux'; require('child_process').execSync(cmd,{stdio:'inherit'})\"",
-    "initialize-mounts:windows": "powershell -ExecutionPolicy Bypass -File tools\\initialize-mountfiles.ps1",
-    "initialize-mounts:linux": "bash ./tools/initialize-mountfiles.sh"
+    "initialize-development": "node -e \"const p=process.platform; const cmd=p==='win32'?'npm run initialize-development:windows':'npm run initialize-development:linux'; require('child_process').execSync(cmd,{stdio:'inherit'})\"",
+    "initialize-development:windows": "powershell -ExecutionPolicy Bypass -File tools\\initialize-development.ps1",
+    "initialize-development:linux": "bash ./tools/initialize-development.sh"
   }
 }
