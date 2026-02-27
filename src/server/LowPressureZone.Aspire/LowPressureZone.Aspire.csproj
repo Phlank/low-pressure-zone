@@ -19,7 +19,6 @@
     <ItemGroup>
         <ProjectReference Include="../LowPressureZone.Api/LowPressureZone.Api.csproj" />
         <ProjectReference Include="../LowPressureZone.Aspire.Migrations/LowPressureZone.Aspire.Migrations.csproj" />
-        <ProjectReference Include="../LowPressureZone.Aspire.ServiceDefaults/LowPressureZone.Aspire.ServiceDefaults.csproj" />
     </ItemGroup>
 
 </Project>

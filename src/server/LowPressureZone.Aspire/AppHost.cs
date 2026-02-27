@@ -1,5 +1,7 @@
 using Projects;
 
+// ReSharper disable UnusedVariable
+
 const string bindMountDir = "../../../tools/mounts";
 
 var builder = DistributedApplication.CreateBuilder(args);
@@ -56,6 +58,6 @@ var api = builder.AddProject<LowPressureZone_Api>("lpz-api")
 var client = builder.AddViteApp("lpz-client", "../../client")
                     .WithYarn()
                     .WithRunScript("dev")
-                    .WithHttpEndpoint(port: 4001, env: "PORT", name: "Client");
+                    .WithHttpEndpoint(4001, env: "PORT", name: "Client");
 
 builder.Build().Run();

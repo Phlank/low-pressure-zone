@@ -36,6 +36,6 @@ public static class DbContextOptionsBuilderExtensions
     {
         public void ConfigureDomainSeeding() =>
             optionsBuilder.UseSeeding((context, _) => { Seed_AddCommunity(context); })
-                          .UseAsyncSeeding(async (context, _, ct) => { Seed_AddCommunityAsync(context, ct); });
+                          .UseAsyncSeeding(async (context, _, ct) => { await Seed_AddCommunityAsync(context, ct); });
     }
 }
