@@ -10,13 +10,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FastEndpoints" Version="7.2.0" />
-        <PackageReference Include="FastEndpoints.Generator" Version="7.2.0">
+        <PackageReference Include="FastEndpoints" Version="8.0.1" />
+        <PackageReference Include="FastEndpoints.Generator" Version="8.0.1">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="FastEndpoints.Security" Version="7.2.0" />
-        <PackageReference Include="FastEndpoints.Swagger" Version="7.2.0" />
+        <PackageReference Include="FastEndpoints.Security" Version="8.0.1" />
+        <PackageReference Include="FastEndpoints.Swagger" Version="8.0.1" />
         <PackageReference Include="FFMpegCore" Version="5.4.0"/>
         <PackageReference Include="Hangfire.AspNetCore" Version="1.8.23" />
         <PackageReference Include="Hangfire.Core" Version="1.8.23" />
