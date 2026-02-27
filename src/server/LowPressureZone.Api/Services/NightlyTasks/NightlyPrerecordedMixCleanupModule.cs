@@ -24,7 +24,7 @@ public sealed partial class NightlyPrerecordedMixCleanupModule(
                                                                        && timeslot.EndsAt <= CutoffTime)
                                                     .ToListAsync();
 
-        LogDeletingMediaAndPlaylistsForTimeslotcountPastTimeslots(logger, prerecordedTimeslots.Count);
+        LogDeletingMediaAndPlaylistsForTimeslotCountPastTimeslots(logger, prerecordedTimeslots.Count);
         foreach (var timeslot in prerecordedTimeslots)
         {
             var mediaId = timeslot.AzuraCastMediaId!.Value;
@@ -48,5 +48,5 @@ public sealed partial class NightlyPrerecordedMixCleanupModule(
     }
 
     [LoggerMessage(LogLevel.Information, "Deleting media and playlists for {timeslotCount} past timeslots")]
-    static partial void LogDeletingMediaAndPlaylistsForTimeslotcountPastTimeslots(ILogger<NightlyPrerecordedMixCleanupModule> logger, int timeslotCount);
+    static partial void LogDeletingMediaAndPlaylistsForTimeslotCountPastTimeslots(ILogger<NightlyPrerecordedMixCleanupModule> logger, int timeslotCount);
 }
