@@ -16,7 +16,7 @@ public sealed class Worker(
     {
         using var activity = ActivitySource.StartActivity(nameof(Migrations), ActivityKind.Client);
         using var scope = serviceProvider.CreateScope();
-        
+
         var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
         var identityContext = scope.ServiceProvider.GetRequiredService<IdentityContext>();
 

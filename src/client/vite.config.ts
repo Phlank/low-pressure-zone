@@ -7,7 +7,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 export default defineConfig(() => {
   const config = {
     host: true,
-    port: 4001,
+    port: parseInt(process.env['PORT'] ?? '4001'),
     strictPort: true
   }
 

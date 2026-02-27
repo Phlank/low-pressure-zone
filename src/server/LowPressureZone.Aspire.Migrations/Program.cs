@@ -1,4 +1,5 @@
 using LowPressureZone.Aspire.Migrations;
+using LowPressureZone.Aspire.ServiceDefaults;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Extensions;
 using LowPressureZone.Identity;
@@ -14,7 +15,8 @@ builder.Services
        .WithTracing(tracing => tracing.AddSource(Worker.ActivitySourceName));
 
 builder.AddNpgsqlDbContext<DataContext>("Data", configureDbContextOptions: config => config.ConfigureDomainSeeding());
-builder.AddNpgsqlDbContext<IdentityContext>("Identity", configureDbContextOptions: config => config.ConfigureIdentitySeeding());
+builder.AddNpgsqlDbContext<IdentityContext>("Identity",
+                                            configureDbContextOptions: config => config.ConfigureIdentitySeeding());
 
 var host = builder.Build();
 host.Run();

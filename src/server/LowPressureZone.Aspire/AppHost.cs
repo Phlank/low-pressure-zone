@@ -1,6 +1,3 @@
-using LowPressureZone.Aspire.Extensions;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Projects;
 
 const string bindMountDir = "../../../tools/mounts";
@@ -20,17 +17,17 @@ var migrations = builder.AddProject<LowPressureZone_Aspire_Migrations>("migratio
                         .WithReference(identityDatabase, "Identity");
 
 var azuracast = builder.AddContainer("azuracast", "ghcr.io/azuracast/azuracast", "0.23.2")
-                       .WithBindMount(source: $"{bindMountDir}/azuracast/stations",
-                                      target: "/var/azuracast/stations")
-                       .WithBindMount(source: $"{bindMountDir}/azuracast/backups",
-                                      target: "/var/azuracast/backups")
-                       .WithBindMount(source: $"{bindMountDir}/azuracast/database",
-                                      target: "/var/lib/mysql")
-                       .WithBindMount(source: $"{bindMountDir}/azuracast/uploads",
-                                      target: "/var/lib/azuracast/storage/uploads")
-                       .WithHttpEndpoint(port: 8147, targetPort: 80, name: "Web")
-                       .WithHttpEndpoint(port: 8030, targetPort: 8030, name: "Streaming")
-                       .WithEndpoint(port: 8149, targetPort: 2022, name: "SFTP", scheme: "sftp", isExternal: true)
+                       .WithBindMount($"{bindMountDir}/azuracast/stations",
+                                      "/var/azuracast/stations")
+                       .WithBindMount($"{bindMountDir}/azuracast/backups",
+                                      "/var/azuracast/backups")
+                       .WithBindMount($"{bindMountDir}/azuracast/database",
+                                      "/var/lib/mysql")
+                       .WithBindMount($"{bindMountDir}/azuracast/uploads",
+                                      "/var/lib/azuracast/storage/uploads")
+                       .WithHttpEndpoint(8147, 80, "Web")
+                       .WithHttpEndpoint(8030, 8030, "Streaming")
+                       .WithEndpoint(8149, 2022, name: "SFTP", scheme: "sftp", isExternal: true)
                        .WithExternalHttpEndpoints()
                        .WithEnvironment(environment =>
                        {
@@ -39,13 +36,13 @@ var azuracast = builder.AddContainer("azuracast", "ghcr.io/azuracast/azuracast",
                        });
 
 var icecast = builder.AddContainer("icecast", "deepcomp/icecast2", "2.4.4")
-                     .WithBindMount(source: $"{bindMountDir}/icecast2/icecast.xml",
-                                    target: "/etc/icecast2/icecast.xml")
-                     .WithBindMount(source: $"{bindMountDir}/icecast2/log",
-                                    target: "/var/log/icecast2")
-                     .WithBindMount(source: $"{bindMountDir}/icecast2/mime.types",
-                                    target: "/etc/mime.types")
-                     .WithHttpEndpoint(port: 8000, targetPort: 8000, name: "icecast");
+                     .WithBindMount($"{bindMountDir}/icecast2/icecast.xml",
+                                    "/etc/icecast2/icecast.xml")
+                     .WithBindMount($"{bindMountDir}/icecast2/log",
+                                    "/var/log/icecast2")
+                     .WithBindMount($"{bindMountDir}/icecast2/mime.types",
+                                    "/etc/mime.types")
+                     .WithHttpEndpoint(8000, 8000, "icecast");
 
 var mailpit = builder.AddMailPit("mailpit", 9280, 9281);
 
@@ -60,6 +57,7 @@ var api = builder.AddProject<LowPressureZone_Api>("lpz-api")
 // http://localhost:4001
 var client = builder.AddViteApp("lpz-client", "../../client")
                     .WithYarn()
-                    .WaitFor(api);
+                    .WithRunScript("dev")
+                    .WithHttpEndpoint(port: 4001, env: "PORT", name: "Client");
 
 builder.Build().Run();
