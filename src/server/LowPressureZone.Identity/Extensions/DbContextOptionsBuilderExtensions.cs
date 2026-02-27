@@ -8,30 +8,14 @@ namespace LowPressureZone.Identity.Extensions;
 
 public static class DbContextOptionsBuilderExtensions
 {
-    extension(DbContextOptionsBuilder optionsBuilder)
-    {
-        public void ConfigureSeeding()
-        {
-            optionsBuilder.UseSeeding((context, _) =>
-            {
-                Seed_AddRoles(context);
-                Seed_AddAdminUser(context);
-            }).UseAsyncSeeding(async (context, _, ct) =>
-            {
-                await Seed_AddRolesAsync(context, ct);
-                await Seed_AddAdminUserAsync(context, ct);
-            });
-        }
-    }
-    
-        private static void Seed_AddAdminUser(DbContext context)
+    private static void Seed_AddAdminUser(DbContext context)
     {
         var users = context.Set<AppUser>();
         var roles = context.Set<AppRole>();
         if (!users.Any())
         {
             var seedData = GetSeedData();
-            if (seedData is null) 
+            if (seedData is null)
                 return;
             var hasher = new PasswordHasher<AppUser>();
             var user = new AppUser
@@ -67,7 +51,7 @@ public static class DbContextOptionsBuilderExtensions
 
         context.SaveChanges();
     }
-    
+
     private static async Task Seed_AddAdminUserAsync(DbContext context, CancellationToken ct)
     {
         var users = context.Set<AppUser>();
@@ -157,5 +141,19 @@ public static class DbContextOptionsBuilderExtensions
                                                .Build();
         var section = config.GetSection("SeedData:Identity");
         return section.Get<IdentitySeedData>();
+    }
+
+    extension(DbContextOptionsBuilder optionsBuilder)
+    {
+        public void ConfigureIdentitySeeding() =>
+            optionsBuilder.UseSeeding((context, _) =>
+            {
+                Seed_AddRoles(context);
+                Seed_AddAdminUser(context);
+            }).UseAsyncSeeding(async (context, _, ct) =>
+            {
+                await Seed_AddRolesAsync(context, ct);
+                await Seed_AddAdminUserAsync(context, ct);
+            });
     }
 }

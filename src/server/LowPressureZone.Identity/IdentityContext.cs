@@ -19,6 +19,6 @@ public class IdentityContext(DbContextOptions<IdentityContext> options)
     {
         if (optionsBuilder.IsConfigured) return;
         
-        optionsBuilder.ConfigureSeeding();
+        optionsBuilder.ConfigureIdentitySeeding();
     }
 }

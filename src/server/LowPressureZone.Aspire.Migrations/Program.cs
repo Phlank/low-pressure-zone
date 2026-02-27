@@ -1,5 +1,6 @@
 using LowPressureZone.Aspire.Migrations;
 using LowPressureZone.Domain;
+using LowPressureZone.Domain.Extensions;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Extensions;
 
@@ -12,8 +13,8 @@ builder.Services
        .AddOpenTelemetry()
        .WithTracing(tracing => tracing.AddSource(Worker.ActivitySourceName));
 
-builder.AddNpgsqlDbContext<DataContext>("Data");
-builder.AddNpgsqlDbContext<IdentityContext>("Identity", configureDbContextOptions: config => config.ConfigureSeeding());
+builder.AddNpgsqlDbContext<DataContext>("Data", configureDbContextOptions: config => config.ConfigureDomainSeeding());
+builder.AddNpgsqlDbContext<IdentityContext>("Identity", configureDbContextOptions: config => config.ConfigureIdentitySeeding());
 
 var host = builder.Build();
 host.Run();
