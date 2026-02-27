@@ -4,8 +4,9 @@
   "description": "Handles development dependencies and deployment.",
   "scripts": {
     "deploy-prod": "./tools/deploy-client.sh && ./tools/deploy-server.sh",
-    "initialize-development": "node -e \"const p=process.platform; const cmd=p==='win32'?'npm run initialize-development:windows':'npm run initialize-development:linux'; require('child_process').execSync(cmd,{stdio:'inherit'})\"",
+    "initialize-development": "node -e \"const p=process.platform; const cmd=p==='win32'?'npm run initialize-development:windows':(p==='darwin'?'npm run initialize-development:macos':'npm run initialize-development:linux'); require('child_process').execSync(cmd,{stdio:'inherit'})\"",
     "initialize-development:windows": "powershell -ExecutionPolicy Bypass -File tools\\initialize-development.ps1",
-    "initialize-development:linux": "bash ./tools/initialize-development.sh"
+    "initialize-development:linux": "bash ./tools/initialize-development.linux.sh",
+    "initialize-development:macos": "bash ./tools/initialize-development.macos.sh"
   }
 }
