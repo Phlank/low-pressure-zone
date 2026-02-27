@@ -53,8 +53,6 @@ var api = builder.AddProject<LowPressureZone_Api>("lpz-api")
                  .WithReference(domainDatabase, "Data")
                  .WithReference(identityDatabase, "Identity");
 
-// Runs on 4001, the argument pass to yarn is broken in Aspire.
-// http://localhost:4001
 var client = builder.AddViteApp("lpz-client", "../../client")
                     .WithYarn()
                     .WithRunScript("dev")
