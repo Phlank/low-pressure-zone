@@ -2,6 +2,17 @@
 
 This document contains information regarding the local environment setup needed for developing Low Pressure Zone.
 
+- [Setup guide](#setup-guide)
+    - [Prerequisites](#prerequisites)
+    - [Setup steps](#setup-steps)
+        - [Fork](#fork)
+        - [Initialize development files](#initialize-development-files)
+        - [Running the application](#running-the-application)
+- [Running the application](#running-the-application)
+    - [View the AppHost dashboard](#view-the-apphost-dashboard)
+    - [Log into the web client](#log-into-the-web-client)
+    - [Credentials for other development services](#credentials-for-other-development-services)
+
 # Setup guide
 
 ## Prerequisites
@@ -24,6 +35,9 @@ Development for Low Pressure Zone requires the following to be installed on your
     1. Free for open-source use.
     2. Cross-platform, formatting and cleanup profiles will be applied uniformly between development environments.
     3. Handles both server and client code extremely well.
+6. [FFMpeg](https://www.ffmpeg.org/) is used for transcoding and altering files uploaded for prerecorded timeslots.
+   This isn't a must-have if the feature you are working on doesn't deal with uploading prerecorded sets. Ensure that
+   the binaries directory is included in your PATH.
 
 ## Setup steps
 
@@ -48,7 +62,7 @@ This does two things:
 2. Creates the initial `appsettings.Development.json` files in the LowPressureZone.Aspire.Migrations and
    LowPressureZone.Api projects.
 
-### Running the application
+# Running the application
 
 1. Open JetBrains Rider.
 2. Using the menu at the top left, do **File** > **Open** > **Open** and navigate to the repository location.
@@ -59,7 +73,7 @@ This does two things:
     2. Right click the **LowPressureZone.Aspire** item and select **Run 'LowPressureZone.Aspire'** in the context menu
        that appears.
 
-### View the AppHost dashboard
+## View the AppHost dashboard
 
 At this point, orchestration should have begun. In Rider,
 
@@ -69,7 +83,7 @@ At this point, orchestration should have begun. In Rider,
 
 At this page, you can view the status of all components of the application running, view their logs, etc.
 
-### Log into the web client
+## Log into the web client
 
 To ensure database information was seeded correctly, we will log into the application. On the AppHost dashboard:
 
@@ -79,6 +93,6 @@ To ensure database information was seeded correctly, we will log into the applic
    resource. You should see an email for the two-factor authentication token needed to complete login. Use this token to
    complete the login on the web client tab.
 
-### Credentials for other development services
+## Credentials for other development services
 
 - AzuraCast: `none@email.com`, `SecretSauce1!`
