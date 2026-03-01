@@ -1,6 +1,8 @@
 <template>
   <div class="timeslots-grid">
-    <p class="timeslots-grid__schedule-description">{{ schedule?.description }}</p>
+    <MarkdownContent
+      v-if="schedule.description"
+      :content="schedule.description" />
     <DataTable
       v-if="!isMobile"
       :value="rows"
@@ -102,10 +104,10 @@ import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
 import TimeslotForm from '@/components/form/requestForms/TimeslotForm.vue'
 import {
   formatReadableTime,
-  timesBetween,
   isDateInTimeslot,
   parseDate,
-  parseTime
+  parseTime,
+  timesBetween
 } from '@/utils/dateUtils'
 import { Column, DataTable, DataView, Divider } from 'primevue'
 import { computed, inject, onMounted, ref, type Ref, useTemplateRef, watch } from 'vue'
@@ -115,6 +117,7 @@ import SlotTime from '@/components/controls/SlotTime.vue'
 import SlotName from '@/components/controls/SlotName.vue'
 import FormDrawer from '@/components/form/FormDrawer.vue'
 import type { ScheduleResponse } from '@/api/resources/schedulesApi.ts'
+import MarkdownContent from '@/components/controls/MarkdownContent.vue'
 
 const props = defineProps<{
   schedule: ScheduleResponse
@@ -137,7 +140,8 @@ watch(
   () => props.schedule,
   () => {
     setupRows()
-  }, { deep: true }
+  },
+  { deep: true }
 )
 
 const setupRows = () => {
