@@ -20,7 +20,7 @@
         <div
           v-if="schedule !== undefined && schedule.description !== ''"
           class="upcoming-schedules__content__description">
-          {{ schedule.description }}
+          <MarkdownContent :content="schedule.description" />
         </div>
         <HomeTimeslotGrid
           v-if="schedule?.type === scheduleTypes.Hourly"
@@ -41,6 +41,7 @@ import { useScheduleStore } from '@/stores/scheduleStore.ts'
 import HomeTimeslotGrid from '@/components/views/home/HomeTimeslotGrid.vue'
 import { scheduleTypes } from '@/constants/scheduleTypes.ts'
 import HomeSoundclashGrid from '@/components/views/home/HomeSoundclashGrid.vue'
+import MarkdownContent from "@/components/controls/MarkdownContent.vue";
 
 const schedules = useScheduleStore()
 
