@@ -1,12 +1,10 @@
 using FFMpegCore;
 using FFMpegCore.Enums;
-using LowPressureZone.Api.Models.Configuration;
 using LowPressureZone.Core;
-using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Api.Services.Audio;
 
-public sealed partial class Mp3Processor(ILogger<Mp3Processor> logger, IOptions<FileConfiguration> fileConfig)
+public sealed partial class Mp3Processor(ILogger<Mp3Processor> logger)
 {
     public async Task<Result<string, string>> ConvertFileToMp3Async(string inputFilePath)
     {

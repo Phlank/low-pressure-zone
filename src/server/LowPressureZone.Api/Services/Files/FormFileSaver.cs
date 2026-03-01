@@ -1,11 +1,8 @@
-using LowPressureZone.Api.Models.Configuration;
 using LowPressureZone.Core;
-using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Api.Services.Files;
 
 public sealed partial class FormFileSaver(
-    IOptions<FileConfiguration> fileConfig,
     EmailService emailer,
     ILogger<FormFileSaver> logger)
 {
