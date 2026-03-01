@@ -28,7 +28,6 @@ public sealed class PrerecordedMixFileProcessor(
     IOptions<FileConfiguration> fileOptions)
 {
     private readonly string _prerecordedSetLocation = fileOptions.Value.AzuraCastPrerecordedSetLocation;
-    private readonly string _tempLocation = fileOptions.Value.TemporaryLocation;
 
     public async Task<Result<string, IEnumerable<ValidationFailure>>> ProcessRequestFileToMp3Async(
         TimeslotRequest request,
@@ -57,7 +56,7 @@ public sealed class PrerecordedMixFileProcessor(
 
         var newMetadata = await GetAudioMetadataAsync(request, scheduleStart, ct);
         var fileName = GetUploadFileName(newMetadata.Artist, newMetadata.Title, request.StartsAt);
-        var outputFilePath = Path.Combine(_tempLocation, fileName);
+        var outputFilePath = Path.Combine(Path.GetTempPath(), fileName);
 
         var processResult = await ProcessToNewFile(analysis, saveResult.Value);
         _ = await fileSaver.DeleteFileAsync(saveResult.Value);

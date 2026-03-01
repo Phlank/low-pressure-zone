@@ -9,9 +9,7 @@ public sealed partial class FormFileSaver(
     EmailService emailer,
     ILogger<FormFileSaver> logger)
 {
-    private readonly string _temporaryLocation = fileConfig.Value.TemporaryLocation;
-
-    private string GetPathForFileName(string fileName) => Path.Combine(_temporaryLocation, fileName);
+    private static string GetPathForFileName(string fileName) => Path.Combine(Path.GetTempPath(), fileName);
 
     public async Task<Result<string, string>> SaveFormFileAsync(IFormFile file, CancellationToken ct = default)
     {

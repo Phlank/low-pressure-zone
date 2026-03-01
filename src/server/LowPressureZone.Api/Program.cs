@@ -19,7 +19,6 @@ builder.Services.Configure<JsonOptions>(options =>
 builder.ConfigureKestrel();
 builder.ConfigureWebApi();
 builder.AddApiServices();
-builder.CreateFileLocations();
 
 var app = builder.Build();
 app.UseForwardedHeaders(new ForwardedHeadersOptions
