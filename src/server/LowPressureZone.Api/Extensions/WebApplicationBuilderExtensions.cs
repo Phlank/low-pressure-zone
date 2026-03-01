@@ -242,15 +242,4 @@ public static class WebApplicationBuilderExtensions
                    .AddMailGunSender(mailgunDomain, mailgunApiKey);
         }
     }
-
-    public static void CreateFileLocations(this WebApplicationBuilder builder)
-    {
-        const string tempLocationKey = $"{FileConfiguration.Name}:{nameof(FileConfiguration.TemporaryLocation)}";
-        var temporaryFilePath = builder.Configuration.GetValue<string>(tempLocationKey);
-
-        if (temporaryFilePath is null)
-            throw new InvalidOperationException("Temporary file path is not configured.");
-
-        if (!Directory.Exists(temporaryFilePath)) Directory.CreateDirectory(temporaryFilePath);
-    }
 }

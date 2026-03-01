@@ -2,110 +2,113 @@
   <div class="schedule-form">
     <FormArea>
       <IftaFormField
-        :message="validation.message('name')"
+        :message="val.message('name')"
         input-id="nameInput"
         label="Name"
         size="m">
         <InputText
           id="nameInput"
-          v-model:model-value="formState.name"
+          v-model:model-value="state.name"
           :disabled="isSubmitting"
-          :invalid="!validation.isValid('name')"
-          @update:model-value="validation.validateIfDirty('name')" />
+          :invalid="!val.isValid('name')"
+          @update:model-value="val.validateIfDirty('name')" />
       </IftaFormField>
       <IftaFormField
-        :message="validation.message('type')"
+        :message="val.message('type')"
         input-id="typeInput"
         label="Type"
         size="m">
         <Select
           id="typeInput"
-          v-model:model-value="formState.type"
+          v-model:model-value="state.type"
           :disabled="isSubmitting || props.schedule !== undefined"
-          :invalid="!validation.isValid('type')"
+          :invalid="!val.isValid('type')"
           :option-label="(data) => data.value"
           :option-value="(data) => data.key"
           :options="entriesToKeyValueArray(scheduleTypes)"
           autofocus
-          @update:model-value="validation.validateIfDirty('type')">
+          @update:model-value="val.validateIfDirty('type')">
         </Select>
       </IftaFormField>
       <IftaFormField
-        :message="validation.message('communityId')"
+        :message="val.message('communityId')"
         input-id="communityInput"
         label="Community"
         size="m">
         <Select
           id="communityInput"
-          v-model:model-value="formState.communityId"
+          v-model:model-value="state.communityId"
           :disabled="isSubmitting || props.schedule?.community.id !== undefined"
-          :invalid="!validation.isValid('communityId')"
+          :invalid="!val.isValid('communityId')"
           :options="availableCommunities"
           option-label="name"
           option-value="id"
           placeholder="Select an community"
-          @update:model-value="validation.validateIfDirty('communityId')" />
+          @update:model-value="val.validateIfDirty('communityId')" />
       </IftaFormField>
       <IftaFormField
-        :message="validation.message('startsAt')"
+        :message="val.message('startsAt')"
         input-id="startTimeInput"
         label="Start Time"
         size="m">
         <DatePicker
           id="startTimeInput"
-          :disabled="formState.startTime.getTime() < minStartTime.getTime() || isSubmitting"
-          :invalid="!validation.isValid('startsAt')"
-          :min-date="minimumDate(formState.startTime, minStartTime)"
-          :model-value="formState.startTime"
+          :disabled="state.startTime.getTime() < minStartTime.getTime() || isSubmitting"
+          :invalid="!val.isValid('startsAt')"
+          :min-date="minimumDate(state.startTime, minStartTime)"
+          :model-value="state.startTime"
           fluid
           hourFormat="12"
           show-time
           @update:model-value="(value) => handleStartTimeChange(value as Date)" />
       </IftaFormField>
       <IftaFormField
-        :message="validation.message('endsAt')"
+        :message="val.message('endsAt')"
         input-id="endTimeInput"
         label="End Time"
         size="m">
         <DatePicker
           id="endTimeInput"
-          v-model:model-value="formState.endTime"
-          :disabled="formState.endTime.getTime() < minStartTime.getTime() || isSubmitting"
-          :invalid="!validation.isValid('endsAt')"
-          :max-date="new Date(formState.startTime.getTime() + maxDurationMinutes * MS_PER_MINUTE)"
-          :min-date="formState.startTime"
+          v-model:model-value="state.endTime"
+          :disabled="state.endTime.getTime() < minStartTime.getTime() || isSubmitting"
+          :invalid="!val.isValid('endsAt')"
+          :max-date="new Date(state.startTime.getTime() + maxDurationMinutes * MS_PER_MINUTE)"
+          :min-date="state.startTime"
           fluid
           hourFormat="12"
           show-time
-          @update:model-value="validation.validateIfDirty('endsAt')" />
+          @update:model-value="val.validateIfDirty('endsAt')" />
       </IftaFormField>
       <IftaFormField
-        :message="validation.message('description')"
+        :message="val.message('description')"
         input-id="descriptionInput"
         label="Description"
         optional
         size="xl">
         <Textarea
           id="descriptionInput"
-          v-model:model-value="formState.description"
+          v-model:model-value="state.description"
           :disabled="isSubmitting"
-          :invalid="!validation.isValid('description')"
+          :invalid="!val.isValid('description')"
           auto-resize />
       </IftaFormField>
       <InlineFormField
-        label="Visible to Organizers Only"
         input-id="isOrganizersOnlyInput"
+        label="Visible to Organizers Only"
         size="xs">
         <ToggleSwitch
-          input-id="isOrganizersOnlyInput"
-          v-model="formState.isOrganizersOnly" />
+          v-model="state.isOrganizersOnly"
+          input-id="isOrganizersOnlyInput" />
       </InlineFormField>
     </FormArea>
+    <MarkdownPreview
+      :markdown-content="state.description"
+      preview-title="Description Preview" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { DatePicker, Select, Textarea, InputText, ToggleSwitch } from 'primevue'
+import { DatePicker, InputText, Select, Textarea, ToggleSwitch } from 'primevue'
 import { computed, onMounted, type Ref, ref } from 'vue'
 import { MS_PER_MINUTE } from '@/constants/times'
 import { minimumDate, parseDate } from '@/utils/dateUtils'
@@ -120,6 +123,7 @@ import { alwaysValid } from '@/validation/rules/untypedRules.ts'
 import entriesToKeyValueArray from '@/utils/entriesToKeyValueArray.ts'
 import { scheduleTypes } from '@/constants/scheduleTypes.ts'
 import InlineFormField from '@/components/form/InlineFormField.vue'
+import MarkdownPreview from '@/components/controls/MarkdownPreview.vue'
 
 const maxDurationMinutes = 1440
 const defaultMinutes = 60
@@ -161,13 +165,11 @@ interface ScheduleFormState extends ScheduleRequest {
   endTime: Date
 }
 
-const {
-  state: formState,
-  val: validation,
-  isSubmitting,
-  submit,
-  reset
-} = useEntityForm<ScheduleRequest, ScheduleFormState, ScheduleResponse>({
+const { state, val, isSubmitting, submit, reset } = useEntityForm<
+  ScheduleRequest,
+  ScheduleFormState,
+  ScheduleResponse
+>({
   validationRules: (form) => ({
     startTime: alwaysValid(),
     endTime: alwaysValid(),
@@ -206,24 +208,24 @@ const {
 })
 
 defineExpose({
-  formState,
-  validation,
+  formState: state,
+  validation: val,
   isSubmitting,
   reset,
   submit
 })
 
 const handleStartTimeChange = (value: Date) => {
-  formState.value.startTime = value
-  if (formState.value.endTime < formState.value.startTime) {
-    formState.value.endTime = new Date(value.getTime() + defaultMinutes * MS_PER_MINUTE)
+  state.value.startTime = value
+  if (state.value.endTime < state.value.startTime) {
+    state.value.endTime = new Date(value.getTime() + defaultMinutes * MS_PER_MINUTE)
   } else if (
-    formState.value.endTime.getTime() >
-    formState.value.startTime.getTime() + maxDurationMinutes * MS_PER_MINUTE
+    state.value.endTime.getTime() >
+    state.value.startTime.getTime() + maxDurationMinutes * MS_PER_MINUTE
   ) {
-    formState.value.endTime = new Date(value.getTime() + maxDurationMinutes * MS_PER_MINUTE)
+    state.value.endTime = new Date(value.getTime() + maxDurationMinutes * MS_PER_MINUTE)
   }
-  validation.validateIfDirty('startsAt')
+  val.validateIfDirty('startsAt')
 }
 
 const emit = defineEmits<{

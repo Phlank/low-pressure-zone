@@ -1,6 +1,8 @@
 <template>
   <div class="soundclash-grid">
-    <p class="soundclash-grid__schedule-description">{{ schedule.description }}</p>
+    <MarkdownContent
+      v-if="schedule.description"
+      :content="schedule.description" />
     <DataTable
       v-if="!isMobile"
       :value="rows"
@@ -45,8 +47,8 @@
               <div>
                 {{
                   data.soundclash
-                  ? `${data.soundclash?.performerOne.name} vs. ${data.soundclash?.performerTwo.name}`
-                  : ''
+                    ? `${data.soundclash?.performerOne.name} vs. ${data.soundclash?.performerTwo.name}`
+                    : ''
                 }}
               </div>
             </template>
@@ -107,6 +109,7 @@ import SoundclashForm from '@/components/form/requestForms/SoundclashForm.vue'
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
 import ListItem from '@/components/data/ListItem.vue'
+import MarkdownContent from '@/components/controls/MarkdownContent.vue'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const soundclashFormRef = useTemplateRef('soundclashFormRef')

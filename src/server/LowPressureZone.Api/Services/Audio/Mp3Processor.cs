@@ -1,18 +1,14 @@
 using FFMpegCore;
 using FFMpegCore.Enums;
-using LowPressureZone.Api.Models.Configuration;
 using LowPressureZone.Core;
-using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Api.Services.Audio;
 
-public sealed partial class Mp3Processor(ILogger<Mp3Processor> logger, IOptions<FileConfiguration> fileConfig)
+public sealed partial class Mp3Processor(ILogger<Mp3Processor> logger)
 {
-    private readonly string _temporaryLocation = fileConfig.Value.TemporaryLocation;
-
     public async Task<Result<string, string>> ConvertFileToMp3Async(string inputFilePath)
     {
-        var outputFilePath = Path.Combine(_temporaryLocation, $"{Guid.NewGuid()}.mp3");
+        var outputFilePath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.mp3");
         try
         {
             var isConversionSuccessful =
@@ -40,7 +36,7 @@ public sealed partial class Mp3Processor(ILogger<Mp3Processor> logger, IOptions<
 
     public async Task<Result<string, string>> StripMp3MetadataAsync(string inputFilePath)
     {
-        var outputFilePath = Path.Combine(_temporaryLocation, $"{Guid.NewGuid()}.mp3");
+        var outputFilePath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.mp3");
         try
         {
             var isMetadataStripSuccessful =
