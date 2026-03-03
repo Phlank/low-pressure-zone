@@ -8,14 +8,15 @@ namespace LowPressureZone.Domain;
 
 public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
 {
+    public DbSet<Broadcast> Broadcasts { get; set; }
     public DbSet<Community> Communities { get; set; }
     public DbSet<CommunityRelationship> CommunityRelationships { get; set; }
+    public DbSet<News> News { get; set; }
     public DbSet<Performer> Performers { get; set; }
     public DbSet<Schedule> Schedules { get; set; }
     public DbSet<Setting> Settings { get; set; }
     public DbSet<Soundclash> Soundclashes { get; set; }
     public DbSet<Timeslot> Timeslots { get; set; }
-    public DbSet<News> News { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
