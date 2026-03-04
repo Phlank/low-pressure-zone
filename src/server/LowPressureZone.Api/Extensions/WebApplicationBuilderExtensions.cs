@@ -61,11 +61,13 @@ public static class WebApplicationBuilderExtensions
             options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
-        
+
         services.Configure<StreamingConfiguration>(builder.Configuration.GetSection(StreamingConfiguration.Name));
         services.Configure<EmailServiceConfiguration>(builder.Configuration.GetSection(EmailServiceConfiguration.Name));
         services.Configure<UrlConfiguration>(builder.Configuration.GetSection(UrlConfiguration.Name));
-        services.Configure<FileConfiguration>(builder.Configuration.GetSection(FileConfiguration.Name));
+        services.Configure<AzuraCastInstallationConfiguration>(builder.Configuration
+                                                                      .GetSection(AzuraCastInstallationConfiguration
+                                                                                      .Name));
         services.SwaggerDocument();
         services.AddCors(options =>
         {

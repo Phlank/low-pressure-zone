@@ -28,7 +28,7 @@ public interface IAzuraCastClient
 
     Task<Result<string, string>> UploadMediaViaSftpAsync(string localFilePath, string targetFilePath);
 
-    Task<Result<string, string>> UploadMediaViaSftpAsync(FileStream fileStream, string targetFilePath);
+    Task<Result<string, string>> UploadMediaViaSftpAsync(Stream stream, string targetFilePath);
 
     Task<Result<StationMedia, HttpResponseMessage>> GetMediaAsync(int mediaId);
 
@@ -42,6 +42,8 @@ public interface IAzuraCastClient
     Task<Result<bool, HttpResponseMessage>> DeleteMediaAsync(int mediaId);
 
     Task<Result<StationPlaylist, HttpResponseMessage>> GetPlaylistAsync(int playlistId);
+
+    Task<Result<List<StationPlaylist>, HttpResponseMessage>> GetPlaylistsAsync();
 
     Task<Result<int, HttpResponseMessage>> PostPlaylistAsync(StationPlaylist playlist);
 
