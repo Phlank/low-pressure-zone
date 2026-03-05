@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Api.Extensions;
+using LowPressureZone.Domain.Entities;
 using LowPressureZone.Identity.Constants;
 
 namespace LowPressureZone.Api.Rules;
@@ -20,4 +21,13 @@ public sealed class BroadcastRules(IHttpContextAccessor contextAccessor)
         && (User.IsInRole(RoleNames.Admin) 
             || User.IsInRole(RoleNames.Organizer)) 
         && broadcast.TimestampEnd is null;
+
+    public bool IsArchivable(
+        StationStreamerBroadcast externalBroadcast,
+        Broadcast? broadcast) =>
+        User is not null &&
+        (User.IsInRole(RoleNames.Admin)
+            || User.IsInRole(RoleNames.Organizer))
+        && !string.IsNullOrEmpty(externalBroadcast.Recording?.DownloadUrl)
+        && broadcast is not { IsArchived: true };
 }

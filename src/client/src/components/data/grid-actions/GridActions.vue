@@ -46,6 +46,7 @@ const props = withDefaults(
   defineProps<{
     showCreate?: boolean
     showDownload?: boolean
+    showArchive?: boolean
     showEdit?: boolean
     showClipboard?: boolean
     showDelete?: boolean
@@ -57,6 +58,7 @@ const props = withDefaults(
   {
     showCreate: false,
     showDownload: false,
+    showArchive: false,
     showEdit: false,
     showClipboard: false,
     showDelete: false,
@@ -73,6 +75,7 @@ const visibleActions = computed(() => {
   const actions: GridAction[] = []
   if (props.showCreate) actions.push(gridActions.create)
   if (props.showDownload) actions.push(gridActions.download)
+  if (props.showArchive) actions.push(gridActions.archive)
   if (props.showEdit) actions.push(gridActions.edit)
   if (props.showClipboard) actions.push(gridActions.clipboard)
   if (props.showDelete) actions.push(gridActions.delete)

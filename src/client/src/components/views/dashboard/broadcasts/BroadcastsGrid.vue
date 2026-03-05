@@ -30,7 +30,9 @@
             <GridActions
               :show-disconnect="data.isDisconnectable"
               :show-download="data.isDownloadable"
+              :show-archive="data.isArchivable"
               @disconnect="handleDisconnectAction"
+              @archive="handleArchiveClicked(data)"
               @download="handleDownloadClicked(data)" />
           </template>
         </Column>
@@ -66,8 +68,10 @@
             <template #right>
               <GridActions
                 :show-disconnect="broadcast.isDisconnectable"
+                :show-archive="broadcast.isArchivable"
                 :show-download="broadcast.isDownloadable"
                 @disconnect="handleDisconnectAction"
+                @archive="handleArchiveClicked(broadcast)"
                 @download="handleDownloadClicked(broadcast)" />
             </template>
           </ListItem>
@@ -117,13 +121,18 @@
 </template>
 
 <script lang="ts" setup>
-import {inject, ref, type Ref} from 'vue'
-import {useBroadcastStore} from '@/stores/broadcastStore.ts'
-import {Button, Column, DataTable, DataView, Dialog, Divider, Skeleton, useToast} from 'primevue'
-import broadcastsApi, {type BroadcastResponse} from '@/api/resources/broadcastsApi.ts'
-import {formatDurationTimestamp, formatReadableTime, getDuration, parseDate} from '@/utils/dateUtils.ts'
+import { inject, ref, type Ref } from 'vue'
+import { useBroadcastStore } from '@/stores/broadcastStore.ts'
+import { Button, Column, DataTable, DataView, Dialog, Divider, Skeleton, useToast } from 'primevue'
+import broadcastsApi, { type BroadcastResponse } from '@/api/resources/broadcastsApi.ts'
+import {
+  formatDurationTimestamp,
+  formatReadableTime,
+  getDuration,
+  parseDate
+} from '@/utils/dateUtils.ts'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
-import {mobilePaginatorTemplate} from '@/constants/componentTemplates.ts'
+import { mobilePaginatorTemplate } from '@/constants/componentTemplates.ts'
 import ListItem from '@/components/data/ListItem.vue'
 
 const toast = useToast()
@@ -146,6 +155,10 @@ const formatMobileTimeInfo = (broadcast: BroadcastResponse) => {
 
 const handleDownloadClicked = (broadcast: BroadcastResponse) => {
   broadcastsApi.download(broadcast.streamerId ?? 0, broadcast.broadcastId)
+}
+
+const handleArchiveClicked = (broadcast: BroadcastResponse) => {
+  broadcasts.archiveAsync(broadcast)
 }
 
 const showDisconnectDialog = ref(false)

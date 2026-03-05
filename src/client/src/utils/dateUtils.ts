@@ -66,6 +66,12 @@ export const formatReadableTime = (date: Date | string) => {
   return date.toLocaleTimeString([], { hour: "numeric", minute: '2-digit' })
 }
 
+export const formatReadableDateTime = (date: Date | string) => {
+  if (typeof date === 'string')
+    date = parseDate(date)
+  return date.toLocaleString([], { hour: "numeric", minute: '2-digit' })
+}
+
 export const getDuration = (start: Date | string, end: Date | string) => {
   const timeA = typeof start === 'string' ? parseDate(start).getTime() : start.getTime()
   const timeB = typeof end === 'string' ? parseDate(end).getTime() : end.getTime()

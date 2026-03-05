@@ -172,14 +172,14 @@ public sealed class AzuraCastClient(
         return await UploadMediaViaSftpAsync(fileStream, targetFilePath);
     }
 
-    public async Task<Result<string, string>> UploadMediaViaSftpAsync(FileStream fileStream, string targetFilePath)
+    public async Task<Result<string, string>> UploadMediaViaSftpAsync(Stream stream, string targetFilePath)
     {
         if (!sftpClient.IsConnected)
             sftpClient.Connect();
 
         try
         {
-            await sftpClient.UploadFileAsync(fileStream, targetFilePath);
+            await sftpClient.UploadFileAsync(stream, targetFilePath);
             return Result.Ok(targetFilePath);
         }
         catch (SftpPermissionDeniedException ex)
@@ -266,6 +266,32 @@ public sealed class AzuraCastClient(
             return Result.Err<StationPlaylist, HttpResponseMessage>(response);
 
         return Result.Ok<StationPlaylist, HttpResponseMessage>(content);
+    }
+
+    public async Task<Result<StationPlaylist, string>> GetPlaylistByNameAsync(string name)
+    {
+        var playlistsResponse = await GetPlaylistsAsync();
+        if (playlistsResponse.IsError)
+            return Result.Err<StationPlaylist>("Unable to retrieve playlists");
+
+        var playlist = playlistsResponse.Value.FirstOrDefault(playlist => playlist.Name == name);
+        if (playlist is null)
+            return Result.Err<StationPlaylist>("Playlist not found");
+        
+        return Result.Ok(playlist);
+    }
+
+    public async Task<Result<List<StationPlaylist>, HttpResponseMessage>> GetPlaylistsAsync()
+    {
+        var response = await Client.GetAsync(PlaylistsEndpoint());
+        if (!response.IsSuccessStatusCode)
+            return Result.Err<List<StationPlaylist>, HttpResponseMessage>(response);
+        
+        var content = await response.Content.ReadFromJsonAsync<List<StationPlaylist>>();
+        if (content is null)
+            return Result.Err<List<StationPlaylist>, HttpResponseMessage>(response);
+
+        return Result.Ok<List<StationPlaylist>, HttpResponseMessage>(content);
     }
 
     public async Task<Result<int, HttpResponseMessage>> PostPlaylistAsync(StationPlaylist playlist)

@@ -2,7 +2,7 @@
 
 public sealed class AzuraCastClientConfiguration
 {
-    public const string Name = "AzuraCast";
+    public const string Name = "AzuraCastClient";
 
     public required Uri ApiUrl { get; init; }
     public required string ApiKey { get; init; }

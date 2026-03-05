@@ -1,10 +1,13 @@
+using LowPressureZone.Core.JsonConverters;
 using System.Text.Json.Serialization;
 
 namespace LowPressureZone.Adapter.AzuraCast.ApiSchema;
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(JsonEnumStringConverterWithEmptyStringToNoneConverter<StationPlaylistBackendOption>))]
 public enum StationPlaylistBackendOption
 {
+    None,
+
     [JsonStringEnumMemberName("interrupt")]
     Interrupt,
 

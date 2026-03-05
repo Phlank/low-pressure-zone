@@ -24,6 +24,7 @@ using LowPressureZone.Api.Models.Configuration.Streaming;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Api.Services.Audio;
+using LowPressureZone.Api.Services.AzuraCast;
 using LowPressureZone.Api.Services.Files;
 using LowPressureZone.Api.Services.NightlyTasks;
 using LowPressureZone.Api.Services.StreamConnectionInfo;
@@ -61,11 +62,13 @@ public static class WebApplicationBuilderExtensions
             options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
-        
+
         services.Configure<StreamingConfiguration>(builder.Configuration.GetSection(StreamingConfiguration.Name));
         services.Configure<EmailServiceConfiguration>(builder.Configuration.GetSection(EmailServiceConfiguration.Name));
         services.Configure<UrlConfiguration>(builder.Configuration.GetSection(UrlConfiguration.Name));
-        services.Configure<FileConfiguration>(builder.Configuration.GetSection(FileConfiguration.Name));
+        services.Configure<AzuraCastInstallationConfiguration>(builder.Configuration
+                                                                      .GetSection(AzuraCastInstallationConfiguration
+                                                                                      .Name));
         services.SwaggerDocument();
         services.AddCors(options =>
         {
@@ -92,10 +95,14 @@ public static class WebApplicationBuilderExtensions
 
         builder.AddFluentEmail();
         builder.Services.AddSingleton<EmailService>();
-
+        
         builder.Services.AddSingleton<MediaAnalyzer>();
         builder.Services.AddSingleton<Mp3Processor>();
         builder.Services.AddSingleton<UriService>();
+        
+        builder.Services.AddSingleton<AzuraCastBroadcastDownloader>();
+        builder.Services.AddSingleton<AzuraCastMediaUpdater>();
+        builder.Services.AddSingleton<AzuraCastMediaUploader>();
 
         builder.Services.AddSingleton<FormFileSaver>();
 
