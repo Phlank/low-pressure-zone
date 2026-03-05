@@ -24,6 +24,7 @@ using LowPressureZone.Api.Models.Configuration.Streaming;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Api.Services.Audio;
+using LowPressureZone.Api.Services.AzuraCast;
 using LowPressureZone.Api.Services.Files;
 using LowPressureZone.Api.Services.NightlyTasks;
 using LowPressureZone.Api.Services.StreamConnectionInfo;
@@ -94,10 +95,14 @@ public static class WebApplicationBuilderExtensions
 
         builder.AddFluentEmail();
         builder.Services.AddSingleton<EmailService>();
-
+        
         builder.Services.AddSingleton<MediaAnalyzer>();
         builder.Services.AddSingleton<Mp3Processor>();
         builder.Services.AddSingleton<UriService>();
+        
+        builder.Services.AddSingleton<AzuraCastBroadcastDownloader>();
+        builder.Services.AddSingleton<AzuraCastMediaUpdater>();
+        builder.Services.AddSingleton<AzuraCastMediaUploader>();
 
         builder.Services.AddSingleton<FormFileSaver>();
 

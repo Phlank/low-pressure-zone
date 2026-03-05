@@ -42,6 +42,8 @@ public interface IAzuraCastClient
     Task<Result<bool, HttpResponseMessage>> DeleteMediaAsync(int mediaId);
 
     Task<Result<StationPlaylist, HttpResponseMessage>> GetPlaylistAsync(int playlistId);
+    
+    Task<Result<StationPlaylist, string>> GetPlaylistByNameAsync(string name);
 
     Task<Result<List<StationPlaylist>, HttpResponseMessage>> GetPlaylistsAsync();
 

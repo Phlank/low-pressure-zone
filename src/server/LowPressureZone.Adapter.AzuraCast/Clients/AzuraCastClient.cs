@@ -268,6 +268,19 @@ public sealed class AzuraCastClient(
         return Result.Ok<StationPlaylist, HttpResponseMessage>(content);
     }
 
+    public async Task<Result<StationPlaylist, string>> GetPlaylistByNameAsync(string name)
+    {
+        var playlistsResponse = await GetPlaylistsAsync();
+        if (playlistsResponse.IsError)
+            return Result.Err<StationPlaylist>("Unable to retrieve playlists");
+
+        var playlist = playlistsResponse.Value.FirstOrDefault(playlist => playlist.Name == name);
+        if (playlist is null)
+            return Result.Err<StationPlaylist>("Playlist not found");
+        
+        return Result.Ok(playlist);
+    }
+
     public async Task<Result<List<StationPlaylist>, HttpResponseMessage>> GetPlaylistsAsync()
     {
         var response = await Client.GetAsync(PlaylistsEndpoint());

@@ -1,26 +1,34 @@
 using System.Globalization;
+using System.Text;
 using FastEndpoints;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Adapter.AzuraCast.Mappers;
+using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Models.Configuration;
 using LowPressureZone.Api.Rules;
+using LowPressureZone.Api.Services.AzuraCast;
 using LowPressureZone.Core;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Entities;
 using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Shouldly;
 
 namespace LowPressureZone.Api.Endpoints.Broadcasts.Archive;
 
 public class PostArchiveBroadcast(
+    AzuraCastBroadcastDownloader downloader,
+    AzuraCastMediaUploader uploader,
+    AzuraCastMediaUpdater updater,
     IAzuraCastClient azuraCastClient,
     DataContext dataContext,
     BroadcastRules rules,
     IOptions<AzuraCastInstallationConfiguration> installationConfiguration) : Endpoint<ArchiveBroadcastRequest>
 {
+    private static readonly CompositeFormat ArchiveError = CompositeFormat.Parse("Unable to archive broadcast: {0}");
+    private readonly string _archivePlaylistName = installationConfiguration.Value.ArchivePlaylistName;
+
     public override void Configure()
     {
         Post("/broadcasts/archive");
@@ -39,10 +47,16 @@ public class PostArchiveBroadcast(
             await Send.NotFoundAsync(ct);
             return;
         }
-        
+
         var broadcast = await dataContext.Broadcasts
                                          .Where(broadcast => broadcast.AzuraCastBroadcastId == req.Id)
                                          .FirstOrDefaultAsync(ct);
+
+        if (string.IsNullOrEmpty(externalBroadcast.Recording?.DownloadUrl))
+            ThrowError(nameof(req.Id), "Broadcast recording is not available");
+
+        if (broadcast is { IsArchived: true })
+            ThrowError(nameof(req.Id), "Broadcast is already archived.");
 
         if (!rules.IsArchivable(externalBroadcast, broadcast))
         {
@@ -50,86 +64,41 @@ public class PostArchiveBroadcast(
             return;
         }
 
-        if (string.IsNullOrEmpty(externalBroadcast.Recording?.DownloadUrl))
-            ThrowError(nameof(req.Id), "Broadcast recording is not available");
+        var playlistResult = await azuraCastClient.GetPlaylistByNameAsync(_archivePlaylistName);
+        this.ThrowIfError(playlistResult, ArchiveError);
+        var archivesPlaylist = playlistResult.Value;
+
+        var recordingStreamResult = await downloader.GetStreamAsync(externalBroadcast.Id);
+        this.ThrowIfError(recordingStreamResult, ArchiveError);
+        await using var stream = recordingStreamResult.Value;
+
+        var uploadResult = await uploader.UploadAndGetMediaAsync(stream, AzuraCastMediaDirectory.Archives);
+        this.ThrowIfError(uploadResult, ArchiveError);
+        var media = uploadResult.Value;
+
+        var updateResult = await updater.UpdateAsync(media,
+                                                     externalBroadcast.Streamer!.DisplayName,
+                                                     externalBroadcast.TimestampStart
+                                                                      .ToString("yyyy-MM-dd",
+                                                                                CultureInfo.InvariantCulture),
+                                                     [archivesPlaylist.Id]);
+        this.ThrowIfError(updateResult, ArchiveError);
         
-        if (broadcast is { IsArchived: true })
-            ThrowError(nameof(req.Id), "Broadcast is already archived.");
-
-        var playlistsResult = await azuraCastClient.GetPlaylistsAsync();
-        if (playlistsResult.IsError)
-            ThrowError("Unable to get playlists from AzuraCast", 500);
-
-        var archivesPlaylist = playlistsResult.Value
-                                              .FirstOrDefault(playlist => playlist.Name ==
-                                                                          installationConfiguration.Value
-                                                                                                   .ArchivePlaylistName);
-        if (archivesPlaylist is null)
-            ThrowError("Could not find archive playlist in AzuraCast", 500);
-
-        var downloadResult = await azuraCastClient.DownloadBroadcastFileAsync(externalBroadcast.Streamer!.Id,
-                                                                              externalBroadcast.Id);
-        if (downloadResult.IsError)
-            ThrowError("Unable to download file from AzuraCast", 500);
-        
-        var stream = await downloadResult.Value.ReadAsStreamAsync(ct);
-
-        var filePath = $"{installationConfiguration.Value.ArchiveSetLocation}/{Guid.NewGuid()}.mp3";
-        var uploadResult = await azuraCastClient.UploadMediaViaSftpAsync(stream, filePath);
-        if (uploadResult.IsError)
-            ThrowError("Failed to upload file to AzuraCast", 500);
-
-        var uploadedFileResult = await Retry.RetryAsync(async () => await GetUploadedFileAsync(filePath),
-                                                        result => result.IsError
-                                                                  || (result.IsSuccess
-                                                                      && result.Value.Media is not null), 1000, 10, ct);
-        if (uploadedFileResult.IsError)
-            ThrowError("Failed to update file metadata in AzuraCast", 500);
-        var uploadedFile = uploadedFileResult.Value;
-        uploadedFile.Media.ShouldNotBeNull();
-        var media = uploadedFile.Media;
-        var updateMediaRequest = StationMediaMapper.ToRequest(media);
-        updateMediaRequest.Artist = externalBroadcast.Streamer.DisplayName;
-        updateMediaRequest.Title = externalBroadcast.TimestampStart
-                                                    .ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-        updateMediaRequest.Playlists = [archivesPlaylist.Id];
-        var updateMediaResult = await azuraCastClient.PutMediaAsync(media.Id, updateMediaRequest);
-        if (updateMediaResult.IsError)
-            ThrowError("Failed to update media metadata in AzuraCast", 500);
-
-        if (broadcast is null)
-        {
-            broadcast = new Broadcast()
-            {
-                AzuraCastBroadcastId = externalBroadcast.Id,
-                IsArchived = true
-            };
-            dataContext.Broadcasts.Add(broadcast);
-        }
-        else
+        if (broadcast is not null)
         {
             broadcast.IsArchived = true;
             broadcast.LastModifiedDate = DateTime.UtcNow;
         }
+        else
+        {
+            dataContext.Broadcasts.Add(new()
+            {
+                AzuraCastBroadcastId = externalBroadcast.Id,
+                IsArchived = true
+            });
+        }
 
         await dataContext.SaveChangesAsync(ct);
         await Send.NoContentAsync(ct);
-    }
-
-    private async Task<Result<StationFileListItem, string>> GetUploadedFileAsync(string filePath)
-    {
-        var archiveListResult =
-            await azuraCastClient.GetMediaInDirectoryAsync(installationConfiguration.Value.ArchiveSetLocation);
-
-        if (archiveListResult.IsError)
-            return Result.Err<StationFileListItem>("Failed to retrieve files from AzuraCast");
-
-        var uploadedFile = archiveListResult.Value
-                                            .FirstOrDefault(file => file.PathShort == filePath.Split('/').Last());
-
-        if (uploadedFile is null)
-            return Result.Err<StationFileListItem>("Uploaded file not found in AzuraCast prerecorded directory");
-
-        return Result.Ok<StationFileListItem, string>(uploadedFile);
     }
 }
