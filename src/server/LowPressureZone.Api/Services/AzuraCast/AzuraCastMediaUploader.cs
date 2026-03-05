@@ -22,7 +22,7 @@ public partial class AzuraCastMediaUploader(
         if (uploadResult.IsError)
             return Result.Err<StationMedia>("Unable to upload media.");
 
-        var uploadedFileResult = await Retry.RetryAsync(() => GetUploadedFileAsync(path, directory),
+        var uploadedFileResult = await Retry.RetryAsync(async () => await GetUploadedFileAsync(path, directory),
                                                         result => result.IsError
                                                                   || (result.IsSuccess &&
                                                                       result.Value.Media is not null),
@@ -40,10 +40,8 @@ public partial class AzuraCastMediaUploader(
 
     private string GetFilePath(AzuraCastMediaDirectory directory)
     {
-        var path = new StringBuilder();
-        path.Append(GetLocationForDirectory(directory));
-        path.Append(Guid.NewGuid().ToString());
-        return path.ToString();
+        var fileName = Guid.NewGuid() + ".mp3";
+        return Path.Combine(GetLocationForDirectory(directory), fileName);
     }
 
     private string GetLocationForDirectory(AzuraCastMediaDirectory directory) =>
