@@ -53,7 +53,6 @@ import type { SoundclashResponse } from '@/api/resources/soundclashApi'
 import { computed, inject, ref, type Ref, watch } from 'vue'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
 import { parseDate, timesBetween } from '@/utils/dateUtils.ts'
-import { addHours } from 'date-fns'
 import { Column, DataTable, Divider } from 'primevue'
 import SlotTime from '@/components/controls/SlotTime.vue'
 
