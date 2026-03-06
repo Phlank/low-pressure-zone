@@ -16,8 +16,13 @@
             style="width: fit-content" />
           <Column
             v-if="!isMobile"
-            field="community.name"
-            header="Community" />
+            field="name">
+            <template #body="{ data }: { data: ScheduleResponse }">
+              <TwoLineData
+                :above="data.name"
+                :below="data.community.name" />
+            </template>
+          </Column>
           <Column
             v-if="!isMobile"
             field="start"
@@ -37,8 +42,9 @@
           </Column>
           <Column v-if="isMobile">
             <template #body="{ data }: { data: ScheduleResponse }">
-              <div>{{ parseDate(data.startsAt).toLocaleDateString() }}</div>
-              <div class="text-s ellipsis">{{ data.community.name }}</div>
+              <TwoLineData
+                :above="data.name"
+                :below="parseDate(data.startsAt).toLocaleDateString()" />
             </template>
           </Column>
           <!-- Only show the action col for grids with schedules in the future -->
@@ -101,6 +107,7 @@ import { roles } from '@/constants/roles.ts'
 import copyToClipboard from '@/utils/copyToClipboard.ts'
 import { scheduleToRedditMarkdown } from '@/utils/markdown.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
+import TwoLineData from '@/components/layout/TwoLineData.vue'
 
 const communities = useCommunityStore()
 const auth = useAuthStore()
