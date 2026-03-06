@@ -80,8 +80,6 @@ const setupRows = () => {
   const startFirst = new Date(soundclashes[0]!.startsAt)
   const endLast = new Date(soundclashes[schedule.value.soundclashes.length - 1]!.endsAt)
   const hours = timesBetween(startFirst, endLast, 120)
-  if (startFirst > parseDate(schedule.value.startsAt)) hours.unshift(addHours(startFirst, -2))
-  if (endLast < parseDate(schedule.value.endsAt)) hours.push(endLast)
 
   hours.forEach((hour) => {
     const soundclash = soundclashes.find(
