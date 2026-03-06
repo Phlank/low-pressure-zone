@@ -8,9 +8,7 @@
         field="start"
         header="Time">
         <template #body="{ data }: { data: SoundclashRow }">
-          <SlotTime
-            :date="data.start"
-            style="width: max-content" />
+          <SlotTime :date="data.start" />
         </template>
       </Column>
       <Column
@@ -19,16 +17,29 @@
         <template #body="{ data }: { data: SoundclashRow }">
           <div
             v-if="data.soundclash"
-            style="text-align: center">
-            <div>
-              <strong style="font-size: large">
-                {{ data.soundclash.performerOne.name }} vs.
+            class="home-soundclash-grid__slot">
+            <div class="home-soundclash-grid__slot__performers">
+              <div class="home-soundclash-grid__slot__performers__name">
+                {{ data.soundclash.performerOne.name }}
+              </div>
+              <Divider type="dotted"><i>vs.</i></Divider>
+              <div class="home-soundclash-grid__slot__performers__name">
                 {{ data.soundclash.performerTwo.name }}
-              </strong>
+              </div>
             </div>
-            <div>
-              {{ data.soundclash.roundOne }} | {{ data.soundclash.roundTwo }} |
-              {{ data.soundclash.roundThree }}
+            <Divider
+              v-if="isMobile"
+              type="dotted" />
+            <div class="home-soundclash-grid__slot__rounds">
+              <div
+                v-for="round in [
+                  data.soundclash.roundOne,
+                  data.soundclash.roundTwo,
+                  data.soundclash.roundThree
+                ]"
+                :key="round">
+                {{ round }}
+              </div>
             </div>
           </div>
         </template>
@@ -39,13 +50,14 @@
 
 <script lang="ts" setup>
 import type { SoundclashResponse } from '@/api/resources/soundclashApi'
-import { computed, ref, type Ref, watch } from 'vue'
+import { computed, inject, ref, type Ref, watch } from 'vue'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
 import { parseDate, timesBetween } from '@/utils/dateUtils.ts'
 import { addHours } from 'date-fns'
-import { Column, DataTable } from 'primevue'
+import { Column, DataTable, Divider } from 'primevue'
 import SlotTime from '@/components/controls/SlotTime.vue'
 
+const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const schedules = useScheduleStore()
 
 const props = defineProps<{
@@ -91,3 +103,42 @@ watch(
   { immediate: true, deep: true }
 )
 </script>
+
+<style lang="scss">
+@use '@/assets/styles/variables';
+
+.home-soundclash-grid {
+  &__slot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    @include variables.mobile() {
+      flex-direction: column;
+    }
+
+    &__performers {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      margin: variables.$space-s 0;
+      text-align: center;
+      &__name {
+        font-weight: bolder;
+        font-size: large;
+      }
+    }
+
+    &__rounds {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: variables.$space-m;
+      font-weight: 500;
+    }
+  }
+}
+</style>
