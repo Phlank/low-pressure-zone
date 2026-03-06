@@ -138,7 +138,7 @@ watch(
     }
 
     .p-divider-content {
-      z-index: inherit;
+      z-index: 0;
     }
   }
 }
