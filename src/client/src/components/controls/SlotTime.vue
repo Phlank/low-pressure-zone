@@ -19,7 +19,13 @@ const utcDate = computed(() => {
 </script>
 
 <style lang="scss" scoped>
+@use '@/assets/styles/variables';
+
 .slot-time {
-  width: max-content;
+  min-width: max-content;
+
+  @include variables.mobile() {
+    min-width: 4.5em;
+  }
 }
 </style>
