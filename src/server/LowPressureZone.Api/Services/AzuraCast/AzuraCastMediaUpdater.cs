@@ -5,7 +5,7 @@ using LowPressureZone.Core;
 
 namespace LowPressureZone.Api.Services.AzuraCast;
 
-public class AzuraCastMediaUpdater(IAzuraCastClient client)
+public class AzuraCastMediaUpdater(ILogger<AzuraCastMediaUpdater> logger, IAzuraCastClient client)
 {
     public async Task<Result<string>> UpdateAsync(
         StationMedia media,
@@ -19,7 +19,10 @@ public class AzuraCastMediaUpdater(IAzuraCastClient client)
         updateRequest.Playlists = playlistIds;
         var updateResult = await client.PutMediaAsync(media.Id, updateRequest);
         if (updateResult.IsError)
+        {
+            logger.LogError("Failed to update media: {reason}", updateResult.Error.ReasonPhrase);
             return Result.Err("Failed to update media");
+        }
         return new Result<string>();
     }
 }
