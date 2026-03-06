@@ -18,7 +18,7 @@ var migrations = builder.AddProject<LowPressureZone_Aspire_Migrations>("migratio
                         .WithReference(domainDatabase, "Data")
                         .WithReference(identityDatabase, "Identity");
 
-var azuracast = builder.AddContainer("azuracast", "ghcr.io/azuracast/azuracast", "0.23.2")
+var azuracast = builder.AddContainer("azuracast", "ghcr.io/azuracast/azuracast", "0.23.3")
                        .WithBindMount($"{bindMountDir}/azuracast/stations",
                                       "/var/azuracast/stations")
                        .WithBindMount($"{bindMountDir}/azuracast/backups",
