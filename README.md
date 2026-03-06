@@ -68,7 +68,8 @@ migrations. Hangfire is used to manage scheduled and delayed tasks.
 
 ## Contributing
 
-The code is available to fork, though I haven't written any documentation for development setup. If you are interested
+The code is available to fork, and development setup information can be found in DEVELOPMENT.md. If you are interested
 in working on the site, please reach out to me.
 
 If you want to support me and the site maintenance, feel free to make a donation at https://coff.ee/phlank :)
+

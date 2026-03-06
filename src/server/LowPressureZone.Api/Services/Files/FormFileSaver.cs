@@ -1,17 +1,12 @@
-using LowPressureZone.Api.Models.Configuration;
 using LowPressureZone.Core;
-using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Api.Services.Files;
 
 public sealed partial class FormFileSaver(
-    IOptions<FileConfiguration> fileConfig,
     EmailService emailer,
     ILogger<FormFileSaver> logger)
 {
-    private readonly string _temporaryLocation = fileConfig.Value.TemporaryLocation;
-
-    private string GetPathForFileName(string fileName) => Path.Combine(_temporaryLocation, fileName);
+    private static string GetPathForFileName(string fileName) => Path.Combine(Path.GetTempPath(), fileName);
 
     public async Task<Result<string, string>> SaveFormFileAsync(IFormFile file, CancellationToken ct = default)
     {

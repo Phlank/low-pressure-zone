@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>dotnet-LowPressureZone.Aspire.Migrations-a468d0c2-64c4-4125-83da-933d9a53687d</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.3"/>
+        <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="13.1.1"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="../LowPressureZone.Aspire.ServiceDefaults/LowPressureZone.Aspire.ServiceDefaults.csproj"/>
+        <ProjectReference Include="../LowPressureZone.Domain/LowPressureZone.Domain.csproj"/>
+        <ProjectReference Include="../LowPressureZone.Identity/LowPressureZone.Identity.csproj"/>
+    </ItemGroup>
+
+</Project>

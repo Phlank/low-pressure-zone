@@ -1,13 +1,15 @@
 ﻿using FastEndpoints;
-using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Clients;
+using LowPressureZone.Domain;
+using LowPressureZone.Domain.Entities;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Broadcasts;
 
-public class GetBroadcasts(UserManager<AppUser> userManager, IAzuraCastClient client)
+public class GetBroadcasts(UserManager<AppUser> userManager, DataContext dataContext, IAzuraCastClient client)
     : EndpointWithoutRequest<IEnumerable<BroadcastResponse>, BroadcastMapper>
 {
     public override void Configure() => Get("/broadcasts");
@@ -27,12 +29,26 @@ public class GetBroadcasts(UserManager<AppUser> userManager, IAzuraCastClient cl
             ThrowError(broadcastsResult.Error.ReasonPhrase ?? "Unknown reason",
                        (int)broadcastsResult.Error.StatusCode);
 
-        IEnumerable<StationStreamerBroadcast> broadcasts = broadcastsResult.Value;
+        var externalBroadcasts = broadcastsResult.Value
+                                                 .OrderByDescending(broadcast => broadcast.TimestampStart)
+                                                 .ToList();
+        Dictionary<int, Broadcast> broadcasts = new();
         if (!(User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Organizer)))
-            broadcasts = broadcasts.Where(broadcast => broadcast.Streamer?.Id == user.StreamerId);
+        {
+            externalBroadcasts = externalBroadcasts.Where(broadcast => broadcast.Streamer?.Id == user.StreamerId)
+                                                   .ToList();
+        }
+        else
+        {
+            var externalIds = externalBroadcasts.Select(broadcast => broadcast.Id);
+            broadcasts = await dataContext.Broadcasts
+                                          .Where(broadcast => externalIds.Contains(broadcast.AzuraCastBroadcastId))
+                                          .ToDictionaryAsync(broadcast => broadcast.AzuraCastBroadcastId, ct);
+        }
 
-        var responses = broadcasts.OrderByDescending(broadcast => broadcast.TimestampStart)
-                                  .Select(Map.FromEntity);
+        List<BroadcastResponse> responses = new(externalBroadcasts.Count);
+        foreach (var externalBroadcast in externalBroadcasts)
+            responses.Add(Map.FromEntity(externalBroadcast, broadcasts.GetValueOrDefault(externalBroadcast.Id)));
 
         await Send.OkAsync(responses, ct);
     }

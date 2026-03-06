@@ -4,7 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace LowPressureZone.Identity;
 
-public class TokenContext
+public sealed class TokenContext
 {
     public required string Email { get; set; }
     public required string Token { get; set; }

@@ -1,9 +1,8 @@
-﻿using System.Text.Json;
+﻿using System.Globalization;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using FastEndpoints;
 using FastEndpoints.Swagger;
-using FluentEmail.Core.Interfaces;
-using FluentEmail.Mailgun;
 using Hangfire;
 using Hangfire.PostgreSql;
 using LowPressureZone.Adapter.AzuraCast.Extensions;
@@ -25,6 +24,7 @@ using LowPressureZone.Api.Models.Configuration.Streaming;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Api.Services.Audio;
+using LowPressureZone.Api.Services.AzuraCast;
 using LowPressureZone.Api.Services.Files;
 using LowPressureZone.Api.Services.NightlyTasks;
 using LowPressureZone.Api.Services.StreamConnectionInfo;
@@ -39,7 +39,6 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using NightlyBroadcastDeletionModule = LowPressureZone.Api.Services.NightlyTasks.NightlyBroadcastDeletionModule;
 using NightlyTaskService = LowPressureZone.Api.Services.NightlyTasks.NightlyTaskService;
 
@@ -64,11 +63,12 @@ public static class WebApplicationBuilderExtensions
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
 
-        services.Configure<IcecastConfiguration>(builder.Configuration.GetSection(IcecastConfiguration.Name));
         services.Configure<StreamingConfiguration>(builder.Configuration.GetSection(StreamingConfiguration.Name));
         services.Configure<EmailServiceConfiguration>(builder.Configuration.GetSection(EmailServiceConfiguration.Name));
         services.Configure<UrlConfiguration>(builder.Configuration.GetSection(UrlConfiguration.Name));
-        services.Configure<FileConfiguration>(builder.Configuration.GetSection(FileConfiguration.Name));
+        services.Configure<AzuraCastInstallationConfiguration>(builder.Configuration
+                                                                      .GetSection(AzuraCastInstallationConfiguration
+                                                                                      .Name));
         services.SwaggerDocument();
         services.AddCors(options =>
         {
@@ -93,12 +93,16 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddFastEndpoints();
 
-        builder.Services.AddSingleton<ISender, MailgunSender>(serviceProvider => serviceProvider.CreateMailgunSender());
+        builder.AddFluentEmail();
         builder.Services.AddSingleton<EmailService>();
-
+        
         builder.Services.AddSingleton<MediaAnalyzer>();
         builder.Services.AddSingleton<Mp3Processor>();
         builder.Services.AddSingleton<UriService>();
+        
+        builder.Services.AddSingleton<AzuraCastBroadcastDownloader>();
+        builder.Services.AddSingleton<AzuraCastMediaUpdater>();
+        builder.Services.AddSingleton<AzuraCastMediaUploader>();
 
         builder.Services.AddSingleton<FormFileSaver>();
 
@@ -137,7 +141,9 @@ public static class WebApplicationBuilderExtensions
         var hangfireConnectionString = builder.Configuration.GetConnectionString("Data");
         builder.Services.AddHangfire(config =>
         {
-            config.UsePostgreSqlStorage(pgsqlConfig => pgsqlConfig.UseNpgsqlConnection(hangfireConnectionString));
+            config.UsePostgreSqlStorage(pgsqlConfig =>
+                                            pgsqlConfig
+                                                .UseNpgsqlConnection(hangfireConnectionString));
         });
         builder.Services.AddHangfireServer();
     }
@@ -218,20 +224,29 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton<SoundclashRules>();
     }
 
-    private static MailgunSender CreateMailgunSender(this IServiceProvider services)
+    private static void AddFluentEmail(this WebApplicationBuilder builder)
     {
-        var options = services.GetRequiredService<IOptions<EmailServiceConfiguration>>();
-        return new MailgunSender(options.Value.MailgunDomain, options.Value.MailgunApiKey);
-    }
-
-    public static void CreateFileLocations(this WebApplicationBuilder builder)
-    {
-        const string tempLocationKey = $"{FileConfiguration.Name}:{nameof(FileConfiguration.TemporaryLocation)}";
-        var temporaryFilePath = builder.Configuration.GetValue<string>(tempLocationKey);
-
-        if (temporaryFilePath is null)
-            throw new InvalidOperationException("Temporary file path is not configured.");
-
-        if (!Directory.Exists(temporaryFilePath)) Directory.CreateDirectory(temporaryFilePath);
+        var mailpitConnectionString = builder.Configuration.GetConnectionString("mailpit");
+        if (mailpitConnectionString is not null)
+        {
+            // Format is Endpoint={SmtpUrl}
+            var uriPart = mailpitConnectionString.Split('=')[1];
+            Uri url = new(uriPart);
+            builder.Services
+                   .AddFluentEmail("noreply@lowpressurezone.com", "Low Pressure Zone")
+                   .AddSmtpSender(url.Host, url.Port);
+        }
+        else
+        {
+            var mailgunApiConfigKey =
+                $"{EmailServiceConfiguration.Name}__{nameof(EmailServiceConfiguration.MailgunApiKey)}";
+            var mailgunDomainConfigKey =
+                $"{EmailServiceConfiguration.Name}__{nameof(EmailServiceConfiguration.MailgunDomain)}";
+            var mailgunApiKey = builder.Configuration.GetValue<string>(mailgunApiConfigKey);
+            var mailgunDomain = builder.Configuration.GetValue<string>(mailgunDomainConfigKey);
+            builder.Services
+                   .AddFluentEmail("noreply@lowpressurezone.com", "Low Pressure Zone")
+                   .AddMailGunSender(mailgunDomain, mailgunApiKey);
+        }
     }
 }

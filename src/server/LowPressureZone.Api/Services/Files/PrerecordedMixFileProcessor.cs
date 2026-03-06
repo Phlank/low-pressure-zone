@@ -25,10 +25,9 @@ public sealed class PrerecordedMixFileProcessor(
     DataContext dataContext,
     IAzuraCastClient azuraCastClient,
     TimeslotRequestToAzuraCastPlaylistConverter requestToPlaylistConverter,
-    IOptions<FileConfiguration> fileOptions)
+    IOptions<AzuraCastInstallationConfiguration> installationOptions)
 {
-    private readonly string _prerecordedSetLocation = fileOptions.Value.AzuraCastPrerecordedSetLocation;
-    private readonly string _tempLocation = fileOptions.Value.TemporaryLocation;
+    private readonly string _prerecordedSetLocation = installationOptions.Value.PrerecordedSetLocation;
 
     public async Task<Result<string, IEnumerable<ValidationFailure>>> ProcessRequestFileToMp3Async(
         TimeslotRequest request,
@@ -54,10 +53,6 @@ public sealed class PrerecordedMixFileProcessor(
             _ = await fileSaver.DeleteFileAsync(saveResult.Value);
             return Result.Err<string>(analysisValidationFailures);
         }
-
-        var newMetadata = await GetAudioMetadataAsync(request, scheduleStart, ct);
-        var fileName = GetUploadFileName(newMetadata.Artist, newMetadata.Title, request.StartsAt);
-        var outputFilePath = Path.Combine(_tempLocation, fileName);
 
         var processResult = await ProcessToNewFile(analysis, saveResult.Value);
         _ = await fileSaver.DeleteFileAsync(saveResult.Value);
@@ -247,9 +242,7 @@ public sealed class PrerecordedMixFileProcessor(
 
     private async Task<Result<StationFileListItem, string>> GetUploadedFileAsync(string filePath)
     {
-        var prerecordListResult = await azuraCastClient.GetMediaInDirectoryAsync(_prerecordedSetLocation,
-                                                                                 true,
-                                                                                 true);
+        var prerecordListResult = await azuraCastClient.GetMediaInDirectoryAsync(_prerecordedSetLocation);
 
         if (prerecordListResult.IsError)
             return Result.Err<StationFileListItem>("Failed to retrieve files from AzuraCast");

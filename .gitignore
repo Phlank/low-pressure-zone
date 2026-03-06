@@ -34,8 +34,12 @@ coverage
 .vs/
 bin/
 obj/
-appsettings*json
+appsettings.*.json
 
 # Local environment files
 .idea/.idea.LowPressureZone/.idea/copilot**
 temporaryFiles
+
+# Mount files
+tools/mounts/azuracast
+tools/mounts/icecast2

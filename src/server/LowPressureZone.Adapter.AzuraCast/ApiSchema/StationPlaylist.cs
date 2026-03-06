@@ -44,13 +44,13 @@ public sealed class StationPlaylist
 
     [JsonPropertyName("include_in_on_demand")]
     public bool IncludeInOnDemand { get; init; }
-
+    
     [JsonPropertyName("backend_options")]
-    public IEnumerable<StationPlaylistBackendOption> BackendOptions { get; init; } = [];
+    public List<StationPlaylistBackendOption> BackendOptions { get; init; } = [];
 
     [JsonPropertyName("avoid_duplicates")]
     public bool AvoidDuplicates { get; init; }
 
     [JsonPropertyName("schedule_items")]
-    public IEnumerable<StationPlaylistScheduleItem> ScheduleItems { get; init; } = [];
+    public List<StationPlaylistScheduleItem> ScheduleItems { get; init; } = [];
 }

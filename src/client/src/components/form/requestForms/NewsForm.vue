@@ -30,11 +30,9 @@
         <slot name="actions"></slot>
       </template>
     </FormArea>
-    <div class="news-form__preview">
-      <Divider>Preview</Divider>
-      <h2>{{ previewTitle }}</h2>
-      <div v-html="previewBody"></div>
-    </div>
+    <MarkdownPreview
+      :markdown-content="previewBody"
+      :contentTitle="previewTitle" />
   </div>
 </template>
 
@@ -43,12 +41,13 @@ import FormArea from '@/components/form/FormArea.vue'
 import type { NewsResponse } from '@/api/resources/newsApi.ts'
 import { onMounted, ref, watch } from 'vue'
 import { required } from '@/validation/rules/untypedRules.ts'
-import { Divider, InputText, Textarea } from 'primevue'
+import { InputText, Textarea } from 'primevue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import { useDebounceFn } from '@vueuse/core'
 import { parseMarkdownAsync } from '@/utils/markdown.ts'
 import { useNewsStore } from '@/stores/newsStore.ts'
 import { useEntityForm } from '@/composables/useEntityForm.ts'
+import MarkdownPreview from '@/components/controls/MarkdownPreview.vue'
 
 const news = useNewsStore()
 
@@ -104,10 +103,5 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-
-  &__preview {
-    display: flex;
-    flex-direction: column;
-  }
 }
 </style>

@@ -2,9 +2,11 @@
 import { computed, type ComputedRef, type Ref, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { useRefresh } from '@/composables/useRefresh.ts'
-import {useToast} from "primevue";
-import tryHandleUnsuccessfulResponse from "@/api/tryHandleUnsuccessfulResponse.ts";
+import { useToast } from 'primevue'
+import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import { err, ok, type Result } from '@/types/result.ts'
+import { showSuccessToast } from '@/utils/toastUtils.ts'
+import { formatReadableDateTime } from '@/utils/dateUtils.ts'
 
 export const useBroadcastStore = defineStore('broadcastStore', () => {
   const loadedBroadcasts: Ref<BroadcastResponse[]> = ref([])
@@ -15,11 +17,29 @@ export const useBroadcastStore = defineStore('broadcastStore', () => {
     loadedBroadcasts.value = data
   })
 
+  const archiveAsync = async (broadcast: BroadcastResponse) => {
+    const loaded = loadedBroadcasts.value.find(
+      (loadedBroadcast) => loadedBroadcast.broadcastId === broadcast.broadcastId
+    )
+    if (loaded === undefined) return
+    loaded.isArchivable = false
+    const response = await broadcastsApi.archive({ id: broadcast.broadcastId })
+    if (tryHandleUnsuccessfulResponse(response, toast)) {
+      loaded.isArchivable = true
+      return
+    }
+    showSuccessToast(
+      toast,
+      'Archived',
+      'broadcast',
+      `${broadcast.streamerDisplayName} - ${formatReadableDateTime(broadcast.start)}`
+    )
+  }
+
   const disconnectAsync = async (disableMinutes?: number): Promise<Result> => {
     const response = await broadcastsApi.disconnect({ disableMinutes: disableMinutes })
     if (tryHandleUnsuccessfulResponse(response, toast)) return err()
-    if (loadedBroadcasts.value[0])
-      loadedBroadcasts.value[0].isDisconnectable = false
+    if (loadedBroadcasts.value[0]) loadedBroadcasts.value[0].isDisconnectable = false
     return ok()
   }
 
@@ -27,6 +47,7 @@ export const useBroadcastStore = defineStore('broadcastStore', () => {
     refresh,
     isLoading,
     broadcasts,
-    disconnectAsync
+    disconnectAsync,
+    archiveAsync
   }
 })

@@ -11,6 +11,8 @@ export default {
         broadcastId: broadcastId
       })}`
     ),
+  archive: (request: ArchiveBroadcastRequest) =>
+    sendPost<ArchiveBroadcastRequest>(`${route()}/archive`, request),
   disconnect: (request: DisconnectBroadcastRequest) =>
     sendPost<DisconnectBroadcastRequest>(`${route()}/disconnect`, request)
 }
@@ -22,9 +24,14 @@ export interface BroadcastResponse {
   start: string
   end: string | null
   isDownloadable: boolean
+  isArchivable: boolean
   isDisconnectable: boolean
 }
 
 export interface DisconnectBroadcastRequest {
   disableMinutes?: number | null
+}
+
+export interface ArchiveBroadcastRequest {
+  id: number
 }
