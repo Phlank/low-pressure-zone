@@ -227,7 +227,7 @@ public static class WebApplicationBuilderExtensions
     private static void AddFluentEmail(this WebApplicationBuilder builder)
     {
         var mailpitConnectionString = builder.Configuration.GetConnectionString("mailpit");
-        if (mailpitConnectionString is not null)
+        if (!string.IsNullOrEmpty(mailpitConnectionString))
         {
             // Format is Endpoint={SmtpUrl}
             var uriPart = mailpitConnectionString.Split('=')[1];
@@ -239,14 +239,14 @@ public static class WebApplicationBuilderExtensions
         else
         {
             var mailgunApiConfigKey =
-                $"{EmailServiceConfiguration.Name}__{nameof(EmailServiceConfiguration.MailgunApiKey)}";
+                $"{EmailServiceConfiguration.Name}:{nameof(EmailServiceConfiguration.MailgunApiKey)}";
             var mailgunDomainConfigKey =
-                $"{EmailServiceConfiguration.Name}__{nameof(EmailServiceConfiguration.MailgunDomain)}";
+                $"{EmailServiceConfiguration.Name}:{nameof(EmailServiceConfiguration.MailgunDomain)}";
             var mailgunApiKey = builder.Configuration.GetValue<string>(mailgunApiConfigKey);
             var mailgunDomain = builder.Configuration.GetValue<string>(mailgunDomainConfigKey);
             builder.Services
                    .AddFluentEmail("noreply@lowpressurezone.com", "Low Pressure Zone")
-                   .AddMailGunSender(mailgunDomain, mailgunApiKey);
+                   .AddMailGunSender($"https://api.mailgun.net/v3/{mailgunDomain}", mailgunApiKey);
         }
     }
 }
