@@ -136,6 +136,10 @@ watch(
       gap: variables.$space-m;
       font-weight: 500;
     }
+
+    .p-divider-content {
+      z-index: 0;
+    }
   }
 }
 </style>
