@@ -4,4 +4,5 @@ public enum SettingKey
 {
     AboutContent,
     WelcomeContent,
+    PrivacyPolicy
 }
