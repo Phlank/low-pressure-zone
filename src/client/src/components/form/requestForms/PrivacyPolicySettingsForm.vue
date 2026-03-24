@@ -5,14 +5,19 @@
       is-single-column>
       <IftaFormField
         label="Privacy Policy Text"
-        input-id="privacyPolicyTextInput">
+        input-id="privacyPolicyTextInput"
+        size="full">
         <Textarea
           v-model:value="form.privacyPolicy"
           :invalid="!val.isValid('privacyPolicy')"
           id="privacyPolicyTextInput" />
       </IftaFormField>
       <template #actions>
-        <Button label="Save" />
+        <Button
+          :disabled="isSubmitting"
+          :loading="isSubmitting"
+          label="Save"
+          @click="submit" />
       </template>
     </FormArea>
   </div>
@@ -24,7 +29,7 @@ import FormArea from '@/components/form/FormArea.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import { usePrivacyPolicySettingsStore } from '@/stores/settings/privacyPolicySettingsStore.ts'
 import type { PrivacyPolicySettingsRequest } from '@/api/resources/settingsApi.ts'
-import { ref, type Ref } from 'vue'
+import { ref, type Ref, watch } from 'vue'
 import { createFormValidation } from '@/validation/types/formValidation.ts'
 import { required } from '@/validation/rules/untypedRules.ts'
 
@@ -36,4 +41,23 @@ const form: Ref<PrivacyPolicySettingsRequest> = ref<PrivacyPolicySettingsRequest
 const val = createFormValidation(form, {
   privacyPolicy: required()
 })
+
+watch(
+  () => [privacyPolicySettings.privacyPolicy],
+  () => reset(),
+  { once: true }
+)
+
+const reset = () => {
+  form.value.privacyPolicy = privacyPolicySettings.privacyPolicy
+}
+
+const isSubmitting = ref(false)
+const submit = async () => {
+  isSubmitting.value = true
+  await privacyPolicySettings.update(form, val)
+  isSubmitting.value = false
+}
+
+defineExpose({ form, val })
 </script>
