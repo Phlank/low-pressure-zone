@@ -1,16 +1,15 @@
 ﻿<template>
-  <div class="privacy-policy-form">
-    <FormArea
-      header="Privacy Policy"
-      is-single-column>
+  <div class="privacy-policy-settings-form">
+    <FormArea is-single-column>
       <IftaFormField
-        label="Privacy Policy Text"
         input-id="privacyPolicyTextInput"
+        label="Privacy Policy Text"
         size="full">
         <Textarea
-          v-model:value="form.privacyPolicy"
+          id="privacyPolicyTextInput"
+          v-model:model-value="form.privacyPolicy"
           :invalid="!val.isValid('privacyPolicy')"
-          id="privacyPolicyTextInput" />
+          auto-resize />
       </IftaFormField>
       <template #actions>
         <Button
@@ -23,8 +22,8 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { Textarea, Button } from 'primevue'
+<script lang="ts" setup>
+import { Button, Textarea } from 'primevue'
 import FormArea from '@/components/form/FormArea.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import { usePrivacyPolicySettingsStore } from '@/stores/settings/privacyPolicySettingsStore.ts'

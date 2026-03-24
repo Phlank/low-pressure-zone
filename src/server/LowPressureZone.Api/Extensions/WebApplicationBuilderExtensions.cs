@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using FastEndpoints;
 using FastEndpoints.Swagger;
@@ -95,11 +94,11 @@ public static class WebApplicationBuilderExtensions
 
         builder.AddFluentEmail();
         builder.Services.AddSingleton<EmailService>();
-        
+
         builder.Services.AddSingleton<MediaAnalyzer>();
         builder.Services.AddSingleton<Mp3Processor>();
         builder.Services.AddSingleton<UriService>();
-        
+
         builder.Services.AddSingleton<AzuraCastBroadcastDownloader>();
         builder.Services.AddSingleton<AzuraCastMediaUpdater>();
         builder.Services.AddSingleton<AzuraCastMediaUploader>();
