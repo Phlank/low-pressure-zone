@@ -12,7 +12,7 @@ public sealed class AzuraCastStatusService(
 {
     private readonly Lock _statusLock = new();
     private readonly PeriodicTimer _timer = new(TimeSpan.FromSeconds(5));
-    
+
     public Models.Stream.StreamStatus? Status { get; private set; }
 
     public void Dispose() => _timer.Dispose();
@@ -55,6 +55,16 @@ public sealed class AzuraCastStatusService(
             var content = result.Value;
             lock (_statusLock)
             {
+                DateTimeOffset? startTime = null;
+                if (content.Live.BroadcastStart.HasValue)
+                    startTime = DateTimeOffset.FromUnixTimeSeconds(content.Live.BroadcastStart.Value);
+                else if (content.CurrentSong is not null)
+                    startTime = DateTimeOffset.FromUnixTimeSeconds(content.CurrentSong.PlayedAt);
+
+                TimeSpan? duration = null;
+                if (content.CurrentSong is not null && !content.Live.BroadcastStart.HasValue)
+                    duration = TimeSpan.FromSeconds(content.CurrentSong.Duration);
+                
                 Status = new Models.Stream.StreamStatus
                 {
                     IsOnline = content.IsOnline,
@@ -63,7 +73,9 @@ public sealed class AzuraCastStatusService(
                     Name = GetStreamName(content),
                     Type = "AzuraCast",
                     ListenUrl = content.Station.ListenUrl,
-                    ListenerCount = content.Listeners.Current
+                    ListenerCount = content.Listeners.Current,
+                    StartedAt = startTime,
+                    Duration = duration
                 };
             }
         }

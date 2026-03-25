@@ -20,6 +20,9 @@
                 {{ streamStore.status.name ?? 'Connecting...' }}
               </div>
             </div>
+            <div class="play-button__content__text-area__elapsed">
+              {{ elapsedText }}
+            </div>
           </div>
         </div>
       </Button>
@@ -41,11 +44,12 @@
 
 <script lang="ts" setup>
 import { Button, Slider, useToast } from 'primevue'
-import { computed, type Ref, ref, watch } from 'vue'
+import { computed, onMounted, type Ref, ref, watch } from 'vue'
 import clamp from '@/utils/clamp.ts'
 import { useDebounceFn, useResizeObserver } from '@vueuse/core'
 import { useStreamStore } from '@/stores/streamStore.ts'
 import delay from '@/utils/delay.ts'
+import { formatElapsedTime } from '@/utils/dateUtils.ts'
 
 const toast = useToast()
 const streamStore = useStreamStore()
@@ -172,6 +176,21 @@ const statusText = computed(() => {
   return `${liveText} | Listeners: ${streamStore.status.listenerCount}`
 })
 
+const elapsedText = ref('')
+const refreshElapsedText = async () => {
+  while (true) {
+    await delay(50)
+    const startedAt = streamStore.status.startedAt
+    const durationSeconds = streamStore.status.durationSeconds
+    if (startedAt === null) {
+      elapsedText.value = ''
+      continue
+    }
+
+    elapsedText.value = formatElapsedTime(startedAt, durationSeconds)
+  }
+}
+
 const textWidth = ref(0)
 const nameWidthPx = computed(() => Math.round(textWidth.value) + 'px')
 const buttonWidth = ref(0)
@@ -189,7 +208,7 @@ const textScrollAnimationDuration = computed(
 const buttonElement = ref(null)
 useResizeObserver(buttonElement, () => updateTextScrollingBehavior())
 watch(
-  () => streamStore.status,
+  () => [streamStore.status],
   () => setTimeout(() => updateTextScrollingBehavior())
 )
 
@@ -199,8 +218,11 @@ const updateTextScrollingBehavior = useDebounceFn(async () => {
     .getBoundingClientRect().width
   const statusTextWidth = document
     .getElementsByClassName('play-button__content__text-area__status')[0]!
+    .getBoundingClientRect().width + 20
+  const timeTextWidth = document
+    .getElementsByClassName('play-button__content__text-area__elapsed')[0]!
     .getBoundingClientRect().width
-  textWidth.value = Math.max(artistTextWidth, statusTextWidth)
+  textWidth.value = Math.max(artistTextWidth, statusTextWidth, timeTextWidth)
   await delay(100)
   buttonWidth.value = document
     .getElementsByClassName('play-button__play-element')[0]!
@@ -240,6 +262,10 @@ const toggleVolumeSlider = () => {
     showVolumeSlider.value = !isDisplayed
   }, 100)
 }
+
+onMounted(() => {
+  refreshElapsedText()
+})
 </script>
 
 <style lang="scss">
@@ -254,6 +280,12 @@ $text-translate-amount: v-bind(nameTranslateWidthPx);
     calc(100dvw - 2 * #{variables.$space-l}),
     calc(30px + 28px + 10px + 46px + 10px + #{$text-width})
   );
+
+  transition: width 0.1s ease, height 0.1s ease;
+
+  .play-button__play-element {
+    border-radius: calc(#{variables.$space-l} * 2);
+  }
 
   &__buttons {
     width: 100%;
@@ -301,6 +333,10 @@ $text-translate-amount: v-bind(nameTranslateWidthPx);
         font-size: small;
         text-align: left;
         white-space: nowrap;
+      }
+
+      &__elapsed {
+        font-size: small;
       }
 
       &__now-playing {

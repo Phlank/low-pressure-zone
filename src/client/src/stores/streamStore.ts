@@ -15,17 +15,7 @@ export const useStreamStore = defineStore('streamStore', () => {
   })
 
   const updateStatus = (newStatus: StreamStatusResponse) => {
-    if (
-      newStatus.isLive !== status.value?.isLive ||
-      newStatus.isOnline !== status.value?.isOnline ||
-      (newStatus.name ?? 'Unknown') !== status.value?.name ||
-      newStatus.listenUrl !== status.value?.listenUrl ||
-      newStatus.isStatusStale !== status.value?.isStatusStale ||
-      newStatus.type !== status.value?.type ||
-      newStatus.listenerCount !== status.value?.listenerCount
-    ) {
-      status.value = newStatus
-    }
+    status.value = newStatus
   }
 
   let isTitleUpdatingStarted = false
