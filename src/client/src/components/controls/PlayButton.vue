@@ -44,7 +44,7 @@
 
 <script lang="ts" setup>
 import { Button, Slider, useToast } from 'primevue'
-import { computed, onMounted, type Ref, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue'
 import clamp from '@/utils/clamp.ts'
 import { useDebounceFn, useResizeObserver } from '@vueuse/core'
 import { useStreamStore } from '@/stores/streamStore.ts'
@@ -177,19 +177,11 @@ const statusText = computed(() => {
 })
 
 const elapsedText = ref('')
-const refreshElapsedText = async () => {
-  while (true) {
-    await delay(50)
-    const startedAt = streamStore.status.startedAt
-    const durationSeconds = streamStore.status.durationSeconds
-    if (startedAt === null) {
-      elapsedText.value = ''
-      continue
-    }
+let elapsedTextInterval: ReturnType<typeof setInterval> | undefined
 
-    elapsedText.value = formatElapsedTime(startedAt, durationSeconds)
-  }
-}
+onUnmounted(() => {
+  clearInterval(elapsedTextInterval)
+})
 
 const textWidth = ref(0)
 const nameWidthPx = computed(() => Math.round(textWidth.value) + 'px')
@@ -216,12 +208,14 @@ const updateTextScrollingBehavior = useDebounceFn(async () => {
   const artistTextWidth = document
     .getElementsByClassName('play-button__content__text-area__now-playing')[0]!
     .getBoundingClientRect().width
-  const statusTextWidth = document
-    .getElementsByClassName('play-button__content__text-area__status')[0]!
-    .getBoundingClientRect().width + 20
-  const timeTextWidth = document
-    .getElementsByClassName('play-button__content__text-area__elapsed')[0]!
-    .getBoundingClientRect().width
+  const statusTextWidth =
+    document
+      .getElementsByClassName('play-button__content__text-area__status')[0]!
+      .getBoundingClientRect().width + 20 // without this, the padding seems off
+  const timeTextWidth =
+    document
+      .getElementsByClassName('play-button__content__text-area__elapsed')[0]!
+      .getBoundingClientRect().width + 20 // // without this, the padding seems off
   textWidth.value = Math.max(artistTextWidth, statusTextWidth, timeTextWidth)
   await delay(100)
   buttonWidth.value = document
@@ -264,7 +258,15 @@ const toggleVolumeSlider = () => {
 }
 
 onMounted(() => {
-  refreshElapsedText()
+  elapsedTextInterval = setInterval(() => {
+    const startedAt = streamStore.status.startedAt
+    const durationSeconds = streamStore.status.durationSeconds
+    if (startedAt === null) {
+      elapsedText.value = ''
+      return
+    }
+    elapsedText.value = formatElapsedTime(startedAt, durationSeconds)
+  }, 50)
 })
 </script>
 
@@ -281,7 +283,9 @@ $text-translate-amount: v-bind(nameTranslateWidthPx);
     calc(30px + 28px + 10px + 46px + 10px + #{$text-width})
   );
 
-  transition: width 0.1s ease, height 0.1s ease;
+  transition:
+    width 0.1s ease,
+    height 0.1s ease;
 
   .play-button__play-element {
     border-radius: calc(#{variables.$space-l} * 2);
