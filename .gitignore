@@ -1,4 +1,4 @@
-# Logs
+ # Logs
 logs
 *.log
 npm-debug.log*
@@ -43,3 +43,4 @@ temporaryFiles
 # Mount files
 tools/mounts/azuracast
 tools/mounts/icecast2
+/LowPressureZone.sln.DotSettings.user
