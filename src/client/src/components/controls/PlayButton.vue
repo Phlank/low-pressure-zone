@@ -31,7 +31,9 @@
         rounded
         size="large"
         @click="toggleVolumeSlider">
-        <span class="pi pi-volume-up" />
+        <span v-if="volumeSliderAmount === 100" class="pi pi-volume-up" />
+        <span v-else-if="volumeSliderAmount === 0" class="pi pi-volume-off" />
+        <span v-else class="pi pi-volume-down" />
       </Button>
     </div>
     <div class="play-button__volume">
@@ -46,7 +48,7 @@
 import { Button, Slider, useToast } from 'primevue'
 import { computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue'
 import clamp from '@/utils/clamp.ts'
-import { useDebounceFn, useResizeObserver } from '@vueuse/core'
+import { useDebounceFn, useLocalStorage, useResizeObserver } from '@vueuse/core'
 import { useStreamStore } from '@/stores/streamStore.ts'
 import delay from '@/utils/delay.ts'
 import { formatElapsedTime } from '@/utils/dateUtils.ts'
@@ -232,7 +234,7 @@ const updateTextScrollingBehavior = useDebounceFn(async () => {
   nameTranslateWidth.value = translateWidth
 }, 200)
 
-const volumeSliderAmount = ref(100)
+const volumeSliderAmount = useLocalStorage('volumeSliderAmount', 100)
 const volume = computed(() => volumeSliderAmount.value / 100)
 const showVolumeSliderArea = ref(false)
 const showVolumeSlider = ref(false)
@@ -240,7 +242,7 @@ const volumeSliderDisplayValue = computed(() => (showVolumeSlider.value ? 'block
 const volumeSliderAreaPaddingValue = computed(() => (showVolumeSliderArea.value ? '20px' : '0px'))
 const volumeSliderAreaMarginTopValue = computed(() => (showVolumeSliderArea.value ? '10px' : '0px'))
 const volumeSliderAreaBorder = computed(() =>
-  showVolumeSliderArea.value ? '1px solid var(--p-button-primary-border-color)' : 'none'
+  showVolumeSliderArea.value ? '1px solid var(--p-panel-border-color)' : 'none'
 )
 
 watch(volume, () => {
@@ -386,8 +388,8 @@ $text-translate-amount: v-bind(nameTranslateWidthPx);
     margin-top: v-bind(volumeSliderAreaMarginTopValue);
     transition:
       padding 0.1s ease-in-out,
-      margin-top 0.1s ease-in-out,
-      border 0.1s ease-in-out;
+      margin-top 0.1s ease-in-out;
+      //border 0.1s ease-in-out;
     border-radius: calc(2 * #{variables.$space-l});
     border: v-bind(volumeSliderAreaBorder);
 
