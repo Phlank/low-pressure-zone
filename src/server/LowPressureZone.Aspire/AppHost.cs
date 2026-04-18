@@ -52,6 +52,8 @@ var api = builder.AddProject<LowPressureZone_Api>("lpz-api")
                  .WaitFor(azuracast)
                  .WaitFor(mailpit)
                  .WaitForCompletion(migrations)
+                 .WaitFor(domainDatabase)
+                 .WaitFor(identityDatabase)
                  .WithReference(mailpit)
                  .WithReference(domainDatabase, "Data")
                  .WithReference(identityDatabase, "Identity");
