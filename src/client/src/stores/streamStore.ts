@@ -5,6 +5,7 @@ import streamApi, {
   type StreamStatusResponse
 } from '@/api/resources/streamApi.ts'
 import { useRefresh } from '@/composables/useRefresh.ts'
+import areObjectPropertiesEqual from "@/utils/areObjectPropertiesEqual.ts";
 
 export const useStreamStore = defineStore('streamStore', () => {
   const status = ref<StreamStatusResponse>(defaultStreamStatus)
@@ -15,17 +16,8 @@ export const useStreamStore = defineStore('streamStore', () => {
   })
 
   const updateStatus = (newStatus: StreamStatusResponse) => {
-    if (
-      newStatus.isLive !== status.value?.isLive ||
-      newStatus.isOnline !== status.value?.isOnline ||
-      (newStatus.name ?? 'Unknown') !== status.value?.name ||
-      newStatus.listenUrl !== status.value?.listenUrl ||
-      newStatus.isStatusStale !== status.value?.isStatusStale ||
-      newStatus.type !== status.value?.type ||
-      newStatus.listenerCount !== status.value?.listenerCount
-    ) {
-      status.value = newStatus
-    }
+    if (areObjectPropertiesEqual(status.value, newStatus)) return
+    status.value = newStatus
   }
 
   let isTitleUpdatingStarted = false

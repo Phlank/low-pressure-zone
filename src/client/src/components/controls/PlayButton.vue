@@ -20,6 +20,9 @@
                 {{ streamStore.status.name ?? 'Connecting...' }}
               </div>
             </div>
+            <div class="play-button__content__text-area__elapsed">
+              {{ elapsedText }}
+            </div>
           </div>
         </div>
       </Button>
@@ -28,7 +31,9 @@
         rounded
         size="large"
         @click="toggleVolumeSlider">
-        <span class="pi pi-volume-up" />
+        <span v-if="volumeSliderAmount === 100" class="pi pi-volume-up" />
+        <span v-else-if="volumeSliderAmount === 0" class="pi pi-volume-off" />
+        <span v-else class="pi pi-volume-down" />
       </Button>
     </div>
     <div class="play-button__volume">
@@ -41,11 +46,12 @@
 
 <script lang="ts" setup>
 import { Button, Slider, useToast } from 'primevue'
-import { computed, type Ref, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue'
 import clamp from '@/utils/clamp.ts'
-import { useDebounceFn, useResizeObserver } from '@vueuse/core'
+import { useDebounceFn, useLocalStorage, useResizeObserver } from '@vueuse/core'
 import { useStreamStore } from '@/stores/streamStore.ts'
 import delay from '@/utils/delay.ts'
+import { formatElapsedTime } from '@/utils/dateUtils.ts'
 
 const toast = useToast()
 const streamStore = useStreamStore()
@@ -172,6 +178,13 @@ const statusText = computed(() => {
   return `${liveText} | Listeners: ${streamStore.status.listenerCount}`
 })
 
+const elapsedText = ref('')
+let elapsedTextInterval: ReturnType<typeof setInterval> | undefined
+
+onUnmounted(() => {
+  clearInterval(elapsedTextInterval)
+})
+
 const textWidth = ref(0)
 const nameWidthPx = computed(() => Math.round(textWidth.value) + 'px')
 const buttonWidth = ref(0)
@@ -189,7 +202,7 @@ const textScrollAnimationDuration = computed(
 const buttonElement = ref(null)
 useResizeObserver(buttonElement, () => updateTextScrollingBehavior())
 watch(
-  () => streamStore.status,
+  () => [streamStore.status],
   () => setTimeout(() => updateTextScrollingBehavior())
 )
 
@@ -197,10 +210,15 @@ const updateTextScrollingBehavior = useDebounceFn(async () => {
   const artistTextWidth = document
     .getElementsByClassName('play-button__content__text-area__now-playing')[0]!
     .getBoundingClientRect().width
-  const statusTextWidth = document
-    .getElementsByClassName('play-button__content__text-area__status')[0]!
-    .getBoundingClientRect().width
-  textWidth.value = Math.max(artistTextWidth, statusTextWidth)
+  const statusTextWidth =
+    document
+      .getElementsByClassName('play-button__content__text-area__status')[0]!
+      .getBoundingClientRect().width + 20 // without this, the padding seems off
+  const timeTextWidth =
+    document
+      .getElementsByClassName('play-button__content__text-area__elapsed')[0]!
+      .getBoundingClientRect().width + 20 // // without this, the padding seems off
+  textWidth.value = Math.max(artistTextWidth, statusTextWidth, timeTextWidth)
   await delay(100)
   buttonWidth.value = document
     .getElementsByClassName('play-button__play-element')[0]!
@@ -216,7 +234,7 @@ const updateTextScrollingBehavior = useDebounceFn(async () => {
   nameTranslateWidth.value = translateWidth
 }, 200)
 
-const volumeSliderAmount = ref(100)
+const volumeSliderAmount = useLocalStorage('volumeSliderAmount', 100)
 const volume = computed(() => volumeSliderAmount.value / 100)
 const showVolumeSliderArea = ref(false)
 const showVolumeSlider = ref(false)
@@ -224,7 +242,7 @@ const volumeSliderDisplayValue = computed(() => (showVolumeSlider.value ? 'block
 const volumeSliderAreaPaddingValue = computed(() => (showVolumeSliderArea.value ? '20px' : '0px'))
 const volumeSliderAreaMarginTopValue = computed(() => (showVolumeSliderArea.value ? '10px' : '0px'))
 const volumeSliderAreaBorder = computed(() =>
-  showVolumeSliderArea.value ? '1px solid var(--p-button-primary-border-color)' : 'none'
+  showVolumeSliderArea.value ? '1px solid var(--p-panel-border-color)' : 'none'
 )
 
 watch(volume, () => {
@@ -240,6 +258,18 @@ const toggleVolumeSlider = () => {
     showVolumeSlider.value = !isDisplayed
   }, 100)
 }
+
+onMounted(() => {
+  elapsedTextInterval = setInterval(() => {
+    const startedAt = streamStore.status.startedAt
+    const durationSeconds = streamStore.status.durationSeconds
+    if (startedAt === null) {
+      elapsedText.value = ''
+      return
+    }
+    elapsedText.value = formatElapsedTime(startedAt, durationSeconds)
+  }, 50)
+})
 </script>
 
 <style lang="scss">
@@ -254,6 +284,14 @@ $text-translate-amount: v-bind(nameTranslateWidthPx);
     calc(100dvw - 2 * #{variables.$space-l}),
     calc(30px + 28px + 10px + 46px + 10px + #{$text-width})
   );
+
+  transition:
+    width 0.1s ease,
+    height 0.1s ease;
+
+  .play-button__play-element {
+    border-radius: calc(#{variables.$space-l} * 2);
+  }
 
   &__buttons {
     width: 100%;
@@ -303,6 +341,10 @@ $text-translate-amount: v-bind(nameTranslateWidthPx);
         white-space: nowrap;
       }
 
+      &__elapsed {
+        font-size: small;
+      }
+
       &__now-playing {
         font-size: medium;
         text-align: left;
@@ -346,8 +388,8 @@ $text-translate-amount: v-bind(nameTranslateWidthPx);
     margin-top: v-bind(volumeSliderAreaMarginTopValue);
     transition:
       padding 0.1s ease-in-out,
-      margin-top 0.1s ease-in-out,
-      border 0.1s ease-in-out;
+      margin-top 0.1s ease-in-out;
+      //border 0.1s ease-in-out;
     border-radius: calc(2 * #{variables.$space-l});
     border: v-bind(volumeSliderAreaBorder);
 

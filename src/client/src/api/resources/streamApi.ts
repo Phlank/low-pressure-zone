@@ -16,6 +16,8 @@ export interface StreamStatusResponse {
   type: string | null
   listenUrl: string | null
   listenerCount: number
+  startedAt: string | null
+  durationSeconds: number | null
 }
 
 export const defaultStreamStatus: StreamStatusResponse = {
@@ -25,7 +27,9 @@ export const defaultStreamStatus: StreamStatusResponse = {
   name: null,
   type: null,
   listenUrl: null,
-  listenerCount: 0
+  listenerCount: 0,
+  startedAt: null,
+  durationSeconds: null
 }
 
 export interface ConnectionInformationResponse {

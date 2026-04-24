@@ -1,8 +1,11 @@
 import {addMinutes} from "date-fns";
+import clamp from "@/utils/clamp.ts";
 
-export const parseDate = (date: string | Date): Date => {
+export const parseDate = (date: string | number | Date): Date => {
   if (date instanceof Date)
     return date
+  if (typeof date === 'number')
+    return new Date(date)
   return new Date(Date.parse(date))
 }
 
@@ -93,6 +96,32 @@ export const formatDurationOption = (durationMinutes: number) => {
     output += ` ${minutes.toFixed(0)}m`
   }
   return output
+}
+
+const formatDurationSeconds = (totalSeconds: number) => {
+  const clampedSeconds = Math.max(0, Math.floor(totalSeconds))
+  const seconds = clampedSeconds % 60
+  const totalMinutes = Math.floor(clampedSeconds / 60)
+  const minutes = totalMinutes % 60
+  const hours = Math.floor(totalMinutes / 60)
+  if (hours > 0) {
+    return `${hours}:${formatTwoDigits(minutes)}:${formatTwoDigits(seconds)}`
+  }
+  return `${minutes}:${formatTwoDigits(seconds)}`
+}
+
+export const formatElapsedTime = (
+  startedAt: string | number | Date,
+  durationSeconds?: number | null
+) => {
+  startedAt = parseDate(startedAt)
+  let elapsedSeconds = Math.max(0, Math.floor((Date.now() - startedAt.getTime()) / 1000))
+  if (durationSeconds === undefined || durationSeconds === null) {
+    return formatDurationSeconds(elapsedSeconds)
+  }
+  elapsedSeconds = clamp(elapsedSeconds, 0, durationSeconds)
+  const totalSeconds = Math.max(0, durationSeconds)
+  return `${formatDurationSeconds(elapsedSeconds)} / ${formatDurationSeconds(totalSeconds)}`
 }
 
 const formatTwoDigits = (value: number) => ('0' + value.toFixed(0)).slice(-2)
