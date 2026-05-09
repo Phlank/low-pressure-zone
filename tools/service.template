@@ -1,0 +1,17 @@
+[Unit]
+Description=Low Pressure Zone API
+
+[Service]
+WorkingDirectory=/var/www/html/low-pressure-zone-api
+ExecStart=/usr/bin/dotnet /var/www/html/low-pressure-zone-api/LowPressureZone.Api.dll
+Restart=always
+# Restart after five seconds if the dotnet service crashes
+RestartSec=5
+KillSignal=SIGINT
+SyslogIdentifier=lpzapi
+User=www-data
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=DOTNET_NOLOGO=true
+
+[Install]
+WantedBy=multi-user.target 
