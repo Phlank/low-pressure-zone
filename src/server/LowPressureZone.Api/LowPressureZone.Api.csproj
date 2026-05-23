@@ -48,8 +48,4 @@
         <ProjectReference Include="..\LowPressureZone.Adapter.AzuraCast\LowPressureZone.Adapter.AzuraCast.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="wwwroot\client-build\"/>
-    </ItemGroup>
-
 </Project>

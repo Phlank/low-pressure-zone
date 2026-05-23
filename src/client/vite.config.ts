@@ -3,7 +3,6 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
-// https://vite.dev/config/
 export default defineConfig(() => {
   const config = {
     host: true,
@@ -22,8 +21,7 @@ export default defineConfig(() => {
       }
     },
     build: {
-      outDir: './../server/LowPressureZone.Api/wwwroot/client-build',
-      emptyOutDir: true,
+      outDir: './../server/LowPressureZone.Api/wwwroot',
       license: true
     }
   }
