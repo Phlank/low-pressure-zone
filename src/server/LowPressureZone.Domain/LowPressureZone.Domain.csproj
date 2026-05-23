@@ -29,7 +29,4 @@
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\LowPressureZone.Identity\LowPressureZone.Identity.csproj"/>
-    </ItemGroup>
 </Project>
