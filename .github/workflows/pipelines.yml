@@ -1,4 +1,4 @@
-name: App Pipeline
+name: Low Pressure Zone
 on:
   pull_request:
     branches: [ "main", "develop" ]
@@ -76,7 +76,7 @@ jobs:
   publish-docker-image:
     name: Deploy Docker Image
     runs-on: ubuntu-latest
-    if: github.ref=='refs/heads/main' && github.event_name == 'push'
+    if: github.event_name == 'push'
     needs: [ build-client, build-server, test-server ]
     steps:
       - name: Download Build Artifacts
