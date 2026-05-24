@@ -89,6 +89,8 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.PUBLISH_TOKEN }}
+      - name: Restore dependencies
+        run: dotnet restore
       - name: Publish to Docker Image
         run: dotnet publish --no-build -c release
         
