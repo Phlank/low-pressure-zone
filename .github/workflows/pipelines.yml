@@ -76,7 +76,7 @@ jobs:
   publish-docker-image:
     name: Deploy Docker Image
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [ build-client, build-server, test-server ]
     steps:
       - name: Checkout repository

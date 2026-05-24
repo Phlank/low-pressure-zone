@@ -10,12 +10,12 @@
         <Version>1.5.7</Version>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <PublishProfile>DefaultContainer</PublishProfile>
-        <ContainerRegistry>ghcr.io</ContainerRegistry>
-        <ContainerRepository>phlank/low-pressure-zone</ContainerRepository>
-        <ContainerImageTags>latest;$(Version)</ContainerImageTags>
-    </PropertyGroup>
+<!--    <PropertyGroup>-->
+<!--        <PublishProfile>DefaultContainer</PublishProfile>-->
+<!--        <ContainerRegistry>ghcr.io</ContainerRegistry>-->
+<!--        <ContainerRepository>phlank/low-pressure-zone</ContainerRepository>-->
+<!--        <ContainerImageTags>latest;$(Version)</ContainerImageTags>-->
+<!--    </PropertyGroup>-->
 
     <ItemGroup>
         <PackageReference Include="FastEndpoints" Version="8.1.0" />
