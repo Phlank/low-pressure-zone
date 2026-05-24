@@ -246,7 +246,7 @@ public static class WebApplicationBuilderExtensions
             var mailgunDomain = builder.Configuration.GetValue<string>(mailgunDomainConfigKey);
             builder.Services
                    .AddFluentEmail("noreply@lowpressurezone.com", "Low Pressure Zone")
-                   .AddMailGunSender($"https://api.mailgun.net/v3/{mailgunDomain}", mailgunApiKey);
+                   .AddMailGunSender(mailgunDomain, mailgunApiKey);
         }
     }
 }

@@ -1,0 +1,96 @@
+name: Low Pressure Zone
+on:
+  pull_request:
+    branches: [ "main", "develop" ]
+  push:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build-client:
+    name: Build Client
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: corepack enable
+      - name: Use Node.js 24.x
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: 'yarn'
+          cache-dependency-path: src/client/yarn.lock
+          check-latest: true
+      - run: yarn
+        working-directory: src/client
+      - run: yarn lint
+        working-directory: src/client
+      - run: yarn stylelint
+        working-directory: src/client
+      - run: yarn build
+        working-directory: src/client
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: client-build
+          path: ./src/server/LowPressureZone.Api/wwwroot/**
+  
+  build-server:
+    name: Build Server
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore -c Release
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: server-build
+          path: |
+            ./src/server/**/bin/**
+            ./src/server/**/obj/**
+  
+  test-server:
+    name: Test Server
+    runs-on: ubuntu-latest
+    needs: build-server
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Download Server Build Artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: server-build
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+      - name: Test Server
+        run: dotnet test --no-build
+  
+  publish-docker-image:
+    name: Deploy Docker Image
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [ build-client, build-server, test-server ]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v8
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.PUBLISH_TOKEN }}
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Publish to Docker Image
+        run: dotnet publish -c Release
+        

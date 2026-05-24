@@ -1,0 +1,19 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace LowPressureZone.Identity.Extensions;
+
+public static class WebApplicationExtensions
+{
+    extension(WebApplication app)
+    {
+        public async Task<WebApplication> MigrateIdentityContextAsync()
+        {
+            await using var scope = app.Services.CreateAsyncScope();
+            var dataContext = scope.ServiceProvider.GetRequiredService<IdentityContext>();
+            await dataContext.Database.MigrateAsync();
+            return app;
+        }
+    }
+}

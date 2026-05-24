@@ -7,24 +7,32 @@
         <UserSecretsId>9d2c548d-3c62-4409-9c65-fe1fa2b047b1</UserSecretsId>
         <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
         <AnalysisLevel>latest-recommended</AnalysisLevel>
+        <Version>1.5.7</Version>
     </PropertyGroup>
 
+<!--    <PropertyGroup>-->
+<!--        <PublishProfile>DefaultContainer</PublishProfile>-->
+<!--        <ContainerRegistry>ghcr.io</ContainerRegistry>-->
+<!--        <ContainerRepository>phlank/low-pressure-zone</ContainerRepository>-->
+<!--        <ContainerImageTags>latest;$(Version)</ContainerImageTags>-->
+<!--    </PropertyGroup>-->
+
     <ItemGroup>
-        <PackageReference Include="FastEndpoints" Version="8.0.1" />
-        <PackageReference Include="FastEndpoints.Generator" Version="8.0.1">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PackageReference Include="FastEndpoints" Version="8.1.0" />
+        <PackageReference Include="FastEndpoints.Generator" Version="8.1.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="FastEndpoints.Security" Version="8.0.1" />
-        <PackageReference Include="FastEndpoints.Swagger" Version="8.0.1" />
+        <PackageReference Include="FastEndpoints.Security" Version="8.1.0" />
+        <PackageReference Include="FastEndpoints.Swagger" Version="8.1.0" />
         <PackageReference Include="FFMpegCore" Version="5.4.0"/>
-        <PackageReference Include="Hangfire.AspNetCore" Version="1.8.23" />
-        <PackageReference Include="Hangfire.Core" Version="1.8.23" />
-        <PackageReference Include="Hangfire.PostgreSql" Version="1.21.1" />
-        <PackageReference Include="jcamp.FluentEmail.Mailgun" Version="4.0.0" />
-        <PackageReference Include="jcamp.FluentEmail.Smtp" Version="4.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="10.0.3"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.3">
+        <PackageReference Include="Hangfire.AspNetCore" Version="1.8.23"/>
+        <PackageReference Include="Hangfire.Core" Version="1.8.23"/>
+        <PackageReference Include="Hangfire.PostgreSql" Version="1.21.1"/>
+        <PackageReference Include="jcamp.FluentEmail.Mailgun" Version="4.0.0"/>
+        <PackageReference Include="jcamp.FluentEmail.Smtp" Version="4.0.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="10.0.8"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.8">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
