@@ -31,7 +31,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: client-build
-          path: ./src/server/LowPressureZone.Api/wwwroot/client-build/**
+          path: ./src/server/LowPressureZone.Api/wwwroot/**
   
   build-server:
     name: Build Server
