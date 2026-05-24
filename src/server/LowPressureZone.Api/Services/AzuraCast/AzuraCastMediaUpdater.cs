@@ -20,7 +20,7 @@ public class AzuraCastMediaUpdater(ILogger<AzuraCastMediaUpdater> logger, IAzura
         var updateResult = await client.PutMediaAsync(media.Id, updateRequest);
         if (updateResult.IsError)
         {
-            logger.LogError("Failed to update media: {reason}", updateResult.Error.ReasonPhrase);
+            logger.LogError("Failed to update media: {Reason}", updateResult.Error.ReasonPhrase);
             return Result.Err("Failed to update media");
         }
         return new Result<string>();
