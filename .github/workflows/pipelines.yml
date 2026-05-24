@@ -10,7 +10,7 @@ jobs:
     name: Build Client
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: corepack enable
       - name: Use Node.js 24.x
         uses: actions/setup-node@v4
@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -61,7 +61,7 @@ jobs:
     needs: build-server
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Download Server Build Artifacts
         uses: actions/download-artifact@v8
         with:
@@ -79,10 +79,12 @@ jobs:
     if: github.event_name == 'push'
     needs: [ build-client, build-server, test-server ]
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
       - name: Download Build Artifacts
         uses: actions/download-artifact@v8
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@650006c
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
