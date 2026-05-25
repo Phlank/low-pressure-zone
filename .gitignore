@@ -16,7 +16,7 @@ coverage
 *.local
 .yarn/*
 .yarn
-**/wwwroot/client-build
+wwwroot/**
 
 /cypress/videos/
 /cypress/screenshots/

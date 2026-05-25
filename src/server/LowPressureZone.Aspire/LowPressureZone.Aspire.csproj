@@ -19,7 +19,14 @@
     
     <ItemGroup>
         <ProjectReference Include="../LowPressureZone.Api/LowPressureZone.Api.csproj" />
-        <ProjectReference Include="../LowPressureZone.Aspire.Migrations/LowPressureZone.Aspire.Migrations.csproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Content Update="appsettings-template.Development.json">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>
