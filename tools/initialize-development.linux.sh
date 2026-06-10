@@ -12,11 +12,11 @@ read admin_password
 rm src/server/LowPressureZone.Aspire.Migrations/appsettings.Development.json
 rm src/server/LowPressureZone.Api/appsettings.Development.json
 
-cp src/server/LowPressureZone.Aspire.Migrations/appsettings-template.Development.json src/server/LowPressureZone.Aspire.Migrations/appsettings.Development.json
-sed -i "s/{AdminUsername}/$admin_username/g" src/server/LowPressureZone.Aspire.Migrations/appsettings.Development.json
-sed -i "s/{AdminDisplayName}/$admin_displayname/g" src/server/LowPressureZone.Aspire.Migrations/appsettings.Development.json
-sed -i "s/{AdminEmail}/$admin_email/g" src/server/LowPressureZone.Aspire.Migrations/appsettings.Development.json
-sed -i "s/{AdminPassword}/$admin_password/g" src/server/LowPressureZone.Aspire.Migrations/appsettings.Development.json
+cp src/server/LowPressureZone.Aspire/appsettings-template.Development.json src/server/LowPressureZone.Aspire/appsettings.Development.json
+sed -i "s/{AdminUsername}/$admin_username/g" src/server/LowPressureZone.Aspire/appsettings.Development.json
+sed -i "s/{AdminDisplayName}/$admin_displayname/g" src/server/LowPressureZone.Aspire/appsettings.Development.json
+sed -i "s/{AdminEmail}/$admin_email/g" src/server/LowPressureZone.Aspire/appsettings.Development.json
+sed -i "s/{AdminPassword}/$admin_password/g" src/server/LowPressureZone.Aspire/appsettings.Development.json
 
 cp src/server/LowPressureZone.Api/appsettings-template.Development.json src/server/LowPressureZone.Api/appsettings.Development.json
 sed -i "s/{AdminEmail}/$admin_email/g" src/server/LowPressureZone.Api/appsettings.Development.json

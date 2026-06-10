@@ -2,6 +2,7 @@
 using System.Text.Json;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Clients;
+using LowPressureZone.Api.Models.Stream;
 
 namespace LowPressureZone.Api.Services.StreamStatus;
 
@@ -64,7 +65,7 @@ public sealed class AzuraCastStatusService(
                 TimeSpan? duration = null;
                 if (content.CurrentSong is not null && !content.Live.BroadcastStart.HasValue)
                     duration = TimeSpan.FromSeconds(content.CurrentSong.Duration);
-                
+
                 Status = new Models.Stream.StreamStatus
                 {
                     IsOnline = content.IsOnline,
@@ -72,10 +73,13 @@ public sealed class AzuraCastStatusService(
                     IsStatusStale = false,
                     Name = GetStreamName(content),
                     Type = "AzuraCast",
-                    ListenUrl = content.Station.ListenUrl,
                     ListenerCount = content.Listeners.Current,
                     StartedAt = startTime,
-                    Duration = duration
+                    Duration = duration,
+                    Mounts = content.Station
+                                    .Mounts
+                                    .OrderBy(mount => mount.Name)
+                                    .Select(mount => new Mount(mount.Name, mount.Url))
                 };
             }
         }
