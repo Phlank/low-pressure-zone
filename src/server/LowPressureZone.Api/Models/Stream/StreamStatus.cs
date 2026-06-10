@@ -7,8 +7,8 @@ public sealed class StreamStatus
     public required bool IsStatusStale { get; set; }
     public required string? Name { get; set; }
     public required string? Type { get; set; }
-    public required string? ListenUrl { get; set; }
     public required int ListenerCount { get; set; }
     public required DateTimeOffset? StartedAt { get; set; }
     public required TimeSpan? Duration { get; set; }
+    public required IEnumerable<Mount> Mounts { get; set; }
 }

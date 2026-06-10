@@ -1,4 +1,6 @@
-﻿namespace LowPressureZone.Api.Endpoints.Stream.Status;
+﻿using LowPressureZone.Api.Models.Stream;
+
+namespace LowPressureZone.Api.Endpoints.Stream.Status;
 
 public sealed class StreamStatusResponse
 {
@@ -7,8 +9,8 @@ public sealed class StreamStatusResponse
     public required bool IsStatusStale { get; set; }
     public required string? Name { get; set; }
     public required string? Type { get; set; }
-    public required string? ListenUrl { get; set; }
     public required int ListenerCount { get; set; }
     public required DateTimeOffset? StartedAt { get; set; }
     public required double? DurationSeconds { get; set; }
+    public required IEnumerable<Mount> Mounts { get; set; }
 }

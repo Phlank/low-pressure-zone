@@ -1,4 +1,7 @@
+using LowPressureZone.Aspire.Extensions;
+using Microsoft.Extensions.Configuration;
 using Projects;
+#pragma warning disable ASPIRECERTIFICATES001
 
 // ReSharper disable UnusedVariable
 
@@ -11,12 +14,6 @@ var postgres = builder.AddPostgres("lpz-postgres")
 var domainDatabase = postgres.AddDatabase("lpz-domain");
 var identityDatabase = postgres.AddDatabase("lpz-identity");
 var pgAdmin = postgres.WithPgAdmin(containerName: "lpz-pgAdmin");
-
-var migrations = builder.AddProject<LowPressureZone_Aspire_Migrations>("migrations")
-                        .WaitFor(domainDatabase)
-                        .WaitFor(identityDatabase)
-                        .WithReference(domainDatabase, "Data")
-                        .WithReference(identityDatabase, "Identity");
 
 var azuracast = builder.AddContainer("azuracast", "ghcr.io/azuracast/azuracast", "0.23.3")
                        .WithBindMount($"{bindMountDir}/azuracast/stations",
@@ -49,9 +46,9 @@ var icecast = builder.AddContainer("icecast", "deepcomp/icecast2", "2.4.4")
 var mailpit = builder.AddMailPit("mailpit", 9280, 9281);
 
 var api = builder.AddProject<LowPressureZone_Api>("lpz-api")
+                 .AddConfigurationToEnvironment(builder.Configuration.GetSection("LowPressureZone"))
                  .WaitFor(azuracast)
                  .WaitFor(mailpit)
-                 .WaitForCompletion(migrations)
                  .WaitFor(domainDatabase)
                  .WaitFor(identityDatabase)
                  .WithReference(mailpit)
@@ -60,7 +57,6 @@ var api = builder.AddProject<LowPressureZone_Api>("lpz-api")
 
 var client = builder.AddViteApp("lpz-client", "../../client")
                     .WithYarn()
-                    .WithRunScript("dev")
-                    .WithHttpEndpoint(4001, env: "PORT", name: "Client");
+                    .WithHttpEndpoint(port: 4001, targetPort: 4001, env: "PORT", isProxied: false);
 
 builder.Build().Run();

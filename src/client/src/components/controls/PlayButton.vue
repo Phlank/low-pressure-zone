@@ -31,9 +31,15 @@
         rounded
         size="large"
         @click="toggleVolumeSlider">
-        <span v-if="volumeSliderAmount === 100" class="pi pi-volume-up" />
-        <span v-else-if="volumeSliderAmount === 0" class="pi pi-volume-off" />
-        <span v-else class="pi pi-volume-down" />
+        <span
+          v-if="volumeSliderAmount === 100"
+          class="pi pi-volume-up" />
+        <span
+          v-else-if="volumeSliderAmount === 0"
+          class="pi pi-volume-off" />
+        <span
+          v-else
+          class="pi pi-volume-down" />
       </Button>
     </div>
     <div class="play-button__volume">
@@ -41,11 +47,17 @@
         v-model.number="volumeSliderAmount"
         class="play-button__volume__slider" />
     </div>
+    <div class="play-button__bitrates">
+      <SelectButton
+        v-model="selectedMount"
+        :options="streamStore.mounts"
+        option-label="name" />
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Button, Slider, useToast } from 'primevue'
+import { Button, Slider, useToast, SelectButton } from 'primevue'
 import { computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue'
 import clamp from '@/utils/clamp.ts'
 import { useDebounceFn, useLocalStorage, useResizeObserver } from '@vueuse/core'
@@ -55,6 +67,15 @@ import { formatElapsedTime } from '@/utils/dateUtils.ts'
 
 const toast = useToast()
 const streamStore = useStreamStore()
+
+const selectedMount = computed({
+  get() {
+    return streamStore.mounts.find((mount) => mount.name === streamStore.selectedMountName)
+  },
+  set(value) {
+    streamStore.selectMount(value)
+  }
+})
 
 enum PlayState {
   Playing,
@@ -97,9 +118,9 @@ const stopAudio = () => {
 
 const startAudio = () => {
   audioAbortController = new AbortController()
-  audio = new Audio(streamStore.status.listenUrl ?? '')
+  audio = new Audio(streamStore.selectedMountUrl ?? '')
   audio.volume = volume.value
-  audio.preload = 'metadata'
+  audio.preload = 'none'
   addAudioEventListeners()
   audio.play()
 }
@@ -125,6 +146,13 @@ watch(playState, (newPlayState) => {
     // Stream is not playing and the user presses play
     startAudio()
     streamStore.startTitleUpdating()
+  }
+})
+
+watch(selectedMount, (newValue, oldValue) => {
+  if (playState.value === PlayState.Playing && newValue?.name !== oldValue?.name) {
+    stopAudio()
+    startAudio()
   }
 })
 
@@ -244,6 +272,7 @@ const volumeSliderAreaMarginTopValue = computed(() => (showVolumeSliderArea.valu
 const volumeSliderAreaBorder = computed(() =>
   showVolumeSliderArea.value ? '1px solid var(--p-panel-border-color)' : 'none'
 )
+const bitrateAreaHeight = computed(() => showVolumeSliderArea.value ? '38px' : '0px')
 
 watch(volume, () => {
   if (audio !== undefined) {
@@ -284,6 +313,9 @@ $text-translate-amount: v-bind(nameTranslateWidthPx);
     calc(100dvw - 2 * #{variables.$space-l}),
     calc(30px + 28px + 10px + 46px + 10px + #{$text-width})
   );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
   transition:
     width 0.1s ease,
@@ -389,12 +421,69 @@ $text-translate-amount: v-bind(nameTranslateWidthPx);
     transition:
       padding 0.1s ease-in-out,
       margin-top 0.1s ease-in-out;
-      //border 0.1s ease-in-out;
     border-radius: calc(2 * #{variables.$space-l});
     border: v-bind(volumeSliderAreaBorder);
 
     div.p-slider {
       display: v-bind(volumeSliderDisplayValue);
+    }
+  }
+
+  &__bitrates {
+    width: min-content;
+    height: v-bind(bitrateAreaHeight);
+    background-color: var(--p-panel-background);
+    border-radius: variables.$space-l;
+    overflow: hidden;
+    margin-top: calc(v-bind(volumeSliderAreaMarginTopValue));
+    transition:
+      height 0.1s ease-in-out,
+      margin-top 0.1s ease-in-out;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+
+    div.p-selectbutton {
+      border-left-radius: variables.$space-l;
+      margin-left: auto;
+      border: none;
+
+      button.p-togglebutton {
+        border: none;
+        background: var(--p-panel-background);
+
+        span.p-togglebutton-content {
+          border-radius: 0;
+        }
+      }
+
+      button.p-togglebutton-checked {
+        span.p-togglebutton-content {
+          background: var(--p-button-primary-background);
+          color: var(--p-button-primary-color);
+        }
+      }
+
+      button.p-togglebutton:first-child {
+        border-top-left-radius: variables.$space-l;
+        border-bottom-left-radius: variables.$space-l;
+
+        span.p-togglebutton-content {
+          border-top-left-radius: variables.$space-l;
+          border-bottom-left-radius: variables.$space-l;
+        }
+      }
+
+      button.p-togglebutton:last-child {
+        border-top-right-radius: variables.$space-l;
+        border-bottom-right-radius: variables.$space-l;
+
+        span.p-togglebutton-content {
+          border-top-right-radius: variables.$space-l;
+          border-bottom-right-radius: variables.$space-l;
+        }
+      }
     }
   }
 }

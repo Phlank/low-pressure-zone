@@ -13,9 +13,9 @@ public class StreamStatusMapper : IResponseMapper
             IsStatusStale = status.IsStatusStale,
             Name = status.Name,
             Type = status.Type,
-            ListenUrl = status.ListenUrl,
             ListenerCount = status.ListenerCount,
             StartedAt = status.StartedAt,
-            DurationSeconds = status.Duration?.TotalSeconds
+            DurationSeconds = status.Duration?.TotalSeconds,
+            Mounts = status.Mounts
         };
 }
