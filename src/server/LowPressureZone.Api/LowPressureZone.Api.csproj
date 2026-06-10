@@ -7,15 +7,15 @@
         <UserSecretsId>9d2c548d-3c62-4409-9c65-fe1fa2b047b1</UserSecretsId>
         <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
         <AnalysisLevel>latest-recommended</AnalysisLevel>
-        <Version>1.5.7</Version>
+        <Version>1.6.0</Version>
     </PropertyGroup>
 
-<!--    <PropertyGroup>-->
-<!--        <PublishProfile>DefaultContainer</PublishProfile>-->
-<!--        <ContainerRegistry>ghcr.io</ContainerRegistry>-->
-<!--        <ContainerRepository>phlank/low-pressure-zone</ContainerRepository>-->
-<!--        <ContainerImageTags>latest;$(Version)</ContainerImageTags>-->
-<!--    </PropertyGroup>-->
+    <PropertyGroup>
+        <PublishProfile>DefaultContainer</PublishProfile>
+        <ContainerRegistry>ghcr.io</ContainerRegistry>
+        <ContainerRepository>phlank/low-pressure-zone</ContainerRepository>
+        <ContainerImageTags>latest;$(Version)</ContainerImageTags>
+    </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="FastEndpoints" Version="8.1.0" />
