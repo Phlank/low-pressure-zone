@@ -1,6 +1,7 @@
 using LowPressureZone.Aspire.Extensions;
 using Microsoft.Extensions.Configuration;
 using Projects;
+#pragma warning disable ASPIRECERTIFICATES001
 
 // ReSharper disable UnusedVariable
 
@@ -56,7 +57,6 @@ var api = builder.AddProject<LowPressureZone_Api>("lpz-api")
 
 var client = builder.AddViteApp("lpz-client", "../../client")
                     .WithYarn()
-                    .WithRunScript("dev")
-                    .WithHttpEndpoint(4001, env: "PORT", name: "Client");
+                    .WithHttpEndpoint(port: 4001, targetPort: 4001, env: "PORT", isProxied: false);
 
 builder.Build().Run();

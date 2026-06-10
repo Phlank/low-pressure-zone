@@ -14,10 +14,15 @@ export interface StreamStatusResponse {
   isStatusStale: boolean
   name: string | null
   type: string | null
-  listenUrl: string | null
   listenerCount: number
   startedAt: string | null
   durationSeconds: number | null
+  mounts: Mount[]
+}
+
+export interface Mount {
+  name: string
+  url: string
 }
 
 export const defaultStreamStatus: StreamStatusResponse = {
@@ -26,10 +31,10 @@ export const defaultStreamStatus: StreamStatusResponse = {
   isStatusStale: false,
   name: null,
   type: null,
-  listenUrl: null,
   listenerCount: 0,
   startedAt: null,
-  durationSeconds: null
+  durationSeconds: null,
+  mounts: [],
 }
 
 export interface ConnectionInformationResponse {
