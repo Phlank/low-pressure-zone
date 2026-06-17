@@ -83,6 +83,6 @@ jobs:
       - name: Download Build Artifacts
         uses: actions/download-artifact@v8
       - name: Publish to Folder
-        run: dotnet publish ./src/server/LowPressureZone.Api/LowPressureZone.Api.csproj --no-restore --no-build -c Release -o ./publish
+        run: dotnet publish --no-restore --no-build -c Release -o ./publish
       - name: Zip Publish Output
         run: zip -r low-pressure-zone.zip ./publish/*
