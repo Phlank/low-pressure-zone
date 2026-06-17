@@ -24,8 +24,8 @@
         <PackageReference Include="Hangfire.PostgreSql" Version="1.21.1"/>
         <PackageReference Include="jcamp.FluentEmail.Mailgun" Version="4.0.0"/>
         <PackageReference Include="jcamp.FluentEmail.Smtp" Version="4.0.0"/>
-        <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="10.0.8"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.8">
+        <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="10.0.9"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -39,17 +39,6 @@
         <ProjectReference Include="..\LowPressureZone.Domain\LowPressureZone.Domain.csproj"/>
         <ProjectReference Include="..\LowPressureZone.Identity\LowPressureZone.Identity.csproj"/>
         <ProjectReference Include="..\LowPressureZone.Adapter.AzuraCast\LowPressureZone.Adapter.AzuraCast.csproj"/>
-    </ItemGroup>
-
-    <PropertyGroup>
-        <PublishProfile>DefaultContainer</PublishProfile>
-        <ContainerRegistry>ghcr.io</ContainerRegistry>
-        <ContainerRepository>phlank/low-pressure-zone</ContainerRepository>
-        <ContainerImageTags>latest;$(Version)</ContainerImageTags>
-    </PropertyGroup>
-    
-    <ItemGroup>
-        <ContainerAppParameter Include="package" Value="libgssapi-krb5-2" />
     </ItemGroup>
 
 </Project>

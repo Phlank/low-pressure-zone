@@ -73,24 +73,16 @@ jobs:
       - name: Test Server
         run: dotnet test --no-build
   
-  publish-docker-image:
-    name: Deploy Docker Image
+  publish:
+    name: Publish App
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [ build-client, build-server, test-server ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
       - name: Download Build Artifacts
         uses: actions/download-artifact@v8
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.PUBLISH_TOKEN }}
-      - name: Restore dependencies
-        run: dotnet restore
-      - name: Publish to Docker Image
-        run: dotnet publish -c Release
-        
+      - name: Publish to Folder
+        run: dotnet publish ./src/server/LowPressureZone.Api/LowPressureZone.Api.csproj --no-restore --no-build -c Release -o ./publish
+      - name: Zip Publish Output
+        run: zip -r low-pressure-zone.zip ./publish/*
