@@ -47,13 +47,6 @@ jobs:
         run: dotnet restore
       - name: Build
         run: dotnet build --no-restore -c Release
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: server-build
-          path: |
-            ./src/server/**/bin/**
-            ./src/server/**/obj/**
   
   test-server:
     name: Test Server
@@ -62,16 +55,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-      - name: Download Server Build Artifacts
-        uses: actions/download-artifact@v8
-        with:
-          name: server-build
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
       - name: Test Server
-        run: dotnet test --no-build
+        run: dotnet test
   
   publish:
     name: Publish App
@@ -86,6 +75,6 @@ jobs:
           name: client-build
           path: ./src/server/LowPressureZone.Api/wwwroot
       - name: Publish to Folder
-        run: dotnet publish --no-restore ./src/server/LowPressureZone.Api/LowPressureZone.Api.csproj -c Release -o ./publish
+        run: dotnet publish ./src/server/LowPressureZone.Api/LowPressureZone.Api.csproj -c Release -o ./publish
       - name: Zip Publish Output
         run: zip -r low-pressure-zone.zip ./publish/*
