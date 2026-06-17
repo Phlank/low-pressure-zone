@@ -31,7 +31,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: client-build
-          path: ./src/server/LowPressureZone.Api/wwwroot/**
+          path: ./src/server/LowPressureZone.Api/wwwroot/
   
   build-server:
     name: Build Server
@@ -80,9 +80,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-      - name: Download Build Artifacts
+      - name: Download Client Build Artifacts
         uses: actions/download-artifact@v8
+        with:
+          name: client-build
+          path: ./src/server/LowPressureZone.Api/wwwroot
       - name: Publish to Folder
-        run: dotnet publish ./src/server/LowPressureZone.Api/LowPressureZone.Api.csproj -c Release -o ./publish
+        run: dotnet publish --no-restore ./src/server/LowPressureZone.Api/LowPressureZone.Api.csproj -c Release -o ./publish
       - name: Zip Publish Output
         run: zip -r low-pressure-zone.zip ./publish/*
