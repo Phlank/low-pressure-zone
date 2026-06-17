@@ -9,22 +9,22 @@
     <ItemGroup>
         <PackageReference Include="FakeItEasy" Version="9.0.1" />
         <PackageReference Include="FastEndpoints.Testing" Version="8.1.0" />
-        <PackageReference Include="JetBrains.Annotations" Version="2025.2.4"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.8" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
-        <PackageReference Include="Npgsql" Version="10.0.2" />
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1"/>
+        <PackageReference Include="JetBrains.Annotations" Version="2026.2.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
+        <PackageReference Include="Npgsql" Version="10.0.3" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.2" />
         <PackageReference Include="Testcontainers.PostgreSql" Version="4.12.0" />
         <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="xunit.v3" Version="3.2.2"/>
+        <PackageReference Include="xunit.v3" Version="3.2.2" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\LowPressureZone.Api\LowPressureZone.Api.csproj"/>
-        <ProjectReference Include="..\LowPressureZone.Domain\LowPressureZone.Domain.csproj"/>
+        <ProjectReference Include="..\LowPressureZone.Api\LowPressureZone.Api.csproj" />
+        <ProjectReference Include="..\LowPressureZone.Domain\LowPressureZone.Domain.csproj" />
         <ProjectReference Include="..\LowPressureZone.Adapter.AzuraCast\LowPressureZone.Adapter.AzuraCast.csproj" />
     </ItemGroup>
 

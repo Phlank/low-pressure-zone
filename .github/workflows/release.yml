@@ -1,0 +1,58 @@
+name: Low Pressure Zone Release
+on: release
+
+jobs:
+  build-client:
+    name: Build Client
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: corepack enable
+      - name: Use Node.js 24.x
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: 'yarn'
+          cache-dependency-path: src/client/yarn.lock
+          check-latest: true
+      - run: yarn
+        working-directory: src/client
+      - run: yarn lint
+        working-directory: src/client
+      - run: yarn stylelint
+        working-directory: src/client
+      - run: yarn build
+        working-directory: src/client
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: client-build
+          path: ./src/server/LowPressureZone.Api/wwwroot/
+
+  publish:
+    name: Publish App
+    runs-on: ubuntu-latest
+    needs: [ build-client ]
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+      - name: Download Client Build Artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: client-build
+          path: ./src/server/LowPressureZone.Api/wwwroot
+      - name: Publish to Folder
+        run: dotnet publish ./src/server/LowPressureZone.Api/LowPressureZone.Api.csproj -c Release -o ./publish
+      - name: Zip Publish Output
+        run: zip -r low-pressure-zone-${{ github.event.release.tag_name }}.zip ./publish/*
+      - name: Upload zip to release
+        uses: softprops/action-gh-release@v3
+        with:
+          files: low-pressure-zone-${{ github.event.release.tag_name }}.zip
+
