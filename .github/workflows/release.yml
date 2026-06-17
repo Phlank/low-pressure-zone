@@ -55,4 +55,5 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           files: low-pressure-zone-${{ github.event.release.tag_name }}.zip
+          token: '${{ secrets.RELEASE_ASSET_TOKEN }}'
 
