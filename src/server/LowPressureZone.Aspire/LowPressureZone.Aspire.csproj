@@ -1,4 +1,4 @@
-<Project Sdk="Aspire.AppHost.Sdk/13.4.3">
+<Project Sdk="Aspire.AppHost.Sdk/13.4.4">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -9,24 +9,21 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Aspire.Hosting.AppHost" Version="13.4.3" />
-      <PackageReference Include="Aspire.Hosting.JavaScript" Version="13.4.3" />
-      <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.4.3" />
-      <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="13.4.3" />
-      <PackageReference Include="CommunityToolkit.Aspire.Hosting.MailPit" Version="13.4.0" />
-    <PackageReference Include="OpenTelemetry.Api" Version="1.15.3" />
+        <PackageReference Include="Aspire.Hosting.JavaScript" Version="13.4.4" />
+        <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.4.4" />
+        <PackageReference Include="CommunityToolkit.Aspire.Hosting.MailPit" Version="13.4.0" />
     </ItemGroup>
-    
+
     <ItemGroup>
         <ProjectReference Include="../LowPressureZone.Api/LowPressureZone.Api.csproj" />
     </ItemGroup>
-    
+
     <ItemGroup>
-      <Content Update="appsettings-template.Development.json">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
+        <Content Update="appsettings-template.Development.json">
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
     </ItemGroup>
 
 </Project>
