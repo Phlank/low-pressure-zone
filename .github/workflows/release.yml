@@ -23,7 +23,7 @@ jobs:
         working-directory: src/client
       - run: yarn stylelint
         working-directory: src/client
-      - run: yarn build
+      - run: yarn build --mode production
         working-directory: src/client
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7
