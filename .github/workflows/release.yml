@@ -50,6 +50,8 @@ jobs:
         with:
           name: client-build
           path: ./src/server/LowPressureZone.Api/wwwroot
+      - name: Update launchSettings.json to production information
+        run: mv ./src/server/LowPressureZone.Api/Properties/launchSettings-production.json ./src/server/LowPressureZone.Api/Properties/launchSettings.json
       - name: Publish to Folder
         run: dotnet publish ./src/server/LowPressureZone.Api/LowPressureZone.Api.csproj -c Release -o ./publish
       - name: Zip Publish Output
