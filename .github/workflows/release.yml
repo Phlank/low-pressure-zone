@@ -23,7 +23,7 @@ jobs:
         working-directory: src/client
       - run: yarn stylelint
         working-directory: src/client
-      - run: yarn build
+      - run: yarn build --mode production
         working-directory: src/client
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7
@@ -50,6 +50,8 @@ jobs:
         with:
           name: client-build
           path: ./src/server/LowPressureZone.Api/wwwroot
+      - name: Update launchSettings.json to production information
+        run: mv ./src/server/LowPressureZone.Api/Properties/launchSettings-production.json ./src/server/LowPressureZone.Api/Properties/launchSettings.json
       - name: Publish to Folder
         run: dotnet publish ./src/server/LowPressureZone.Api/LowPressureZone.Api.csproj -c Release -o ./publish
       - name: Zip Publish Output

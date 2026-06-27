@@ -19,7 +19,7 @@
     "@primevue/themes": "^4.5.4",
     "@vueuse/core": "^14.3.0",
     "date-fns": "^4.3.0",
-    "dompurify": "^3.4.9",
+    "dompurify": "^3.4.11",
     "marked": "^18.0.4",
     "pinia": "^3.0.4",
     "primeicons": "^7.0.0",
