@@ -22,6 +22,7 @@ export default defineConfig(() => {
     },
     build: {
       outDir: './../server/LowPressureZone.Api/wwwroot',
+      emptyOutDir: true,
       license: true
     }
   }

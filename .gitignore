@@ -46,3 +46,4 @@ temporaryFiles
 tools/mounts/azuracast
 tools/mounts/icecast2
 /LowPressureZone.sln.DotSettings.user
+wwwroot
