@@ -34,7 +34,7 @@ jobs:
   publish:
     name: Publish App
     runs-on: ubuntu-latest
-    if: github.event.release.draft == false && github.event.release.prerelease == false
+    if: github.event.release.draft == true && github.event.release.prerelease == false
     needs: [ build-client ]
     permissions:
       contents: write
