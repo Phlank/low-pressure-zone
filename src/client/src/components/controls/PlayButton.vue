@@ -51,6 +51,7 @@
       <SelectButton
         v-model="selectedMount"
         :options="streamStore.mounts"
+        :allow-empty="false"
         option-label="name" />
     </div>
   </div>
@@ -272,7 +273,7 @@ const volumeSliderAreaMarginTopValue = computed(() => (showVolumeSliderArea.valu
 const volumeSliderAreaBorder = computed(() =>
   showVolumeSliderArea.value ? '1px solid var(--p-panel-border-color)' : 'none'
 )
-const bitrateAreaHeight = computed(() => showVolumeSliderArea.value ? '38px' : '0px')
+const bitrateAreaHeight = computed(() => (showVolumeSliderArea.value ? '38px' : '0px'))
 
 watch(volume, () => {
   if (audio !== undefined) {
@@ -433,6 +434,7 @@ $text-translate-amount: v-bind(nameTranslateWidthPx);
     width: min-content;
     height: v-bind(bitrateAreaHeight);
     background-color: var(--p-panel-background);
+    border: v-bind(volumeSliderAreaBorder);
     border-radius: variables.$space-l;
     overflow: hidden;
     margin-top: calc(v-bind(volumeSliderAreaMarginTopValue));
