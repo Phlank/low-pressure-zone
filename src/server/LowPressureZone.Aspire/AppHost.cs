@@ -9,7 +9,7 @@ const string bindMountDir = "../../../tools/mounts";
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-var postgres = builder.AddPostgres("lpz-postgres")
+var postgres = builder.AddPostgres("lpz-postgres", port: 4000)
                       .WithDataVolume();
 var domainDatabase = postgres.AddDatabase("lpz-domain");
 var identityDatabase = postgres.AddDatabase("lpz-identity");
@@ -59,4 +59,4 @@ var client = builder.AddViteApp("lpz-client", "../../client")
                     .WithYarn()
                     .WithHttpEndpoint(port: 4001, targetPort: 4001, env: "PORT", isProxied: false);
 
-builder.Build().Run();
+await builder.Build().RunAsync();
