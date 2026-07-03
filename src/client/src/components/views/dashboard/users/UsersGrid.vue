@@ -25,7 +25,7 @@
               @click="emit('createStreamer', data)" />
           </template>
         </Column>
-        <Column>
+        <Column class="grid-action-col grid-action-col--1">
           <template #body="{ data }: { data: UserResponse }">
             <GridActions
               :show-disable="data.canBeDisabled"
@@ -76,6 +76,12 @@
                   v-if="!user.isStreamer"
                   label="Create Streamer"
                   @click="emit('createStreamer', user)" />
+                <GridActions
+                  v-else
+                  :show-disable="user.canBeDisabled"
+                  :show-enable="user.canBeEnabled"
+                  @enable="handleEnableUser(user.id)"
+                  @disable="handleDisableUser(user.id)" />
               </template>
             </ListItem>
             <Divider v-if="index < items.length - 1" />
