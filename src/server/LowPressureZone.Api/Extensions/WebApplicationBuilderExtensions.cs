@@ -222,6 +222,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton<TimeslotRules>();
         builder.Services.AddSingleton<BroadcastRules>();
         builder.Services.AddSingleton<SoundclashRules>();
+        builder.Services.AddSingleton<UserRules>();
     }
 
     private static void AddFluentEmail(this WebApplicationBuilder builder)

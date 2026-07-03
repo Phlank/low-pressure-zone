@@ -34,7 +34,7 @@ jobs:
   publish:
     name: Publish App
     runs-on: ubuntu-latest
-    if: github.event.release.draft == false && github.event.release.prerelease == false
+    if: github.event.release.draft == true && github.event.release.prerelease == false
     needs: [ build-client ]
     permissions:
       contents: write
@@ -55,7 +55,7 @@ jobs:
       - name: Publish to Folder
         run: dotnet publish ./src/server/LowPressureZone.Api/LowPressureZone.Api.csproj -c Release -o ./publish
       - name: Zip Publish Output
-        run: zip -r low-pressure-zone-${{ github.event.release.tag_name }}.zip ./publish/*
+        run: zip -r low-pressure-zone-${{ github.event.release.tag_name }}.zip ./publish/* ./deploy.sh
       - name: Upload zip to release
         uses: softprops/action-gh-release@v3
         with:

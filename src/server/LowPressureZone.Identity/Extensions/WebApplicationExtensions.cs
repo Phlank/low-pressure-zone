@@ -11,8 +11,10 @@ public static class WebApplicationExtensions
         public async Task<WebApplication> MigrateIdentityContextAsync()
         {
             await using var scope = app.Services.CreateAsyncScope();
-            var dataContext = scope.ServiceProvider.GetRequiredService<IdentityContext>();
-            await dataContext.Database.MigrateAsync();
+            var identityContext = scope.ServiceProvider.GetRequiredService<IdentityContext>();
+            await identityContext.Database.MigrateAsync();
+            await identityContext.SeedRolesAsync(CancellationToken.None);
+            await identityContext.SeedAdminUserAsync(CancellationToken.None);
             return app;
         }
     }
