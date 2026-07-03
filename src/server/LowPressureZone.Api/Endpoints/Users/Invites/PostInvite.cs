@@ -38,7 +38,9 @@ public class PostInvite(
             NormalizedEmail = normalizedEmail,
             DisplayName = username,
             UserName = username,
-            NormalizedUserName = normalizedUsername
+            NormalizedUserName = normalizedUsername,
+            LockoutEnabled = false,
+            LockoutEnd = DateTimeOffset.MaxValue.ToUniversalTime()
         };
         var createResult = await userManager.CreateAsync(user);
         createResult.Errors.ForEach(e => AddError(e.Code + " " + e.Description));
