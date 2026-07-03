@@ -7,4 +7,6 @@ public sealed class UserResponse
     public required bool IsAdmin { get; set; }
     public required DateTime? RegistrationDate { get; set; }
     public required bool IsStreamer { get; set; }
+    public required bool CanBeEnabled { get; set; }
+    public required bool CanBeDisabled { get; set; }
 }

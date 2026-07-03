@@ -1,14 +1,15 @@
 import { sendGet, sendPost, sendPut } from '../fetchFunctions.ts'
 
-const route = '/users'
+const route = (id?: string) => id ? `/users/${id}` : '/users'
 
 export default {
-  get: () => sendGet<UserResponse[]>(route),
-  createStreamer: (userId: string) => sendPost(`${route}/streamers/link/${userId}`),
-  createStreamers: () => sendPost(`${route}/streamers/link`),
+  get: () => sendGet<UserResponse[]>(route()),
+  createStreamer: (userId: string) => sendPost(`${route()}/streamers/link/${userId}`),
+  createStreamers: () => sendPost(`${route()}/streamers/link`),
   putStreamer: (request: StreamerRequest) =>
-    sendPut<StreamerRequest>(`${route}/streamers`, request),
-  getStreamerPassword: () => sendGet<StreamerPasswordResponse>(`${route}/streamers/password`)
+    sendPut<StreamerRequest>(`${route()}/streamers`, request),
+  getStreamerPassword: () => sendGet<StreamerPasswordResponse>(`${route()}/streamers/password`),
+  putEnabled: (id: string, enabled: boolean) => sendPut(`${route(id)}/enabled`, { enabled: enabled })
 }
 
 export interface UserResponse {
@@ -17,6 +18,8 @@ export interface UserResponse {
   registrationDate: string
   isAdmin: boolean
   isStreamer: boolean
+  canBeEnabled: boolean
+  canBeDisabled: boolean
 }
 
 export interface StreamerRequest {

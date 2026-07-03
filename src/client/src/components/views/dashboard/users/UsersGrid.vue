@@ -25,6 +25,15 @@
               @click="emit('createStreamer', data)" />
           </template>
         </Column>
+        <Column>
+          <template #body="{ data }: { data: UserResponse }">
+            <GridActions
+              :show-disable="data.canBeDisabled"
+              :show-enable="data.canBeEnabled"
+              @enable="handleEnableUser(data.id)"
+              @disable="handleDisableUser(data.id)" />
+          </template>
+        </Column>
         <template #footer>
           <Button
             v-if="authStore.isInAnyRoles(roles.organizer, roles.admin)"
@@ -89,11 +98,12 @@ import ListItem from '@/components/data/ListItem.vue'
 import { parseDate } from '@/utils/dateUtils'
 import { Button, Column, DataTable, DataView, Divider } from 'primevue'
 import { computed, inject, type Ref } from 'vue'
-import { type UserResponse } from '@/api/resources/usersApi.ts'
+import usersApi, { type UserResponse } from '@/api/resources/usersApi.ts'
 import { mobilePaginatorTemplate } from '@/constants/componentTemplates.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
 import { roles } from '@/constants/roles.ts'
 import { useUserStore } from '@/stores/userStore.ts'
+import GridActions from '@/components/data/grid-actions/GridActions.vue'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
 const authStore = useAuthStore()
@@ -107,6 +117,25 @@ const emit = defineEmits<{
   newInvite: []
   createStreamer: [UserResponse]
 }>()
+
+const handleEnableUser = async (id: string) => {
+  const result = await usersApi.putEnabled(id, true)
+  if (result.isSuccess()) {
+    const user = userStore.getUser(id)
+    if (!user) return
+    user.canBeEnabled = false
+    user.canBeDisabled = true
+  }
+}
+const handleDisableUser = async (id: string) => {
+  const result = await usersApi.putEnabled(id, false)
+  if (result.isSuccess()) {
+    const user = userStore.getUser(id)
+    if (!user) return
+    user.canBeEnabled = true
+    user.canBeDisabled = false
+  }
+}
 </script>
 
 <style lang="scss">

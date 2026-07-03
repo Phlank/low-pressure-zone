@@ -6,9 +6,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace LowPressureZone.Identity.Extensions;
 
-public static class DbContextOptionsBuilderExtensions
+public static class DbContextExtensions
 {
-    private static void Seed_AddAdminUser(DbContext context)
+    public static void SeedAdminUser(this DbContext context)
     {
         var users = context.Set<AppUser>();
         var roles = context.Set<AppRole>();
@@ -52,7 +52,7 @@ public static class DbContextOptionsBuilderExtensions
         context.SaveChanges();
     }
 
-    private static async Task Seed_AddAdminUserAsync(DbContext context, CancellationToken ct)
+    public static async Task SeedAdminUserAsync(this DbContext context, CancellationToken ct)
     {
         var users = context.Set<AppUser>();
         var roles = context.Set<AppRole>();
@@ -96,7 +96,7 @@ public static class DbContextOptionsBuilderExtensions
         await context.SaveChangesAsync(ct);
     }
 
-    private static void Seed_AddRoles(DbContext context)
+    public static void SeedRoles(this DbContext context)
     {
         var roles = context.Set<AppRole>();
         foreach (var roleName in RoleNames.DatabaseRoles)
@@ -114,7 +114,7 @@ public static class DbContextOptionsBuilderExtensions
         context.SaveChanges();
     }
 
-    private static async Task Seed_AddRolesAsync(DbContext context, CancellationToken ct)
+    public static async Task SeedRolesAsync(this DbContext context, CancellationToken ct)
     {
         var roles = context.Set<AppRole>();
         foreach (var roleName in RoleNames.DatabaseRoles)
@@ -142,18 +142,20 @@ public static class DbContextOptionsBuilderExtensions
         var section = config.GetSection("SeedData:Identity");
         return section.Get<IdentitySeedData>();
     }
+}
 
-    extension(DbContextOptionsBuilder optionsBuilder)
+public static class DbContextOptionsBuilderExtensions
+{
+    public static DbContextOptionsBuilder ConfigureIdentitySeeding(this DbContextOptionsBuilder optionsBuilder)
     {
-        public void ConfigureIdentitySeeding() =>
-            optionsBuilder.UseSeeding((context, _) =>
-            {
-                Seed_AddRoles(context);
-                Seed_AddAdminUser(context);
-            }).UseAsyncSeeding(async (context, _, ct) =>
-            {
-                await Seed_AddRolesAsync(context, ct);
-                await Seed_AddAdminUserAsync(context, ct);
-            });
+        return optionsBuilder.UseSeeding((context, _) =>
+        {
+            context.SeedRoles();
+            context.SeedAdminUser();
+        }).UseAsyncSeeding(async (context, _, ct) =>
+        {
+            await context.SeedRolesAsync(ct);
+            await context.SeedAdminUserAsync(ct);
+        });
     }
 }
