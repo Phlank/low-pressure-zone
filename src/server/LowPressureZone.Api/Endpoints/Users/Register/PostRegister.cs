@@ -98,6 +98,7 @@ public class PostRegister(
         user.EmailConfirmed = true;
         user.DisplayName = req.DisplayName;
         user.TwoFactorEnabled = true;
+        user.LockoutEnabled = false;
         await userManager.UpdateAsync(user);
 
         var createStreamerResult = await userManager.LinkToNewStreamer(user, radioClient);

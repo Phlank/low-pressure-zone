@@ -53,6 +53,8 @@ const props = withDefaults(
     showInfo?: boolean
     showResend?: boolean
     showDisconnect?: boolean
+    showDisable?: boolean,
+    showEnable?: boolean,
     disabled?: boolean
   }>(),
   {
@@ -65,6 +67,8 @@ const props = withDefaults(
     showInfo: false,
     showResend: false,
     showDisconnect: false,
+    showDisable: false,
+    showEnable: false,
     disabled: false
   }
 )
@@ -82,6 +86,8 @@ const visibleActions = computed(() => {
   if (props.showInfo) actions.push(gridActions.info)
   if (props.showResend) actions.push(gridActions.resend)
   if (props.showDisconnect) actions.push(gridActions.disconnect)
+  if (props.showDisable) actions.push(gridActions.disable)
+  if (props.showEnable) actions.push(gridActions.enable)
   return actions
 })
 
