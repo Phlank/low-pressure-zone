@@ -7,7 +7,7 @@
         <UserSecretsId>9d2c548d-3c62-4409-9c65-fe1fa2b047b1</UserSecretsId>
         <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
         <AnalysisLevel>latest-recommended</AnalysisLevel>
-        <Version>1.6.4</Version>
+        <Version>1.6.7</Version>
     </PropertyGroup>
 
     <ItemGroup>
