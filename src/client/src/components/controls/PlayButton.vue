@@ -206,8 +206,7 @@ const handleError = () => {
   })
   waitAndTryReconnect()
 }
-
-const statusText = computed(() => {
+computed(() => {
   const liveText = streamStore.status.isLive ? 'Live' : 'Offline'
   return `${liveText} | Listeners: ${streamStore.status.listenerCount}`
 })
