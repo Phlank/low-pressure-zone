@@ -28,7 +28,7 @@
             field="start"
             header="Date">
             <template #body="{ data }: { data: ScheduleResponse }">
-              {{ parseDate(data.startsAt).toLocaleDateString() }}
+                {{ parseDate(data.startsAt).toLocaleDateString(undefined, dateStringOptions) }}
             </template>
           </Column>
           <Column
@@ -44,7 +44,7 @@
             <template #body="{ data }: { data: ScheduleResponse }">
               <TwoLineData
                 :above="data.name"
-                :below="parseDate(data.startsAt).toLocaleDateString()" />
+                :below="parseDate(data.startsAt).toLocaleDateString(undefined, dateStringOptions)" />
             </template>
           </Column>
           <!-- Only show the action col for grids with schedules in the future -->
@@ -114,6 +114,8 @@ const auth = useAuthStore()
 const toast = useToast()
 const expandedRows = ref({})
 const isMobile: Ref<boolean> | undefined = inject('isMobile')
+
+const dateStringOptions: Intl.DateTimeFormatOptions = { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' }
 
 const props = withDefaults(
   defineProps<{
