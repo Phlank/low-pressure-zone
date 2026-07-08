@@ -13,7 +13,12 @@
           </div>
           <div class="play-button__content__text-area">
             <div class="play-button__content__text-area__status">
-              {{ statusText }}
+              <span>{{ liveText }}</span>
+              <span>|</span>
+              <span class="play-button__content__text-area__status__listeners">
+                <span class="pi pi-wave-pulse" />
+                <span>{{ listenersText }}</span>
+              </span>
             </div>
             <div class="play-button__content__text-area__now-playing">
               <div class="play-button__content__text-area__now-playing__text">
@@ -201,10 +206,17 @@ const handleError = () => {
   })
   waitAndTryReconnect()
 }
-
-const statusText = computed(() => {
+computed(() => {
   const liveText = streamStore.status.isLive ? 'Live' : 'Offline'
   return `${liveText} | Listeners: ${streamStore.status.listenerCount}`
+})
+
+const liveText = computed(() => {
+  return streamStore.status.isLive ? 'Live' : 'Offline'
+})
+
+const listenersText = computed(() => {
+  return streamStore.status.listenerCount ?? 0
 })
 
 const elapsedText = ref('')
@@ -372,6 +384,14 @@ $text-translate-amount: v-bind(nameTranslateWidthPx);
         font-size: small;
         text-align: left;
         white-space: nowrap;
+        display: flex;
+        flex-direction: row;
+        gap: variables.$space-m;
+
+        &__listeners {
+          display: flex;
+          gap: variables.$space-s;
+        }
       }
 
       &__elapsed {
