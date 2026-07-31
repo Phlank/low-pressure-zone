@@ -69,6 +69,9 @@ const rightClass = computed(() =>
   &__right {
     display: flex;
     flex-direction: column;
+    overflow: visible;
+    text-overflow: unset;
+    word-wrap: break-word;
 
     &--no-overflow {
       overflow: hidden;

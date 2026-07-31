@@ -1,6 +1,6 @@
 <template>
   <div class="two-line-data">
-    <div class="two-line-data__top">{{ above }}</div>
+    <div :class="{ 'two-line-data__top': true, 'two-line-data__top__wrapped': wrapTop }">{{ above }}</div>
     <div
       v-if="below"
       class="two-line-data__bottom">
@@ -10,10 +10,13 @@
 </template>
 
 <script lang="ts" setup>
-defineProps<{
+withDefaults(defineProps<{
   above: string
   below: string
-}>()
+  wrapTop?: boolean
+}>(), {
+  wrapTop: false
+})
 </script>
 
 <style lang="scss">
@@ -23,6 +26,11 @@ defineProps<{
 
   &__top {
     color: var(--p-text-color);
+
+    &__wrapped {
+      white-space: wrap;
+      word-wrap: break-word;
+    }
   }
 
   &__bottom {
