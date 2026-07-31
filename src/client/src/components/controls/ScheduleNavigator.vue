@@ -31,15 +31,20 @@
           <ListItem
             v-if="value !== undefined"
             :hide-overflow-left="false"
-            hide-overflow-right
             style="min-height: fit-content">
             <template #left>
               <TwoLineData
                 :above="parseDate(value.startsAt).toLocaleDateString()"
-                :below="value.community.name" />
+                :below="
+                  parseDate(value.startsAt).toLocaleDateString(undefined, { weekday: 'long' })
+                " />
             </template>
             <template #right>
-              <span>{{ value.name }}</span>
+              <TwoLineData
+                style="align-items: end; text-align: right"
+                :above="value.name"
+                :below="value.community.name"
+                wrap-top />
             </template>
           </ListItem>
         </template>
@@ -52,10 +57,16 @@
             <template #left>
               <TwoLineData
                 :above="parseDate(option.startsAt).toLocaleDateString()"
-                :below="option.community.name" />
+                :below="
+                  parseDate(option.startsAt).toLocaleDateString(undefined, { weekday: 'long' })
+                " />
             </template>
             <template #right>
-              <span>{{ option.name }}</span>
+              <TwoLineData
+                style="align-items: end; text-align: right"
+                :above="option.name"
+                :below="option.community.name"
+                wrap-top />
             </template>
           </ListItem>
         </template>
@@ -159,10 +170,6 @@ watch(
       }
     }
 
-    &__two-line-data {
-      gap: 0 !important;
-    }
-
     &__overlay {
       min-width: unset !important;
       width: min(calc(100dvw - 2 * #{variables.$space-m} - 2 * #{variables.$space-l}), 390px);
@@ -179,6 +186,14 @@ watch(
 
   div.two-line-data {
     gap: 0;
+  }
+
+  div.two-line-data {
+    div.two-line-data__top {
+      overflow-wrap: break-word;
+      min-height: fit-content;
+      white-space: wrap;
+    }
   }
 }
 </style>
