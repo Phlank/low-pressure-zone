@@ -1,6 +1,7 @@
 <template>
   <div class="form-drawer">
     <Drawer
+      :dismissable="false"
       :position="position"
       auto-z-index
       block-scroll
