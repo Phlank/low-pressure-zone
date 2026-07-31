@@ -13,9 +13,11 @@ public static class RuleBuilderExtensions
     private static readonly Regex PasswordLowercaseRegex = new("[a-z]", RegexOptions.Compiled);
     private static readonly Regex PasswordUppercaseRegex = new("[A-Z]", RegexOptions.Compiled);
 
-    public static IRuleBuilder<T, string> AbsoluteHttpUri<T>(this IRuleBuilder<T, string> ruleBuilder)
-        => ruleBuilder.Must(e => Uri.IsWellFormedUriString(e, UriKind.Absolute)).WithMessage(Errors.InvalidUrl)
-                      .Must(e => e.StartsWith("https://", StringComparison.InvariantCulture) ||
+    public static IRuleBuilderOptions<T, string?> AbsoluteHttpUri<T>(this IRuleBuilder<T, string?> ruleBuilder)
+        => ruleBuilder.Must(e => string.IsNullOrEmpty(e) || Uri.IsWellFormedUriString(e, UriKind.Absolute))
+                      .WithMessage(Errors.InvalidUrl)
+                      .Must(e => string.IsNullOrEmpty(e) ||
+                                 e.StartsWith("https://", StringComparison.InvariantCulture) ||
                                  e.StartsWith("http://", StringComparison.InvariantCulture))
                       .WithMessage(Errors.InvalidUrl);
 
