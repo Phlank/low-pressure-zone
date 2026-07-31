@@ -17,6 +17,9 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     public DbSet<Setting> Settings { get; set; }
     public DbSet<Soundclash> Soundclashes { get; set; }
     public DbSet<Timeslot> Timeslots { get; set; }
+    public DbSet<Artist> Artists { get; set; }
+    public DbSet<Release> Releases { get; set; }
+    public DbSet<ReleaseCredit> ReleaseCredits { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
