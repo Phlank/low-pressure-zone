@@ -71,7 +71,7 @@ const rightClass = computed(() =>
     flex-direction: column;
     overflow: visible;
     text-overflow: unset;
-    word-wrap: break-word;
+    overflow-wrap: break-word;
 
     &--no-overflow {
       overflow: hidden;

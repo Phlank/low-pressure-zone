@@ -29,7 +29,7 @@ withDefaults(defineProps<{
 
     &__wrapped {
       white-space: wrap;
-      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
   }
 

@@ -190,7 +190,7 @@ watch(
 
   div.two-line-data {
     div.two-line-data__top {
-      word-wrap: break-word;
+      overflow-wrap: break-word;
       min-height: fit-content;
       white-space: wrap;
     }
