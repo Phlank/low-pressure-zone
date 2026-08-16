@@ -2,9 +2,7 @@
 using LowPressureZone.Api.Endpoints.Communities;
 using LowPressureZone.Api.Endpoints.Soundclashes;
 using LowPressureZone.Api.Endpoints.Timeslots;
-using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
-using LowPressureZone.Domain;
 using LowPressureZone.Domain.Entities;
 using Shouldly;
 

@@ -1,7 +1,6 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Data;
-using LowPressureZone.Domain;
 using LowPressureZone.Domain.Entities;
 using LowPressureZone.Identity.Extensions;
 using Microsoft.EntityFrameworkCore;

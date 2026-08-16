@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using LowPressureZone.Api.Authentication;
 using LowPressureZone.Testing.Infrastructure.Factories;
 using LowPressureZone.Testing.Infrastructure.Fixtures;

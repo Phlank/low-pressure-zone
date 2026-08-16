@@ -5,13 +5,9 @@ using FastEndpoints.Swagger;
 using Hangfire;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Data.Extensions;
-using LowPressureZone.Domain;
-using LowPressureZone.Domain.Extensions;
-using LowPressureZone.Identity;
 using LowPressureZone.Identity.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Minerals.StringCases;
 
 var builder = WebApplication.CreateBuilder(args);

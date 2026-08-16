@@ -1,5 +1,4 @@
 using LowPressureZone.Aspire.Extensions;
-using Microsoft.Extensions.Configuration;
 using Projects;
 #pragma warning disable ASPIRECERTIFICATES001
 

@@ -1,17 +1,12 @@
 using System.Globalization;
 using System.Text;
 using FastEndpoints;
-using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Clients;
-using LowPressureZone.Adapter.AzuraCast.Mappers;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Models.Configuration;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services.AzuraCast;
-using LowPressureZone.Core;
 using LowPressureZone.Data;
-using LowPressureZone.Domain;
-using LowPressureZone.Domain.Entities;
 using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;

@@ -1,6 +1,5 @@
 using FastEndpoints;
 using LowPressureZone.Data;
-using LowPressureZone.Domain;
 using LowPressureZone.Identity.Constants;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

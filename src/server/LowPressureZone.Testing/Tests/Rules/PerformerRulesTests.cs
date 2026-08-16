@@ -1,7 +1,6 @@
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain.PerformerAggregate;
 using LowPressureZone.Identity.Constants;
-using LowPressureZone.Testing.Data.EntityFactories;
 using LowPressureZone.Testing.Infrastructure.Factories;
 using Microsoft.AspNetCore.Http;
 using Shouldly;

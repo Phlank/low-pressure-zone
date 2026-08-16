@@ -1,6 +1,5 @@
 using FastEndpoints;
 using LowPressureZone.Data;
-using LowPressureZone.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.News;

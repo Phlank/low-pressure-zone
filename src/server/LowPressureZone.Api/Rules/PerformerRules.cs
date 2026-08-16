@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Domain.Entities;
 using LowPressureZone.Domain.PerformerAggregate;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;

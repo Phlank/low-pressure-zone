@@ -1,4 +1,3 @@
-using System.Text;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Models.Configuration;

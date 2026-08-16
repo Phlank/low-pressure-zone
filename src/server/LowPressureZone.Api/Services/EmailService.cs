@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using FluentEmail.Core;
-using FluentEmail.Core.Interfaces;
 using FluentEmail.Core.Models;
 using LowPressureZone.Api.Models.Configuration;
 using LowPressureZone.Core;

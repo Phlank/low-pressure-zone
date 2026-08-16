@@ -2,7 +2,6 @@
 using LowPressureZone.Api.Endpoints.Performers;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain.Entities;
-using Shouldly;
 
 namespace LowPressureZone.Api.Endpoints.Timeslots;
 

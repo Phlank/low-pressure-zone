@@ -2,7 +2,6 @@
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Data;
-using LowPressureZone.Domain;
 using LowPressureZone.Domain.Entities;
 
 namespace LowPressureZone.Api.Endpoints.Communities.Relationships;

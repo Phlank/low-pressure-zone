@@ -12,7 +12,6 @@ using LowPressureZone.Api.Models.Configuration;
 using LowPressureZone.Api.Services.Audio;
 using LowPressureZone.Core;
 using LowPressureZone.Data;
-using LowPressureZone.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Shouldly;

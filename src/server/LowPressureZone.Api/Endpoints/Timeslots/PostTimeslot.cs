@@ -4,7 +4,6 @@ using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services.Files;
 using LowPressureZone.Data;
-using LowPressureZone.Domain;
 using LowPressureZone.Identity.Extensions;
 using Microsoft.EntityFrameworkCore;
 

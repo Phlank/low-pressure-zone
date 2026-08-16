@@ -1,11 +1,8 @@
-﻿using LowPressureZone.Identity.Constants;
-using LowPressureZone.Identity.Entities;
+﻿using LowPressureZone.Identity.Entities;
 using LowPressureZone.Identity.Extensions;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace LowPressureZone.Identity;
 

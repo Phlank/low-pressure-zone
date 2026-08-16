@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Identity.Constants;
-using LowPressureZone.Identity.Entities;
 using LowPressureZone.Identity.Extensions;
 
 namespace LowPressureZone.Api.Rules;

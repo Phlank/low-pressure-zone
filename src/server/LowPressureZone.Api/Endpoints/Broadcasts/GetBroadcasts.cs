@@ -1,7 +1,6 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Data;
-using LowPressureZone.Domain;
 using LowPressureZone.Domain.Entities;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Entities;

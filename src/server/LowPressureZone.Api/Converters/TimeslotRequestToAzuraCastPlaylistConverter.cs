@@ -6,7 +6,6 @@ using LowPressureZone.Api.Extensions;
 using LowPressureZone.Core;
 using LowPressureZone.Core.Interfaces;
 using LowPressureZone.Data;
-using LowPressureZone.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Converters;

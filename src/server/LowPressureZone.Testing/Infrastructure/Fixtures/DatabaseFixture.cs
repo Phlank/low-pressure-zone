@@ -1,10 +1,8 @@
 using LowPressureZone.Data;
-using LowPressureZone.Domain;
 using LowPressureZone.Identity;
 using LowPressureZone.Testing.Tests.Authentication;
 using LowPressureZone.Testing.Tests.Endpoints.Communities;
 using Microsoft.EntityFrameworkCore;
-using Testcontainers.PostgreSql;
 using Xunit;
 
 // ReSharper disable ArrangeAccessorOwnerBody
@@ -14,7 +12,6 @@ namespace LowPressureZone.Testing.Infrastructure.Fixtures;
 [Collection("Database Query Tests")]
 public class DatabaseFixture : IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder("postgres:16-alpine").Build();
     private DataContext? _dataContext;
     private IdentityContext? _identityContext;
     private bool _isInitialized;
@@ -41,12 +38,9 @@ public class DatabaseFixture : IAsyncLifetime
 
     public async ValueTask InitializeAsync()
     {
-        await _container.StartAsync();
-        var connectionString = _container.GetConnectionString();
-        var dataConnectionString = connectionString.Replace("Database=postgres;", "Database=lpz-data;");
-        var identityConnectionString = connectionString.Replace("Database=postgres;", "Database=lpz-identity;");
-        var dataContextOptions = new DbContextOptionsBuilder<DataContext>().UseNpgsql(dataConnectionString).Options;
-        var identityContextOptions = new DbContextOptionsBuilder<IdentityContext>().UseNpgsql(identityConnectionString)
+        var dataContextOptions = new DbContextOptionsBuilder<DataContext>().UseInMemoryDatabase("lpz-data")
+                                                                           .Options;
+        var identityContextOptions = new DbContextOptionsBuilder<IdentityContext>().UseInMemoryDatabase("lpz-identity")
                                                                                    .Options;
         _dataContext = new DataContext(dataContextOptions);
         _identityContext = new IdentityContext(identityContextOptions);
@@ -77,6 +71,5 @@ public class DatabaseFixture : IAsyncLifetime
             await _dataContext.DisposeAsync();
         if (_identityContext is not null)
             await _identityContext.DisposeAsync();
-        await _container.DisposeAsync();
     }
 }

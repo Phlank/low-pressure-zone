@@ -2,7 +2,6 @@ using FastEndpoints;
 using Hangfire;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Clients;
-using LowPressureZone.Core;
 using LowPressureZone.Identity.Constants;
 
 namespace LowPressureZone.Api.Endpoints.Broadcasts.Disconnect;

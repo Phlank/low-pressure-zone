@@ -1,7 +1,6 @@
 using FastEndpoints;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Data;
-using LowPressureZone.Domain;
 using LowPressureZone.Identity.Constants;
 
 namespace LowPressureZone.Api.Endpoints.News;
