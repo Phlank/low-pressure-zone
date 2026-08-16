@@ -93,7 +93,7 @@
         size="m">
         <InputText
           id="performerUrlInput"
-          v-model:model-value="performerForm.state.value.url"
+          v-model:model-value="performerForm.state.value.socialUrl"
           :disabled="isSubmitting"
           :invalid="!performerForm.val.isValid('url')" />
       </IftaFormField>

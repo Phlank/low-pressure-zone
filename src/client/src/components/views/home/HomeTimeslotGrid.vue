@@ -25,8 +25,8 @@
             </template>
             <template #right>
               <a
-                v-if="data.timeslot?.performer.url"
-                :href="data.timeslot.performer.url">
+                v-if="data.timeslot?.performer.socialUrl"
+                :href="data.timeslot.performer.socialUrl">
                 <i class="pi pi-external-link"></i>
               </a>
             </template>

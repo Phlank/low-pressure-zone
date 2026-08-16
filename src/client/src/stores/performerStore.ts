@@ -55,7 +55,7 @@ export const usePerformerStore = defineStore('performerStore', () => {
     performers,
     performersApi.put,
     (form, entity) => {
-      entity.url = form.url
+      entity.socialUrl = form.socialUrl
       if (entity.name !== form.name) {
         entity.name = form.name
         performers.value.sort((a, b) => a.name.localeCompare(b.name))

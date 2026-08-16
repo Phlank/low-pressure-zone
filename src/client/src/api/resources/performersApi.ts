@@ -12,20 +12,20 @@ export default {
 
 export interface PerformerRequest {
   name: string
-  url: string
+  socialUrl: string
 }
 
 const mapRequest = <TRequest extends PerformerRequest>(request: TRequest) => {
   return {
     name: request.name,
-    url: request.url
+    socialUrl: request.socialUrl
   }
 }
 
 export interface PerformerResponse {
   id: string
   name: string
-  url: string
+  socialUrl: string
   isDeletable: boolean
   isEditable: boolean
   isLinkableToTimeslot: boolean

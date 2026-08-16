@@ -8,6 +8,9 @@ dotnet_diagnostic.CA1848.severity = none
 
 dotnet_diagnostic.IDE0160.severity = none
 
+
+dotnet_diagnostic.IDE0008.severity = none
+
 [*.{js,jsx,mjs,cjs,ts,tsx,mts,cts,vue}]
 charset = utf-8
 indent_size = 2

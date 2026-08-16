@@ -9,6 +9,6 @@ public class NewsRequestValidator : Validator<NewsRequest>
     public NewsRequestValidator()
     {
         RuleFor(request => request.Title).NotEmpty().WithMessage(Errors.Required);
-        RuleFor(request => request.Body).NotEmpty().WithMessage(Errors.Required);
+        RuleFor(request => request.Content).NotEmpty().WithMessage(Errors.Required);
     }
 }

@@ -5,7 +5,7 @@ using LowPressureZone.Identity.Constants;
 
 namespace LowPressureZone.Api.Endpoints.News;
 
-public class PostNews(DataContext dataContext) : EndpointWithMapper<NewsRequest, NewsMapper>
+public class PostNews(DataContext dataContext) : Endpoint<NewsRequest>
 {
     public override void Configure()
     {
@@ -17,13 +17,16 @@ public class PostNews(DataContext dataContext) : EndpointWithMapper<NewsRequest,
 
     public override async Task HandleAsync(NewsRequest req, CancellationToken ct)
     {
-        var newsItem = Map.ToEntity(req);
-        await dataContext.News.AddAsync(newsItem, ct);
+        var result = Domain.NewsAggregate.News.Create(req.Title, req.Content);
+        this.ThrowIfDomainError(result);
+
+        dataContext.Add(result.Value);
         await dataContext.SaveChangesAsync(ct);
+
         HttpContext.ExposeLocation();
         await Send.CreatedAtAsync<GetNewsById>(new
         {
-            newsItem.Id
+            result.Value.Id
         }, Response, cancellation: ct);
     }
 }

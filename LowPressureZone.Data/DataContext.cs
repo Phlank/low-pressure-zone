@@ -1,6 +1,7 @@
 ﻿using LowPressureZone.Data.Extensions;
 using LowPressureZone.Domain.Entities;
 using LowPressureZone.Domain.Entities.Settings;
+using LowPressureZone.Domain.NewsAggregate;
 using LowPressureZone.Domain.PerformerAggregate;
 using Microsoft.EntityFrameworkCore;
 

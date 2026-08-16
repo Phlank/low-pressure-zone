@@ -48,7 +48,7 @@
             <template #left>
               <span class="ellipsis">{{ performer.name }}</span>
               <span class="text-s ellipsis">
-                {{ performer.url }}
+                {{ performer.socialUrl }}
               </span>
             </template>
             <template #right>

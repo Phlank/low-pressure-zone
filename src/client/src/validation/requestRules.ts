@@ -27,12 +27,12 @@ import type { Ref } from 'vue'
 
 export const communityRequestRules: PropertyRules<CommunityRequest> = {
   name: combineRules(required(), maximumLength(64)),
-  url: combineRules(required(), url(), maximumLength(256))
+  socialUrl: combineRules(required(), url(), maximumLength(256))
 }
 
 export const performerRequestRules: PropertyRules<PerformerRequest> = {
   name: combineRules(required(), maximumLength(64)),
-  url: combineRules(url(), maximumLength(256))
+  socialUrl: combineRules(url(), maximumLength(256))
 }
 
 export const scheduleRequestRules = (

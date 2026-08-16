@@ -16,7 +16,7 @@ partial class DataContextModelSnapshot : ModelSnapshot
     // If you encounter a merge conflict in the line below, it means you need to
     // discard one of the migration branches and recreate its migrations on top of
     // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-    public override string LastMigrationId => "20260816182254_EnrichPerformer";
+    public override string LastMigrationId => "20260816185950_EnrichNews";
 
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
@@ -113,31 +113,6 @@ partial class DataContextModelSnapshot : ModelSnapshot
                     .IsUnique();
 
                 b.ToTable("CommunityRelationships");
-            });
-
-        modelBuilder.Entity("LowPressureZone.Domain.Entities.News", b =>
-            {
-                b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uuid");
-
-                b.Property<string>("Body")
-                    .IsRequired()
-                    .HasColumnType("text");
-
-                b.Property<DateTime>("CreatedDate")
-                    .HasColumnType("timestamp with time zone");
-
-                b.Property<DateTime>("LastModifiedDate")
-                    .HasColumnType("timestamp with time zone");
-
-                b.Property<string>("Title")
-                    .IsRequired()
-                    .HasColumnType("text");
-
-                b.HasKey("Id");
-
-                b.ToTable("News");
             });
 
         modelBuilder.Entity("LowPressureZone.Domain.Entities.Schedule", b =>
@@ -318,6 +293,30 @@ partial class DataContextModelSnapshot : ModelSnapshot
                     .IsUnique();
 
                 b.ToTable("Timeslots");
+            });
+
+        modelBuilder.Entity("LowPressureZone.Domain.NewsAggregate.News", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
+
+                b.Property<string>("Content")
+                    .IsRequired()
+                    .HasMaxLength(16384)
+                    .HasColumnType("character varying(16384)");
+
+                b.Property<DateTimeOffset>("PublishedAt")
+                    .HasColumnType("timestamp with time zone");
+
+                b.Property<string>("Title")
+                    .IsRequired()
+                    .HasMaxLength(256)
+                    .HasColumnType("character varying(256)");
+
+                b.HasKey("Id");
+
+                b.ToTable("News", "lpz");
             });
 
         modelBuilder.Entity("LowPressureZone.Domain.PerformerAggregate.Performer", b =>

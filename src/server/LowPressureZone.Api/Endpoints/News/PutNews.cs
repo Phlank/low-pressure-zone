@@ -1,4 +1,5 @@
 using FastEndpoints;
+using LowPressureZone.Api.Extensions;
 using LowPressureZone.Data;
 using LowPressureZone.Identity.Constants;
 using Microsoft.AspNetCore.Mvc;
@@ -6,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.News;
 
-public class PutNews(DataContext dataContext) : EndpointWithMapper<NewsRequest, NewsMapper>
+public class PutNews(DataContext dataContext) : Endpoint<NewsRequest>
 {
     public override void Configure()
     {
@@ -21,19 +22,17 @@ public class PutNews(DataContext dataContext) : EndpointWithMapper<NewsRequest, 
     public override async Task HandleAsync(NewsRequest request, CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        var persistentNewsItem = await dataContext.News
+        var news = await dataContext.News
                                                   .FirstOrDefaultAsync(news => news.Id == id, ct);
-        if (persistentNewsItem == null)
+        if (news == null)
         {
             await Send.NotFoundAsync(ct);
             return;
         }
 
-        var mapped = Map.ToEntity(request);
-
-        persistentNewsItem.Title = mapped.Title;
-        persistentNewsItem.Body = mapped.Body;
-        persistentNewsItem.LastModifiedDate = mapped.LastModifiedDate;
+        var result = news.Edit(request.Title, request.Content);
+        this.ThrowIfDomainError(result);
         await dataContext.SaveChangesAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }
