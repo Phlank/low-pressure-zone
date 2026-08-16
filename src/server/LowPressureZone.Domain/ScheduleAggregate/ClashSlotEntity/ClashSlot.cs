@@ -1,0 +1,109 @@
+using System.ComponentModel.DataAnnotations.Schema;
+using LowPressureZone.Core;
+using LowPressureZone.Core.Domain;
+using LowPressureZone.Core.Interfaces;
+using LowPressureZone.Domain.PerformerAggregate;
+using LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity.ClashTimeRangeObject;
+using LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity.Rules;
+using Microsoft.EntityFrameworkCore;
+
+namespace LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity;
+
+public class ClashSlot : Entity, ITimeRange
+{
+    public Guid ScheduleId { get; private init; }
+    public Schedule Schedule { get; private init; } = null!;
+    public Guid PerformerOneId { get; private set; }
+    public Performer PerformerOne { get; private init; } = null!;
+    public Guid PerformerTwoId { get; private set; }
+    public Performer PerformerTwo { get; private init; } = null!;
+
+    public List<string> Rounds
+    {
+        get;
+        private set => field = value.Where(item => !string.IsNullOrWhiteSpace(item))
+                                    .Select(item => item.Trim())
+                                    .ToList();
+    } = [];
+
+    public ClashTimeRange TimeRange { get; private set; }
+
+    public DateTimeOffset StartsAt => TimeRange.StartsAt;
+    public DateTimeOffset EndsAt => TimeRange.EndsAt;
+    public TimeSpan TimeSpan => TimeRange.TimeSpan;
+
+    // EF Core constructor
+    private ClashSlot()
+    {
+    }
+
+    private ClashSlot(Guid scheduleId,
+                      Guid performerOneId,
+                      Guid performerTwoId,
+                      List<string> rounds,
+                      ClashTimeRange timeRange,
+                      Guid? id = null)
+    {
+        ScheduleId = scheduleId;
+        PerformerOneId = performerOneId;
+        PerformerTwoId = performerTwoId;
+        Rounds = rounds;
+        TimeRange = timeRange;
+        Id = id ?? Guid.NewGuid();
+    }
+
+    public static DomainResult<ClashSlot> Create(Guid scheduleId,
+                                                 Guid performerOneId,
+                                                 Guid performerTwoId,
+                                                 List<string> rounds,
+                                                 DateTimeOffset startsAt,
+                                                 int duration)
+    {
+        var timeRangeResult = ClashTimeRange.Create(startsAt, duration);
+        List<RuleError> errors =
+        [
+            .. Rule.Apply(new RoundsMustBeProvidedRule(rounds)),
+            .. timeRangeResult.Errors
+        ];
+
+        if (errors.Count > 0)
+            return DomainResult.Err<ClashSlot>(errors);
+
+        return DomainResult.Ok(new ClashSlot(scheduleId, 
+                                             performerOneId, 
+                                             performerTwoId, 
+                                             rounds,
+                                             timeRangeResult.Value));
+    }
+
+    public DomainResult<NoValue> ChangeRounds(List<string> rounds)
+    {
+        var result = Rule.ApplyIntoResult(NoValue.Instance,
+                                          new RoundsMustBeProvidedRule(rounds));
+        if (result.IsSuccess)
+            Rounds = rounds;
+        return result;
+    }
+
+    public DomainResult<NoValue> ChangeTime(DateTimeOffset startsAt, int duration)
+    {
+        var result = ClashTimeRange.Create(startsAt, duration);
+        if (result.IsSuccess)
+        {
+            TimeRange = result.Value;
+            return DomainResult.Ok();
+        }
+
+        return DomainResult.Err(result.Error);
+    }
+
+    public static void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ClashSlot>()
+                    .ComplexProperty(clash => clash.TimeRange);
+
+        modelBuilder.Entity<ClashSlot>()
+                    .HasIndex(slot => slot.TimeRange.StartsAt)
+                    .IsUnique();
+    }
+}

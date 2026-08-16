@@ -26,10 +26,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="ScheduleAggregate\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\LowPressureZone.Core\LowPressureZone.Core.csproj" />
     </ItemGroup>
 

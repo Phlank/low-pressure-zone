@@ -1,12 +1,10 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
 using LowPressureZone.Domain.NewsAggregate.Rules;
 
 namespace LowPressureZone.Domain.NewsAggregate;
 
-[Table("News", Schema = "lpz")]
 public sealed class News : Entity
 {
     [MaxLength(256)]
