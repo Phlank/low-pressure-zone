@@ -2,7 +2,7 @@
 
 namespace LowPressureZone.Core;
 
-public class Result<T, TErr>(T? value, TErr? error) where TErr : notnull
+public class Result<T, TErr>(T? value, TErr? error)
 {
     public T Value =>
         value ?? throw new InvalidOperationException("Cannot access the value of an unsuccessful result");
@@ -19,7 +19,6 @@ public sealed class Result<TErr>(TErr? error = default) : Result<bool?, TErr>(nu
 public static class Result
 {
     public static Result<T, string> Ok<T>(T value) => new(value, null);
-
     public static Result<T, TErr> Ok<T, TErr>(T value) where TErr : notnull => new(value, default);
 
     public static Result<T, string> Err<T>(string error) => new(default, error);

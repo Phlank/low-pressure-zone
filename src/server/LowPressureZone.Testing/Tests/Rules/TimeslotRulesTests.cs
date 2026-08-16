@@ -1,5 +1,6 @@
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
+using LowPressureZone.Domain.PerformerAggregate;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Testing.Data.EntityFactories;
 using LowPressureZone.Testing.Infrastructure.Factories;
@@ -31,7 +32,7 @@ public sealed class TimeslotRulesTests
     {
         // Arrange
         var (_, accessor) = HttpContextFactory.Create();
-        var performer = PerformerFactory.Create(userId: Guid.NewGuid());
+        var performer = Performer.Create(Guid.NewGuid(), "Test", null).Value;
         var timeslot = TimeslotFactory.Create(performer: performer,
                                               startsAt: DateTimeOffset.UtcNow.TopOfHour(1));
 
@@ -49,7 +50,7 @@ public sealed class TimeslotRulesTests
         var userId = Guid.NewGuid();
         var principal = ClaimsPrincipalFactory.Create(userId: userId);
         var (_, accessor) = HttpContextFactory.Create(user: principal);
-        var performer = PerformerFactory.Create(userId: userId);
+        var performer = Performer.Create(userId, "Test", null).Value;
         var timeslot = TimeslotFactory.Create(performer: performer,
                                               startsAt: DateTimeOffset.UtcNow.TopOfHour(-1));
 
@@ -67,7 +68,7 @@ public sealed class TimeslotRulesTests
         var userId = Guid.NewGuid();
         var principal = ClaimsPrincipalFactory.Create(userId: userId);
         var (_, accessor) = HttpContextFactory.Create(user: principal);
-        var performer = PerformerFactory.Create(userId: userId);
+        var performer = Performer.Create(userId, "Test", null).Value;
         var timeslot = TimeslotFactory.Create(performer: performer,
                                               startsAt: DateTimeOffset.UtcNow.TopOfHour(1));
 
@@ -85,7 +86,7 @@ public sealed class TimeslotRulesTests
         var userId = Guid.NewGuid();
         var principal = ClaimsPrincipalFactory.Create(userId: userId);
         var (_, accessor) = HttpContextFactory.Create(user: principal);
-        var performer = PerformerFactory.Create(userId: Guid.NewGuid());
+        var performer = Performer.Create(Guid.NewGuid(), "Test", null).Value;
         var timeslot = TimeslotFactory.Create(performer: performer,
                                               startsAt: DateTimeOffset.UtcNow.TopOfHour(1));
 
@@ -101,7 +102,7 @@ public sealed class TimeslotRulesTests
     {
         // Arrange
         var (_, accessor) = HttpContextFactory.Create();
-        var performer = PerformerFactory.Create(userId: Guid.NewGuid());
+        var performer = Performer.Create(Guid.NewGuid(), "Test", null).Value;
         var timeslot = TimeslotFactory.Create(performer: performer,
                                               startsAt: DateTimeOffset.UtcNow.TopOfHour(1));
 
@@ -118,7 +119,7 @@ public sealed class TimeslotRulesTests
         // Arrange
         var principal = ClaimsPrincipalFactory.Create(userId: Guid.NewGuid(), roles: [RoleNames.Admin]);
         var (_, accessor) = HttpContextFactory.Create(user: principal);
-        var performer = PerformerFactory.Create(userId: Guid.NewGuid());
+        var performer = Performer.Create(Guid.NewGuid(), "Test", null).Value;
         var timeslot = TimeslotFactory.Create(performer: performer,
                                               startsAt: DateTimeOffset.UtcNow.TopOfHour(-1));
 
@@ -135,7 +136,7 @@ public sealed class TimeslotRulesTests
         // Arrange
         var principal = ClaimsPrincipalFactory.Create(userId: Guid.NewGuid(), roles: [RoleNames.Admin]);
         var (_, accessor) = HttpContextFactory.Create(user: principal);
-        var performer = PerformerFactory.Create(userId: Guid.NewGuid());
+        var performer = Performer.Create(Guid.NewGuid(), "Test", null).Value;
         var timeslot = TimeslotFactory.Create(performer: performer,
                                               startsAt: DateTimeOffset.UtcNow.TopOfHour(1));
 
@@ -153,7 +154,7 @@ public sealed class TimeslotRulesTests
         var userId = Guid.NewGuid();
         var principal = ClaimsPrincipalFactory.Create(userId: userId);
         var (_, accessor) = HttpContextFactory.Create(user: principal);
-        var performer = PerformerFactory.Create(userId: userId);
+        var performer = Performer.Create(userId, "Test", null).Value;
         var timeslot = TimeslotFactory.Create(performer: performer,
                                               startsAt: DateTimeOffset.UtcNow.TopOfHour(1));
 
@@ -171,7 +172,7 @@ public sealed class TimeslotRulesTests
         var userId = Guid.NewGuid();
         var principal = ClaimsPrincipalFactory.Create(userId: userId);
         var (_, accessor) = HttpContextFactory.Create(user: principal);
-        var performer = PerformerFactory.Create(userId: Guid.NewGuid());
+        var performer = Performer.Create(Guid.NewGuid(), "Test", null).Value;
         var timeslot = TimeslotFactory.Create(performer: performer,
                                               startsAt: DateTimeOffset.UtcNow.TopOfHour(1));
 

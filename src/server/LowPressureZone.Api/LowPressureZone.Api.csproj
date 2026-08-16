@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFramework>net11.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>9d2c548d-3c62-4409-9c65-fe1fa2b047b1</UserSecretsId>
@@ -24,14 +24,14 @@
         <PackageReference Include="Hangfire.PostgreSql" Version="1.21.1"/>
         <PackageReference Include="jcamp.FluentEmail.Mailgun" Version="4.0.0"/>
         <PackageReference Include="jcamp.FluentEmail.Smtp" Version="4.0.0"/>
-        <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="10.0.9"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
+        <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="11.0.0-preview.6.26359.118" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="11.0.0-preview.6.26359.118">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Minerals.StringCases" Version="0.2.2"/>
         <PackageReference Include="Shouldly" Version="4.3.0"/>
-        <PackageReference Include="SSH.NET" Version="2026.0.0"/>
+        <PackageReference Include="SSH.NET" Version="2026.0.0" />
     </ItemGroup>
 
     <ItemGroup>

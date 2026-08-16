@@ -2,9 +2,8 @@
 using FastEndpoints;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
-using LowPressureZone.Data;
-using LowPressureZone.Domain;
-using LowPressureZone.Domain.Entities;
+using LowPressureZone.Core.Domain;
+using LowPressureZone.Domain.PerformerAggregate;
 using LowPressureZone.Identity.Extensions;
 using Shouldly;
 
@@ -15,29 +14,10 @@ public sealed class PerformerMapper(IHttpContextAccessor contextAccessor, Perfor
 {
     private ClaimsPrincipal? User => contextAccessor.GetAuthenticatedUserOrDefault();
 
-    public Performer ToEntity(PerformerRequest request)
+    public DomainResult<Performer> ToEntity(PerformerRequest request)
     {
         User.ShouldNotBeNull();
-
-        return new Performer
-        {
-            Id = Guid.NewGuid(),
-            Name = request.Name.Trim(),
-            Url = request.Url?.Trim(),
-            CreatedDate = DateTime.UtcNow,
-            LastModifiedDate = DateTime.UtcNow,
-            LinkedUserId = User.GetIdOrDefault()
-        };
-    }
-
-    public async Task UpdateEntityAsync(PerformerRequest request, Performer performer, CancellationToken ct = default)
-    {
-        var dataContext = contextAccessor.Resolve<DataContext>();
-        performer.Name = request.Name;
-        performer.Url = request.Url;
-        if (!dataContext.ChangeTracker.HasChanges()) return;
-        performer.LastModifiedDate = DateTime.UtcNow;
-        await dataContext.SaveChangesAsync(ct);
+        return Performer.Create(User.GetIdOrDefault(), request.Name, request.SocialUrl);
     }
 
     public PerformerResponse FromEntity(Performer performer)
@@ -45,7 +25,7 @@ public sealed class PerformerMapper(IHttpContextAccessor contextAccessor, Perfor
         {
             Id = performer.Id,
             Name = performer.Name,
-            Url = performer.Url,
+            SocialUrl = performer.SocialUrl,
             IsDeletable = rules.IsDeleteAuthorized(performer) && !performer.IsDeleted,
             IsEditable = rules.IsEditAuthorized(performer),
             IsLinkableToTimeslot = rules.IsTimeslotLinkAuthorized(performer)

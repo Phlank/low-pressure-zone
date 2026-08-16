@@ -1,4 +1,5 @@
 using LowPressureZone.Api.Rules;
+using LowPressureZone.Domain.PerformerAggregate;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Testing.Data.EntityFactories;
 using LowPressureZone.Testing.Infrastructure.Factories;
@@ -19,10 +20,11 @@ public sealed class PerformerRulesTests
         var userId = Guid.NewGuid();
         var principal = ClaimsPrincipalFactory.Create(userId: userId);
         var (_, accessor) = HttpContextFactory.Create(user: principal);
-        var performer = PerformerFactory.Create(userId: userId, isDeleted: true);
+        var performer = Performer.Create(userId, "Test", null);
+        performer.Value.Delete();
 
         // Act
-        var result = Rules(accessor).IsTimeslotLinkAuthorized(performer);
+        var result = Rules(accessor).IsTimeslotLinkAuthorized(performer.Value);
 
         // Assert
         result.ShouldBeFalse();
@@ -33,7 +35,7 @@ public sealed class PerformerRulesTests
     {
         // Arrange
         var (_, accessor) = HttpContextFactory.Create();
-        var performer = PerformerFactory.Create(userId: Guid.NewGuid());
+        var performer = Performer.Create(Guid.NewGuid(), "Test", null).Value;
 
         // Act
         var result = Rules(accessor).IsTimeslotLinkAuthorized(performer);
@@ -49,7 +51,7 @@ public sealed class PerformerRulesTests
         var userId = Guid.NewGuid();
         var principal = ClaimsPrincipalFactory.Create(userId: userId);
         var (_, accessor) = HttpContextFactory.Create(user: principal);
-        var performer = PerformerFactory.Create(userId: userId);
+        var performer = Performer.Create(userId, "Test", null).Value;
 
         // Act
         var result = Rules(accessor).IsTimeslotLinkAuthorized(performer);
@@ -65,7 +67,7 @@ public sealed class PerformerRulesTests
         var userId = Guid.NewGuid();
         var principal = ClaimsPrincipalFactory.Create(userId: userId);
         var (_, accessor) = HttpContextFactory.Create(user: principal);
-        var performer = PerformerFactory.Create(userId: Guid.NewGuid());
+        var performer = Performer.Create(Guid.NewGuid(), "Test", null).Value;
 
         // Act
         var result = Rules(accessor).IsTimeslotLinkAuthorized(performer);
@@ -81,7 +83,7 @@ public sealed class PerformerRulesTests
         var userId = Guid.NewGuid();
         var principal = ClaimsPrincipalFactory.Create(userId: userId, roles: [RoleNames.Admin]);
         var (_, accessor) = HttpContextFactory.Create(user: principal);
-        var performer = PerformerFactory.Create(userId: Guid.NewGuid());
+        var performer = Performer.Create(Guid.NewGuid(), "Test", null).Value;
 
         // Act
         var result = Rules(accessor).IsTimeslotLinkAuthorized(performer);
@@ -96,7 +98,8 @@ public sealed class PerformerRulesTests
         // Arrange
         var principal = ClaimsPrincipalFactory.Create(userId: Guid.NewGuid(), roles: [RoleNames.Admin]);
         var (_, accessor) = HttpContextFactory.Create(user: principal);
-        var performer = PerformerFactory.Create(isDeleted: true);
+        var performer = Performer.Create(Guid.NewGuid(), "Test", null).Value;
+        performer.Delete();
 
         // Act
         var result = Rules(accessor).IsEditAuthorized(performer);
@@ -110,7 +113,7 @@ public sealed class PerformerRulesTests
     {
         // Arrange
         var (_, accessor) = HttpContextFactory.Create();
-        var performer = PerformerFactory.Create();
+        var performer = Performer.Create(Guid.NewGuid(), "Test", null).Value;
 
         // Act
         var result = Rules(accessor).IsEditAuthorized(performer);
@@ -125,7 +128,7 @@ public sealed class PerformerRulesTests
         // Arrange
         var principal = ClaimsPrincipalFactory.Create(userId: Guid.NewGuid(), roles: [RoleNames.Admin]);
         var (_, accessor) = HttpContextFactory.Create(user: principal);
-        var performer = PerformerFactory.Create();
+        var performer = Performer.Create(Guid.NewGuid(), "Test", null).Value;
 
         // Act
         var result = Rules(accessor).IsEditAuthorized(performer);
@@ -141,7 +144,7 @@ public sealed class PerformerRulesTests
         var userId = Guid.NewGuid();
         var principal = ClaimsPrincipalFactory.Create(userId: userId);
         var (_, accessor) = HttpContextFactory.Create(user: principal);
-        var performer = PerformerFactory.Create(userId: userId);
+        var performer = Performer.Create(userId, "Test", null).Value;
 
         // Act
         var result = Rules(accessor).IsEditAuthorized(performer);
@@ -157,7 +160,7 @@ public sealed class PerformerRulesTests
         var userId = Guid.NewGuid();
         var principal = ClaimsPrincipalFactory.Create(userId: userId);
         var (_, accessor) = HttpContextFactory.Create(user: principal);
-        var performer = PerformerFactory.Create(userId: Guid.NewGuid());
+        var performer = Performer.Create(Guid.NewGuid(), "Test", null).Value;
 
         // Act
         var result = Rules(accessor).IsEditAuthorized(performer);
@@ -172,7 +175,8 @@ public sealed class PerformerRulesTests
         // Arrange
         var principal = ClaimsPrincipalFactory.Create(userId: Guid.NewGuid(), roles: [RoleNames.Admin]);
         var (_, accessor) = HttpContextFactory.Create(user: principal);
-        var performer = PerformerFactory.Create(isDeleted: true);
+        var performer = Performer.Create(Guid.NewGuid(), "Test", null).Value;
+        performer.Delete();
 
         // Act
         var result = Rules(accessor).IsDeleteAuthorized(performer);
@@ -186,7 +190,7 @@ public sealed class PerformerRulesTests
     {
         // Arrange
         var (_, accessor) = HttpContextFactory.Create();
-        var performer = PerformerFactory.Create();
+        var performer = Performer.Create(Guid.NewGuid(), "Test", null).Value;
 
         // Act
         var result = Rules(accessor).IsDeleteAuthorized(performer);
@@ -201,7 +205,7 @@ public sealed class PerformerRulesTests
         // Arrange
         var principal = ClaimsPrincipalFactory.Create(userId: Guid.NewGuid(), roles: [RoleNames.Admin]);
         var (_, accessor) = HttpContextFactory.Create(user: principal);
-        var performer = PerformerFactory.Create();
+        var performer = Performer.Create(Guid.NewGuid(), "Test", null).Value;
 
         // Act
         var result = Rules(accessor).IsDeleteAuthorized(performer);
@@ -217,7 +221,7 @@ public sealed class PerformerRulesTests
         var userId = Guid.NewGuid();
         var principal = ClaimsPrincipalFactory.Create(userId: userId);
         var (_, accessor) = HttpContextFactory.Create(user: principal);
-        var performer = PerformerFactory.Create(userId: userId);
+        var performer = Performer.Create(userId, "Test", null).Value;
 
         // Act
         var result = Rules(accessor).IsDeleteAuthorized(performer);
@@ -233,7 +237,7 @@ public sealed class PerformerRulesTests
         var userId = Guid.NewGuid();
         var principal = ClaimsPrincipalFactory.Create(userId: userId);
         var (_, accessor) = HttpContextFactory.Create(user: principal);
-        var performer = PerformerFactory.Create(userId: Guid.NewGuid());
+        var performer = Performer.Create(Guid.NewGuid(), "Test", null).Value;
 
         // Act
         var result = Rules(accessor).IsDeleteAuthorized(performer);
@@ -246,7 +250,8 @@ public sealed class PerformerRulesTests
     public void IsHiddenFromApi_ReturnsTrue_WhenPerformerIsDeleted()
     {
         // Arrange
-        var performer = PerformerFactory.Create(isDeleted: true);
+        var performer = Performer.Create(Guid.NewGuid(), "Test", null).Value;
+        performer.Delete();
 
         // Act
         var result = PerformerRules.IsHiddenFromApi(performer);
@@ -259,7 +264,7 @@ public sealed class PerformerRulesTests
     public void IsHiddenFromApi_ReturnsFalse_WhenPerformerIsNotDeleted()
     {
         // Arrange
-        var performer = PerformerFactory.Create(isDeleted: false);
+        var performer = Performer.Create(Guid.NewGuid(), "Test", null).Value;
 
         // Act
         var result = PerformerRules.IsHiddenFromApi(performer);

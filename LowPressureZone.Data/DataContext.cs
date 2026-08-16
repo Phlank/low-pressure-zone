@@ -1,6 +1,7 @@
 ﻿using LowPressureZone.Data.Extensions;
 using LowPressureZone.Domain.Entities;
 using LowPressureZone.Domain.Entities.Settings;
+using LowPressureZone.Domain.PerformerAggregate;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Data;
@@ -24,8 +25,7 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
         modelBuilder.Entity<Schedule>().HasIndex(nameof(Schedule.StartsAt)).IsUnique();
         modelBuilder.Entity<Schedule>().HasIndex(nameof(Schedule.EndsAt)).IsUnique();
 
-        modelBuilder.Entity<Timeslot>().HasIndex(nameof(Timeslot.StartsAt)).IsUnique();
-        modelBuilder.Entity<Timeslot>().HasIndex(nameof(Timeslot.EndsAt)).IsUnique();
+        Timeslot.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<CommunityRelationship>()
                     .HasIndex(nameof(CommunityRelationship.CommunityId), nameof(CommunityRelationship.UserId))

@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Domain.Entities;
+using LowPressureZone.Domain.PerformerAggregate;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
 
@@ -14,7 +15,7 @@ public sealed class PerformerRules(IHttpContextAccessor contextAccessor)
     {
         if (performer.IsDeleted) return false;
         if (User == null) return false;
-        return performer.LinkedUserId == User.GetIdOrDefault();
+        return performer.CreatorUserId == User.GetIdOrDefault();
     }
 
     public bool IsEditAuthorized(Performer performer)
@@ -22,7 +23,7 @@ public sealed class PerformerRules(IHttpContextAccessor contextAccessor)
         if (performer.IsDeleted) return false;
         if (User == null) return false;
         if (User.IsInRole(RoleNames.Admin)) return true;
-        return performer.LinkedUserId == User.GetIdOrDefault();
+        return performer.CreatorUserId == User.GetIdOrDefault();
     }
 
     public bool IsDeleteAuthorized(Performer performer)
@@ -30,7 +31,7 @@ public sealed class PerformerRules(IHttpContextAccessor contextAccessor)
         if (performer.IsDeleted) return false;
         if (User == null) return false;
         if (User.IsInRole(RoleNames.Admin)) return true;
-        return performer.LinkedUserId == User.GetIdOrDefault();
+        return performer.CreatorUserId == User.GetIdOrDefault();
     }
 
     public static bool IsHiddenFromApi(Performer entity)

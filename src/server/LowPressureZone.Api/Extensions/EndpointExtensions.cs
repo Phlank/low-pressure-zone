@@ -4,6 +4,7 @@ using System.Text;
 using FastEndpoints;
 using LowPressureZone.Api.Utilities;
 using LowPressureZone.Core;
+using LowPressureZone.Core.Domain;
 
 namespace LowPressureZone.Api.Extensions;
 
@@ -60,5 +61,15 @@ public static class EndpointExtensions
     {
         if (result.IsError)
             endpoint.ThrowError(string.Format(CultureInfo.InvariantCulture, format, result.Error.ReasonPhrase));
+    }
+
+    public static void ThrowIfDomainError<T, TRequest, TResponse>(
+        this Endpoint<TRequest, TResponse> endpoint,
+        DomainResult<T> result) where TRequest : notnull
+    {
+        foreach (var failure in result.Failures)
+            endpoint.AddError(failure);
+
+        endpoint.ThrowIfAnyErrors();
     }
 }

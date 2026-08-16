@@ -37,7 +37,6 @@ public sealed class TimeslotMapper(
 
     public TimeslotResponse FromEntity(Timeslot timeslot)
     {
-        timeslot.Performer.ShouldNotBeNull();
         return new TimeslotResponse
         {
             Id = timeslot.Id,

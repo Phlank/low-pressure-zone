@@ -2,6 +2,8 @@
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Data;
 using LowPressureZone.Domain;
+using LowPressureZone.Domain.PerformerAggregate;
+using LowPressureZone.Identity.Extensions;
 
 namespace LowPressureZone.Api.Endpoints.Performers;
 
@@ -15,13 +17,15 @@ public sealed class PostPerformer(DataContext dataContext) : EndpointWithMapper<
 
     public override async Task HandleAsync(PerformerRequest request, CancellationToken ct)
     {
-        var performer = Map.ToEntity(request);
-        dataContext.Performers.Add(performer);
+        var result = Performer.Create(User.GetIdOrDefault(), request.Name, request.SocialUrl);
+        this.ThrowIfDomainError(result);
+        
+        dataContext.Performers.Add(result.Value);
         await dataContext.SaveChangesAsync(ct);
         HttpContext.ExposeLocation();
         await Send.CreatedAtAsync<GetPerformerById>(new
         {
-            performer.Id
+            result.Value.Id
         }, Response, cancellation: ct);
     }
 }

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFramework>net11.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
@@ -16,13 +16,21 @@
         <PackageReference Include="Ardalis.SmartEnum" Version="8.2.0"/>
         <PackageReference Include="Ardalis.SmartEnum.EFCore" Version="8.2.0"/>
         <PackageReference Include="Ardalis.SmartEnum.SystemTextJson" Version="8.1.0"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.9" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="11.0.0-preview.6.26359.118" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="11.0.0-preview.6.26359.118" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="11.0.0-preview.6.26359.118">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.2" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="11.0.0-preview.6" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="ScheduleAggregate\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\LowPressureZone.Core\LowPressureZone.Core.csproj" />
     </ItemGroup>
 
 </Project>

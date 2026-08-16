@@ -1,5 +1,8 @@
 ﻿using FastEndpoints;
+using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
+using LowPressureZone.Core;
+using LowPressureZone.Core.Domain;
 using LowPressureZone.Data;
 using LowPressureZone.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +26,7 @@ public sealed class PutPerformer(DataContext dataContext, PerformerRules rules)
                                          .Where(p => p.Id == id)
                                          .FirstOrDefaultAsync(ct);
 
-        if (performer == null || PerformerRules.IsHiddenFromApi(performer))
+        if (performer is null || PerformerRules.IsHiddenFromApi(performer))
         {
             await Send.NotFoundAsync(ct);
             return;
@@ -35,7 +38,13 @@ public sealed class PutPerformer(DataContext dataContext, PerformerRules rules)
             return;
         }
 
-        await Map.UpdateEntityAsync(req, performer, ct);
+        var result = DomainResult.Compose(performer.ChangeName(req.Name),
+                                          performer.ChangeSocialUrl(req.SocialUrl));
+        
+        this.ThrowIfDomainError(result);
+
+        await dataContext.SaveChangesAsync(ct);
+        
         await Send.NoContentAsync(ct);
     }
 }

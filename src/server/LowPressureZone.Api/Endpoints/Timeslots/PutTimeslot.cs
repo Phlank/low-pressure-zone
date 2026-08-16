@@ -25,7 +25,6 @@ public class PutTimeslot(DataContext dataContext, PrerecordedMixFileProcessor fi
         var timeslotId = Route<Guid>("id");
 
         var timeslot = await dataContext.Timeslots
-                                        .Include(timeslot => timeslot.Performer)
                                         .Include(timeslot => timeslot.Schedule)
                                         .Where(timeslot => timeslot.Id == timeslotId)
                                         .FirstOrDefaultAsync(ct);

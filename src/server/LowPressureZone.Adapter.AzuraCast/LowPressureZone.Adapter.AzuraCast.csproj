@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFramework>net11.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <RootNamespace>LowPressureZone.Adapter.AzuraCast</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="SSH.NET" Version="2026.0.0"/>
+        <PackageReference Include="SSH.NET" Version="2026.0.0" />
     </ItemGroup>
 
     <ItemGroup>

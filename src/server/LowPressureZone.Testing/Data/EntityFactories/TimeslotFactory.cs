@@ -1,5 +1,6 @@
 using LowPressureZone.Api.Constants;
 using LowPressureZone.Domain.Entities;
+using LowPressureZone.Domain.PerformerAggregate;
 
 namespace LowPressureZone.Testing.Data.EntityFactories;
 

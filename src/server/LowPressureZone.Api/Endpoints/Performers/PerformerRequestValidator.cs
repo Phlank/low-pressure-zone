@@ -15,9 +15,9 @@ public sealed class PerformerRequestValidator : Validator<PerformerRequest>
                                         .MaximumLength(64)
                                         .WithMessage(Errors.MaxLength(64));
 
-        When(request => !string.IsNullOrEmpty(request.Url), () =>
+        When(request => !string.IsNullOrEmpty(request.SocialUrl), () =>
         {
-            RuleFor(request => request.Url!).MaximumLength(64)
+            RuleFor(request => request.SocialUrl!).MaximumLength(64)
                                             .WithMessage(Errors.MaxLength(256))
                                             .AbsoluteHttpUri();
         });
