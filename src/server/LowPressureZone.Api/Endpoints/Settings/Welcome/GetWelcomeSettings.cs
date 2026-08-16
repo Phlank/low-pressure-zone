@@ -1,4 +1,5 @@
 using FastEndpoints;
+using LowPressureZone.Data;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Enums;
 using LowPressureZone.Identity.Constants;

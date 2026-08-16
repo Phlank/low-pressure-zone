@@ -2,6 +2,7 @@
 using FluentEmail.Core;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Services;
+using LowPressureZone.Data;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Entities;
 using LowPressureZone.Identity;

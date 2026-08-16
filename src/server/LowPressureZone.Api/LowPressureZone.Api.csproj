@@ -35,6 +35,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\LowPressureZone.Data\LowPressureZone.Data.csproj" />
         <ProjectReference Include="..\LowPressureZone.Core\LowPressureZone.Core.csproj"/>
         <ProjectReference Include="..\LowPressureZone.Domain\LowPressureZone.Domain.csproj"/>
         <ProjectReference Include="..\LowPressureZone.Identity\LowPressureZone.Identity.csproj"/>

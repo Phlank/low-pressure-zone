@@ -4,6 +4,7 @@ using FastEndpoints;
 using FastEndpoints.Swagger;
 using Hangfire;
 using LowPressureZone.Api.Extensions;
+using LowPressureZone.Data.Extensions;
 using LowPressureZone.Domain;
 using LowPressureZone.Domain.Extensions;
 using LowPressureZone.Identity;

@@ -3,6 +3,7 @@ using FastEndpoints;
 using FluentEmail.Core;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Rules;
+using LowPressureZone.Data;
 using LowPressureZone.Domain;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Constants;
