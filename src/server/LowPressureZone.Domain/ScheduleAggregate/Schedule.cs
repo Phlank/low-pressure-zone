@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
 using LowPressureZone.Core.Interfaces;
+using LowPressureZone.Domain.CommunityAggregate;
 using LowPressureZone.Domain.ScheduleAggregate.AllowedScheduleSlotTypesObject;
 using LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity;
 using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity;
@@ -14,12 +15,27 @@ namespace LowPressureZone.Domain.ScheduleAggregate;
 
 public class Schedule : Entity
 {
-    [MaxLength(256)] public string Name { get; private set; } = string.Empty;
-    [MaxLength(16384)] public string Description { get; private set; } = string.Empty;
+    [MaxLength(256)]
+    public string Name
+    {
+        get;
+        private set => field = value.Trim();
+    } = string.Empty;
+
+    [MaxLength(16384)]
+    public string Description
+    {
+        get;
+        private set => field = value.Trim();
+    } = string.Empty;
+
     public ScheduleTimeRange TimeRange { get; private set; }
     public AllowedScheduleSlotTypes AllowedSlotTypes { get; private set; }
     public List<ClashSlot> ClashSlots { get; private init; } = [];
     public List<HourlySlot> HourlySlots { get; private init; } = [];
+    public Guid CommunityId { get; set; }
+    public Community Community { get; set; } = null!;
+    public bool IsVisibleToPublic { get; private set; }
 
     public List<ITimeRange> SlotTimeRanges =>
     [
@@ -34,19 +50,29 @@ public class Schedule : Entity
 
     private Schedule(string name,
                      string description,
+                     Guid communityId,
                      ScheduleTimeRange timeRange,
-                     AllowedScheduleSlotTypes allowedSlotTypes)
+                     AllowedScheduleSlotTypes allowedSlotTypes,
+                     bool isVisibleToPublic)
     {
         Name = name;
         Description = description;
+        CommunityId = communityId;
         TimeRange = timeRange;
         AllowedSlotTypes = allowedSlotTypes;
+        IsVisibleToPublic = isVisibleToPublic;
     }
 
-    public static DomainResult<Schedule> Create(string name, string description, DateTimeOffset startsAt, int duration,
-                                                bool isHourlyAllowed, bool isClashAllowed)
+    public static DomainResult<Schedule> Create(string name,
+                                                string description,
+                                                Guid communityId,
+                                                DateTimeOffset startsAt,
+                                                DateTimeOffset endsAt,
+                                                bool isHourlyAllowed,
+                                                bool isClashAllowed,
+                                                bool isVisibleToPublic)
     {
-        var timeRangeResult = ScheduleTimeRange.Create(startsAt, duration);
+        var timeRangeResult = ScheduleTimeRange.Create(startsAt, endsAt);
         var allowedSlotTypesResult = AllowedScheduleSlotTypes.Create(isHourlyAllowed, isClashAllowed);
 
         List<RuleError> errors =
@@ -60,7 +86,9 @@ public class Schedule : Entity
 
         if (errors.Count > 0) return DomainResult.Err<Schedule>(errors);
 
-        return DomainResult.Ok(new Schedule(name, description, timeRangeResult.Value, allowedSlotTypesResult.Value));
+        return DomainResult.Ok(new Schedule(name, description, communityId, timeRangeResult.Value,
+                                            allowedSlotTypesResult.Value,
+                                            isVisibleToPublic));
     }
 
     public DomainResult<NoValue> AddHourlySlot(HourlySlot slot)

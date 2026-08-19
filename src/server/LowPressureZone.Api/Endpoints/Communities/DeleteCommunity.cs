@@ -1,4 +1,5 @@
 ﻿using FastEndpoints;
+using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Data;
 using LowPressureZone.Identity.Constants;
@@ -24,7 +25,7 @@ public class DeleteCommunity(DataContext dataContext, CommunityRules rules) : En
                                          .Where(a => a.Id == id)
                                          .FirstOrDefaultAsync(ct);
 
-        if (community == null || community.IsDeleted)
+        if (community is null || community.IsDeleted)
         {
             await Send.NotFoundAsync(ct);
             return;
@@ -36,9 +37,7 @@ public class DeleteCommunity(DataContext dataContext, CommunityRules rules) : En
             return;
         }
 
-        await dataContext.Schedules.Where(s => s.StartsAt > DateTime.UtcNow).ExecuteDeleteAsync(ct);
-        community.IsDeleted = true;
-        community.LastModifiedDate = DateTime.UtcNow;
+        this.ThrowIfDomainError(community.Delete());
         await dataContext.SaveChangesAsync(ct);
         await Send.NoContentAsync(ct);
     }

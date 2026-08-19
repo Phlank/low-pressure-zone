@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Soundclashes;
 
-public class DeleteSoundclash(DataContext dataContext, SoundclashRules rules) : EndpointWithoutRequest
+public class DeleteSoundclash(DataContext dataContext, ClashSlotRules rules) : EndpointWithoutRequest
 {
     public override void Configure()
     {

@@ -22,11 +22,6 @@ public class DeleteSchedule(DataContext dataContext, ScheduleRules rules) : Endp
         var id = Route<Guid>("id");
         var schedule = await dataContext.Schedules
                                         .AsNoTracking()
-                                        .Include(schedule => schedule.Community)
-                                        .ThenInclude(community =>
-                                                         community.Relationships.Where(relationship =>
-                                                                                           relationship.UserId ==
-                                                                                           User.GetIdOrDefault()))
                                         .Where(schedule => schedule.Id == id)
                                         .FirstOrDefaultAsync(ct);
         if (schedule == null)

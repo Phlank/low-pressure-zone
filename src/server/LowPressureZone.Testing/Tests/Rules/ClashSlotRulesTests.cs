@@ -9,9 +9,9 @@ using Xunit;
 
 namespace LowPressureZone.Testing.Tests.Rules;
 
-public sealed class SoundclashRulesTests
+public sealed class ClashSlotRulesTests
 {
-    private static SoundclashRules Rules(IHttpContextAccessor accessor) => new(accessor);
+    private static ClashSlotRules Rules(IHttpContextAccessor accessor) => new(accessor);
 
     [Fact]
     public void PermissionsMethods_ThrowException_WhenScheduleIsNull()

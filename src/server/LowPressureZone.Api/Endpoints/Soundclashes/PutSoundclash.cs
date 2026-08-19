@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Soundclashes;
 
-public class PutSoundclash(DataContext dataContext, SoundclashRules rules) : EndpointWithMapper<SoundclashRequest, SoundclashMapper>
+public class PutSoundclash(DataContext dataContext, ClashSlotRules rules) : EndpointWithMapper<SoundclashRequest, SoundclashMapper>
 {
     public override void Configure()
     {

@@ -1,17 +1,13 @@
-﻿using System.Text.Json.Serialization;
-using LowPressureZone.Domain.Enums;
-using LowPressureZone.Domain.Interfaces;
+﻿namespace LowPressureZone.Api.Endpoints.Schedules;
 
-namespace LowPressureZone.Api.Endpoints.Schedules;
-
-public sealed class ScheduleRequest : IDateTimeRange
+public sealed class ScheduleRequest
 {
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public required Guid CommunityId { get; set; }
     public required DateTimeOffset StartsAt { get; set; }
-    public required DateTimeOffset EndsAt { get; set; }
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public required ScheduleType Type { get; set; }
-    public required bool IsOrganizersOnly { get; set; }
+    public required int Duration { get; set; }
+    public bool IsHourlyAllowed { get; set; }
+    public bool IsClashAllowed { get; set; }
+    public required bool IsVisibleToPublic { get; set; }
 }

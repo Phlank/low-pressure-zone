@@ -34,9 +34,6 @@ public class DeletePerformer(DataContext dataContext, PerformerRules rules) : En
 
         var result = performer.Delete();
         await dataContext.SaveChangesAsync(ct);
-        await dataContext.Timeslots
-                         .Where(timeslot => timeslot.PerformerId == performer.Id && timeslot.EndsAt > DateTime.UtcNow)
-                         .ExecuteDeleteAsync(ct);
         await Send.NoContentAsync(ct);
     }
 }

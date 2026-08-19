@@ -7,17 +7,15 @@ namespace LowPressureZone.Domain.ScheduleAggregate.ScheduleTimeRangeObject;
 public readonly record struct ScheduleTimeRange : ITimeRange
 {
     public DateTimeOffset StartsAt { get; private init; }
-    public int Duration { get; private init; }
     public DateTimeOffset EndsAt { get; private init; }
-    public TimeSpan TimeSpan => TimeSpan.FromHours(Duration);
+    public TimeSpan TimeSpan => EndsAt - StartsAt;
 
-    public static DomainResult<ScheduleTimeRange> Create(DateTimeOffset startsAt, int duration) =>
+    public static DomainResult<ScheduleTimeRange> Create(DateTimeOffset startsAt, DateTimeOffset endsAt) =>
         Rule.ApplyIntoResult(new ScheduleTimeRange
                              {
                                  StartsAt = startsAt,
-                                 Duration = duration,
-                                 EndsAt = startsAt.AddHours(duration)
+                                 EndsAt = endsAt
                              },
-                             new DurationMustBeAtLeastOneHourRule(duration),
-                             new DurationCannotExceed24HoursRule(duration));
+                             new DurationMustBeAtLeastOneHourRule(startsAt, endsAt),
+                             new DurationCannotExceed24HoursRule(startsAt, endsAt));
 }

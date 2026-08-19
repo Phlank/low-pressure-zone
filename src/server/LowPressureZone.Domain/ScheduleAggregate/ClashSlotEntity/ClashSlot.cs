@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
 using LowPressureZone.Core.Interfaces;
@@ -105,5 +104,17 @@ public class ClashSlot : Entity, ITimeRange
         modelBuilder.Entity<ClashSlot>()
                     .HasIndex(slot => slot.TimeRange.StartsAt)
                     .IsUnique();
+        
+        modelBuilder.Entity<ClashSlot>()
+                    .HasOne(slot => slot.PerformerOne)
+                    .WithMany()
+                    .HasForeignKey(slot => slot.PerformerOneId)
+                    .ExcludeForeignKeyFromMigrations();
+        
+        modelBuilder.Entity<ClashSlot>()
+                    .HasOne(slot => slot.PerformerTwo)
+                    .WithMany()
+                    .HasForeignKey(slot => slot.PerformerTwoId)
+                    .ExcludeForeignKeyFromMigrations();
     }
 }

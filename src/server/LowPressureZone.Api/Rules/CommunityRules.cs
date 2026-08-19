@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Domain.Entities;
+using LowPressureZone.Domain.CommunityAggregate;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
 using Shouldly;

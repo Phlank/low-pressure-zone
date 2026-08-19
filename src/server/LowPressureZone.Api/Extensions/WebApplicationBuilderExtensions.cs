@@ -220,7 +220,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton<PerformerRules>();
         builder.Services.AddSingleton<TimeslotRules>();
         builder.Services.AddSingleton<BroadcastRules>();
-        builder.Services.AddSingleton<SoundclashRules>();
+        builder.Services.AddSingleton<ClashSlotRules>();
         builder.Services.AddSingleton<UserRules>();
     }
 

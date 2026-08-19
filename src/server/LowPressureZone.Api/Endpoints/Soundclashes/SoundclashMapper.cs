@@ -6,7 +6,7 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Endpoints.Soundclashes;
 
-public class SoundclashMapper(SoundclashRules rules, PerformerMapper performerMapper) : IRequestMapper, IResponseMapper
+public class SoundclashMapper(ClashSlotRules rules, PerformerMapper performerMapper) : IRequestMapper, IResponseMapper
 {
     public Soundclash FromRequest(SoundclashRequest req) =>
         new()
