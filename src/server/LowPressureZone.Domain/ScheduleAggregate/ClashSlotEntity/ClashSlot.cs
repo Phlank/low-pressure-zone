@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity;
 
-[Table("ClashSlots")]
+[Table("Soundclashes")]
 public class ClashSlot : Entity, ITimeRange
 {
     public Guid ScheduleId { get; private init; }

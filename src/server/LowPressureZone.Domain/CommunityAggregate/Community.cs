@@ -16,7 +16,7 @@ public class Community : Entity
         get;
         private set => field = value.Trim();
     } = string.Empty;
-
+    
     [MaxLength(512)]
     public string SocialUrl
     {
