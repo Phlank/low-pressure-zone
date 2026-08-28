@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
 using LowPressureZone.Core.Interfaces;
@@ -10,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity;
 
+[Table("ClashSlots")]
 public class ClashSlot : Entity, ITimeRange
 {
     public Guid ScheduleId { get; private init; }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
 using LowPressureZone.Core.Extensions;
@@ -12,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity;
 
+[Table("HourlySlots")]
 public class HourlySlot : Entity, ITimeRange
 {
     [MaxLength(128)]

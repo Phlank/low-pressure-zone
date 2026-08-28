@@ -1,8 +1,10 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
 
 namespace LowPressureZone.Domain.CommunityAggregate.RelationshipEntity;
 
+[Table("Relationships")]
 public class Relationship : Entity
 {
     public Guid CommunityId { get; private init; }
