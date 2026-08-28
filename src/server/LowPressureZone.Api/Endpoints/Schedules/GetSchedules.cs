@@ -1,7 +1,7 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Data;
-using LowPressureZone.Domain.Entities;
+using LowPressureZone.Domain.ScheduleAggregate;
 using LowPressureZone.Identity.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,12 +18,13 @@ public class GetSchedules(DataContext dataContext, ScheduleRules rules)
 
     public override async Task HandleAsync(GetSchedulesRequest req, CancellationToken ct)
     {
-        IQueryable<Schedule> scheduleQuery = dataContext.Schedules.GetSchedulesForResponse(User.GetIdOrDefault());
+        IQueryable<Schedule> scheduleQuery = dataContext.Schedules
+                                                        .GetSchedulesForResponse(User.GetIdOrDefault());
 
         if (req.Before.HasValue)
-            scheduleQuery = scheduleQuery.Where(s => s.EndsAt < req.Before.Value.ToUniversalTime());
+            scheduleQuery = scheduleQuery.Where(schedule => schedule.TimeRange.EndsAt < req.Before.Value.ToUniversalTime());
         if (req.After.HasValue)
-            scheduleQuery = scheduleQuery.Where(s => s.EndsAt > req.After.Value.ToUniversalTime());
+            scheduleQuery = scheduleQuery.Where(schedule => schedule.TimeRange.EndsAt > req.After.Value.ToUniversalTime());
 
         var schedules = await scheduleQuery.ToListAsync(ct);
         schedules.RemoveAll(rules.IsHiddenFromApi);

@@ -1,4 +1,4 @@
-using LowPressureZone.Domain.Entities;
+using LowPressureZone.Domain.ScheduleAggregate;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
@@ -6,18 +6,18 @@ namespace LowPressureZone.Api.Endpoints.Schedules;
 public static class ScheduleQueries
 {
     public static IQueryable<Schedule> GetSchedulesForResponse(this IQueryable<Schedule> queryable, Guid userId) =>
-        queryable.OrderBy(schedule => schedule.StartsAt)
+        queryable.OrderBy(schedule => schedule.TimeRange.StartsAt)
                  .Include(schedule => schedule.Community)
                  .ThenInclude(community => community.Relationships
                                                     .Where(relationship => relationship.UserId == userId))
-                 .Include(schedule => schedule.Timeslots
-                                              .OrderBy(timeslot => timeslot.StartsAt))
+                 .Include(schedule => schedule.HourlySlots
+                                              .OrderBy(slot => slot.TimeRange.StartsAt))
                  .ThenInclude(timeslot => timeslot.Performer)
-                 .Include(schedule => schedule.Soundclashes
-                                              .OrderBy(soundclash => soundclash.StartsAt))
+                 .Include(schedule => schedule.ClashSlots
+                                              .OrderBy(slot => slot.TimeRange.StartsAt))
                  .ThenInclude(soundclash => soundclash.PerformerOne)
-                 .Include(schedule => schedule.Soundclashes
-                                              .OrderBy(soundclash => soundclash.StartsAt))
+                 .Include(schedule => schedule.ClashSlots
+                                              .OrderBy(slot => slot.TimeRange.StartsAt))
                  .ThenInclude(soundclash => soundclash.PerformerTwo)
                  .AsNoTracking()
                  .AsSplitQuery();

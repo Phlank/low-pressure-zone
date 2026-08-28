@@ -2,7 +2,7 @@ namespace LowPressureZone.Core.Domain;
 
 public class Entity
 {
-    public Guid Id { get; init; } = Guid.NewGuid();
+    public Guid Id { get; protected init; } = Guid.NewGuid();
 
     public override bool Equals(object? obj)
     {

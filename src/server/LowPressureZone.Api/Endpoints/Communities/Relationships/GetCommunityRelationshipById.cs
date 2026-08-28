@@ -8,7 +8,7 @@ using Shouldly;
 namespace LowPressureZone.Api.Endpoints.Communities.Relationships;
 
 public class GetCommunityRelationshipById(DataContext dataContext, IdentityContext identityContext)
-    : EndpointWithoutRequest<CommunityRelationshipResponse, CommunityRelationshipMapper>
+    : EndpointWithoutRequest<RelationshipResponse, CommunityRelationshipMapper>
 {
     public override void Configure()
     {
@@ -21,14 +21,14 @@ public class GetCommunityRelationshipById(DataContext dataContext, IdentityConte
         var communityId = Route<Guid>("communityId");
         var userId = Route<Guid>("userId");
 
-        var requestRelationship = await dataContext.CommunityRelationships
+        var requestRelationship = await dataContext.Relationships
                                                    .AsNoTracking()
                                                    .Where(relationship =>
                                                               relationship.CommunityId == communityId &&
                                                               relationship.UserId == userId)
                                                    .FirstOrDefaultAsync(ct);
 
-        var userRelationship = await dataContext.CommunityRelationships
+        var userRelationship = await dataContext.Relationships
                                                 .AsNoTracking()
                                                 .Where(relationship =>
                                                            relationship.CommunityId == communityId &&

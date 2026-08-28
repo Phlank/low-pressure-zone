@@ -1,10 +1,9 @@
-namespace LowPressureZone.Core.Interfaces;
+namespace LowPressureZone.Core;
 
 public interface ITimeRange
 {
     DateTimeOffset StartsAt { get; }
     DateTimeOffset EndsAt { get; }
-    TimeSpan TimeSpan { get; }
 }
 
 public static class TimeRangeExtensions

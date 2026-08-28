@@ -1,11 +1,12 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Data;
+using LowPressureZone.Domain.CommunityAggregate;
 using LowPressureZone.Identity.Constants;
 
 namespace LowPressureZone.Api.Endpoints.Communities;
 
-public sealed class PostCommunity(DataContext dataContext) : EndpointWithMapper<CommunityRequest, CommunityMapper>
+public sealed class PostCommunity(DataContext dataContext) : Endpoint<CommunityRequest>
 {
     public override void Configure()
     {
@@ -16,13 +17,16 @@ public sealed class PostCommunity(DataContext dataContext) : EndpointWithMapper<
 
     public override async Task HandleAsync(CommunityRequest req, CancellationToken ct)
     {
-        var community = Map.ToEntity(req);
-        dataContext.Communities.Add(community);
+        var result = Community.Create(req.Name, req.Url);
+        this.ThrowIfDomainError(result);
+        
+        dataContext.Communities.Add(result.Value);
         await dataContext.SaveChangesAsync(ct);
+        
         HttpContext.ExposeLocation();
         await Send.CreatedAtAsync<GetCommunities>(new
         {
-            community.Id
+            result.Value.Id
         }, Response, cancellation: ct);
     }
 }

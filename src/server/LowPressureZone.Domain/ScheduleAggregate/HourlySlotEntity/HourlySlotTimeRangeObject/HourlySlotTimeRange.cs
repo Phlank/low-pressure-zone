@@ -1,3 +1,4 @@
+using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
 using LowPressureZone.Core.Interfaces;
 using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlotTimeRangeObject.Rules;
@@ -13,11 +14,12 @@ public readonly record struct HourlySlotTimeRange : ITimeRange
 
     public static DomainResult<HourlySlotTimeRange> Create(DateTimeOffset startsAt, int duration) =>
         Rule.ApplyIntoResult(new HourlySlotTimeRange
-                             {
-                                 StartsAt = startsAt,
-                                 Duration = duration,
-                                 EndsAt = startsAt.AddHours(duration)
-                             },
-                             new DurationCannotExceedThreeHoursRule(duration),
-                             new DurationMustBeAtLeastOneHourRule(duration));
+                                          {
+                                              StartsAt = startsAt,
+                                              Duration = duration,
+                                              EndsAt = startsAt.AddHours(duration)
+                                          },
+                                          new DurationCannotExceedThreeHoursRule(duration),
+                                          new DurationMustBeAtLeastOneHourRule(duration),
+                                          new TimeCannotBeInThePastRule(startsAt, duration));
 }

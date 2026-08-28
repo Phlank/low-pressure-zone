@@ -5,29 +5,9 @@ using FastEndpoints.Swagger;
 using Hangfire;
 using Hangfire.PostgreSql;
 using LowPressureZone.Adapter.AzuraCast.Extensions;
-using LowPressureZone.Api.Authentication;
-using LowPressureZone.Api.Converters;
-using LowPressureZone.Api.Endpoints.Broadcasts;
-using LowPressureZone.Api.Endpoints.Communities;
-using LowPressureZone.Api.Endpoints.Communities.Relationships;
-using LowPressureZone.Api.Endpoints.News;
-using LowPressureZone.Api.Endpoints.Performers;
-using LowPressureZone.Api.Endpoints.Schedules;
-using LowPressureZone.Api.Endpoints.Settings.About;
-using LowPressureZone.Api.Endpoints.Settings.Welcome;
-using LowPressureZone.Api.Endpoints.Soundclashes;
-using LowPressureZone.Api.Endpoints.Timeslots;
-using LowPressureZone.Api.Endpoints.Users.Invites;
+using LowPressureZone.Api.Auth;
 using LowPressureZone.Api.Models.Configuration;
 using LowPressureZone.Api.Models.Configuration.Streaming;
-using LowPressureZone.Api.Rules;
-using LowPressureZone.Api.Services;
-using LowPressureZone.Api.Services.Audio;
-using LowPressureZone.Api.Services.AzuraCast;
-using LowPressureZone.Api.Services.Files;
-using LowPressureZone.Api.Services.NightlyTasks;
-using LowPressureZone.Api.Services.StreamConnectionInfo;
-using LowPressureZone.Api.Services.StreamStatus;
 using LowPressureZone.Data;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;
@@ -38,7 +18,6 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NightlyBroadcastDeletionModule = LowPressureZone.Api.Services.NightlyTasks.NightlyBroadcastDeletionModule;
 using NightlyTaskService = LowPressureZone.Api.Services.NightlyTasks.NightlyTaskService;
 
 namespace LowPressureZone.Api.Extensions;
@@ -85,36 +64,14 @@ public static class WebApplicationBuilderExtensions
     public static void AddApiServices(this WebApplicationBuilder builder)
     {
         builder.AddAzuraCast();
-        builder.AddEndpointServices();
         builder.AddDatabases();
         builder.AddHangfire();
         builder.ConfigureAndAddIdentity();
+        builder.AddFluentEmail();
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddFastEndpoints();
-
-        builder.AddFluentEmail();
-        builder.Services.AddSingleton<EmailService>();
-        
-        builder.Services.AddSingleton<MediaAnalyzer>();
-        builder.Services.AddSingleton<Mp3Processor>();
-        builder.Services.AddSingleton<UriService>();
-        
-        builder.Services.AddSingleton<AzuraCastBroadcastDownloader>();
-        builder.Services.AddSingleton<AzuraCastMediaUpdater>();
-        builder.Services.AddSingleton<AzuraCastMediaUploader>();
-
-        builder.Services.AddSingleton<FormFileSaver>();
-
-        builder.Services.AddSingleton<IStreamStatusService, AzuraCastStatusService>();
-        builder.Services.AddScoped<StreamingInfoService>();
-
-        builder.Services.AddSingleton<PrerecordedMixCleanupService>();
-        builder.Services.AddScoped<PrerecordedMixFileProcessor>();
-        builder.Services.AddScoped<TimeslotRequestToAzuraCastPlaylistConverter>();
-
-        builder.Services.AddSingleton<NightlyBroadcastDeletionModule>();
-        builder.Services.AddSingleton<NightlyPrerecordedMixCleanupModule>();
         builder.Services.AddHostedService<NightlyTaskService>();
+        builder.Services.RegisterServicesFromLowPressureZoneApi();
     }
 
     private static void AddDatabases(this WebApplicationBuilder builder)
@@ -197,31 +154,6 @@ public static class WebApplicationBuilderExtensions
     {
         builder.WebHost.ConfigureKestrel(options => { options.Limits.MaxRequestBodySize = 1024 * 1024 * 1024; });
         builder.Services.Configure<FormOptions>(options => { options.MultipartBodyLengthLimit = 1024 * 1024 * 1024; });
-    }
-
-    private static void AddEndpointServices(this WebApplicationBuilder builder)
-    {
-        builder.Services.AddSingleton<CommunityMapper>();
-        builder.Services.AddSingleton<CommunityRelationshipMapper>();
-        builder.Services.AddSingleton<ScheduleMapper>();
-        builder.Services.AddSingleton<PerformerMapper>();
-        builder.Services.AddSingleton<TimeslotMapper>();
-        builder.Services.AddSingleton<InviteMapper>();
-        builder.Services.AddSingleton<BroadcastMapper>();
-        builder.Services.AddSingleton<AboutSettingsMapper>();
-        builder.Services.AddSingleton<NewsMapper>();
-        builder.Services.AddSingleton<SoundclashMapper>();
-        builder.Services.AddSingleton<AboutSettingsMapper>();
-        builder.Services.AddSingleton<WelcomeSettingsMapper>();
-
-        builder.Services.AddSingleton<CommunityRules>();
-        builder.Services.AddSingleton<CommunityRelationshipRules>();
-        builder.Services.AddSingleton<ScheduleRules>();
-        builder.Services.AddSingleton<PerformerRules>();
-        builder.Services.AddSingleton<TimeslotRules>();
-        builder.Services.AddSingleton<BroadcastRules>();
-        builder.Services.AddSingleton<ClashSlotRules>();
-        builder.Services.AddSingleton<UserRules>();
     }
 
     private static void AddFluentEmail(this WebApplicationBuilder builder)

@@ -1,12 +1,9 @@
-﻿using System.Text.Json.Serialization;
-using LowPressureZone.Api.Endpoints.Communities;
-using LowPressureZone.Api.Endpoints.Soundclashes;
-using LowPressureZone.Api.Endpoints.Timeslots;
-using LowPressureZone.Domain.Enums;
+﻿using LowPressureZone.Api.Endpoints.Communities;
+using LowPressureZone.Core;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
-public sealed class ScheduleResponse
+public sealed class ScheduleResponse : ITimeRange
 {
     public required Guid Id { get; set; }
     public required DateTimeOffset StartsAt { get; set; }
@@ -14,13 +11,10 @@ public sealed class ScheduleResponse
     public required string Name { get; set; }
     public required string Description { get; set; }
     public required CommunityResponse Community { get; set; }
-    public required IEnumerable<TimeslotResponse> Timeslots { get; set; }
-    public required IEnumerable<SoundclashResponse> Soundclashes { get; set; }
+    public required IEnumerable<ITimeRange> Slots { get; set; }
     public required bool IsEditable { get; set; }
     public required bool IsDeletable { get; set; }
-    public required bool IsTimeslotCreationAllowed { get; set; }
-    public required bool IsSoundclashCreationAllowed { get; set; }
-    public required bool IsOrganizersOnly { get; set; }
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public required ScheduleType Type { get; set; }
+    public required bool IsHourlyAllowed { get; set; }
+    public required bool IsClashAllowed { get; set; }
+    public required bool IsVisibleToPublic { get; set; }
 }

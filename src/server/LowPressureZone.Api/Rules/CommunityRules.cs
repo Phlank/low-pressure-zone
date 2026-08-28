@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using FastEndpoints;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Domain.CommunityAggregate;
 using LowPressureZone.Identity.Constants;
@@ -7,6 +8,7 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Rules;
 
+[RegisterService<CommunityRules>(LifeTime.Singleton)]
 public sealed class CommunityRules(IHttpContextAccessor contextAccessor)
 {
     private ClaimsPrincipal? User => contextAccessor.GetAuthenticatedUserOrDefault();

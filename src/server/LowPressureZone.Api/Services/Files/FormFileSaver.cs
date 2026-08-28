@@ -1,8 +1,10 @@
+using FastEndpoints;
 using LowPressureZone.Core;
 
 namespace LowPressureZone.Api.Services.Files;
 
-public sealed partial class FormFileSaver(
+[RegisterService<FormFileSaver>(LifeTime.Singleton)]
+public sealed class FormFileSaver(
     EmailService emailer,
     ILogger<FormFileSaver> logger)
 {
@@ -21,7 +23,7 @@ public sealed partial class FormFileSaver(
         }
         catch (Exception ex)
         {
-            LogSaveFailure(logger, ex.Message);
+            logger.LogError(ex, "Failed to save uploaded file: {ErrorMessage}", ex.Message);
             return Result.Err<string, string>("Failed to save uploaded file.");
         }
 
@@ -38,24 +40,15 @@ public sealed partial class FormFileSaver(
                 return Result.Ok(path);
             }
 
-            LogNotFoundDeleteFailure(logger, path);
+            logger.LogError("Failed to delete saved file at {Path} because it was not found.", path);
             return Result.Err<string>($"File does not exist at path: {path}");
         }
         catch (Exception ex)
         {
-            LogExceptionDeleteFailure(logger, path, ex.Message);
+            logger.LogError(ex, "Failed to delete saved file at {Path}: {ErrorMessage}", path, ex.Message);
             _ = await emailer.SendAdminMessage($"Failed to delete saved file at {path}: {ex.Message}",
                                                "Failed to delete saved file");
             return Result.Err<string, string>($"Failed to delete saved file at {path}: {ex.Message}");
         }
     }
-
-    [LoggerMessage(LogLevel.Error, "Failed to save uploaded file: {errorMessage}")]
-    static partial void LogSaveFailure(ILogger<FormFileSaver> logger, string errorMessage);
-
-    [LoggerMessage(LogLevel.Error, "Failed to delete saved file at {path} because it was not found.")]
-    static partial void LogNotFoundDeleteFailure(ILogger<FormFileSaver> logger, string path);
-
-    [LoggerMessage(LogLevel.Error, "Failed to delete file saved at {path}: {errorMessage}")]
-    static partial void LogExceptionDeleteFailure(ILogger<FormFileSaver> logger, string path, string errorMessage);
 }

@@ -1,11 +1,12 @@
 using System.Globalization;
+using FastEndpoints;
 using FFMpegCore;
 using FluentValidation.Results;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Adapter.AzuraCast.Mappers;
 using LowPressureZone.Api.Converters;
-using LowPressureZone.Api.Endpoints.Timeslots;
+using LowPressureZone.Api.Endpoints.Schedules.HourlySlots;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Models;
 using LowPressureZone.Api.Models.Configuration;
@@ -18,20 +19,21 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Services.Files;
 
+[RegisterService<PrerecordedMixFileProcessor>(LifeTime.Scoped)]
 public sealed class PrerecordedMixFileProcessor(
     FormFileSaver fileSaver,
     MediaAnalyzer mediaAnalyzer,
     Mp3Processor mp3Processor,
     DataContext dataContext,
     IAzuraCastClient azuraCastClient,
-    TimeslotRequestToAzuraCastPlaylistConverter requestToPlaylistConverter,
+    HourlySlotRequestToAzuraCastPlaylistConverter requestToPlaylistConverter,
     IOptions<AzuraCastInstallationConfiguration> installationOptions)
 {
     private readonly string _prerecordedSetLocation = installationOptions.Value.PrerecordedSetLocation;
+    private const int PrerecordedDurationMinutesTolerance = 2;
 
     public async Task<Result<string, IEnumerable<ValidationFailure>>> ProcessRequestFileToMp3Async(
-        TimeslotRequest request,
-        DateTimeOffset scheduleStart,
+        HourlySlotRequest request,
         CancellationToken ct = default)
     {
         request.File.ShouldNotBeNull();
@@ -47,7 +49,7 @@ public sealed class PrerecordedMixFileProcessor(
         }
 
         var analysis = analysisResult.Value;
-        var analysisValidationFailures = TimeslotRequestValidator.ValidateMediaAnalysis(request, analysis);
+        var analysisValidationFailures = ValidateMediaAnalysis(request, analysis);
         if (analysisValidationFailures.Count != 0)
         {
             _ = await fileSaver.DeleteFileAsync(saveResult.Value);
@@ -62,9 +64,26 @@ public sealed class PrerecordedMixFileProcessor(
 
         return Result.Ok<string, IEnumerable<ValidationFailure>>(processResult.Value);
     }
+    
+    public static ICollection<ValidationFailure> ValidateMediaAnalysis(HourlySlotRequest request, IMediaAnalysis analysis)
+    {
+        request.File.ShouldNotBeNull();
+        List<ValidationFailure> failures = new();
+        var timeslotDuration = request.StartsAt.AddHours(request.Duration) - request.StartsAt;
+        if (TimeSpan.FromMinutes(timeslotDuration.TotalMinutes - PrerecordedDurationMinutesTolerance) >
+            analysis.Duration
+            || TimeSpan.FromMinutes(timeslotDuration.TotalMinutes + PrerecordedDurationMinutesTolerance) <
+            analysis.Duration)
+            failures.Add(new ValidationFailure(nameof(request.File),
+                                               "Media file duration does not match the specified timeslot duration. Ensure it is +/- 2 minutes from the timeslot duration."));
+
+        failures.AddRange(AudioQualityValidator.ValidateAudioQuality(analysis, request.File.Length,
+                                                                     nameof(request.File)));
+        return failures;
+    }
 
     public async Task<Result<int, ValidationFailure>> EnqueuePrerecordedMixAsync(
-        TimeslotRequest request,
+        HourlySlotRequest request,
         DateTimeOffset scheduleStart,
         string localFilePath,
         CancellationToken ct = default)
@@ -80,7 +99,10 @@ public sealed class PrerecordedMixFileProcessor(
         var uploadedFileResult = await Retry.RetryAsync(async () => await GetUploadedFileAsync(azuraCastFilePath),
                                                         result => result.IsError
                                                                   || (result.IsSuccess
-                                                                      && result.Value.Media is not null), 1000, 10, ct);
+                                                                      && result.Value.Media is not null),
+                                                        1000,
+                                                        10,
+                                                        ct);
         if (uploadedFileResult.IsError)
             return Result.Err<int>(uploadedFileResult.Error.ToValidationFailure(nameof(request.File)));
 
@@ -110,20 +132,20 @@ public sealed class PrerecordedMixFileProcessor(
     }
 
     public async Task<Result<int, IEnumerable<ValidationFailure>>> UpdateEnqueuedPrerecordedMixAsync(
-        Guid timeslotId,
-        TimeslotRequest request,
+        Guid hourlySlotId,
+        HourlySlotRequest request,
         CancellationToken ct = default)
     {
         // Get necessary data
-        var timeslot = await dataContext.Timeslots
-                                        .Include(timeslot => timeslot.Schedule)
-                                        .Where(timeslot => timeslot.Id == timeslotId)
-                                        .FirstOrDefaultAsync(ct);
+        var hourlySlot = await dataContext.HourlySlots
+                                          .Include(hourlySlot => hourlySlot.Schedule)
+                                          .Where(hourlySlot => hourlySlot.Id == hourlySlotId)
+                                          .FirstOrDefaultAsync(ct);
 
-        timeslot.ShouldNotBeNull();
-        timeslot.AzuraCastMediaId.ShouldNotBeNull();
+        hourlySlot.ShouldNotBeNull();
+        hourlySlot.Prerecord.AzuraCastMediaId.ShouldNotBeNull();
 
-        var getExistingMediaResult = await azuraCastClient.GetMediaAsync(timeslot.AzuraCastMediaId.Value);
+        var getExistingMediaResult = await azuraCastClient.GetMediaAsync(hourlySlot.Prerecord.AzuraCastMediaId.Value);
         if (getExistingMediaResult.IsError)
             return Result.Err<int>("Unable to load existing media in AzuraCast".ToValidationFailures());
 
@@ -135,13 +157,13 @@ public sealed class PrerecordedMixFileProcessor(
         StationMedia? newMedia = null;
         if (request.File is not null)
         {
-            var processResult = await ProcessRequestFileToMp3Async(request, timeslot.Schedule.StartsAt, ct);
+            var processResult = await ProcessRequestFileToMp3Async(request, ct);
             if (processResult.IsError)
                 return Result.Err<int>(processResult.Error);
 
             var localFilePath = processResult.Value;
 
-            var deleteMediaResult = await azuraCastClient.DeleteMediaAsync(timeslot.AzuraCastMediaId.Value);
+            var deleteMediaResult = await azuraCastClient.DeleteMediaAsync(hourlySlot.Prerecord.AzuraCastMediaId.Value);
             if (deleteMediaResult.IsError)
                 return Result.Err<int>((deleteMediaResult.Error.ReasonPhrase ??
                                         "Unable to delete existing media in AzuraCast")
@@ -155,7 +177,10 @@ public sealed class PrerecordedMixFileProcessor(
             var uploadedFileResult = await Retry.RetryAsync(async () => await GetUploadedFileAsync(azuraCastFilePath),
                                                             result => result.IsError
                                                                       || (result.IsSuccess
-                                                                          && result.Value.Media is not null), 1000, 10, ct);
+                                                                          && result.Value.Media is not null),
+                                                            1000,
+                                                            10,
+                                                            ct);
             if (uploadedFileResult.IsError)
                 return Result.Err<int>(uploadedFileResult.Error.ToValidationFailures(nameof(request.File)));
 
@@ -167,7 +192,7 @@ public sealed class PrerecordedMixFileProcessor(
         // Update the metadata and playlist reference on the target media.
         var targetMedia = newMedia ?? getExistingMediaResult.Value;
         var updateMediaRequest = StationMediaMapper.ToRequest(targetMedia);
-        var metadata = await GetAudioMetadataAsync(request, timeslot.Schedule.StartsAt, ct);
+        var metadata = await GetAudioMetadataAsync(request, hourlySlot.Schedule.TimeRange.StartsAt, ct);
         updateMediaRequest.Title = metadata.Title;
         updateMediaRequest.Artist = metadata.Artist;
         updateMediaRequest.Playlists = [playlistId.Value];
@@ -198,7 +223,7 @@ public sealed class PrerecordedMixFileProcessor(
         {
             var stripResult = await mp3Processor.StripMp3MetadataAsync(inputFilePath);
             if (stripResult.IsError)
-                return Result.Err<string>(stripResult.Error.ToValidationFailures(nameof(TimeslotRequest.File)));
+                return Result.Err<string>(stripResult.Error.ToValidationFailures(nameof(HourlySlotRequest.File)));
 
             outputFilePath = stripResult.Value;
         }
@@ -206,7 +231,7 @@ public sealed class PrerecordedMixFileProcessor(
         {
             var conversionResult = await mp3Processor.ConvertFileToMp3Async(inputFilePath);
             if (conversionResult.IsError)
-                return Result.Err<string>(conversionResult.Error.ToValidationFailures(nameof(TimeslotRequest.File)));
+                return Result.Err<string>(conversionResult.Error.ToValidationFailures(nameof(HourlySlotRequest.File)));
 
             outputFilePath = conversionResult.Value;
         }
@@ -215,7 +240,7 @@ public sealed class PrerecordedMixFileProcessor(
     }
 
     private async Task<SimpleAudioMetadata> GetAudioMetadataAsync(
-        TimeslotRequest request,
+        HourlySlotRequest request,
         DateTimeOffset scheduleStart,
         CancellationToken ct)
     {

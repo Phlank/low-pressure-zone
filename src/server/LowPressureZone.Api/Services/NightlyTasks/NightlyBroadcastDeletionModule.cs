@@ -1,8 +1,10 @@
 using System.Net;
+using FastEndpoints;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 
 namespace LowPressureZone.Api.Services.NightlyTasks;
 
+[RegisterService<NightlyBroadcastDeletionModule>(LifeTime.Singleton)]
 public sealed partial class NightlyBroadcastDeletionModule(
     IAzuraCastClient client,
     ILogger<NightlyBroadcastDeletionModule> logger)

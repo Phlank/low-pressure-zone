@@ -1,11 +1,13 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using FastEndpoints;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Models.Stream;
 
 namespace LowPressureZone.Api.Services.StreamStatus;
 
+[RegisterService<IStreamStatusService>(LifeTime.Singleton)]
 public sealed class AzuraCastStatusService(
     IAzuraCastClient client,
     ILogger<AzuraCastStatusService> logger)

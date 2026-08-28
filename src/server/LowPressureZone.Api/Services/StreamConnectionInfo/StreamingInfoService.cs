@@ -1,4 +1,5 @@
-﻿using LowPressureZone.Adapter.AzuraCast.Clients;
+﻿using FastEndpoints;
+using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Models.Configuration.Streaming;
 using LowPressureZone.Core;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Api.Services.StreamConnectionInfo;
 
+[RegisterService<StreamingInfoService>(LifeTime.Scoped)]
 public sealed class StreamingInfoService(
     IOptions<StreamingConfiguration> streamOptions,
     IHttpContextAccessor httpContextAccessor,

@@ -1,10 +1,12 @@
+using FastEndpoints;
 using FFMpegCore;
 using FFMpegCore.Enums;
 using LowPressureZone.Core;
 
 namespace LowPressureZone.Api.Services.Audio;
 
-public sealed partial class Mp3Processor(ILogger<Mp3Processor> logger)
+[RegisterService<Mp3Processor>(LifeTime.Singleton)]
+public sealed class Mp3Processor(ILogger<Mp3Processor> logger)
 {
     public async Task<Result<string, string>> ConvertFileToMp3Async(string inputFilePath)
     {
@@ -24,12 +26,15 @@ public sealed partial class Mp3Processor(ILogger<Mp3Processor> logger)
             if (isConversionSuccessful)
                 return Result.Ok(outputFilePath);
 
-            LogUnableToConvertFile(logger, inputFilePath);
+            logger.LogError("Unable to convert file to MP3 at {InputFilePath}", inputFilePath);
             return Result.Err<string>("Failed to process audio file.");
         }
         catch (Exception ex)
         {
-            LogUnableToConvertFileException(logger, inputFilePath, ex.Message);
+            logger.LogError(ex,
+                            "Unable to convert file to MP3 at {InputFilePath}: {ErrorMessage}",
+                            inputFilePath,
+                            ex.Message);
             return Result.Err<string>("Failed to process audio file.");
         }
     }
@@ -42,38 +47,24 @@ public sealed partial class Mp3Processor(ILogger<Mp3Processor> logger)
             var isMetadataStripSuccessful =
                 await FFMpegArguments.FromFileInput(inputFilePath,
                                                     false)
-                                     .OutputToFile(outputFilePath, true,
+                                     .OutputToFile(outputFilePath,
+                                                   true,
                                                    options => options.WithCopyCodec()
                                                                      .WithoutMetadata())
-                                     .ProcessAsynchronously(true);
+                                     .ProcessAsynchronously();
             if (isMetadataStripSuccessful)
                 return Result.Ok(outputFilePath);
 
-            LogUnableToStripMetadata(logger, inputFilePath);
+            logger.LogError("Unable to strip metadata from MP3 file at {InputFilePath}", inputFilePath);
             return Result.Err<string>("Failed to process MP3 file.");
         }
         catch (Exception ex)
         {
-            LogUnableToStripMetadataException(logger, inputFilePath, ex.Message);
+            logger.LogError(ex,
+                            "Unable to strip metadata from MP3 file at {InputFilePath}: {ErrorMessage}",
+                            inputFilePath,
+                            ex.Message);
             return Result.Err<string>("Failed to process MP3 file.");
         }
     }
-
-    [LoggerMessage(LogLevel.Error, "Unable to convert file to MP3 at {inputFilePath}")]
-    static partial void LogUnableToConvertFile(ILogger<Mp3Processor> logger, string inputFilePath);
-
-    [LoggerMessage(LogLevel.Error, "Unable to convert file to MP3 at {inputFilePath}: {errorMessage}")]
-    static partial void LogUnableToConvertFileException(
-        ILogger<Mp3Processor> logger,
-        string inputFilePath,
-        string errorMessage);
-
-    [LoggerMessage(LogLevel.Error, "Unable to strip metadata from MP3 file at {inputFilePath}")]
-    static partial void LogUnableToStripMetadata(ILogger<Mp3Processor> logger, string inputFilePath);
-
-    [LoggerMessage(LogLevel.Error, "Unable to strip metadata from MP3 file at {inputFilePath}: {errorMessage}")]
-    static partial void LogUnableToStripMetadataException(
-        ILogger<Mp3Processor> logger,
-        string inputFilePath,
-        string errorMessage);
 }

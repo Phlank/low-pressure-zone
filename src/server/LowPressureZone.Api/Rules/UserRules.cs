@@ -1,10 +1,12 @@
 using System.Security.Claims;
+using FastEndpoints;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
 
 namespace LowPressureZone.Api.Rules;
 
+[RegisterService<UserRules>(LifeTime.Singleton)]
 public class UserRules(IHttpContextAccessor contextAccessor)
 {
     private ClaimsPrincipal? User => contextAccessor.GetAuthenticatedUserOrDefault();

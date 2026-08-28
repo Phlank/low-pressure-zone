@@ -19,7 +19,7 @@ public class PostArchiveBroadcast(
     AzuraCastMediaUpdater updater,
     IAzuraCastClient azuraCastClient,
     DataContext dataContext,
-    BroadcastRules rules,
+    BroadcastPermissions permissions,
     IOptions<AzuraCastInstallationConfiguration> installationConfiguration) : Endpoint<ArchiveBroadcastRequest>
 {
     private static readonly CompositeFormat ArchiveError = CompositeFormat.Parse("Unable to archive broadcast: {0}");
@@ -54,7 +54,7 @@ public class PostArchiveBroadcast(
         if (broadcast is { IsArchived: true })
             ThrowError(nameof(req.Id), "Broadcast is already archived.");
 
-        if (!rules.IsArchivable(externalBroadcast, broadcast))
+        if (!permissions.IsArchivable(externalBroadcast, broadcast))
         {
             await Send.UnauthorizedAsync(ct);
             return;

@@ -1,19 +1,21 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Endpoints.Communities;
-using LowPressureZone.Api.Endpoints.Soundclashes;
-using LowPressureZone.Api.Endpoints.Timeslots;
+using LowPressureZone.Api.Endpoints.Schedules.ClashSlots;
+using LowPressureZone.Api.Endpoints.Schedules.HourlySlots;
 using LowPressureZone.Api.Rules;
+using LowPressureZone.Core;
 using LowPressureZone.Domain.ScheduleAggregate;
 using Shouldly;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
+[RegisterService<ScheduleMapper>(LifeTime.Singleton)]
 public sealed class ScheduleMapper(
-    TimeslotMapper timeslotMapper,
-    SoundclashMapper soundclashMapper,
+    HourlySlotMapper hourlySlotMapper,
+    ClashSlotMapper clashSlotMapper,
     CommunityMapper communityMapper,
     ScheduleRules rules)
-    : IRequestMapper, IResponseMapper
+    : IResponseMapper
 {
     public ScheduleResponse FromEntity(Schedule schedule)
     {
@@ -28,6 +30,12 @@ public sealed class ScheduleMapper(
             slot.PerformerTwo.ShouldNotBeNull();
         }
 
+        List<ITimeRange> slots =
+        [
+            .. schedule.HourlySlots.Select(hourlySlotMapper.FromEntity),
+            .. schedule.ClashSlots.Select(clashSlotMapper.FromEntity)
+        ];
+
         return new ScheduleResponse
         {
             Id = schedule.Id,
@@ -36,14 +44,12 @@ public sealed class ScheduleMapper(
             Name = schedule.Name,
             Description = schedule.Description,
             Community = communityMapper.FromEntity(schedule.Community),
-            Timeslots = schedule.HourlySlots.Select(timeslotMapper.FromEntity),
-            Soundclashes = schedule.ClashSlots.Select(soundclashMapper.FromEntity),
+            Slots = slots.OrderBy(x => x.StartsAt),
+            IsVisibleToPublic = schedule.IsVisibleToPublic,
             IsEditable = rules.IsEditAuthorized(schedule),
             IsDeletable = rules.IsDeleteAuthorized(schedule),
-            IsTimeslotCreationAllowed = rules.IsAddingTimeslotsAllowed(schedule),
-            IsSoundclashCreationAllowed = rules.IsAddingSoundclashesAllowed(schedule),
-            IsOrganizersOnly = schedule.IsOrganizersOnly,
-            Type = schedule.Type
+            IsHourlyAllowed = rules.IsAddingHourlySlotsAllowed(schedule),
+            IsClashAllowed = rules.IsAddingClashSlotsAllowed(schedule),
         };
     }
 }

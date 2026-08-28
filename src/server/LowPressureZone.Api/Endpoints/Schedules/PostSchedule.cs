@@ -2,16 +2,15 @@
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Data;
+using LowPressureZone.Domain.ScheduleAggregate;
 using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
 public class PostSchedule(DataContext dataContext, CommunityRules communityRules)
-    : EndpointWithMapper<ScheduleRequest, ScheduleMapper>
+    : Endpoint<ScheduleRequest>
 {
-    public required DataContext DataContext { get; set; }
-
     public override void Configure()
     {
         Post("/schedules");
@@ -32,14 +31,23 @@ public class PostSchedule(DataContext dataContext, CommunityRules communityRules
             return;
         }
 
-        var schedule = Map.ToEntity(request);
-
-        DataContext.Schedules.Add(schedule);
-        await DataContext.SaveChangesAsync(ct);
+        var result = Schedule.Create(request.Name,
+                                     request.Description,
+                                     request.CommunityId,
+                                     request.StartsAt,
+                                     request.EndsAt,
+                                     request.IsHourlyAllowed,
+                                     request.IsClashAllowed,
+                                     request.IsVisibleToPublic);
+        
+        this.ThrowIfDomainError(result);
+        dataContext.Add(result.Value);
+        await dataContext.SaveChangesAsync(ct);
+        
         HttpContext.ExposeLocation();
         await Send.CreatedAtAsync<GetScheduleById>(new
         {
-            schedule.Id
+            result.Value.Id
         }, Response, cancellation: ct);
     }
 }

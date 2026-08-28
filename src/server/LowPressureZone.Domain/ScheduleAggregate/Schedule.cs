@@ -33,8 +33,15 @@ public class Schedule : Entity
     public AllowedScheduleSlotTypes AllowedSlotTypes { get; private set; }
     public List<ClashSlot> ClashSlots { get; private init; } = [];
     public List<HourlySlot> HourlySlots { get; private init; } = [];
-    public Guid CommunityId { get; set; }
-    public Community Community { get; set; } = null!;
+
+    public List<Slot> Slots =>
+    [
+        .. ClashSlots.Select(slot => new Slot(slot)),
+        .. HourlySlots.Select(slot => new Slot(slot))
+    ];
+
+    public Guid CommunityId { get; init; }
+    public Community Community { get; init; } = null!;
     public bool IsVisibleToPublic { get; private set; }
 
     public List<ITimeRange> SlotTimeRanges =>
@@ -78,23 +85,86 @@ public class Schedule : Entity
         List<RuleError> errors =
         [
             .. Rule.Apply(new NameIsRequiredRule(name),
-                          new NameLengthCannotExceed256Rule(name),
-                          new DescriptionLengthCannotExceed16384Rule(description)),
+                                       new NameLengthCannotExceed256Rule(name),
+                                       new DescriptionLengthCannotExceed16384Rule(description)),
             .. timeRangeResult.Errors,
             .. allowedSlotTypesResult.Errors
         ];
 
-        if (errors.Count > 0) return DomainResult.Err<Schedule>(errors);
+        if (errors.Count > 0)
+            return DomainResult.Err<Schedule>(errors);
 
-        return DomainResult.Ok(new Schedule(name, description, communityId, timeRangeResult.Value,
+        return DomainResult.Ok(new Schedule(name,
+                                            description,
+                                            communityId,
+                                            timeRangeResult.Value,
                                             allowedSlotTypesResult.Value,
                                             isVisibleToPublic));
     }
 
+    public DomainResult<NoValue> ChangeName(string name)
+    {
+        var result = Rule.ApplyIntoResult(NoValue.Instance,
+                                                       new NameIsRequiredRule(name),
+                                                       new NameLengthCannotExceed256Rule(name));
+
+        if (result.IsSuccess)
+            Name = name;
+
+        return result;
+    }
+
+    public DomainResult<NoValue> ChangeDescription(string description)
+    {
+        var result = Rule.ApplyIntoResult(NoValue.Instance,
+                                                       new DescriptionLengthCannotExceed16384Rule(description));
+
+        if (result.IsSuccess)
+            Description = description;
+
+        return result;
+    }
+
+    public DomainResult<NoValue> ChangeAllowedSlotTypes(bool isHourlyAllowed, bool isClashAllowed)
+    {
+        var result = Rule.ApplyIntoResult(NoValue.Instance,
+                                                       new NoHourlySlotsWhenNotAllowed(HourlySlots, isHourlyAllowed),
+                                                       new NoClashSlotsWhenNotAllowed(ClashSlots, isClashAllowed));
+
+        if (result.IsSuccess)
+        {
+            AllowedSlotTypes = AllowedScheduleSlotTypes.Create(isHourlyAllowed, isClashAllowed).Value;
+        }
+
+        return result;
+    }
+
+    public DomainResult<NoValue> ChangeVisibility(bool isVisibleToPublic)
+    {
+        IsVisibleToPublic = isVisibleToPublic;
+        return DomainResult.Ok();
+    }
+
+    public DomainResult<NoValue> ChangeTime(DateTimeOffset startsAt, DateTimeOffset endsAt)
+    {
+        var timeRangeResult = ScheduleTimeRange.Create(startsAt, endsAt);
+        if (timeRangeResult.IsError)
+            return timeRangeResult.ToNoValue();
+
+        var result = Rule.ApplyIntoResult(NoValue.Instance,
+                                                       new SlotsMustBeWithinScheduleTimeRange(timeRangeResult.Value,
+                                                                                              [.. HourlySlots, .. ClashSlots]));
+        if (result.IsSuccess)
+            TimeRange = timeRangeResult.Value;
+
+        return result;
+    }
+
     public DomainResult<NoValue> AddHourlySlot(HourlySlot slot)
     {
-        var errors = Rule.Apply(new SlotMustBeWithinScheduleTimeRange(TimeRange, slot),
-                                new SlotsCannotHaveOverlappingTimeRangesRule(SlotTimeRanges, slot));
+        var errors = Rule.Apply(new SlotsMustBeWithinScheduleTimeRange(TimeRange,
+                                                                                    [slot, .. HourlySlots, .. ClashSlots]),
+                                             new SlotsCannotHaveOverlappingTimeRangesRule(SlotTimeRanges, slot));
         if (errors.Count > 0) return DomainResult.Err<NoValue>(errors);
 
         HourlySlots.Add(slot);
@@ -103,8 +173,9 @@ public class Schedule : Entity
 
     public DomainResult<NoValue> AddClashSlot(ClashSlot slot)
     {
-        var errors = Rule.Apply(new SlotMustBeWithinScheduleTimeRange(TimeRange, slot),
-                                new SlotsCannotHaveOverlappingTimeRangesRule(SlotTimeRanges, slot));
+        var errors = Rule.Apply(new SlotsMustBeWithinScheduleTimeRange(TimeRange,
+                                                                                    [slot, .. HourlySlots, .. ClashSlots]),
+                                             new SlotsCannotHaveOverlappingTimeRangesRule(SlotTimeRanges, slot));
         if (errors.Count > 0) return DomainResult.Err<NoValue>(errors);
 
         ClashSlots.Add(slot);
@@ -122,5 +193,17 @@ public class Schedule : Entity
         modelBuilder.Entity<Schedule>()
                     .HasIndex(schedule => schedule.TimeRange.StartsAt)
                     .IsUnique();
+
+        modelBuilder.Entity<Schedule>().Navigation(schedule => schedule.Community).AutoInclude();
+        modelBuilder.Entity<Schedule>().HasOne(schedule => schedule.Community).WithMany()
+                    .HasForeignKey(schedule => schedule.CommunityId).ExcludeForeignKeyFromMigrations();
+
+        modelBuilder.Entity<Schedule>().HasMany(schedule => schedule.HourlySlots).WithOne(slot => slot.Schedule)
+                    .HasForeignKey(slot => slot.ScheduleId).ExcludeForeignKeyFromMigrations();
+        modelBuilder.Entity<Schedule>().Navigation(schedule => schedule.HourlySlots).AutoInclude();
+
+        modelBuilder.Entity<Schedule>().HasMany(schedule => schedule.ClashSlots).WithOne(slot => slot.Schedule)
+                    .HasForeignKey(slot => slot.ScheduleId).ExcludeForeignKeyFromMigrations();
+        modelBuilder.Entity<Schedule>().Navigation(schedule => schedule.ClashSlots).AutoInclude();
     }
 }

@@ -36,18 +36,18 @@ public sealed class News : Entity
 
     public static DomainResult<News> Create(string title, string content) =>
         Rule.ApplyIntoResult(new News(title, content),
-                             new TitleIsRequiredRule(title),
-                             new TitleLengthCannotExceedThan256Rule(title),
-                             new ContentIsRequiredRule(content),
-                             new ContentLengthCannotExceed16384Rule(content));
-
-    public DomainResult<NoValue> Edit(string title, string content)
-    {
-        var result = Rule.ApplyIntoResult(NoValue.Instance,
                                           new TitleIsRequiredRule(title),
                                           new TitleLengthCannotExceedThan256Rule(title),
                                           new ContentIsRequiredRule(content),
                                           new ContentLengthCannotExceed16384Rule(content));
+
+    public DomainResult<NoValue> Edit(string title, string content)
+    {
+        var result = Rule.ApplyIntoResult(NoValue.Instance,
+                                                       new TitleIsRequiredRule(title),
+                                                       new TitleLengthCannotExceedThan256Rule(title),
+                                                       new ContentIsRequiredRule(content),
+                                                       new ContentLengthCannotExceed16384Rule(content));
 
         if (result.IsSuccess)
         {

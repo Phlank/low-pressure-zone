@@ -5,6 +5,7 @@ using LowPressureZone.Domain.Enums;
 
 namespace LowPressureZone.Api.Endpoints.Settings.About;
 
+[RegisterService<AboutSettingsMapper>(LifeTime.Singleton)]
 public sealed class AboutSettingsMapper(ILogger<AboutSettingsMapper> logger) : IRequestMapper, IResponseMapper
 {
     private static readonly AboutSettingsResponse DefaultResponse = new()

@@ -10,9 +10,9 @@ public readonly record struct AllowedScheduleSlotTypes
 
     public static DomainResult<AllowedScheduleSlotTypes> Create(bool isHourlyAllowed, bool isClashAllowed) =>
         Rule.ApplyIntoResult(new AllowedScheduleSlotTypes
-                             {
-                                 IsHourlyAllowed = isHourlyAllowed,
-                                 IsClashAllowed = isClashAllowed
-                             },
-                             new AtLeastOneSlotTypeMustBeAllowedRule(isHourlyAllowed, isClashAllowed));
+                                          {
+                                              IsHourlyAllowed = isHourlyAllowed,
+                                              IsClashAllowed = isClashAllowed
+                                          },
+                                          new AtLeastOneSlotTypeMustBeAllowedRule(isHourlyAllowed, isClashAllowed));
 }

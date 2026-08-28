@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
+using LowPressureZone.Domain.CommunityAggregate.Events;
 using LowPressureZone.Domain.CommunityAggregate.RelationshipEntity;
 using LowPressureZone.Domain.CommunityAggregate.Rules;
 using Microsoft.EntityFrameworkCore;
@@ -40,13 +41,41 @@ public class Community : Entity
 
     public static DomainResult<Community> Create(string name, string socialUrl) =>
         Rule.ApplyIntoResult(new Community(name, socialUrl),
-                             new NameIsRequiredRule(name),
-                             new NameLengthCannotExceed128Rule(name),
-                             new SocialUrlMustBeWellFormedRule(socialUrl),
-                             new SocialUrlLengthCannotExceed512Rule(socialUrl));
+                                          new NameIsRequiredRule(name),
+                                          new NameLengthCannotExceed128Rule(name),
+                                          new SocialUrlMustBeWellFormedRule(socialUrl),
+                                          new SocialUrlLengthCannotExceed512Rule(socialUrl));
 
-    public DomainResult<NoValue> SetRolesForUser(Guid userId, bool isPerformer, bool isOrganizer) =>
+    public DomainResult<NoValue> Rename(string name)
+    {
+        var result = Rule.ApplyIntoResult(NoValue.Instance,
+                                                       new NameChanged(Id),
+                                                       new NameIsRequiredRule(name),
+                                                       new NameLengthCannotExceed128Rule(name));
+        
+        if (result.IsSuccess)
+            Name = name;
+
+        return result;
+    }
+
+    public DomainResult<NoValue> ChangeSocialUrl(string socialUrl)
+    {
+        var result = Rule.ApplyIntoResult(NoValue.Instance,
+                                                       new SocialUrlChanged(Id),
+                                                       new SocialUrlLengthCannotExceed512Rule(socialUrl),
+                                                       new SocialUrlMustBeWellFormedRule(socialUrl));
+        if (result.IsSuccess)
+            SocialUrl = socialUrl;
+
+        return result;
+    }
+
+    public DomainResult<NoValue> SetRolesForUser(Guid userId, bool isPerformer, bool isOrganizer)
+    {
         GetRelationshipForUser(userId).SetRoles(isPerformer, isOrganizer);
+        return Rule.ApplyIntoResult(NoValue.Instance, new RelationshipChanged(Id, userId));
+    }
 
     private Relationship GetRelationshipForUser(Guid userId)
     {

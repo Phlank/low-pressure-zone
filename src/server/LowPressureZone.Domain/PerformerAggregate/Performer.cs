@@ -41,16 +41,16 @@ public sealed class Performer : Entity
 
     public static DomainResult<Performer> Create(Guid creatorUserId, string name, string? socialUrl, Guid? id = null) =>
         Rule.ApplyIntoResult(new Performer(creatorUserId, name, socialUrl, id ?? Guid.NewGuid()),
-                             new NameIsRequiredRule(name),
-                             new NameLengthCannotExceed64Rule(name),
-                             new SocialUrlLengthCannotExceed512Rule(socialUrl),
-                             new SocialUrlMustBeWellFormedIfProvidedRule(socialUrl));
+                                          new NameIsRequiredRule(name),
+                                          new NameLengthCannotExceed64Rule(name),
+                                          new SocialUrlLengthCannotExceed512Rule(socialUrl),
+                                          new SocialUrlMustBeWellFormedIfProvidedRule(socialUrl));
 
     public DomainResult<NoValue> ChangeName(string name)
     {
         var result = Rule.ApplyIntoResult(NoValue.Instance,
-                                          new NameIsRequiredRule(name),
-                                          new NameLengthCannotExceed64Rule(name));
+                                                       new NameIsRequiredRule(name),
+                                                       new NameLengthCannotExceed64Rule(name));
         if (result.IsSuccess) Name = name;
         return result;
     }
@@ -58,8 +58,8 @@ public sealed class Performer : Entity
     public DomainResult<NoValue> ChangeSocialUrl(string? socialUrl)
     {
         var result = Rule.ApplyIntoResult(NoValue.Instance,
-                                          new SocialUrlLengthCannotExceed512Rule(socialUrl),
-                                          new SocialUrlMustBeWellFormedIfProvidedRule(socialUrl));
+                                                       new SocialUrlLengthCannotExceed512Rule(socialUrl),
+                                                       new SocialUrlMustBeWellFormedIfProvidedRule(socialUrl));
         if (result.IsSuccess) SocialUrl = socialUrl;
         return result;
     }

@@ -46,7 +46,7 @@ public class GetUsers(
         if (!User.IsInRole(RoleNames.Admin))
             responses = responses.Where(response => !response.IsAdmin).ToList();
 
-        var organizerRelationships = await dataContext.CommunityRelationships
+        var organizerRelationships = await dataContext.Relationships
                                                       .AsNoTracking()
                                                       .Where(relationship => relationship.IsOrganizer)
                                                       .GroupBy(relationship => relationship.UserId)

@@ -1,10 +1,11 @@
-using LowPressureZone.Api.Constants;
+using FastEndpoints;
 using LowPressureZone.Api.Services.Files;
 using LowPressureZone.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Services.NightlyTasks;
 
+[RegisterService<NightlyPrerecordedMixCleanupModule>(LifeTime.Singleton)]
 public sealed partial class NightlyPrerecordedMixCleanupModule(
     IServiceProvider services,
     PrerecordedMixCleanupService cleanupService,
@@ -18,29 +19,28 @@ public sealed partial class NightlyPrerecordedMixCleanupModule(
         await using var scope = services.CreateAsyncScope();
         await using var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
 
-        var prerecordedTimeslots = await dataContext.Timeslots
-                                                    .Where(timeslot => timeslot.Type == PerformanceTypes.Prerecorded
-                                                                       && timeslot.AzuraCastMediaId.HasValue
-                                                                       && timeslot.EndsAt <= CutoffTime)
+        var prerecordedSlots = await dataContext.HourlySlots
+                                                    .Where(hourlySlot => hourlySlot.Prerecord.AzuraCastMediaId.HasValue
+                                                                         && hourlySlot.EndsAt <= CutoffTime)
                                                     .ToListAsync();
 
-        LogDeletingMediaAndPlaylistsForTimeslotCountPastTimeslots(logger, prerecordedTimeslots.Count);
-        foreach (var timeslot in prerecordedTimeslots)
+        LogDeletingMediaAndPlaylistsForTimeslotCountPastTimeslots(logger, prerecordedSlots.Count);
+        foreach (var slot in prerecordedSlots)
         {
-            var mediaId = timeslot.AzuraCastMediaId!.Value;
+            var mediaId = slot.Prerecord.AzuraCastMediaId!.Value;
             try
             {
                 var deleteResult = await cleanupService.DeleteEnqueuedPrerecordedMixAsync(mediaId);
                 if (deleteResult.IsError)
                     logger.LogError("Unable to delete prerecorded mix items in AzuraCast for timeslot {TimeslotId}",
-                                    timeslot.Id);
+                                    slot.Id);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Exception thrown while deleting prerecorded mix items in AzuraCast");
             }
 
-            timeslot.AzuraCastMediaId = null;
+            var deleteMixResult = slot.DeletePrerecordedMix();
         }
 
         await dataContext.SaveChangesAsync();
@@ -48,5 +48,7 @@ public sealed partial class NightlyPrerecordedMixCleanupModule(
     }
 
     [LoggerMessage(LogLevel.Information, "Deleting media and playlists for {timeslotCount} past timeslots")]
-    static partial void LogDeletingMediaAndPlaylistsForTimeslotCountPastTimeslots(ILogger<NightlyPrerecordedMixCleanupModule> logger, int timeslotCount);
+    static partial void LogDeletingMediaAndPlaylistsForTimeslotCountPastTimeslots(
+        ILogger<NightlyPrerecordedMixCleanupModule> logger,
+        int timeslotCount);
 }

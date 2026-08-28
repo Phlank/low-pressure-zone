@@ -1,3 +1,4 @@
+using FastEndpoints;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Models.Configuration;
@@ -7,7 +8,8 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Services.AzuraCast;
 
-public partial class AzuraCastMediaUploader(
+[RegisterService<AzuraCastMediaUploader>(LifeTime.Singleton)]
+public class AzuraCastMediaUploader(
     IAzuraCastClient client,
     IOptions<AzuraCastInstallationConfiguration> installation,
     ILogger<AzuraCastMediaUploader> logger)
@@ -25,10 +27,11 @@ public partial class AzuraCastMediaUploader(
                                                         result => result.IsError
                                                                   || (result.IsSuccess &&
                                                                       result.Value.Media is not null),
-                                                        1000, 10);
+                                                        1000,
+                                                        10);
         if (uploadedFileResult.IsError)
         {
-            LogMediaFileNotFound(logger, path);
+            logger.LogError("Media file not found after upload: {Path}", path);
             return Result.Err<StationMedia>($"Uploaded file did not become station media.");
         }
 
@@ -70,6 +73,4 @@ public partial class AzuraCastMediaUploader(
         return Result.Ok<StationFileListItem, string>(uploadedFile);
     }
 
-    [LoggerMessage(LogLevel.Error, "Media file not found after upload: {path}")]
-    static partial void LogMediaFileNotFound(ILogger<AzuraCastMediaUploader> logger, string path);
 }

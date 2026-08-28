@@ -5,7 +5,8 @@ using LowPressureZone.Domain.Entities;
 
 namespace LowPressureZone.Api.Endpoints.Broadcasts;
 
-public sealed class BroadcastMapper(BroadcastRules rules) : IResponseMapper
+[RegisterService<BroadcastMapper>(LifeTime.Singleton)]
+public sealed class BroadcastMapper(BroadcastPermissions permissions) : IResponseMapper
 {
     public BroadcastResponse FromEntity(StationStreamerBroadcast externalBroadcast, Broadcast? broadcast = null)
         => new()
@@ -15,8 +16,8 @@ public sealed class BroadcastMapper(BroadcastRules rules) : IResponseMapper
             BroadcastId = externalBroadcast.Id,
             StreamerId = externalBroadcast.Streamer?.Id,
             StreamerDisplayName = externalBroadcast.Streamer?.DisplayName,
-            IsDownloadable = rules.IsDownloadable(externalBroadcast),
-            IsArchivable = rules.IsArchivable(externalBroadcast, broadcast),
-            IsDisconnectable = rules.IsDisconnectable(externalBroadcast)
+            IsDownloadable = permissions.IsDownloadable(externalBroadcast),
+            IsArchivable = permissions.IsArchivable(externalBroadcast, broadcast),
+            IsDisconnectable = permissions.IsDisconnectable(externalBroadcast)
         };
 }

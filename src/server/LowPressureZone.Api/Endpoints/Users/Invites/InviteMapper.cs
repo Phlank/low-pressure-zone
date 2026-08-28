@@ -4,6 +4,7 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Endpoints.Users.Invites;
 
+[RegisterService<InviteMapper>(LifeTime.Singleton)]
 public sealed class InviteMapper : IRequestMapper, IResponseMapper
 {
     public Invitation<Guid, AppUser> ToEntity(InviteRequest request)

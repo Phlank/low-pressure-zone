@@ -6,6 +6,7 @@
         <Nullable>enable</Nullable>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <AnalysisLevel>latest-recommended</AnalysisLevel>
+        <LangVersion>preview</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>

@@ -1,11 +1,13 @@
 ﻿using FastEndpoints;
+using LowPressureZone.Api.Extensions;
+using LowPressureZone.Core.Domain;
 using LowPressureZone.Data;
 using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Communities;
 
-public sealed class PutCommunity(DataContext dataContext) : EndpointWithMapper<CommunityRequest, CommunityMapper>
+public sealed class PutCommunity(DataContext dataContext) : Endpoint<CommunityRequest>
 {
     public override void Configure()
     {
@@ -18,13 +20,18 @@ public sealed class PutCommunity(DataContext dataContext) : EndpointWithMapper<C
     {
         var id = Route<Guid>("id");
         var community = await dataContext.Communities.FirstOrDefaultAsync(community => community.Id == id, ct);
-        if (community == null || (community.IsDeleted && !User.IsInRole(RoleNames.Admin)))
+
+        if (community is null)
         {
             await Send.NotFoundAsync(ct);
             return;
         }
 
-        await Map.UpdateEntityAsync(request, community, ct);
+        var result = DomainResult.Compose(community.Rename(request.Name),
+                                          community.ChangeSocialUrl(request.Url));
+
+        this.ThrowIfDomainError(result);
+        await dataContext.SaveChangesAsync(ct);
         await Send.NoContentAsync(ct);
     }
 }

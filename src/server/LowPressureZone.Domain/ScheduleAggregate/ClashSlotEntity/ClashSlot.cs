@@ -4,6 +4,8 @@ using LowPressureZone.Core.Interfaces;
 using LowPressureZone.Domain.PerformerAggregate;
 using LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity.ClashTimeRangeObject;
 using LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity.Rules;
+using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.Rules;
+using LowPressureZone.Domain.ScheduleAggregate.Rules;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity;
@@ -20,9 +22,11 @@ public class ClashSlot : Entity, ITimeRange
     public List<string> Rounds
     {
         get;
-        private set => field = value.Where(item => !string.IsNullOrWhiteSpace(item))
-                                    .Select(item => item.Trim())
-                                    .ToList();
+        private set => field =
+        [
+            .. value.Where(item => !string.IsNullOrWhiteSpace(item))
+                    .Select(item => item.Trim())
+        ];
     } = [];
 
     public ClashTimeRange TimeRange { get; private set; }
@@ -61,39 +65,70 @@ public class ClashSlot : Entity, ITimeRange
         var timeRangeResult = ClashTimeRange.Create(startsAt, duration);
         List<RuleError> errors =
         [
-            .. Rule.Apply(new RoundsMustBeProvidedRule(rounds)),
+            .. Rule.Apply(new RoundsMustBeProvidedRule(rounds),
+                                       new PerformersMustBeDifferentRule(performerOneId, performerTwoId)),
             .. timeRangeResult.Errors
         ];
 
         if (errors.Count > 0)
+        {
             return DomainResult.Err<ClashSlot>(errors);
+        }
 
-        return DomainResult.Ok(new ClashSlot(scheduleId, 
-                                             performerOneId, 
-                                             performerTwoId, 
+        return DomainResult.Ok(new ClashSlot(scheduleId,
+                                             performerOneId,
+                                             performerTwoId,
                                              rounds,
                                              timeRangeResult.Value));
+    }
+
+    public DomainResult<NoValue> ChangePerformers(Guid performerOneId, Guid performerTwoId)
+    {
+        var result = Rule.ApplyIntoResult(NoValue.Instance,
+                                                       new PerformersMustBeDifferentRule(performerOneId, performerTwoId));
+        
+        if (result.IsSuccess)
+        {
+            PerformerOneId = performerOneId;
+            PerformerTwoId = performerTwoId;
+        }
+
+        return result;
     }
 
     public DomainResult<NoValue> ChangeRounds(List<string> rounds)
     {
         var result = Rule.ApplyIntoResult(NoValue.Instance,
-                                          new RoundsMustBeProvidedRule(rounds));
+                                                       new RoundsMustBeProvidedRule(rounds));
         if (result.IsSuccess)
             Rounds = rounds;
+        
         return result;
     }
 
     public DomainResult<NoValue> ChangeTime(DateTimeOffset startsAt, int duration)
     {
-        var result = ClashTimeRange.Create(startsAt, duration);
+        var additionalErrors = Rule.Apply(new CannotChangeSlotAfterItEndsRule(this));
+        var result = ClashTimeRange.Create(startsAt, duration)
+                                   .WithAdditionalErrors(additionalErrors);
         if (result.IsSuccess)
         {
             TimeRange = result.Value;
             return DomainResult.Ok();
         }
 
-        return DomainResult.Err(result.Error);
+        return result.ToNoValue();
+    }
+
+    public DomainResult<NoValue> Delete()
+    {
+        var result = Rule.ApplyIntoResult(NoValue.Instance, new CannotChangeSlotAfterItEndsRule(this));
+        if (result.IsSuccess)
+        {
+            Schedule.ClashSlots.Remove(this);
+        }
+
+        return result;
     }
 
     public static void OnModelCreating(ModelBuilder modelBuilder)
@@ -104,17 +139,13 @@ public class ClashSlot : Entity, ITimeRange
         modelBuilder.Entity<ClashSlot>()
                     .HasIndex(slot => slot.TimeRange.StartsAt)
                     .IsUnique();
-        
-        modelBuilder.Entity<ClashSlot>()
-                    .HasOne(slot => slot.PerformerOne)
-                    .WithMany()
-                    .HasForeignKey(slot => slot.PerformerOneId)
-                    .ExcludeForeignKeyFromMigrations();
-        
-        modelBuilder.Entity<ClashSlot>()
-                    .HasOne(slot => slot.PerformerTwo)
-                    .WithMany()
-                    .HasForeignKey(slot => slot.PerformerTwoId)
-                    .ExcludeForeignKeyFromMigrations();
+
+        modelBuilder.Entity<ClashSlot>().HasOne(slot => slot.PerformerOne).WithMany()
+                    .HasForeignKey(slot => slot.PerformerOneId).ExcludeForeignKeyFromMigrations();
+        modelBuilder.Entity<ClashSlot>().Navigation(slot => slot.PerformerOne).AutoInclude();
+
+        modelBuilder.Entity<ClashSlot>().HasOne(slot => slot.PerformerTwo).WithMany()
+                    .HasForeignKey(slot => slot.PerformerTwoId).ExcludeForeignKeyFromMigrations();
+        modelBuilder.Entity<ClashSlot>().Navigation(slot => slot.PerformerTwo).AutoInclude();
     }
 }

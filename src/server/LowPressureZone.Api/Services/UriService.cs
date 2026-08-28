@@ -1,9 +1,11 @@
-﻿using LowPressureZone.Api.Models.Configuration;
+﻿using FastEndpoints;
+using LowPressureZone.Api.Models.Configuration;
 using LowPressureZone.Identity;
 using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Api.Services;
 
+[RegisterService<UriService>(LifeTime.Singleton)]
 public sealed class UriService(IOptions<UrlConfiguration> options)
 {
     public Uri GetInviteUrl(TokenContext context)

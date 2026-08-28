@@ -1,8 +1,10 @@
+using FastEndpoints;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Core;
 
 namespace LowPressureZone.Api.Services.Files;
 
+[RegisterService<PrerecordedMixCleanupService>(LifeTime.Singleton)]
 public sealed class PrerecordedMixCleanupService(
     IAzuraCastClient azuraCastClient,
     ILogger<PrerecordedMixCleanupService> logger)

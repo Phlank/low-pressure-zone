@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Text;
 using FastEndpoints;
+using FluentValidation.Results;
 using LowPressureZone.Api.Utilities;
 using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
@@ -60,6 +61,25 @@ public static class EndpointExtensions
     {
         if (result.IsError)
             endpoint.ThrowError(string.Format(CultureInfo.InvariantCulture, format, result.Error.ReasonPhrase));
+    }
+
+    public static void ThrowIfError<T, TRequest, TResponse>(this Endpoint<TRequest, TResponse> endpoint,
+                                                            Result<T, ValidationFailure> result) where TRequest : notnull
+    {
+        if (result.IsError)
+            endpoint.ThrowError(result.Error.ErrorMessage);
+    }
+    
+    public static void ThrowIfError<T, TRequest, TResponse>(this Endpoint<TRequest, TResponse> endpoint,
+                                                            Result<T, IEnumerable<ValidationFailure>> result) where TRequest : notnull
+    {
+        if (!result.IsError) return;
+        
+        foreach (var failure in result.Error)
+        {
+            endpoint.AddError(failure);
+        }
+        endpoint.ThrowIfAnyErrors();
     }
 
     public static void ThrowIfDomainError<T, TRequest, TResponse>(

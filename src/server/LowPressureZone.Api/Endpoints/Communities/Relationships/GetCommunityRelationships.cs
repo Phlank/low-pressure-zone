@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace LowPressureZone.Api.Endpoints.Communities.Relationships;
 
 public class GetCommunityRelationships(DataContext dataContext, IdentityContext identityContext)
-    : EndpointWithoutRequest<IEnumerable<CommunityRelationshipResponse>, CommunityRelationshipMapper>
+    : EndpointWithoutRequest<IEnumerable<RelationshipResponse>, CommunityRelationshipMapper>
 {
     public override void Configure() => Get("/communities/{communityId}/relationships");
 
@@ -15,7 +15,7 @@ public class GetCommunityRelationships(DataContext dataContext, IdentityContext 
     {
         var communityId = Route<Guid>("communityId");
 
-        var relationships = await dataContext.CommunityRelationships
+        var relationships = await dataContext.Relationships
                                              .AsNoTracking()
                                              .Where(relationship => relationship.CommunityId == communityId)
                                              .ToListAsync(ct);

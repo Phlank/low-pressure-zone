@@ -1,23 +1,27 @@
 using System.ComponentModel.DataAnnotations;
 using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
+using LowPressureZone.Core.Extensions;
 using LowPressureZone.Core.Interfaces;
 using LowPressureZone.Domain.PerformerAggregate;
 using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlotTimeRangeObject;
 using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.PrerecordedMixObject;
 using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.Rules;
+using LowPressureZone.Domain.ScheduleAggregate.Rules;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity;
 
 public class HourlySlot : Entity, ITimeRange
 {
-    [MaxLength(128)] public string? Subtitle { get; private set; }
+    [MaxLength(128)]
+    public string? Subtitle { get; private set; }
+
     public Guid PerformerId { get; private set; }
     public Performer Performer { get; private init; } = null!;
     public Guid ScheduleId { get; private init; }
     public Schedule Schedule { get; init; } = null!;
-    public PrerecordedMix Mix { get; private set; }
+    public PrerecordedMix Prerecord { get; private set; }
     public HourlySlotTimeRange TimeRange { get; private set; }
     public DateTimeOffset StartsAt => TimeRange.StartsAt;
     public DateTimeOffset EndsAt => TimeRange.EndsAt;
@@ -33,12 +37,14 @@ public class HourlySlot : Entity, ITimeRange
         int? azuraCastMediaId = null,
         Guid? id = null)
     {
-        var mixResult = PrerecordedMix.Create(uploadedFileName, azuraCastMediaId);
+        var prerecordedMixResult = PrerecordedMix.Create(uploadedFileName is not null,
+                                                         uploadedFileName,
+                                                         azuraCastMediaId);
         var timeRangeResult = HourlySlotTimeRange.Create(startsAt, duration);
         List<RuleError> errors =
         [
             .. Rule.Apply(new SubtitleLengthCannotExceed128Rule(subtitle)),
-            .. mixResult.Errors,
+            .. prerecordedMixResult.Errors,
             .. timeRangeResult.Errors
         ];
 
@@ -50,7 +56,7 @@ public class HourlySlot : Entity, ITimeRange
             Subtitle = subtitle?.Trim(),
             PerformerId = performerId,
             ScheduleId = scheduleId,
-            Mix = mixResult.Value,
+            Prerecord = prerecordedMixResult.Value,
             TimeRange = timeRangeResult.Value,
             Id = id ?? Guid.NewGuid()
         });
@@ -58,9 +64,11 @@ public class HourlySlot : Entity, ITimeRange
 
     public DomainResult<NoValue> ChangeSubtitle(string? subtitle)
     {
-        var result = Rule.ApplyIntoResult(NoValue.Instance, new SubtitleLengthCannotExceed128Rule(subtitle));
+        var result = Rule.ApplyIntoResult(NoValue.Instance,
+                                                       new SubtitleLengthCannotExceed128Rule(subtitle));
         if (result.IsSuccess)
             Subtitle = subtitle;
+
         return result;
     }
 
@@ -70,26 +78,56 @@ public class HourlySlot : Entity, ITimeRange
         return DomainResult.Ok();
     }
 
-    public DomainResult<NoValue> ChangePrerecordedMix(string? uploadedFileName, int? azuraCastMediaId = null)
+    public DomainResult<NoValue> ReplacePrerecordedMix(string? uploadedFileName, int? azuraCastMediaId = null)
     {
-        var mixResult = PrerecordedMix.Create(uploadedFileName, azuraCastMediaId);
+        var mixResult = PrerecordedMix.Create(true, uploadedFileName, azuraCastMediaId);
+
         if (mixResult.IsSuccess)
-            Mix = mixResult.Value;
+            Prerecord = mixResult.Value;
+
         return mixResult.ToNoValue();
+    }
+
+    public DomainResult<NoValue> DeletePrerecordedMix()
+    {
+        if (!Prerecord.IsPrerecorded)
+            return DomainResult.Err<NoValue>(new RuleError("No mix to delete"));
+        
+        var result = PrerecordedMix.Create(false, null, null);
+
+        if (result.IsSuccess)
+            Prerecord = result.Value;
+
+        return result.ToNoValue();
     }
 
     public DomainResult<NoValue> ChangeTime(DateTimeOffset startsAt, int duration)
     {
-        var timeRangeResult = HourlySlotTimeRange.Create(startsAt, duration);
+        var timeRangeResult = HourlySlotTimeRange.Create(startsAt, duration)
+                                                 .WithAdditionalRules(new CannotChangeSlotAfterItEndsRule(this));
+        
         if (timeRangeResult.IsSuccess)
             TimeRange = timeRangeResult.Value;
+
         return timeRangeResult.ToNoValue();
+    }
+
+    public DomainResult<NoValue> Delete()
+    {
+        var result = Rule.ApplyIntoResult(NoValue.Instance,
+                                                       new CannotChangeSlotAfterItEndsRule(this));
+        if (result.IsSuccess)
+        {
+            Schedule.HourlySlots.Remove(this);
+        }
+
+        return result;
     }
 
     public static void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<HourlySlot>()
-                    .ComplexProperty(slot => slot.Mix);
+                    .ComplexProperty(slot => slot.Prerecord);
 
         modelBuilder.Entity<HourlySlot>()
                     .ComplexProperty(slot => slot.TimeRange);
@@ -98,10 +136,8 @@ public class HourlySlot : Entity, ITimeRange
                     .HasIndex(slot => slot.TimeRange.StartsAt)
                     .IsUnique();
 
-        modelBuilder.Entity<HourlySlot>()
-                    .HasOne(slot => slot.Performer)
-                    .WithMany()
-                    .HasForeignKey(slot => slot.PerformerId)
-                    .ExcludeForeignKeyFromMigrations();
+        modelBuilder.Entity<HourlySlot>().HasOne(slot => slot.Performer).WithMany()
+                    .HasForeignKey(slot => slot.PerformerId).ExcludeForeignKeyFromMigrations();
+        modelBuilder.Entity<HourlySlot>().Navigation(slot => slot.Performer).AutoInclude();
     }
 }

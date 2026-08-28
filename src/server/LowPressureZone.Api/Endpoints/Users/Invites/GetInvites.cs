@@ -26,7 +26,7 @@ public class GetInvites(IdentityContext identityContext, DataContext dataContext
 
         var userIds = invites.Select(invitation => invitation.User!.Id);
 
-        var userCommunities = await dataContext.CommunityRelationships
+        var userCommunities = await dataContext.Relationships
                                                .AsNoTracking()
                                                .Where(relationship => userIds.Contains(relationship.UserId))
                                                .GroupBy(relationship => relationship.UserId)

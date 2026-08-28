@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using FastEndpoints;
 using FluentEmail.Core;
 using FluentEmail.Core.Models;
 using LowPressureZone.Api.Models.Configuration;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Api.Services;
 
+[RegisterService<EmailService>(LifeTime.Singleton)]
 public sealed class EmailService(
     IOptions<EmailServiceConfiguration> options,
     UriService uriService,

@@ -1,10 +1,12 @@
+using FastEndpoints;
 using FFMpegCore;
 using FFMpegCore.Exceptions;
 using LowPressureZone.Core;
 
 namespace LowPressureZone.Api.Services.Audio;
 
-public sealed partial class MediaAnalyzer(ILogger<MediaAnalyzer> logger)
+[RegisterService<MediaAnalyzer>(LifeTime.Singleton)]
+public sealed class MediaAnalyzer(ILogger<MediaAnalyzer> logger)
 {
     public async Task<Result<IMediaAnalysis, string>> AnalyzeAsync(string filePath, CancellationToken ct)
     {
@@ -15,19 +17,19 @@ public sealed partial class MediaAnalyzer(ILogger<MediaAnalyzer> logger)
         }
         catch (FFMpegException ex)
         {
-            LogAnalysisException(logger, filePath, ex.Message);
+            logger.LogError(ex,
+                            $"{nameof(FFMpegException)} while analyzing media file at {{FilePath}}: {{ErrorMessage}}",
+                            filePath,
+                            ex.Message);
         }
         catch (Exception ex)
         {
-            LogOtherException(logger, filePath, ex.Message);
+            logger.LogError(ex,
+                            "Exception while analyzing media file at {FilePath}: {ErrorMessage}",
+                            filePath,
+                            ex.Message);
         }
 
         return Result.Err<IMediaAnalysis>("Failed to analyze media file.");
     }
-
-    [LoggerMessage(LogLevel.Error, "FFMpegException while analyzing media file at {filePath}: {errorMessage}")]
-    static partial void LogAnalysisException(ILogger<MediaAnalyzer> logger, string filePath, string errorMessage);
-
-    [LoggerMessage(LogLevel.Error, "Exception while analyzing media file at {filePath}: {errorMessage}")]
-    static partial void LogOtherException(ILogger<MediaAnalyzer> logger, string filePath, string errorMessage);
 }

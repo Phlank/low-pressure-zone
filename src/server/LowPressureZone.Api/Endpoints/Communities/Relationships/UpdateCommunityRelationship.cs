@@ -16,7 +16,7 @@ public class UpdateCommunityRelationship(
     IdentityContext identityContext,
     UserManager<AppUser> userManager,
     CommunityRules communityRules)
-    : EndpointWithMapper<CommunityRelationshipRequest, CommunityRelationshipMapper>
+    : Endpoint<RelationshipRequest>
 {
     public override void Configure()
     {
@@ -25,66 +25,31 @@ public class UpdateCommunityRelationship(
         Routes("/communities/{communityId}/relationships/{userId}");
     }
 
-    public override async Task HandleAsync(CommunityRelationshipRequest request, CancellationToken ct)
+    public override async Task HandleAsync(RelationshipRequest request, CancellationToken ct)
     {
         var communityId = Route<Guid>("communityId");
         var userId = Route<Guid>("userId");
 
-        if (!await dataContext.Communities.AnyAsync(community => community.Id == communityId, ct)
-            || !await identityContext.Users.AnyAsync(user => user.Id == userId, ct))
+        var community = await dataContext.Communities.FirstOrDefaultAsync(community => community.Id == communityId, ct);
+        var relationshipUser = await userManager.FindByIdAsync(userId.ToString());
+
+        if (community is null || relationshipUser is null)
         {
             await Send.NotFoundAsync(ct);
             return;
         }
 
-        var user = await userManager.FindByIdAsync(userId.ToString());
-        if (user == null)
-        {
-            await Send.NotFoundAsync(ct);
-            return;
-        }
-
-        var roles = await userManager.GetRolesAsync(user);
-        if (roles.Contains(RoleNames.Admin))
+        var relationshipUserRoles = await userManager.GetRolesAsync(relationshipUser);
+        if (relationshipUserRoles.Any(role => role == RoleNames.Admin))
         {
             await Send.ForbiddenAsync(ct);
             return;
         }
 
-        var community = await dataContext.Communities
-                                         .AsNoTracking()
-                                         .Where(community => community.Id == communityId)
-                                         .Include(community =>
-                                                      community.Relationships.Where(relationship =>
-                                                                                        relationship.UserId ==
-                                                                                        User.GetIdOrDefault()))
-                                         .FirstAsync(ct);
-
-        if (!communityRules.IsOrganizingAuthorized(community))
+        var result = community.SetRolesForUser(userId, request.IsPerformer, request.IsOrganizer);
+        if (result.IsSuccess)
         {
-            await Send.UnauthorizedAsync(ct);
-            return;
-        }
-
-        var existing = await dataContext.CommunityRelationships
-                                        .Where(relationship =>
-                                                   relationship.CommunityId == communityId &&
-                                                   relationship.UserId == userId)
-                                        .FirstOrDefaultAsync(ct);
-        if (existing != null)
-        {
-            await Map.UpdateEntityAsync(request, existing, ct);
             await Send.NoContentAsync(ct);
-            return;
         }
-
-        await dataContext.AddAsync(Map.ToEntity(request), ct);
-        await dataContext.SaveChangesAsync(ct);
-        HttpContext.ExposeLocation();
-        await Send.CreatedAtAsync<GetCommunityRelationshipById>(new
-        {
-            communityId,
-            userId
-        }, null, Http.GET, cancellation: ct);
     }
 }

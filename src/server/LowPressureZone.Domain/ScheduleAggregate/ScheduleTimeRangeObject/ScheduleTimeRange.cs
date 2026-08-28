@@ -1,3 +1,4 @@
+using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
 using LowPressureZone.Core.Interfaces;
 using LowPressureZone.Domain.ScheduleAggregate.ScheduleTimeRangeObject.Rules;
@@ -12,10 +13,10 @@ public readonly record struct ScheduleTimeRange : ITimeRange
 
     public static DomainResult<ScheduleTimeRange> Create(DateTimeOffset startsAt, DateTimeOffset endsAt) =>
         Rule.ApplyIntoResult(new ScheduleTimeRange
-                             {
-                                 StartsAt = startsAt,
-                                 EndsAt = endsAt
-                             },
-                             new DurationMustBeAtLeastOneHourRule(startsAt, endsAt),
-                             new DurationCannotExceed24HoursRule(startsAt, endsAt));
+                                          {
+                                              StartsAt = startsAt,
+                                              EndsAt = endsAt
+                                          },
+                                          new DurationMustBeAtLeastOneHourRule(startsAt, endsAt),
+                                          new DurationCannotExceed24HoursRule(startsAt, endsAt));
 }

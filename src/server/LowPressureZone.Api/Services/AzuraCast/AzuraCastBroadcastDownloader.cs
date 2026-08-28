@@ -1,8 +1,10 @@
+using FastEndpoints;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Core;
 
 namespace LowPressureZone.Api.Services.AzuraCast;
 
+[RegisterService<AzuraCastBroadcastDownloader>(LifeTime.Singleton)]
 public class AzuraCastBroadcastDownloader(IAzuraCastClient azuraCastClient)
 {
     public async Task<Result<Stream, string>> GetStreamAsync(int broadcastId)

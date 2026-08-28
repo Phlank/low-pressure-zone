@@ -1,3 +1,4 @@
+using FastEndpoints;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Adapter.AzuraCast.Mappers;
@@ -5,6 +6,7 @@ using LowPressureZone.Core;
 
 namespace LowPressureZone.Api.Services.AzuraCast;
 
+[RegisterService<AzuraCastMediaUpdater>(LifeTime.Singleton)]
 public class AzuraCastMediaUpdater(ILogger<AzuraCastMediaUpdater> logger, IAzuraCastClient client)
 {
     public async Task<Result<string>> UpdateAsync(

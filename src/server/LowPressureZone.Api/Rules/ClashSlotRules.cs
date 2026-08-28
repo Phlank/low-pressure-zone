@@ -1,6 +1,6 @@
 using System.Security.Claims;
+using FastEndpoints;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Domain.Entities;
 using LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
@@ -8,6 +8,7 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Rules;
 
+[RegisterService<ClashSlotRules>(LifeTime.Singleton)]
 public sealed class ClashSlotRules(IHttpContextAccessor contextAccessor)
 {
     private ClaimsPrincipal? User => contextAccessor.GetAuthenticatedUserOrDefault();

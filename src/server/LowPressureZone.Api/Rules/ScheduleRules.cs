@@ -1,16 +1,17 @@
 ﻿using System.Security.Claims;
+using FastEndpoints;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Domain.ScheduleAggregate;
 using LowPressureZone.Identity.Constants;
-using LowPressureZone.Identity.Extensions;
 
 namespace LowPressureZone.Api.Rules;
 
+[RegisterService<ScheduleRules>(LifeTime.Singleton)]
 public sealed class ScheduleRules(IHttpContextAccessor contextAccessor)
 {
     private ClaimsPrincipal? User => contextAccessor.GetAuthenticatedUserOrDefault();
 
-    public bool IsAddingTimeslotsAllowed(Schedule schedule)
+    public bool IsAddingHourlySlotsAllowed(Schedule schedule)
     {
         if (!schedule.AllowedSlotTypes.IsHourlyAllowed) return false;
         if (schedule.TimeRange.EndsAt < DateTime.UtcNow) return false;
@@ -18,7 +19,7 @@ public sealed class ScheduleRules(IHttpContextAccessor contextAccessor)
         return User.IsInRole(RoleNames.Performer);
     }
 
-    public bool IsAddingSoundclashesAllowed(Schedule schedule)
+    public bool IsAddingClashSlotsAllowed(Schedule schedule)
     {
         if (!schedule.AllowedSlotTypes.IsClashAllowed) return false;
         if (schedule.TimeRange.EndsAt < DateTime.UtcNow) return false;
