@@ -798,6 +798,83 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@microsoft/kiota-abstractions@npm:^1.0.0-preview.106":
+  version: 1.0.0-preview.106
+  resolution: "@microsoft/kiota-abstractions@npm:1.0.0-preview.106"
+  dependencies:
+    "@opentelemetry/api": "npm:^1.7.0"
+    "@std-uritemplate/std-uritemplate": "npm:^2.0.0"
+    tinyduration: "npm:^3.3.0"
+    tslib: "npm:^2.6.2"
+  checksum: 10c0/e3c51bd9134ce92bfaa838cb1318d26994b6386eabdf557881eb81074b8649d7d7dfde64480a6df63a851add1ecf67909d8013959703c90e95b20abc65dc6a2f
+  languageName: node
+  linkType: hard
+
+"@microsoft/kiota-bundle@npm:^1.0.0-preview.106":
+  version: 1.0.0-preview.106
+  resolution: "@microsoft/kiota-bundle@npm:1.0.0-preview.106"
+  dependencies:
+    "@microsoft/kiota-abstractions": "npm:^1.0.0-preview.106"
+    "@microsoft/kiota-http-fetchlibrary": "npm:^1.0.0-preview.106"
+    "@microsoft/kiota-serialization-form": "npm:^1.0.0-preview.106"
+    "@microsoft/kiota-serialization-json": "npm:^1.0.0-preview.106"
+    "@microsoft/kiota-serialization-multipart": "npm:^1.0.0-preview.106"
+    "@microsoft/kiota-serialization-text": "npm:^1.0.0-preview.106"
+  checksum: 10c0/99e1d06930b623a8dcea66bf0e180a26120e1b9a86b7e6cc8d4eff4814ccf7403ef479ce4b6f5205ec573ecef6825e6d35d2d31b12a34af50e951e2016a524ab
+  languageName: node
+  linkType: hard
+
+"@microsoft/kiota-http-fetchlibrary@npm:^1.0.0-preview.106":
+  version: 1.0.0-preview.106
+  resolution: "@microsoft/kiota-http-fetchlibrary@npm:1.0.0-preview.106"
+  dependencies:
+    "@microsoft/kiota-abstractions": "npm:^1.0.0-preview.106"
+    "@opentelemetry/api": "npm:^1.7.0"
+    tslib: "npm:^2.6.2"
+  checksum: 10c0/609f0200fc47918b9d9a7707674a562172c5acf2d67e1dc5fdaa041b293597d226c16aea1eca8b77b7ec3c95fe225f6c4036b8eab035d85920536151999bc013
+  languageName: node
+  linkType: hard
+
+"@microsoft/kiota-serialization-form@npm:^1.0.0-preview.106":
+  version: 1.0.0-preview.106
+  resolution: "@microsoft/kiota-serialization-form@npm:1.0.0-preview.106"
+  dependencies:
+    "@microsoft/kiota-abstractions": "npm:^1.0.0-preview.106"
+    tslib: "npm:^2.6.2"
+  checksum: 10c0/1b4a339bbfb2d2f6200e975b742e108ae17ddb7a1b9a96a95f5dea1ac2668fd600adeda6db1f53e4e4e4b30765a5d7157053ac3383afb350311e1ec72b28db5d
+  languageName: node
+  linkType: hard
+
+"@microsoft/kiota-serialization-json@npm:^1.0.0-preview.106":
+  version: 1.0.0-preview.106
+  resolution: "@microsoft/kiota-serialization-json@npm:1.0.0-preview.106"
+  dependencies:
+    "@microsoft/kiota-abstractions": "npm:^1.0.0-preview.106"
+    tslib: "npm:^2.6.2"
+  checksum: 10c0/738865db57109291d1ff3794222c5eb27a9c8cb7dae71bad30a95b667266002dcb7a343ca4db9a1cf0a976608c971e7a85edf1af14ebe1f49631e08a0f87e743
+  languageName: node
+  linkType: hard
+
+"@microsoft/kiota-serialization-multipart@npm:^1.0.0-preview.106":
+  version: 1.0.0-preview.106
+  resolution: "@microsoft/kiota-serialization-multipart@npm:1.0.0-preview.106"
+  dependencies:
+    "@microsoft/kiota-abstractions": "npm:^1.0.0-preview.106"
+    tslib: "npm:^2.6.2"
+  checksum: 10c0/014f925a374ac9c37e187ae562930e8777017ee9bcfdbabfdaedcb85f68f401b4adbacf6b5e8d04f4937a9e4d2fafe1e26cebcf763d1e088378ecc92ea9be5c4
+  languageName: node
+  linkType: hard
+
+"@microsoft/kiota-serialization-text@npm:^1.0.0-preview.106":
+  version: 1.0.0-preview.106
+  resolution: "@microsoft/kiota-serialization-text@npm:1.0.0-preview.106"
+  dependencies:
+    "@microsoft/kiota-abstractions": "npm:^1.0.0-preview.106"
+    tslib: "npm:^2.6.2"
+  checksum: 10c0/4c757d93f190a78cc9e9618f4809cf5add257b3361ed57009b1b1759263825ac3938c2e5d2dfe16960ceacb9bcaa0ec550239ede930158861b010f83e2bf57ce
+  languageName: node
+  linkType: hard
+
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -844,6 +921,13 @@ __metadata:
   dependencies:
     semver: "npm:^7.3.5"
   checksum: 10c0/26e376d780f60ff16e874a0ac9bc3399186846baae0b6e1352286385ac134d900cc5dafaded77f38d77f86898fc923ae1cee9d7399f0275b1aa24878915d722b
+  languageName: node
+  linkType: hard
+
+"@opentelemetry/api@npm:^1.7.0":
+  version: 1.9.1
+  resolution: "@opentelemetry/api@npm:1.9.1"
+  checksum: 10c0/c608485fc8b5a91e1f7e05e843b45b509307456b31cd2ad365933d90813e40ebfedf179f1451c762037e82d7c76aa8500e95d2da3609f640a1206cde5322cd14
   languageName: node
   linkType: hard
 
@@ -1187,6 +1271,13 @@ __metadata:
   version: 4.0.0
   resolution: "@sindresorhus/merge-streams@npm:4.0.0"
   checksum: 10c0/482ee543629aa1933b332f811a1ae805a213681ecdd98c042b1c1b89387df63e7812248bb4df3910b02b3cc5589d3d73e4393f30e197c9dde18046ccd471fc6b
+  languageName: node
+  linkType: hard
+
+"@std-uritemplate/std-uritemplate@npm:^2.0.0":
+  version: 2.0.12
+  resolution: "@std-uritemplate/std-uritemplate@npm:2.0.12"
+  checksum: 10c0/f1c0ee8b57d7fba91b8057ecf711b0f5287580c1cecce6b439a91798b1b1df750cc62394d1c6ad19bc68cea993f298dd5f23c0fef8f0e59865a1344a371d322f
   languageName: node
   linkType: hard
 
@@ -3618,6 +3709,7 @@ __metadata:
   resolution: "low-pressure-zone@workspace:."
   dependencies:
     "@date-fns/tz": "npm:^1.5.0"
+    "@microsoft/kiota-bundle": "npm:^1.0.0-preview.106"
     "@primevue/core": "npm:^4.5.5"
     "@primevue/themes": "npm:^4.5.4"
     "@tsconfig/node-lts": "npm:^24.0.1"
@@ -5017,6 +5109,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tinyduration@npm:^3.3.0":
+  version: 3.4.1
+  resolution: "tinyduration@npm:3.4.1"
+  checksum: 10c0/06f0fbf5658c92a07d900208bb0bafad30a4c61cc914fdd72edeb5f02ce9f728eebd986da43b115f2b00d6dde06242a107c018e834db2d3a5ddca37b293a61ba
+  languageName: node
+  linkType: hard
+
 "tinyglobby@npm:^0.2.12, tinyglobby@npm:^0.2.15":
   version: 0.2.15
   resolution: "tinyglobby@npm:0.2.15"
@@ -5059,6 +5158,13 @@ __metadata:
   peerDependencies:
     typescript: ">=4.8.4"
   checksum: 10c0/767849383c114e7f1971fa976b20e73ac28fd0c70d8d65c0004790bf4d8f89888c7e4cf6d5949f9c1beae9bc3c64835bef77bbe27fddf45a3c7b60cebcf85c8c
+  languageName: node
+  linkType: hard
+
+"tslib@npm:^2.6.2":
+  version: 2.8.1
+  resolution: "tslib@npm:2.8.1"
+  checksum: 10c0/9c4759110a19c53f992d9aae23aac5ced636e99887b51b9e61def52611732872ff7668757d4e4c61f19691e36f4da981cd9485e869b4a7408d689f6bf1f14e62
   languageName: node
   linkType: hard
 
