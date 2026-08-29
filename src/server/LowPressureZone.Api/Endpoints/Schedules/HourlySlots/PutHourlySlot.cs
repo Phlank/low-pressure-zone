@@ -23,7 +23,7 @@ public class PutHourlySlot(DataContext dataContext, HourlySlotPrerecordedMixHand
         var scheduleId = Route<Guid>("scheduleId");
         var id = Route<Guid>("id");
 
-        var schedule = await dataContext.Schedules
+        var schedule = await dataContext.NewSchedules
                                         .Where(schedule => schedule.Id == scheduleId)
                                         .FirstOrDefaultAsync(ct);
         

@@ -33,7 +33,7 @@ public class PostHourlySlot(
     {
         var id = Route<Guid>("id");
 
-        var schedule = await dataContext.Schedules
+        var schedule = await dataContext.NewSchedules
                                         .Where(schedule => schedule.Id == id)
                                         .FirstOrDefaultAsync(ct);
 

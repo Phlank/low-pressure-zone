@@ -13,7 +13,7 @@ public sealed class GetCommunities(DataContext dataContext, CommunityRules rules
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var communities = await dataContext.Communities
+        var communities = await dataContext.NewCommunities
                                            .AsNoTracking()
                                            .Include(community =>
                                                         community.Relationships.Where(relationship =>

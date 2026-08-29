@@ -18,7 +18,7 @@ public class GetSchedules(DataContext dataContext, ScheduleRules rules)
 
     public override async Task HandleAsync(GetSchedulesRequest req, CancellationToken ct)
     {
-        IQueryable<Schedule> scheduleQuery = dataContext.Schedules
+        IQueryable<Schedule> scheduleQuery = dataContext.NewSchedules
                                                         .GetSchedulesForResponse(User.GetIdOrDefault());
 
         if (req.Before.HasValue)

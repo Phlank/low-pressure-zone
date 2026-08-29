@@ -20,7 +20,7 @@ public class PostSchedule(DataContext dataContext, CommunityRules communityRules
 
     public override async Task HandleAsync(ScheduleRequest request, CancellationToken ct)
     {
-        var community = await dataContext.Communities
+        var community = await dataContext.NewCommunities
                                          .Where(community => community.Id == request.CommunityId)
                                          .Include(community => community.Relationships)
                                          .FirstAsync(ct);

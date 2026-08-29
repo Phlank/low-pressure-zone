@@ -30,7 +30,7 @@ public class UpdateCommunityRelationship(
         var communityId = Route<Guid>("communityId");
         var userId = Route<Guid>("userId");
 
-        var community = await dataContext.Communities.FirstOrDefaultAsync(community => community.Id == communityId, ct);
+        var community = await dataContext.NewCommunities.FirstOrDefaultAsync(community => community.Id == communityId, ct);
         var relationshipUser = await userManager.FindByIdAsync(userId.ToString());
 
         if (community is null || relationshipUser is null)

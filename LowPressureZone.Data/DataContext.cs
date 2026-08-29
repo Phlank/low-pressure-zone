@@ -16,9 +16,14 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     public DbSet<Broadcast> Broadcasts { get; set; }
     public DbSet<News> News { get; set; }
     public DbSet<Performer> Performers { get; set; }
-    public DbSet<Domain.CommunityAggregate.Community> Communities { get; set; }
+    public DbSet<Domain.CommunityAggregate.Community> NewCommunities { get; set; }
     public IQueryable<Relationship> Relationships => Set<Relationship>().AsQueryable();
-    public DbSet<Domain.ScheduleAggregate.Schedule> Schedules { get; set; }
+    public DbSet<Community> Communities { get; set; }
+    public DbSet<CommunityRelationship> CommunityRelationships { get; set; }
+    public DbSet<Schedule> Schedules { get; set; }
+    public DbSet<Soundclash> Soundclashes { get; set; }
+    public DbSet<HourlySlot> Timeslots { get; set; }
+    public DbSet<Domain.ScheduleAggregate.Schedule> NewSchedules { get; set; }
     public IQueryable<HourlySlot> HourlySlots => Set<HourlySlot>().AsQueryable();
     public IQueryable<ClashSlot> ClashSlots => Set<ClashSlot>().AsQueryable();
     public DbSet<Setting> Settings { get; set; }

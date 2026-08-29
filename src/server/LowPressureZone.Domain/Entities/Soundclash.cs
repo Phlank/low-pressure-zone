@@ -1,9 +1,11 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using LowPressureZone.Domain.Interfaces;
 using LowPressureZone.Domain.PerformerAggregate;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Domain.Entities;
 
+[Table("Soundclashes")]
 public sealed class Soundclash : BaseEntity, IDateTimeRange
 {
     public required Guid ScheduleId { get; set; }

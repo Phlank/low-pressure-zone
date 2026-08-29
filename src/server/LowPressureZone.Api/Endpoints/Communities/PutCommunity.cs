@@ -19,7 +19,7 @@ public sealed class PutCommunity(DataContext dataContext) : Endpoint<CommunityRe
     public override async Task HandleAsync(CommunityRequest request, CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        var community = await dataContext.Communities.FirstOrDefaultAsync(community => community.Id == id, ct);
+        var community = await dataContext.NewCommunities.FirstOrDefaultAsync(community => community.Id == id, ct);
 
         if (community is null)
         {

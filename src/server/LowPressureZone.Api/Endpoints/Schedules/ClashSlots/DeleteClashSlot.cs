@@ -22,7 +22,7 @@ public class DeleteClashSlot(DataContext dataContext, ClashSlotRules rules) : En
         var scheduleId = Route<Guid>("scheduleId");
         var id = Route<Guid>("id");
         
-        var schedule = await dataContext.Schedules.FirstOrDefaultAsync(schedule => schedule.Id == scheduleId, ct);
+        var schedule = await dataContext.NewSchedules.FirstOrDefaultAsync(schedule => schedule.Id == scheduleId, ct);
         var slot = schedule?.ClashSlots.FirstOrDefault(slot => slot.Id == id);
 
         if (schedule is null || slot is null)

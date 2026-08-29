@@ -1,5 +1,8 @@
-﻿namespace LowPressureZone.Domain.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
+namespace LowPressureZone.Domain.Entities;
+
+[Table("CommunityRelationships")]
 public sealed class CommunityRelationship : BaseEntity
 {
     public required Guid CommunityId { get; set; }

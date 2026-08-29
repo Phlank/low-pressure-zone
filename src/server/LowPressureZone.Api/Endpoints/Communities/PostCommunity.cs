@@ -20,7 +20,7 @@ public sealed class PostCommunity(DataContext dataContext) : Endpoint<CommunityR
         var result = Community.Create(req.Name, req.Url);
         this.ThrowIfDomainError(result);
         
-        dataContext.Communities.Add(result.Value);
+        dataContext.NewCommunities.Add(result.Value);
         await dataContext.SaveChangesAsync(ct);
         
         HttpContext.ExposeLocation();

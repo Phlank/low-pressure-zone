@@ -26,7 +26,7 @@ public sealed class CommunityRequestValidator : Validator<CommunityRequest>
             var id = accessor.GetGuidRouteParameterOrDefault("id");
             var dataContext = Resolve<DataContext>();
 
-            var isNameInUse = await dataContext.Communities
+            var isNameInUse = await dataContext.NewCommunities
                                                .AnyAsync(community => community.Name == request.Name
                                                                       && community.Id != id, ct);
             if (isNameInUse)

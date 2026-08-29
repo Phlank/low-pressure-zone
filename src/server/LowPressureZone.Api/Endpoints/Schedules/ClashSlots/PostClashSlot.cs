@@ -21,7 +21,7 @@ public class PostClashSlot(DataContext dataContext, ClashSlotRules rules, Schedu
     public override async Task HandleAsync(ClashSlotRequest req, CancellationToken ct)
     {
         var scheduleId = Route<Guid>("scheduleId");
-        var schedule = await dataContext.Schedules.FirstOrDefaultAsync(schedule => schedule.Id == scheduleId, ct);
+        var schedule = await dataContext.NewSchedules.FirstOrDefaultAsync(schedule => schedule.Id == scheduleId, ct);
 
         if (schedule is null)
         {

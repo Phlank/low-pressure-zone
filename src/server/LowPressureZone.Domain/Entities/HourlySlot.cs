@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using LowPressureZone.Domain.Interfaces;
 using LowPressureZone.Domain.PerformerAggregate;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Domain.Entities;
 
+[Table("Timeslots")]
 public sealed class HourlySlot : BaseEntity, IDateTimeRange
 {
     [MaxLength(64)] public string? Subtitle { get; set; }

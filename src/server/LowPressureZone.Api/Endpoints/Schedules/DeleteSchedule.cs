@@ -20,7 +20,7 @@ public class DeleteSchedule(DataContext dataContext, ScheduleRules rules) : Endp
     public override async Task HandleAsync(CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        var schedule = await dataContext.Schedules
+        var schedule = await dataContext.NewSchedules
                                         .AsNoTracking()
                                         .Where(schedule => schedule.Id == id)
                                         .FirstOrDefaultAsync(ct);
@@ -36,7 +36,7 @@ public class DeleteSchedule(DataContext dataContext, ScheduleRules rules) : Endp
             return;
         }
 
-        await dataContext.Schedules.Where(s => s.Id == id).ExecuteDeleteAsync(ct);
+        await dataContext.NewSchedules.Where(s => s.Id == id).ExecuteDeleteAsync(ct);
         await Send.NoContentAsync(ct);
     }
 }
