@@ -8,6 +8,7 @@ using LowPressureZone.Adapter.AzuraCast.Extensions;
 using LowPressureZone.Api.Auth;
 using LowPressureZone.Api.Models.Configuration;
 using LowPressureZone.Api.Models.Configuration.Streaming;
+using LowPressureZone.Api.Services.BroadcastSync;
 using LowPressureZone.Data;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;
@@ -71,6 +72,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddFastEndpoints();
         builder.Services.AddHostedService<NightlyTaskService>();
+        builder.Services.AddHostedService<BroadcastSyncTaskService>();
         builder.Services.RegisterServicesFromLowPressureZoneApi();
     }
 

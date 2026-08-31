@@ -3,6 +3,7 @@ using LowPressureZone.Domain.BroadcastAggregate;
 using LowPressureZone.Domain.CommunityAggregate.RelationshipEntity;
 using LowPressureZone.Domain.NewsAggregate;
 using LowPressureZone.Domain.PerformerAggregate;
+using LowPressureZone.Domain.ScheduleAggregate;
 using LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity;
 using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity;
 using LowPressureZone.Domain.Settings;
@@ -19,7 +20,7 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     public DbSet<Domain.CommunityAggregate.Community> Communities { get; set; }
     public IQueryable<Relationship> Relationships => Set<Relationship>().AsQueryable()
                                                                         .AsNoTracking();
-    public DbSet<Domain.ScheduleAggregate.Schedule> Schedules { get; set; }
+    public DbSet<Schedule> Schedules { get; set; }
     public IQueryable<HourlySlot> HourlySlots => Set<HourlySlot>().AsQueryable()
                                                                   .AsNoTracking();
     public IQueryable<ClashSlot> ClashSlots => Set<ClashSlot>().AsQueryable()
@@ -28,7 +29,8 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        Domain.ScheduleAggregate.Schedule.OnModelCreating(modelBuilder);
+        Broadcast.OnModelCreating(modelBuilder);
+        Schedule.OnModelCreating(modelBuilder);
         HourlySlot.OnModelCreating(modelBuilder);
         ClashSlot.OnModelCreating(modelBuilder);
 

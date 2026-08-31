@@ -12,24 +12,22 @@ public sealed class BroadcastPermissions(IHttpContextAccessor contextAccessor)
 {
     private ClaimsPrincipal? User => contextAccessor.GetAuthenticatedUserOrDefault();
 
-    public bool IsDownloadable(StationStreamerBroadcast broadcast)
-        => broadcast.Recording is not null;
+    public bool IsDownloadable(Broadcast broadcast)
+        => broadcast.HasFile;
 
-    public bool IsDeletable(StationStreamerBroadcast broadcast)
+    public bool IsDeletable(Broadcast broadcast)
         => User is not null && User.IsInRole(RoleNames.Admin);
 
-    public bool IsDisconnectable(StationStreamerBroadcast broadcast) =>
-        User is not null 
-        && (User.IsInRole(RoleNames.Admin) 
-            || User.IsInRole(RoleNames.Organizer)) 
-        && broadcast.TimestampEnd is null;
+    public bool IsDisconnectable(Broadcast broadcast) =>
+        User is not null
+        && (User.IsInRole(RoleNames.Admin)
+            || User.IsInRole(RoleNames.Organizer))
+        && broadcast.Time.EndsAt is null;
 
     public bool IsArchivable(
-        StationStreamerBroadcast externalBroadcast,
-        Broadcast? broadcast) =>
-        User is not null &&
-        (User.IsInRole(RoleNames.Admin)
+        Broadcast broadcast) =>
+        User is not null
+        && (User.IsInRole(RoleNames.Admin)
             || User.IsInRole(RoleNames.Organizer))
-        && !string.IsNullOrEmpty(externalBroadcast.Recording?.DownloadUrl)
-        && broadcast is not { IsArchived: true };
+        && broadcast is { IsArchived: false, HasFile: true };
 }

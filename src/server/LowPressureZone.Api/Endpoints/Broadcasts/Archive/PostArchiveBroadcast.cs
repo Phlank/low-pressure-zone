@@ -16,7 +16,7 @@ namespace LowPressureZone.Api.Endpoints.Broadcasts.Archive;
 public class PostArchiveBroadcast(
     AzuraCastBroadcastDownloader downloader,
     AzuraCastMediaUploader uploader,
-    AzuraCastMediaUpdater updater,
+    AzuraCastMediaUpdater mediaUpdater,
     IAzuraCastClient azuraCastClient,
     DataContext dataContext,
     BroadcastPermissions permissions,
@@ -40,14 +40,20 @@ public class PostArchiveBroadcast(
             return;
         }
 
+        if (!permissions.IsArchivable(broadcast))
+        {
+            await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
         var domainResult = broadcast.Archive();
-        await this.PublishOrThrowAsync(domainResult);
-        
-        var externalBroadcastsResult = await azuraCastClient.GetBroadcastsAsync();
+        this.ThrowIfDomainError(domainResult);
+
+        var externalBroadcastsResult = await azuraCastClient.GetBroadcastsAsync(broadcast.AzuraCastStreamerId);
         if (externalBroadcastsResult.IsError)
             ThrowError("Failed to retrieve broadcast from AzuraCast.", 500);
 
-        var externalBroadcast = externalBroadcastsResult.Value.FirstOrDefault(broadcast => broadcast.Id == req.Id);
+        var externalBroadcast = externalBroadcastsResult.Value.FirstOrDefault(b => b.Id == req.Id);
         if (externalBroadcast is null)
         {
             await Send.NotFoundAsync(ct);
@@ -59,12 +65,6 @@ public class PostArchiveBroadcast(
 
         if (broadcast is { IsArchived: true })
             ThrowError(nameof(req.Id), "Broadcast is already archived.");
-
-        if (!permissions.IsArchivable(externalBroadcast, broadcast))
-        {
-            await Send.UnauthorizedAsync(ct);
-            return;
-        }
 
         var playlistResult = await azuraCastClient.GetPlaylistByNameAsync(_archivePlaylistName);
         this.ThrowIfError(playlistResult, ArchiveError);
@@ -78,14 +78,13 @@ public class PostArchiveBroadcast(
         this.ThrowIfError(uploadResult, ArchiveError);
         var media = uploadResult.Value;
 
-        var updateResult = await updater.UpdateAsync(media,
-                                                     externalBroadcast.Streamer!.DisplayName,
-                                                     externalBroadcast.TimestampStart
-                                                                      .ToString("yyyy-MM-dd",
-                                                                                CultureInfo.InvariantCulture),
-                                                     [archivesPlaylist.Id]);
+        var updateResult = await mediaUpdater.UpdateAsync(media,
+                                                          externalBroadcast.Streamer!.DisplayName,
+                                                          externalBroadcast.TimestampStart
+                                                                           .ToString("yyyy-MM-dd",
+                                                                                     CultureInfo.InvariantCulture),
+                                                          [archivesPlaylist.Id]);
         this.ThrowIfError(updateResult, ArchiveError);
-        broadcast.Archive();
 
         await dataContext.SaveChangesAsync(ct);
         await Send.NoContentAsync(ct);
