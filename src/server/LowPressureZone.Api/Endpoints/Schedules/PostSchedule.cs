@@ -20,7 +20,7 @@ public class PostSchedule(DataContext dataContext, CommunityRules communityRules
 
     public override async Task HandleAsync(ScheduleRequest request, CancellationToken ct)
     {
-        var community = await dataContext.NewCommunities
+        var community = await dataContext.Communities
                                          .Where(community => community.Id == request.CommunityId)
                                          .Include(community => community.Relationships)
                                          .FirstAsync(ct);
@@ -40,7 +40,7 @@ public class PostSchedule(DataContext dataContext, CommunityRules communityRules
                                      request.IsClashAllowed,
                                      request.IsVisibleToPublic);
         
-        this.ThrowIfDomainError(result);
+        await this.PublishOrThrowAsync(result);
         dataContext.Add(result.Value);
         await dataContext.SaveChangesAsync(ct);
         

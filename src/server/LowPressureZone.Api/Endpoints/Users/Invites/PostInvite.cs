@@ -3,11 +3,11 @@ using FluentEmail.Core;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Data;
-using LowPressureZone.Domain.Entities;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Users.Invites;
 
@@ -27,6 +27,13 @@ public class PostInvite(
     public override async Task HandleAsync(InviteRequest request, CancellationToken ct)
     {
         var invitation = Map.ToEntity(request);
+        
+        var community = await dataContext.Communities.FirstOrDefaultAsync(c => c.Id == request.CommunityId, ct);
+        if (community is null)
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
 
         var normalizedEmail = request.Email.ToUpperInvariant().Normalize();
         var username = Guid.NewGuid().ToString();
@@ -50,13 +57,8 @@ public class PostInvite(
 
         identityContext.Add(invitation);
         await identityContext.SaveChangesAsync(ct);
-        dataContext.Add(new CommunityRelationship
-        {
-            UserId = user.Id,
-            CommunityId = request.CommunityId,
-            IsOrganizer = request.IsOrganizer,
-            IsPerformer = request.IsPerformer
-        });
+        
+        community.SetRolesForUser(user.Id, request.IsPerformer, request.IsOrganizer);
         await dataContext.SaveChangesAsync(ct);
         await Send.NoContentAsync(ct);
     }

@@ -23,7 +23,7 @@ public class PutHourlySlot(DataContext dataContext, HourlySlotPrerecordedMixHand
         var scheduleId = Route<Guid>("scheduleId");
         var id = Route<Guid>("id");
 
-        var schedule = await dataContext.NewSchedules
+        var schedule = await dataContext.Schedules
                                         .Where(schedule => schedule.Id == scheduleId)
                                         .FirstOrDefaultAsync(ct);
         
@@ -43,27 +43,27 @@ public class PutHourlySlot(DataContext dataContext, HourlySlotPrerecordedMixHand
                                                  slot.ChangeSubtitle(request.Subtitle),
                                                  slot.ChangeTime(request.StartsAt, request.Duration));
         
-        this.ThrowIfDomainError(primaryResult);
+        await this.PublishOrThrowAsync(primaryResult);
         
         if (addMix)
         {
             var mixResult = await mixHandler.AddNewMixFile(this, schedule, request, ct);
-            this.ThrowIfDomainError(mixResult);
-            this.ThrowIfDomainError(slot.ReplacePrerecordedMix(mixResult.Value.UploadedFileName, 
+            await this.PublishOrThrowAsync(mixResult);
+            await this.PublishOrThrowAsync(slot.ReplacePrerecordedMix(mixResult.Value.UploadedFileName, 
                                                                mixResult.Value.AzuraCastMediaId));
         } 
         else if (replaceMix)
         {
             var mixResult = await mixHandler.ReplaceMixFile(this, slot, request, ct);
-            this.ThrowIfDomainError(mixResult);
-            this.ThrowIfDomainError(slot.ReplacePrerecordedMix(mixResult.Value.UploadedFileName, 
+            await this.PublishOrThrowAsync(mixResult);
+            await this.PublishOrThrowAsync(slot.ReplacePrerecordedMix(mixResult.Value.UploadedFileName, 
                                                                mixResult.Value.AzuraCastMediaId));
         }
         else if (deleteMix)
         {
             var mixResult = await mixHandler.DeleteMixFile(this, slot);
-            this.ThrowIfDomainError(mixResult);
-            this.ThrowIfDomainError(slot.DeletePrerecordedMix());
+            await this.PublishOrThrowAsync(mixResult);
+            await this.PublishOrThrowAsync(slot.DeletePrerecordedMix());
         }
         
         await dataContext.SaveChangesAsync(ct);

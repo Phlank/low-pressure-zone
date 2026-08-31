@@ -16,7 +16,7 @@ public sealed class GetCommunityById(DataContext dataContext)
     public override async Task HandleAsync(CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        var community = await dataContext.NewCommunities
+        var community = await dataContext.Communities
                                          .AsNoTracking()
                                          .Where(community => community.Id == id && !community.IsDeleted)
                                          .FirstOrDefaultAsync(ct);

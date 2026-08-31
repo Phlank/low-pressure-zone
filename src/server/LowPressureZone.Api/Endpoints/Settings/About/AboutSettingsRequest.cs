@@ -1,4 +1,4 @@
-using LowPressureZone.Domain.Entities.Settings;
+using LowPressureZone.Domain.Settings;
 
 namespace LowPressureZone.Api.Endpoints.Settings.About;
 

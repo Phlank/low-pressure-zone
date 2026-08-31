@@ -1,7 +1,7 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Api.Rules;
-using LowPressureZone.Domain.Entities;
+using LowPressureZone.Domain.BroadcastAggregate;
 
 namespace LowPressureZone.Api.Endpoints.Broadcasts;
 

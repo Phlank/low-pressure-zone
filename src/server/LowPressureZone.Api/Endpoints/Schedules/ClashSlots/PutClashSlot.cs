@@ -23,7 +23,7 @@ public class PutClashSlot(DataContext dataContext, ClashSlotRules rules) : Endpo
         var scheduleId = Route<Guid>("scheduleId");
         var id = Route<Guid>("id");
         
-        var schedule = await dataContext.NewSchedules.FirstOrDefaultAsync(schedule => schedule.Id == scheduleId, ct);
+        var schedule = await dataContext.Schedules.FirstOrDefaultAsync(schedule => schedule.Id == scheduleId, ct);
         var slot = schedule?.ClashSlots.FirstOrDefault(slot => slot.Id == id);
         
         if (schedule is null || slot is null)
@@ -41,7 +41,7 @@ public class PutClashSlot(DataContext dataContext, ClashSlotRules rules) : Endpo
         var result = DomainResult.Compose(slot.ChangeTime(req.StartsAt, req.Duration),
                                           slot.ChangeRounds(req.Rounds),
                                           slot.ChangePerformers(req.PerformerOneId, req.PerformerTwoId));
-        this.ThrowIfDomainError(result);
+        await this.PublishOrThrowAsync(result);
         await dataContext.SaveChangesAsync(ct);
         await Send.NoContentAsync(ct);
     }

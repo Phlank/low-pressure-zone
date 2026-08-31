@@ -21,7 +21,7 @@ public class PostClashSlot(DataContext dataContext, ClashSlotRules rules, Schedu
     public override async Task HandleAsync(ClashSlotRequest req, CancellationToken ct)
     {
         var scheduleId = Route<Guid>("scheduleId");
-        var schedule = await dataContext.NewSchedules.FirstOrDefaultAsync(schedule => schedule.Id == scheduleId, ct);
+        var schedule = await dataContext.Schedules.FirstOrDefaultAsync(schedule => schedule.Id == scheduleId, ct);
 
         if (schedule is null)
         {
@@ -41,9 +41,9 @@ public class PostClashSlot(DataContext dataContext, ClashSlotRules rules, Schedu
                                           req.Rounds,
                                           req.StartsAt,
                                           req.Duration);
-        this.ThrowIfDomainError(slotResult);
+        await this.PublishOrThrowAsync(slotResult);
         var addToScheduleResult = schedule.AddClashSlot(slotResult.Value);
-        this.ThrowIfDomainError(addToScheduleResult);
+        await this.PublishOrThrowAsync(addToScheduleResult);
 
         await dataContext.SaveChangesAsync(ct);
         HttpContext.ExposeLocation();

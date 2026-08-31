@@ -18,7 +18,7 @@ public class PostNews(DataContext dataContext) : Endpoint<NewsRequest>
     public override async Task HandleAsync(NewsRequest req, CancellationToken ct)
     {
         var result = Domain.NewsAggregate.News.Create(req.Title, req.Content);
-        this.ThrowIfDomainError(result);
+        await this.PublishOrThrowAsync(result);
 
         dataContext.Add(result.Value);
         await dataContext.SaveChangesAsync(ct);

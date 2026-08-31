@@ -1,17 +1,15 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
-using LowPressureZone.Core.Interfaces;
 using LowPressureZone.Domain.PerformerAggregate;
 using LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity.ClashTimeRangeObject;
 using LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity.Rules;
-using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.Rules;
 using LowPressureZone.Domain.ScheduleAggregate.Rules;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity;
 
-[Table("Soundclashes")]
+[Table("ClashSlots")]
 public class ClashSlot : Entity, ITimeRange
 {
     public Guid ScheduleId { get; private init; }

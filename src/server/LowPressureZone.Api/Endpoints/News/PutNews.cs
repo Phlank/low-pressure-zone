@@ -31,7 +31,7 @@ public class PutNews(DataContext dataContext) : Endpoint<NewsRequest>
         }
 
         var result = news.Edit(request.Title, request.Content);
-        this.ThrowIfDomainError(result);
+        await this.PublishOrThrowAsync(result);
         await dataContext.SaveChangesAsync(ct);
         await Send.NoContentAsync(ct);
     }

@@ -1,7 +1,7 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Data;
-using LowPressureZone.Domain.Entities;
+using LowPressureZone.Domain.BroadcastAggregate;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;

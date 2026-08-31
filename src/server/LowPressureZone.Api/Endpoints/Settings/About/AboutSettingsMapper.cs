@@ -1,7 +1,7 @@
 using System.Text.Json;
 using FastEndpoints;
-using LowPressureZone.Domain.Entities.Settings;
 using LowPressureZone.Domain.Enums;
+using LowPressureZone.Domain.Settings;
 
 namespace LowPressureZone.Api.Endpoints.Settings.About;
 

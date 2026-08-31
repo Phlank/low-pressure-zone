@@ -4,22 +4,20 @@ using System.Collections.Generic;
 using LowPressureZone.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace LowPressureZone.Domain.Migrations;
+namespace LowPressureZone.Data.Migrations;
 
 [DbContext(typeof(DataContext))]
-partial class DataContextModelSnapshot : ModelSnapshot
+[Migration("20260829205235_RemoveOldScheduleAndCommunity")]
+partial class _20260829205235_RemoveOldScheduleAndCommunity
 {
-    // If you encounter a merge conflict in the line below, it means you need to
-    // discard one of the migration branches and recreate its migrations on top of
-    // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-    public override string LastMigrationId => "20260829221717_UpdateSettings";
-
-    protected override void BuildModel(ModelBuilder modelBuilder)
+    /// <inheritdoc />
+    protected override void BuildTargetModel(ModelBuilder modelBuilder)
     {
 #pragma warning disable 612, 618
         modelBuilder
@@ -49,7 +47,7 @@ partial class DataContextModelSnapshot : ModelSnapshot
 
                 b.HasKey("Id");
 
-                b.ToTable("Communities");
+                b.ToTable("NewCommunities");
             });
 
         modelBuilder.Entity("LowPressureZone.Domain.CommunityAggregate.RelationshipEntity.Relationship", b =>
@@ -74,7 +72,7 @@ partial class DataContextModelSnapshot : ModelSnapshot
 
                 b.HasIndex("CommunityId");
 
-                b.ToTable("Relationships");
+                b.ToTable("Relationship");
             });
 
         modelBuilder.Entity("LowPressureZone.Domain.Entities.Broadcast", b =>
@@ -98,6 +96,33 @@ partial class DataContextModelSnapshot : ModelSnapshot
                 b.HasKey("Id");
 
                 b.ToTable("Broadcasts");
+            });
+
+        modelBuilder.Entity("LowPressureZone.Domain.Entities.Settings.Setting", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
+
+                b.Property<DateTime>("CreatedDate")
+                    .HasColumnType("timestamp with time zone");
+
+                b.Property<int>("Key")
+                    .HasColumnType("integer");
+
+                b.Property<DateTime>("LastModifiedDate")
+                    .HasColumnType("timestamp with time zone");
+
+                b.Property<string>("Value")
+                    .IsRequired()
+                    .HasColumnType("jsonb");
+
+                b.HasKey("Id");
+
+                b.HasIndex("Key")
+                    .IsUnique();
+
+                b.ToTable("Settings");
             });
 
         modelBuilder.Entity("LowPressureZone.Domain.NewsAggregate.News", b =>
@@ -305,28 +330,7 @@ partial class DataContextModelSnapshot : ModelSnapshot
                 b.HasIndex("TimeRange.StartsAt")
                     .IsUnique();
 
-                b.ToTable("Schedules");
-            });
-
-        modelBuilder.Entity("LowPressureZone.Domain.Settings.Setting", b =>
-            {
-                b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uuid");
-
-                b.Property<int>("Key")
-                    .HasColumnType("integer");
-
-                b.Property<string>("Value")
-                    .IsRequired()
-                    .HasColumnType("jsonb");
-
-                b.HasKey("Id");
-
-                b.HasIndex("Key")
-                    .IsUnique();
-
-                b.ToTable("Settings");
+                b.ToTable("NewSchedules");
             });
 
         modelBuilder.Entity("LowPressureZone.Domain.CommunityAggregate.RelationshipEntity.Relationship", b =>

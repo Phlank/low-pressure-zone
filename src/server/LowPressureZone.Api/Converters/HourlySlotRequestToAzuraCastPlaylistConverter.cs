@@ -22,7 +22,7 @@ public sealed class HourlySlotRequestToAzuraCastPlaylistConverter(DataContext da
         var performer = await dataContext.Performers
                                          .Where(performer => performer.Id == source.PerformerId)
                                          .FirstAsync(ct);
-        var schedule = await dataContext.NewSchedules
+        var schedule = await dataContext.Schedules
                                         .Where(schedule => schedule.TimeRange.StartsAt <= source.StartsAt
                                                            && schedule.TimeRange.EndsAt >= source.StartsAt.AddHours(source.Duration))
                                         .FirstAsync(ct);

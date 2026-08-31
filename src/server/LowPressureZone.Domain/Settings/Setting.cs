@@ -1,9 +1,10 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using LowPressureZone.Core.Domain;
 using LowPressureZone.Domain.Enums;
 
-namespace LowPressureZone.Domain.Entities.Settings;
+namespace LowPressureZone.Domain.Settings;
 
-public sealed class Setting : BaseEntity
+public sealed class Setting : Entity
 {
     public required SettingKey Key { get; set; }
 

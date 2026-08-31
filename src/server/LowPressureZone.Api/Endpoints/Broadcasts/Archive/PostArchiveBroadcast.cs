@@ -33,6 +33,16 @@ public class PostArchiveBroadcast(
 
     public override async Task HandleAsync(ArchiveBroadcastRequest req, CancellationToken ct)
     {
+        var broadcast = await dataContext.Broadcasts.FirstOrDefaultAsync(bc => bc.AzuraCastBroadcastId == req.Id, ct);
+        if (broadcast is null)
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        var domainResult = broadcast.Archive();
+        await this.PublishOrThrowAsync(domainResult);
+        
         var externalBroadcastsResult = await azuraCastClient.GetBroadcastsAsync();
         if (externalBroadcastsResult.IsError)
             ThrowError("Failed to retrieve broadcast from AzuraCast.", 500);
@@ -43,10 +53,6 @@ public class PostArchiveBroadcast(
             await Send.NotFoundAsync(ct);
             return;
         }
-
-        var broadcast = await dataContext.Broadcasts
-                                         .Where(broadcast => broadcast.AzuraCastBroadcastId == req.Id)
-                                         .FirstOrDefaultAsync(ct);
 
         if (string.IsNullOrEmpty(externalBroadcast.Recording?.DownloadUrl))
             ThrowError(nameof(req.Id), "Broadcast recording is not available");
@@ -79,20 +85,7 @@ public class PostArchiveBroadcast(
                                                                                 CultureInfo.InvariantCulture),
                                                      [archivesPlaylist.Id]);
         this.ThrowIfError(updateResult, ArchiveError);
-        
-        if (broadcast is not null)
-        {
-            broadcast.IsArchived = true;
-            broadcast.LastModifiedDate = DateTime.UtcNow;
-        }
-        else
-        {
-            dataContext.Broadcasts.Add(new()
-            {
-                AzuraCastBroadcastId = externalBroadcast.Id,
-                IsArchived = true
-            });
-        }
+        broadcast.Archive();
 
         await dataContext.SaveChangesAsync(ct);
         await Send.NoContentAsync(ct);

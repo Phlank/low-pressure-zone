@@ -21,7 +21,7 @@ public class AppUserClaimsTransformation(UserManager<AppUser> userManager, DataC
         var user = await userManager.FindByIdAsync(id.ToString());
         if (user is null) return principal;
 
-        var relationships = await dataContext.NewCommunities
+        var relationships = await dataContext.Communities
                                      .AsNoTracking()
                                      .Include(community => community.Relationships
                                                                     .Where(relationship =>

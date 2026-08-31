@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
-using LowPressureZone.Core.Interfaces;
 using LowPressureZone.Domain.CommunityAggregate;
 using LowPressureZone.Domain.ScheduleAggregate.AllowedScheduleSlotTypesObject;
 using LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity;
@@ -85,8 +84,8 @@ public class Schedule : Entity
         List<RuleError> errors =
         [
             .. Rule.Apply(new NameIsRequiredRule(name),
-                                       new NameLengthCannotExceed256Rule(name),
-                                       new DescriptionLengthCannotExceed16384Rule(description)),
+                          new NameLengthCannotExceed256Rule(name),
+                          new DescriptionLengthCannotExceed16384Rule(description)),
             .. timeRangeResult.Errors,
             .. allowedSlotTypesResult.Errors
         ];
@@ -105,8 +104,8 @@ public class Schedule : Entity
     public DomainResult<NoValue> ChangeName(string name)
     {
         var result = Rule.ApplyIntoResult(NoValue.Instance,
-                                                       new NameIsRequiredRule(name),
-                                                       new NameLengthCannotExceed256Rule(name));
+                                          new NameIsRequiredRule(name),
+                                          new NameLengthCannotExceed256Rule(name));
 
         if (result.IsSuccess)
             Name = name;
@@ -117,7 +116,7 @@ public class Schedule : Entity
     public DomainResult<NoValue> ChangeDescription(string description)
     {
         var result = Rule.ApplyIntoResult(NoValue.Instance,
-                                                       new DescriptionLengthCannotExceed16384Rule(description));
+                                          new DescriptionLengthCannotExceed16384Rule(description));
 
         if (result.IsSuccess)
             Description = description;
@@ -128,8 +127,8 @@ public class Schedule : Entity
     public DomainResult<NoValue> ChangeAllowedSlotTypes(bool isHourlyAllowed, bool isClashAllowed)
     {
         var result = Rule.ApplyIntoResult(NoValue.Instance,
-                                                       new NoHourlySlotsWhenNotAllowed(HourlySlots, isHourlyAllowed),
-                                                       new NoClashSlotsWhenNotAllowed(ClashSlots, isClashAllowed));
+                                          new NoHourlySlotsWhenNotAllowed(HourlySlots, isHourlyAllowed),
+                                          new NoClashSlotsWhenNotAllowed(ClashSlots, isClashAllowed));
 
         if (result.IsSuccess)
         {
@@ -152,8 +151,8 @@ public class Schedule : Entity
             return timeRangeResult.ToNoValue();
 
         var result = Rule.ApplyIntoResult(NoValue.Instance,
-                                                       new SlotsMustBeWithinScheduleTimeRange(timeRangeResult.Value,
-                                                                                              [.. HourlySlots, .. ClashSlots]));
+                                          new SlotsMustBeWithinScheduleTimeRange(timeRangeResult.Value,
+                                                                                 [.. HourlySlots, .. ClashSlots]));
         if (result.IsSuccess)
             TimeRange = timeRangeResult.Value;
 
@@ -163,8 +162,8 @@ public class Schedule : Entity
     public DomainResult<NoValue> AddHourlySlot(HourlySlot slot)
     {
         var errors = Rule.Apply(new SlotsMustBeWithinScheduleTimeRange(TimeRange,
-                                                                                    [slot, .. HourlySlots, .. ClashSlots]),
-                                             new SlotsCannotHaveOverlappingTimeRangesRule(SlotTimeRanges, slot));
+                                                                       [slot, .. HourlySlots, .. ClashSlots]),
+                                new SlotsCannotHaveOverlappingTimeRangesRule(SlotTimeRanges, slot));
         if (errors.Count > 0) return DomainResult.Err<NoValue>(errors);
 
         HourlySlots.Add(slot);
@@ -174,8 +173,8 @@ public class Schedule : Entity
     public DomainResult<NoValue> AddClashSlot(ClashSlot slot)
     {
         var errors = Rule.Apply(new SlotsMustBeWithinScheduleTimeRange(TimeRange,
-                                                                                    [slot, .. HourlySlots, .. ClashSlots]),
-                                             new SlotsCannotHaveOverlappingTimeRangesRule(SlotTimeRanges, slot));
+                                                                       [slot, .. HourlySlots, .. ClashSlots]),
+                                new SlotsCannotHaveOverlappingTimeRangesRule(SlotTimeRanges, slot));
         if (errors.Count > 0) return DomainResult.Err<NoValue>(errors);
 
         ClashSlots.Add(slot);

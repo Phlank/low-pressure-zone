@@ -1,4 +1,4 @@
-namespace LowPressureZone.Domain.Entities.Settings;
+namespace LowPressureZone.Domain.Settings;
 
 public class WelcomeSettings
 {

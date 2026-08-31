@@ -20,10 +20,8 @@ public class DeleteCommunity(DataContext dataContext, CommunityRules rules) : En
     public override async Task HandleAsync(CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        var community = await dataContext.NewCommunities
-                                         .AsNoTracking()
-                                         .Where(a => a.Id == id)
-                                         .FirstOrDefaultAsync(ct);
+        var community = await dataContext.Communities
+                                         .FirstOrDefaultAsync(c => c.Id == id, ct);
 
         if (community is null || community.IsDeleted)
         {
@@ -37,7 +35,8 @@ public class DeleteCommunity(DataContext dataContext, CommunityRules rules) : En
             return;
         }
 
-        this.ThrowIfDomainError(community.Delete());
+        var result = community.Delete();
+        await this.PublishOrThrowAsync(result);
         await dataContext.SaveChangesAsync(ct);
         await Send.NoContentAsync(ct);
     }

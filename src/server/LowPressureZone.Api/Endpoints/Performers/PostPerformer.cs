@@ -17,7 +17,7 @@ public sealed class PostPerformer(DataContext dataContext) : EndpointWithMapper<
     public override async Task HandleAsync(PerformerRequest request, CancellationToken ct)
     {
         var result = Performer.Create(User.GetIdOrDefault(), request.Name, request.SocialUrl);
-        this.ThrowIfDomainError(result);
+        await this.PublishOrThrowAsync(result);
         
         dataContext.Performers.Add(result.Value);
         await dataContext.SaveChangesAsync(ct);

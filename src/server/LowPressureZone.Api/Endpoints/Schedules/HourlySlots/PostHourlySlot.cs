@@ -33,7 +33,7 @@ public class PostHourlySlot(
     {
         var id = Route<Guid>("id");
 
-        var schedule = await dataContext.NewSchedules
+        var schedule = await dataContext.Schedules
                                         .Where(schedule => schedule.Id == id)
                                         .FirstOrDefaultAsync(ct);
 
@@ -57,7 +57,7 @@ public class PostHourlySlot(
                                        ? await mixHandler.AddNewMixFile(this, schedule, request, ct)
                                        : null;
         if (prerecordedMixResult is not null)
-            this.ThrowIfDomainError(prerecordedMixResult);
+            await this.PublishOrThrowAsync(prerecordedMixResult);
 
         var slotResult = HourlySlot.Create(schedule.Id,
                                            request.PerformerId,
@@ -66,10 +66,10 @@ public class PostHourlySlot(
                                            request.Subtitle,
                                            prerecordedMixResult?.Value.UploadedFileName,
                                            prerecordedMixResult?.Value.AzuraCastMediaId);
-        this.ThrowIfDomainError(slotResult);
+        await this.PublishOrThrowAsync(slotResult);
 
         var addResult = schedule.AddHourlySlot(slotResult.Value);
-        this.ThrowIfDomainError(addResult);
+        await this.PublishOrThrowAsync(addResult);
 
         await dataContext.SaveChangesAsync(ct);
         HttpContext.ExposeLocation();

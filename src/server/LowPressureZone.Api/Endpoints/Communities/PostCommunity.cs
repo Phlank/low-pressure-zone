@@ -18,9 +18,9 @@ public sealed class PostCommunity(DataContext dataContext) : Endpoint<CommunityR
     public override async Task HandleAsync(CommunityRequest req, CancellationToken ct)
     {
         var result = Community.Create(req.Name, req.Url);
-        this.ThrowIfDomainError(result);
+        await this.PublishOrThrowAsync(result);
         
-        dataContext.NewCommunities.Add(result.Value);
+        dataContext.Communities.Add(result.Value);
         await dataContext.SaveChangesAsync(ct);
         
         HttpContext.ExposeLocation();

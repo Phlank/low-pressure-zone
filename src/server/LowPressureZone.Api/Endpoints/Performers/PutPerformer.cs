@@ -39,7 +39,7 @@ public sealed class PutPerformer(DataContext dataContext, PerformerRules rules)
         var result = DomainResult.Compose(performer.ChangeName(req.Name),
                                           performer.ChangeSocialUrl(req.SocialUrl));
         
-        this.ThrowIfDomainError(result);
+        await this.PublishOrThrowAsync(result);
 
         await dataContext.SaveChangesAsync(ct);
         

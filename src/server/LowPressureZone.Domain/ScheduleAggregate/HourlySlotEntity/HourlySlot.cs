@@ -2,8 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
-using LowPressureZone.Core.Extensions;
-using LowPressureZone.Core.Interfaces;
 using LowPressureZone.Domain.PerformerAggregate;
 using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlotTimeRangeObject;
 using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.PrerecordedMixObject;
@@ -13,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity;
 
-[Table("Timeslots")]
+[Table("HourlySlots")]
 public class HourlySlot : Entity, ITimeRange
 {
     [MaxLength(128)]

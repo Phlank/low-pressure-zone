@@ -26,7 +26,7 @@ public class InviteRequestValidator : Validator<InviteRequest>
             if (isEmailInUse)
                 ctx.AddFailure(nameof(req.Email), Errors.Unique);
 
-            if (!await dataContext.NewCommunities
+            if (!await dataContext.Communities
                                   .AsNoTracking()
                                   .Where(community => community.Id == req.CommunityId && !community.IsDeleted)
                                   .AnyAsync(ct))

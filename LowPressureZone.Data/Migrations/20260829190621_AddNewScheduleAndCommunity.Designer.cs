@@ -4,22 +4,20 @@ using System.Collections.Generic;
 using LowPressureZone.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace LowPressureZone.Domain.Migrations;
+namespace LowPressureZone.Data.Migrations;
 
 [DbContext(typeof(DataContext))]
-partial class DataContextModelSnapshot : ModelSnapshot
+[Migration("20260829190621_AddNewScheduleAndCommunity")]
+partial class _20260829190621_AddNewScheduleAndCommunity
 {
-    // If you encounter a merge conflict in the line below, it means you need to
-    // discard one of the migration branches and recreate its migrations on top of
-    // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-    public override string LastMigrationId => "20260829221717_UpdateSettings";
-
-    protected override void BuildModel(ModelBuilder modelBuilder)
+    /// <inheritdoc />
+    protected override void BuildTargetModel(ModelBuilder modelBuilder)
     {
 #pragma warning disable 612, 618
         modelBuilder
@@ -49,7 +47,7 @@ partial class DataContextModelSnapshot : ModelSnapshot
 
                 b.HasKey("Id");
 
-                b.ToTable("Communities");
+                b.ToTable("NewCommunities");
             });
 
         modelBuilder.Entity("LowPressureZone.Domain.CommunityAggregate.RelationshipEntity.Relationship", b =>
@@ -74,7 +72,7 @@ partial class DataContextModelSnapshot : ModelSnapshot
 
                 b.HasIndex("CommunityId");
 
-                b.ToTable("Relationships");
+                b.ToTable("Relationship");
             });
 
         modelBuilder.Entity("LowPressureZone.Domain.Entities.Broadcast", b =>
@@ -98,6 +96,235 @@ partial class DataContextModelSnapshot : ModelSnapshot
                 b.HasKey("Id");
 
                 b.ToTable("Broadcasts");
+            });
+
+        modelBuilder.Entity("LowPressureZone.Domain.Entities.Community", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
+
+                b.Property<DateTime>("CreatedDate")
+                    .HasColumnType("timestamp with time zone");
+
+                b.Property<bool>("IsDeleted")
+                    .HasColumnType("boolean");
+
+                b.Property<DateTime>("LastModifiedDate")
+                    .HasColumnType("timestamp with time zone");
+
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasMaxLength(64)
+                    .HasColumnType("character varying(64)");
+
+                b.Property<string>("Url")
+                    .IsRequired()
+                    .HasMaxLength(256)
+                    .HasColumnType("character varying(256)");
+
+                b.HasKey("Id");
+
+                b.ToTable("Communities");
+            });
+
+        modelBuilder.Entity("LowPressureZone.Domain.Entities.CommunityRelationship", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
+
+                b.Property<Guid>("CommunityId")
+                    .HasColumnType("uuid");
+
+                b.Property<DateTime>("CreatedDate")
+                    .HasColumnType("timestamp with time zone");
+
+                b.Property<bool>("IsOrganizer")
+                    .HasColumnType("boolean");
+
+                b.Property<bool>("IsPerformer")
+                    .HasColumnType("boolean");
+
+                b.Property<DateTime>("LastModifiedDate")
+                    .HasColumnType("timestamp with time zone");
+
+                b.Property<Guid>("UserId")
+                    .HasColumnType("uuid");
+
+                b.HasKey("Id");
+
+                b.HasIndex("CommunityId");
+
+                b.ToTable("CommunityRelationships");
+            });
+
+        modelBuilder.Entity("LowPressureZone.Domain.Entities.HourlySlot", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
+
+                b.Property<int?>("AzuraCastMediaId")
+                    .HasColumnType("integer");
+
+                b.Property<DateTime>("CreatedDate")
+                    .HasColumnType("timestamp with time zone");
+
+                b.Property<DateTimeOffset>("EndsAt")
+                    .HasColumnType("timestamp with time zone");
+
+                b.Property<DateTime>("LastModifiedDate")
+                    .HasColumnType("timestamp with time zone");
+
+                b.Property<Guid>("PerformerId")
+                    .HasColumnType("uuid");
+
+                b.Property<Guid>("ScheduleId")
+                    .HasColumnType("uuid");
+
+                b.Property<DateTimeOffset>("StartsAt")
+                    .HasColumnType("timestamp with time zone");
+
+                b.Property<string>("Subtitle")
+                    .HasMaxLength(64)
+                    .HasColumnType("character varying(64)");
+
+                b.Property<string>("Type")
+                    .IsRequired()
+                    .HasMaxLength(64)
+                    .HasColumnType("character varying(64)");
+
+                b.Property<string>("UploadedFileName")
+                    .HasMaxLength(1024)
+                    .HasColumnType("character varying(1024)");
+
+                b.HasKey("Id");
+
+                b.HasIndex("PerformerId");
+
+                b.HasIndex("ScheduleId");
+
+                b.ToTable("Timeslots");
+            });
+
+        modelBuilder.Entity("LowPressureZone.Domain.Entities.Schedule", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
+
+                b.Property<Guid?>("CommunityId")
+                    .HasColumnType("uuid");
+
+                b.Property<DateTime>("CreatedDate")
+                    .HasColumnType("timestamp with time zone");
+
+                b.Property<string>("Description")
+                    .IsRequired()
+                    .HasColumnType("text");
+
+                b.Property<DateTimeOffset>("EndsAt")
+                    .HasColumnType("timestamp with time zone");
+
+                b.Property<bool>("IsOrganizersOnly")
+                    .HasColumnType("boolean");
+
+                b.Property<DateTime>("LastModifiedDate")
+                    .HasColumnType("timestamp with time zone");
+
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasColumnType("text");
+
+                b.Property<DateTimeOffset>("StartsAt")
+                    .HasColumnType("timestamp with time zone");
+
+                b.Property<int>("Type")
+                    .HasColumnType("integer");
+
+                b.HasKey("Id");
+
+                b.HasIndex("CommunityId");
+
+                b.ToTable("Schedules");
+            });
+
+        modelBuilder.Entity("LowPressureZone.Domain.Entities.Settings.Setting", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
+
+                b.Property<DateTime>("CreatedDate")
+                    .HasColumnType("timestamp with time zone");
+
+                b.Property<int>("Key")
+                    .HasColumnType("integer");
+
+                b.Property<DateTime>("LastModifiedDate")
+                    .HasColumnType("timestamp with time zone");
+
+                b.Property<string>("Value")
+                    .IsRequired()
+                    .HasColumnType("jsonb");
+
+                b.HasKey("Id");
+
+                b.HasIndex("Key")
+                    .IsUnique();
+
+                b.ToTable("Settings");
+            });
+
+        modelBuilder.Entity("LowPressureZone.Domain.Entities.Soundclash", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
+
+                b.Property<DateTime>("CreatedDate")
+                    .HasColumnType("timestamp with time zone");
+
+                b.Property<DateTimeOffset>("EndsAt")
+                    .HasColumnType("timestamp with time zone");
+
+                b.Property<DateTime>("LastModifiedDate")
+                    .HasColumnType("timestamp with time zone");
+
+                b.Property<Guid>("PerformerOneId")
+                    .HasColumnType("uuid");
+
+                b.Property<Guid>("PerformerTwoId")
+                    .HasColumnType("uuid");
+
+                b.Property<string>("RoundOne")
+                    .IsRequired()
+                    .HasColumnType("text");
+
+                b.Property<string>("RoundThree")
+                    .IsRequired()
+                    .HasColumnType("text");
+
+                b.Property<string>("RoundTwo")
+                    .IsRequired()
+                    .HasColumnType("text");
+
+                b.Property<Guid>("ScheduleId")
+                    .HasColumnType("uuid");
+
+                b.Property<DateTimeOffset>("StartsAt")
+                    .HasColumnType("timestamp with time zone");
+
+                b.HasKey("Id");
+
+                b.HasIndex("PerformerOneId");
+
+                b.HasIndex("PerformerTwoId");
+
+                b.HasIndex("ScheduleId");
+
+                b.ToTable("Soundclashes");
             });
 
         modelBuilder.Entity("LowPressureZone.Domain.NewsAggregate.News", b =>
@@ -305,28 +532,7 @@ partial class DataContextModelSnapshot : ModelSnapshot
                 b.HasIndex("TimeRange.StartsAt")
                     .IsUnique();
 
-                b.ToTable("Schedules");
-            });
-
-        modelBuilder.Entity("LowPressureZone.Domain.Settings.Setting", b =>
-            {
-                b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uuid");
-
-                b.Property<int>("Key")
-                    .HasColumnType("integer");
-
-                b.Property<string>("Value")
-                    .IsRequired()
-                    .HasColumnType("jsonb");
-
-                b.HasKey("Id");
-
-                b.HasIndex("Key")
-                    .IsUnique();
-
-                b.ToTable("Settings");
+                b.ToTable("NewSchedules");
             });
 
         modelBuilder.Entity("LowPressureZone.Domain.CommunityAggregate.RelationshipEntity.Relationship", b =>
@@ -338,6 +544,70 @@ partial class DataContextModelSnapshot : ModelSnapshot
                     .IsRequired();
 
                 b.Navigation("Community");
+            });
+
+        modelBuilder.Entity("LowPressureZone.Domain.Entities.CommunityRelationship", b =>
+            {
+                b.HasOne("LowPressureZone.Domain.Entities.Community", "Community")
+                    .WithMany("Relationships")
+                    .HasForeignKey("CommunityId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+
+                b.Navigation("Community");
+            });
+
+        modelBuilder.Entity("LowPressureZone.Domain.Entities.HourlySlot", b =>
+            {
+                b.HasOne("LowPressureZone.Domain.PerformerAggregate.Performer", "Performer")
+                    .WithMany()
+                    .HasForeignKey("PerformerId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+
+                b.HasOne("LowPressureZone.Domain.Entities.Schedule", "Schedule")
+                    .WithMany("Timeslots")
+                    .HasForeignKey("ScheduleId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+
+                b.Navigation("Performer");
+
+                b.Navigation("Schedule");
+            });
+
+        modelBuilder.Entity("LowPressureZone.Domain.Entities.Schedule", b =>
+            {
+                b.HasOne("LowPressureZone.Domain.Entities.Community", null)
+                    .WithMany("Schedules")
+                    .HasForeignKey("CommunityId");
+            });
+
+        modelBuilder.Entity("LowPressureZone.Domain.Entities.Soundclash", b =>
+            {
+                b.HasOne("LowPressureZone.Domain.PerformerAggregate.Performer", "PerformerOne")
+                    .WithMany()
+                    .HasForeignKey("PerformerOneId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+
+                b.HasOne("LowPressureZone.Domain.PerformerAggregate.Performer", "PerformerTwo")
+                    .WithMany()
+                    .HasForeignKey("PerformerTwoId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+
+                b.HasOne("LowPressureZone.Domain.Entities.Schedule", "Schedule")
+                    .WithMany("Soundclashes")
+                    .HasForeignKey("ScheduleId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+
+                b.Navigation("PerformerOne");
+
+                b.Navigation("PerformerTwo");
+
+                b.Navigation("Schedule");
             });
 
         modelBuilder.Entity("LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity.ClashSlot", b =>
@@ -406,6 +676,20 @@ partial class DataContextModelSnapshot : ModelSnapshot
         modelBuilder.Entity("LowPressureZone.Domain.CommunityAggregate.Community", b =>
             {
                 b.Navigation("Relationships");
+            });
+
+        modelBuilder.Entity("LowPressureZone.Domain.Entities.Community", b =>
+            {
+                b.Navigation("Relationships");
+
+                b.Navigation("Schedules");
+            });
+
+        modelBuilder.Entity("LowPressureZone.Domain.Entities.Schedule", b =>
+            {
+                b.Navigation("Soundclashes");
+
+                b.Navigation("Timeslots");
             });
 
         modelBuilder.Entity("LowPressureZone.Domain.ScheduleAggregate.Schedule", b =>

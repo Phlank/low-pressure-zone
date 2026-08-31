@@ -1,11 +1,11 @@
 ﻿using LowPressureZone.Data.Extensions;
+using LowPressureZone.Domain.BroadcastAggregate;
 using LowPressureZone.Domain.CommunityAggregate.RelationshipEntity;
-using LowPressureZone.Domain.Entities;
-using LowPressureZone.Domain.Entities.Settings;
 using LowPressureZone.Domain.NewsAggregate;
 using LowPressureZone.Domain.PerformerAggregate;
 using LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity;
 using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity;
+using LowPressureZone.Domain.Settings;
 using Microsoft.EntityFrameworkCore;
 using HourlySlot = LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlot;
 
@@ -16,16 +16,14 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     public DbSet<Broadcast> Broadcasts { get; set; }
     public DbSet<News> News { get; set; }
     public DbSet<Performer> Performers { get; set; }
-    public DbSet<Domain.CommunityAggregate.Community> NewCommunities { get; set; }
-    public IQueryable<Relationship> Relationships => Set<Relationship>().AsQueryable();
-    public DbSet<Community> Communities { get; set; }
-    public DbSet<CommunityRelationship> CommunityRelationships { get; set; }
-    public DbSet<Schedule> Schedules { get; set; }
-    public DbSet<Soundclash> Soundclashes { get; set; }
-    public DbSet<HourlySlot> Timeslots { get; set; }
-    public DbSet<Domain.ScheduleAggregate.Schedule> NewSchedules { get; set; }
-    public IQueryable<HourlySlot> HourlySlots => Set<HourlySlot>().AsQueryable();
-    public IQueryable<ClashSlot> ClashSlots => Set<ClashSlot>().AsQueryable();
+    public DbSet<Domain.CommunityAggregate.Community> Communities { get; set; }
+    public IQueryable<Relationship> Relationships => Set<Relationship>().AsQueryable()
+                                                                        .AsNoTracking();
+    public DbSet<Domain.ScheduleAggregate.Schedule> Schedules { get; set; }
+    public IQueryable<HourlySlot> HourlySlots => Set<HourlySlot>().AsQueryable()
+                                                                  .AsNoTracking();
+    public IQueryable<ClashSlot> ClashSlots => Set<ClashSlot>().AsQueryable()
+                                                               .AsNoTracking();
     public DbSet<Setting> Settings { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

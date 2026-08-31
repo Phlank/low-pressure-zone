@@ -29,7 +29,6 @@ public sealed class PutAboutSettings(DataContext dataContext)
         else
         {
             setting.Value = mappedSetting.Value;
-            setting.LastModifiedDate = mappedSetting.LastModifiedDate;
         }
 
         await dataContext.SaveChangesAsync(ct);

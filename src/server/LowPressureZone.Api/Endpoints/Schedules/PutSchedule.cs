@@ -22,7 +22,7 @@ public class PutSchedule(DataContext dataContext, ScheduleRules rules)
     {
         var id = Route<Guid>("id");
         
-        var schedule = await dataContext.NewSchedules
+        var schedule = await dataContext.Schedules
                                         .FirstOrDefaultAsync(schedule => schedule.Id == id, ct);
         if (schedule is null)
         {

@@ -82,6 +82,24 @@ public static class EndpointExtensions
         endpoint.ThrowIfAnyErrors();
     }
 
+    public static async Task PublishOrThrowAsync<T, TRequest, TResponse>(
+        this Endpoint<TRequest, TResponse> endpoint,
+        DomainResult<T> result) where TRequest : notnull
+    {
+        endpoint.ThrowIfDomainError(result);
+        await endpoint.PublishEventsAsync(result);
+    }
+
+    public static async Task PublishEventsAsync<T, TRequest, TResponse>(
+        this Endpoint<TRequest, TResponse> endpoint,
+        DomainResult<T> result) where TRequest : notnull
+    {
+        foreach (var @event in result.Events)
+        {
+            await endpoint.PublishAsync(@event);
+        }
+    }
+    
     public static void ThrowIfDomainError<T, TRequest, TResponse>(
         this Endpoint<TRequest, TResponse> endpoint,
         DomainResult<T> result) where TRequest : notnull

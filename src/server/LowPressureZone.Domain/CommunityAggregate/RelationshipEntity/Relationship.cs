@@ -4,7 +4,7 @@ using LowPressureZone.Core.Domain;
 
 namespace LowPressureZone.Domain.CommunityAggregate.RelationshipEntity;
 
-[Table("CommunityRelationships")]
+[Table("Relationships")]
 public class Relationship : Entity
 {
     public Guid CommunityId { get; private init; }

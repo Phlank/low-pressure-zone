@@ -18,7 +18,7 @@ public class GetScheduleById(DataContext dataContext, ScheduleRules rules)
     public override async Task HandleAsync(CancellationToken ct)
     {
         var id = Route<Guid>("id");
-        var schedule = await dataContext.NewSchedules
+        var schedule = await dataContext.Schedules
                                         .GetSchedulesForResponse(User.GetIdOrDefault())
                                         .Where(schedule => schedule.Id == id)
                                         .FirstOrDefaultAsync(ct);
