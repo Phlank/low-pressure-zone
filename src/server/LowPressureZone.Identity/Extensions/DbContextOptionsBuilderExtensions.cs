@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -36,7 +37,8 @@ public static class DbContextExtensions
                 UserName = seedData.AdminUsername,
                 NormalizedUserName = seedData.AdminUsername.ToUpperInvariant().Normalize()
             };
-            var passwordHash = hasher.HashPassword(user, seedData.AdminPassword);
+            var tempPassword = PasswordGenerator.Generate(16);
+            var passwordHash = hasher.HashPassword(user, tempPassword);
             user.PasswordHash = passwordHash;
             users.Add(user);
 
@@ -80,7 +82,8 @@ public static class DbContextExtensions
                 UserName = seedData.AdminUsername,
                 NormalizedUserName = seedData.AdminUsername.ToUpperInvariant().Normalize()
             };
-            var passwordHash = hasher.HashPassword(user, seedData.AdminPassword);
+            var tempPassword = PasswordGenerator.Generate(16);
+            var passwordHash = hasher.HashPassword(user, tempPassword);
             user.PasswordHash = passwordHash;
             users.Add(user);
 
