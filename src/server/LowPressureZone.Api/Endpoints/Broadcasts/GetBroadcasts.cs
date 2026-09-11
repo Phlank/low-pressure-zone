@@ -1,11 +1,10 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Adapter.AzuraCast.Clients;
+using LowPressureZone.Api.Commands.Broadcasts.SyncBroadcasts;
 using LowPressureZone.Data;
-using LowPressureZone.Domain.BroadcastAggregate;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Broadcasts;
 
@@ -23,16 +22,11 @@ public class GetBroadcasts(UserManager<AppUser> userManager, DataContext dataCon
             return;
         }
 
-        List<Broadcast> broadcasts;
-        if (User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Organizer))
+        var broadcasts = await new SyncBroadcastsCommand().ExecuteAsync(ct);
+        
+        if (!User.IsInRole(RoleNames.Admin) && !User.IsInRole(RoleNames.Organizer))
         {
-            broadcasts = await dataContext.Broadcasts.ToListAsync(ct);
-        }
-        else
-        {
-            broadcasts = await dataContext.Broadcasts
-                                          .Where(b => b.AzuraCastStreamerId == user.StreamerId)
-                                          .ToListAsync(ct);
+            broadcasts = [ ..broadcasts.Where(b => b.AzuraCastStreamerId == user.StreamerId)];
         }
         
         await Send.OkAsync(broadcasts.Select(Map.FromEntity), ct);

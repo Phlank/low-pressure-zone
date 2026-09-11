@@ -1,3 +1,4 @@
+using FastEndpoints;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Core;
@@ -7,88 +8,56 @@ using LowPressureZone.Domain.BroadcastAggregate;
 using Microsoft.EntityFrameworkCore;
 using Shouldly;
 
-namespace LowPressureZone.Api.Services.BroadcastSync;
+namespace LowPressureZone.Api.Commands.Broadcasts.SyncBroadcasts;
 
-public class BroadcastSyncTaskService(
-    IServiceScopeFactory serviceScopeFactory,
-    ILogger<BroadcastSyncTaskService> logger) : BackgroundService
+public class SyncBroadcastsHandler(
+    DataContext dataContext,
+    IAzuraCastClient azuraCastClient,
+    Logger<SyncBroadcastsHandler> logger) : ICommandHandler<SyncBroadcastsCommand, List<Broadcast>>
 {
-    private static readonly TimeSpan SyncInterval = TimeSpan.FromSeconds(30);
-    
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    public async Task<List<Broadcast>> ExecuteAsync(SyncBroadcastsCommand command, CancellationToken ct)
     {
-        var timer = new PeriodicTimer(SyncInterval);
-
-        while (!stoppingToken.IsCancellationRequested)
-        {
-            try
-            {
-                await timer.WaitForNextTickAsync(stoppingToken);
-                await SyncBroadcastsAsync(stoppingToken);
-            }
-            catch (TaskCanceledException)
-            {
-                break;
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Exception while syncing broadcasts: {ErrorMessage}; continuing loop", ex.Message);
-            }
-        }
-    }
-
-    private async Task SyncBroadcastsAsync(CancellationToken ct)
-    {
-        using var scope = serviceScopeFactory.CreateScope();
-        var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-        var azuraCastClient = scope.ServiceProvider.GetRequiredService<IAzuraCastClient>();
-
+        var domainBroadcasts = await dataContext.Broadcasts
+                                                .ToDictionaryAsync(broadcast => broadcast.AzuraCastBroadcastId, ct);
         var remoteBroadcastsResult = await azuraCastClient.GetBroadcastsAsync();
         if (remoteBroadcastsResult.IsError)
         {
             logger.LogError("Error while fetching remote broadcasts: {ErrorMessage}",
                             remoteBroadcastsResult.Error.ReasonPhrase);
-            return;
+
+            return [ ..domainBroadcasts.Values];
         }
 
         var remoteBroadcasts = remoteBroadcastsResult.Value.ToDictionary(broadcast => broadcast.Id);
-        var domainBroadcasts =
-            await dataContext.Broadcasts.ToDictionaryAsync(broadcast => broadcast.AzuraCastBroadcastId, ct);
 
         var remoteIds = remoteBroadcasts.Keys;
         var domainIds = domainBroadcasts.Keys;
         var idsToDelete = domainIds.Except(remoteIds);
         var idsToAdd = remoteIds.Except(domainIds);
         var idsToUpdate = domainIds.Intersect(remoteIds);
-
+        
         foreach (var id in idsToDelete)
         {
-            var broadcast = domainBroadcasts.GetValueOrDefault(id);
-            broadcast.ShouldNotBeNull();
-            dataContext.Broadcasts.Remove(broadcast);
+            DeleteBroadcastFromDomain(domainBroadcasts[id]);
         }
 
         foreach (var id in idsToAdd)
         {
-            var remoteBroadcast = remoteBroadcasts.GetValueOrDefault(id);
-            remoteBroadcast.ShouldNotBeNull();
-            AddBroadcastToDomain(remoteBroadcast, dataContext);
+            AddBroadcastToDomain(remoteBroadcasts[id]);
         }
-
+        
         foreach (var id in idsToUpdate)
         {
-            var domainBroadcast = domainBroadcasts.GetValueOrDefault(id);
-            var remoteBroadcast = remoteBroadcasts.GetValueOrDefault(id);
-            domainBroadcast.ShouldNotBeNull();
-            remoteBroadcast.ShouldNotBeNull();
-            
-            UpdateBroadcastInDomain(domainBroadcast, remoteBroadcast);
+            UpdateBroadcastInDomain(domainBroadcasts[id], remoteBroadcasts[id]);
         }
-
-        await dataContext.SaveChangesAsync(ct);
+        
+        return await dataContext.Broadcasts.ToListAsync(ct);
     }
+    
+    private void DeleteBroadcastFromDomain(Broadcast domainBroadcast)
+        => dataContext.Broadcasts.Remove(domainBroadcast);
 
-    private void AddBroadcastToDomain(StationStreamerBroadcast remoteBroadcast, DataContext dataContext)
+    private void AddBroadcastToDomain(StationStreamerBroadcast remoteBroadcast)
     {
         remoteBroadcast.Streamer.ShouldNotBeNull();
         var broadcastResult = Broadcast.Create(remoteBroadcast.Id,
@@ -106,8 +75,8 @@ public class BroadcastSyncTaskService(
 
         dataContext.Add(broadcastResult.Value);
     }
-    
-    private void UpdateBroadcastInDomain(Broadcast domainBroadcast, 
+
+    private void UpdateBroadcastInDomain(Broadcast domainBroadcast,
                                          StationStreamerBroadcast remoteBroadcast)
     {
         remoteBroadcast.Streamer.ShouldNotBeNull();
