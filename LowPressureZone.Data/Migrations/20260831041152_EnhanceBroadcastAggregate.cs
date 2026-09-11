@@ -11,6 +11,8 @@ public partial class _20260831041152_EnhanceBroadcastAggregate : Migration
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
+        migrationBuilder.Sql(@"DELETE FROM ""Broadcasts"";");
+        
         migrationBuilder.DropColumn(
             name: "CreatedDate",
             table: "Broadcasts");

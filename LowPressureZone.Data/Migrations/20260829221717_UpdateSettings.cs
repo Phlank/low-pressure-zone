@@ -48,11 +48,6 @@ public partial class _20260829221717_UpdateSettings : Migration
             newName: "Communities");
 
         migrationBuilder.RenameIndex(
-            name: "IX_Relationship_CommunityId",
-            table: "Relationships",
-            newName: "IX_Relationships_CommunityId");
-
-        migrationBuilder.RenameIndex(
             name: "IX_NewSchedules_TimeRange_StartsAt",
             table: "Schedules",
             newName: "IX_Schedules_TimeRange_StartsAt");

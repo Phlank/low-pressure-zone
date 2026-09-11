@@ -22,7 +22,6 @@ public partial class _20260816185950_EnrichNews : Migration
 
         migrationBuilder.AlterColumn<string>(
             name: "Title",
-            schema: "lpz",
             table: "News",
             type: "character varying(256)",
             maxLength: 256,
