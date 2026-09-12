@@ -17,7 +17,6 @@ public class PostHourlySlot(
     DataContext dataContext,
     ScheduleRules scheduleRules,
     PerformerRules performerRules,
-    HourlySlotRules hourlyRules,
     HourlySlotPrerecordedMixHandler mixHandler) : Endpoint<HourlySlotRequest>
 {
     public override void Configure()
@@ -43,11 +42,16 @@ public class PostHourlySlot(
             return;
         }
 
+        if (!scheduleRules.IsAddingHourlySlotsAllowed(schedule))
+        {
+            await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
         var performer = await dataContext.Performers
                                          .Where(performer => performer.Id == request.PerformerId)
                                          .FirstOrDefaultAsync(ct);
-        if (performer is null || !performerRules.IsHourlySlotLinkAuthorized(performer) ||
-            !scheduleRules.IsAddingHourlySlotsAllowed(schedule))
+        if (performer is null || !performerRules.IsHourlySlotLinkAuthorized(performer))
         {
             await Send.UnauthorizedAsync(ct);
             return;

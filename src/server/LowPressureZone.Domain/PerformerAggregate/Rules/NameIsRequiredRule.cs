@@ -6,5 +6,5 @@ public class NameIsRequiredRule(string name) : IRule
 {
     public bool IsBroken() => string.IsNullOrWhiteSpace(name);
 
-    public RuleError Error => new RuleError("Required", nameof(Performer.Name));
+    public RuleError Error => new("Required", nameof(Performer.Name));
 }

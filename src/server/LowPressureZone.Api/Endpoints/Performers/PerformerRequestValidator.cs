@@ -7,7 +7,7 @@ namespace LowPressureZone.Api.Endpoints.Performers;
 
 public sealed class PerformerRequestValidator : Validator<PerformerRequest>
 {
-    public PerformerRequestValidator(IHttpContextAccessor accessor)
+    public PerformerRequestValidator()
     {
         RuleFor(request => request.Name).NotEmpty()
                                         .WithMessage(Errors.Required)

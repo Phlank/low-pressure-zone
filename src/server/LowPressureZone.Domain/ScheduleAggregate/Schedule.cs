@@ -32,13 +32,6 @@ public class Schedule : Entity
     public AllowedScheduleSlotTypes AllowedSlotTypes { get; private set; }
     public List<ClashSlot> ClashSlots { get; private init; } = [];
     public List<HourlySlot> HourlySlots { get; private init; } = [];
-
-    public List<Slot> Slots =>
-    [
-        .. ClashSlots.Select(slot => new Slot(slot)),
-        .. HourlySlots.Select(slot => new Slot(slot))
-    ];
-
     public Guid CommunityId { get; init; }
     public Community Community { get; init; } = null!;
     public bool IsVisibleToPublic { get; private set; }

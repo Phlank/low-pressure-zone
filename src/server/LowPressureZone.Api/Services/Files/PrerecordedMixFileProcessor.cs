@@ -68,7 +68,7 @@ public sealed class PrerecordedMixFileProcessor(
     public static ICollection<ValidationFailure> ValidateMediaAnalysis(HourlySlotRequest request, IMediaAnalysis analysis)
     {
         request.File.ShouldNotBeNull();
-        List<ValidationFailure> failures = new();
+        List<ValidationFailure> failures = [];
         var timeslotDuration = request.StartsAt.AddHours(request.Duration) - request.StartsAt;
         if (TimeSpan.FromMinutes(timeslotDuration.TotalMinutes - PrerecordedDurationMinutesTolerance) >
             analysis.Duration

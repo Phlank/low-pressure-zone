@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using FastEndpoints;
-using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Data;
 using LowPressureZone.Identity;
@@ -12,7 +11,6 @@ namespace LowPressureZone.Api.Endpoints.Users;
 public class GetUsers(
     IdentityContext identityContext,
     DataContext dataContext,
-    IAzuraCastClient azuraCastClient,
     UserRules rules)
     : EndpointWithoutRequest<IEnumerable<UserResponse>>
 {
@@ -44,7 +42,7 @@ public class GetUsers(
                                                           .ToListAsync(ct);
 
         if (!User.IsInRole(RoleNames.Admin))
-            responses = responses.Where(response => !response.IsAdmin).ToList();
+            responses = [.. responses.Where(response => !response.IsAdmin)];
 
         var organizerRelationships = await dataContext.Relationships
                                                       .AsNoTracking()

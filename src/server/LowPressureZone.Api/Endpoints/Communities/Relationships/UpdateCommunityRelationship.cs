@@ -1,8 +1,6 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Api.Rules;
 using LowPressureZone.Data;
-using LowPressureZone.Identity;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Entities;
 using LowPressureZone.Identity.Extensions;
@@ -13,9 +11,7 @@ namespace LowPressureZone.Api.Endpoints.Communities.Relationships;
 
 public class UpdateCommunityRelationship(
     DataContext dataContext,
-    IdentityContext identityContext,
-    UserManager<AppUser> userManager,
-    CommunityRules communityRules)
+    UserManager<AppUser> userManager)
     : Endpoint<RelationshipRequest>
 {
     public override void Configure()

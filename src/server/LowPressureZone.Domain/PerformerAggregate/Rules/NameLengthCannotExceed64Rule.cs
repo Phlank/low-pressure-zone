@@ -6,5 +6,5 @@ public class NameLengthCannotExceed64Rule(string name) : IRule
 {
     public bool IsBroken() => name.Length > 64;
 
-    public RuleError Error => new RuleError("Cannot be more than 64 characters", nameof(Performer.Name));
+    public RuleError Error => new("Cannot be more than 64 characters", nameof(Performer.Name));
 }

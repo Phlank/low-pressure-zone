@@ -30,7 +30,7 @@ public sealed class ScheduleMapper(
             slot.PerformerTwo.ShouldNotBeNull();
         }
 
-        List<ITimeRange> slots =
+        List<SlotResponse> slots =
         [
             .. schedule.HourlySlots.Select(hourlySlotMapper.FromEntity),
             .. schedule.ClashSlots.Select(clashSlotMapper.FromEntity)
@@ -44,7 +44,11 @@ public sealed class ScheduleMapper(
             Name = schedule.Name,
             Description = schedule.Description,
             Community = communityMapper.FromEntity(schedule.Community),
-            Slots = slots.OrderBy(x => x.StartsAt),
+            Slots = slots.OrderBy(x => x switch
+            {
+                ClashSlotResponse clashSlot => clashSlot.StartsAt,
+                HourlySlotResponse hourlySlot => hourlySlot.StartsAt,
+            }),
             IsVisibleToPublic = schedule.IsVisibleToPublic,
             IsEditable = rules.IsEditAuthorized(schedule),
             IsDeletable = rules.IsDeleteAuthorized(schedule),

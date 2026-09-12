@@ -15,9 +15,6 @@ public sealed class BroadcastPermissions(IHttpContextAccessor contextAccessor)
     public bool IsDownloadable(Broadcast broadcast)
         => broadcast.HasFile;
 
-    public bool IsDeletable(Broadcast broadcast)
-        => User is not null && User.IsInRole(RoleNames.Admin);
-
     public bool IsDisconnectable(Broadcast broadcast) =>
         User is not null
         && (User.IsInRole(RoleNames.Admin)

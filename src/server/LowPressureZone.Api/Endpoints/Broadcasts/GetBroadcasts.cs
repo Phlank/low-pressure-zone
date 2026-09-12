@@ -1,14 +1,12 @@
 ﻿using FastEndpoints;
-using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Commands.Broadcasts.SyncBroadcasts;
-using LowPressureZone.Data;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.Endpoints.Broadcasts;
 
-public class GetBroadcasts(UserManager<AppUser> userManager, DataContext dataContext, IAzuraCastClient client)
+public class GetBroadcasts(UserManager<AppUser> userManager)
     : EndpointWithoutRequest<IEnumerable<BroadcastResponse>, BroadcastMapper>
 {
     public override void Configure() => Get("/broadcasts");

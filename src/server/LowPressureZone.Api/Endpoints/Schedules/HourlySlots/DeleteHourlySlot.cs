@@ -31,6 +31,12 @@ public class DeleteHourlySlot(HourlySlotRules rules, DataContext dataContext) : 
             return;
         }
 
+        if (!rules.IsDeleteAuthorized(slot))
+        {
+            await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
         var result = slot.Delete();
         await this.PublishOrThrowAsync(result);
         

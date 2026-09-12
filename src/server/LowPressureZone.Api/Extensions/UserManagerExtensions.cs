@@ -66,7 +66,7 @@ public static class UserManagerExtensions
     }
 
     public static async Task<Result<string, string>> GenerateStreamerPassword(
-        this UserManager<AppUser> userManager,
+        this UserManager<AppUser> _,
         AppUser user,
         IAzuraCastClient client)
     {
@@ -86,7 +86,7 @@ public static class UserManagerExtensions
     }
 
     public static async Task<Result<StationStreamer, string>> GetStreamerAsync(
-        this UserManager<AppUser> userManager,
+        this UserManager<AppUser> _,
         AppUser user,
         IAzuraCastClient client)
     {

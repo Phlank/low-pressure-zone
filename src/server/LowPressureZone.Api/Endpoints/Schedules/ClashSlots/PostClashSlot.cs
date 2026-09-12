@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.ClashSlots;
 
-public class PostClashSlot(DataContext dataContext, ClashSlotRules rules, ScheduleRules scheduleRules)
+public class PostClashSlot(DataContext dataContext, ScheduleRules scheduleRules)
     : Endpoint<ClashSlotRequest>
 {
     public override void Configure()
