@@ -15,12 +15,13 @@ public sealed class HourlySlotMapper(
     {
         Id = slot.Id,
         ScheduleId = slot.ScheduleId,
-        StartsAt = slot.StartsAt,
-        EndsAt = slot.EndsAt,
+        StartsAt = slot.TimeRange.StartsAt,
+        EndsAt = slot.TimeRange.EndsAt,
+        Duration = slot.TimeRange.Duration,
         Subtitle = slot.Subtitle,
-        Performer = performerMapper.FromEntity(slot.Performer),
-        PerformanceType = "Hourly",
+        PerformerId = slot.PerformerId,
         UploadedFileName = slot.Prerecord.UploadedFileName,
+        IsPrerecorded = slot.Prerecord.IsPrerecorded,
         IsEditable = rules.IsEditAuthorized(slot),
         IsDeletable = rules.IsDeleteAuthorized(slot)
     };

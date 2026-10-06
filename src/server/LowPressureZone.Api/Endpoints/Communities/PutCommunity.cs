@@ -28,7 +28,7 @@ public sealed class PutCommunity(DataContext dataContext) : Endpoint<CommunityRe
         }
 
         var result = DomainResult.Compose(community.Rename(request.Name),
-                                          community.ChangeSocialUrl(request.Url));
+                                          community.ChangeSocialUrl(request.SocialUrl));
 
         await this.PublishOrThrowAsync(result);
         await dataContext.SaveChangesAsync(ct);

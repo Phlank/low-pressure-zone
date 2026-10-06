@@ -9,6 +9,7 @@ public class GetStreamStatus(IStreamStatusService streamStatusService)
 {
     public override void Configure()
     {
+        ResponseCache(5);
         Get("/stream/status");
         AllowAnonymous();
     }

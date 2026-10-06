@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts" setup>
-import { InputText, Select, ToggleSwitch } from 'primevue'
+import { InputText, Select, ToggleSwitch } from 'openvue'
 import FormArea from '@/components/form/FormArea.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import { useCommunityStore } from '@/stores/communityStore.ts'

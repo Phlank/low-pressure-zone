@@ -44,7 +44,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Select, ToggleSwitch } from 'primevue'
+import { Select, ToggleSwitch } from 'openvue'
 import { type UserResponse } from '@/api/resources/usersApi.ts'
 import { computed, onMounted, type Ref, ref } from 'vue'
 import {

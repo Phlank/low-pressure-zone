@@ -1,6 +1,6 @@
 import type { Entity } from '@/types/entity.ts'
 import type { ApiResponse } from '@/api/apiResponse.ts'
-import type { ToastServiceMethods } from 'primevue'
+import type { ToastServiceMethods } from 'openvue'
 import { getEntity } from '@/utils/arrayUtils.ts'
 import { err, ok, type Result } from '@/types/result.ts'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
@@ -66,7 +66,7 @@ export const useUpdatePersistentItemFn =
 export const useRemovePersistentItemFn =
   <TEntity extends Entity>(
     entities: Ref<TEntity[]> | ComputedRef<TEntity[]>,
-    apiFunction: (id: string) => Promise<ApiResponse>,
+    apiFunction: ((id: string) => Promise<ApiResponse>),
     onSuccess: (entity: TEntity) => void,
     toast?: ToastServiceMethods
   ) =>

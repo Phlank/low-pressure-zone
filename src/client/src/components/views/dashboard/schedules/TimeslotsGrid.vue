@@ -30,7 +30,7 @@
         <template #body="{ data }: { data: TimeslotRow }">
           <GridActions
             :show-create="
-              schedule?.isTimeslotCreationAllowed &&
+              schedule?.isHourlyAllowed &&
               data.timeslot === undefined &&
               data.start.getTime() > new Date().getTime()
             "
@@ -58,7 +58,7 @@
             <template #right>
               <GridActions
                 :show-create="
-                  schedule?.isTimeslotCreationAllowed &&
+                  schedule?.isHourlyAllowed &&
                   row.timeslot === undefined &&
                   row.start.getTime() > new Date().getTime()
                 "
@@ -79,11 +79,11 @@
       :title="currentTimeslotRow?.timeslot ? 'Edit Timeslot' : 'Create Timeslot'"
       @reset="timeslotFormRef?.reset()"
       @submit="timeslotFormRef?.submit()">
-      <TimeslotForm
+      <HourlySlotForm
         ref="timeslotFormRef"
         :schedule-id="schedule.id"
         :start="currentTimeslotRow?.start ?? new Date()"
-        :timeslot="currentTimeslotRow?.timeslot"
+        :existingSlot="currentTimeslotRow?.timeslot"
         @submitted="showTimeslotForm = false" />
     </FormDrawer>
     <DeleteDialog
@@ -101,17 +101,17 @@
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import ListItem from '@/components/data/ListItem.vue'
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
-import TimeslotForm from '@/components/form/requestForms/TimeslotForm.vue'
+import HourlySlotForm from '@/components/form/requestForms/HourlySlotForm.vue'
 import {
   formatReadableTime,
-  isDateInTimeslot,
+  isDateInSlot,
   parseDate,
   parseTime,
   timesBetween
 } from '@/utils/dateUtils'
-import { Column, DataTable, DataView, Divider } from 'primevue'
+import { Column, DataTable, DataView, Divider } from 'openvue'
 import { computed, inject, onMounted, ref, type Ref, useTemplateRef, watch } from 'vue'
-import { type TimeslotResponse } from '@/api/resources/timeslotsApi.ts'
+import { type HourlySlotResponse } from '@/api/resources/hourlySlotsApi.ts'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
 import SlotTime from '@/components/controls/SlotTime.vue'
 import SlotName from '@/components/controls/SlotName.vue'
@@ -133,7 +133,7 @@ const timeslotFormRef = useTemplateRef('timeslotFormRef')
 interface TimeslotRow {
   start: Date
   isFirstRowOfTimeslot: boolean
-  timeslot?: TimeslotResponse
+  timeslot?: HourlySlotResponse
 }
 
 watch(
@@ -148,7 +148,7 @@ const setupRows = () => {
   const newRows: TimeslotRow[] = []
   const hours = timesBetween(startDate.value, endDate.value)
   hours.forEach((hour) => {
-    const timeslot = timeslots.value?.find((timeslot) => isDateInTimeslot(hour, timeslot))
+    const timeslot = timeslots.value?.find((timeslot) => isDateInSlot(hour, timeslot))
     newRows.push({
       start: hour,
       isFirstRowOfTimeslot: timeslot ? parseTime(timeslot.startsAt) === hour.getTime() : false,
@@ -190,7 +190,7 @@ const handleDeleteAction = async (row: TimeslotRow) => {
 }
 const handleDeleteConfirm = async () => {
   isDeleteSubmitting.value = true
-  const result = await schedules.removeTimeslot(deletingId)
+  const result = await schedules.deleteHourlySlot(deletingId)
   isDeleteSubmitting.value = false
   if (!result.isSuccess) return
   showDeleteDialog.value = false

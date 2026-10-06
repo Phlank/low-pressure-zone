@@ -30,3 +30,9 @@ export const applyRuleIf = <T, TForm extends object>(
   }
   return alwaysValid()
 }
+
+export const equalTo = <T>(value: () => T, msg?: string) => (arg?: T) => {
+    if (!arg) return valid
+    if (arg !== value()) return invalid(msg ?? `Must equal ${value()}`)
+    return valid
+}

@@ -22,26 +22,19 @@
           class="upcoming-schedules__content__description">
           <MarkdownContent :content="schedule.description" />
         </div>
-        <HomeTimeslotGrid
-          v-if="schedule?.type === scheduleTypes.Hourly"
-          :schedule-id="currentId" />
-        <HomeSoundclashGrid
-          v-if="schedule?.type === scheduleTypes.Soundclash"
-          :schedule-id="currentId" />
+        <HomeScheduleGrid :schedule-id="currentId" />
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Skeleton } from 'primevue'
+import { Skeleton } from 'openvue'
 import { computed, ref } from 'vue'
 import ScheduleNavigator from '@/components/controls/ScheduleNavigator.vue'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
-import HomeTimeslotGrid from '@/components/views/home/HomeTimeslotGrid.vue'
-import { scheduleTypes } from '@/constants/scheduleTypes.ts'
-import HomeSoundclashGrid from '@/components/views/home/HomeSoundclashGrid.vue'
 import MarkdownContent from "@/components/controls/MarkdownContent.vue";
+import HomeScheduleGrid from '@/components/views/home/HomeScheduleGrid.vue'
 
 const schedules = useScheduleStore()
 

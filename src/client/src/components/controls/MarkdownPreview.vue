@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import { Divider } from 'primevue'
+import { Divider } from 'openvue'
 import { parseMarkdownAsync } from '@/utils/markdown.ts'
 import { ref, watch } from 'vue'
 import { useDebounceFn } from '@vueuse/core'

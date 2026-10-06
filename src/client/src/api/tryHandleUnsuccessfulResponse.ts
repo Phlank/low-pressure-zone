@@ -1,6 +1,6 @@
 import { showApiStatusToast } from '@/utils/toastUtils'
 import type { FormValidation } from '@/validation/types/formValidation'
-import type { ToastServiceMethods } from 'primevue'
+import type { ToastServiceMethods } from 'openvue'
 import type { ApiResponse } from './apiResponse'
 
 /**

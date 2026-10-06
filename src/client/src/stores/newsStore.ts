@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import newsApi, { type NewsResponse } from '@/api/resources/newsApi.ts'
 import { computed, ref, type Ref } from 'vue'
-import { useToast } from 'primevue'
+import { useToast } from 'openvue'
 import { showDeleteSuccessToast, showSuccessToast } from '@/utils/toastUtils.ts'
 import { removeEntity } from '@/utils/arrayUtils.ts'
 import { useRefresh } from '@/composables/useRefresh.ts'
@@ -24,7 +24,7 @@ export const useNewsStore = defineStore('newsStore', () => {
     (id, form) => {
       const entity: NewsResponse = {
         id: id,
-        createdAt: new Date().toUTCString(),
+        publishedAt: new Date().toUTCString(),
         ...form
       }
       newsItems.value.unshift(entity)
@@ -38,7 +38,7 @@ export const useNewsStore = defineStore('newsStore', () => {
     newsApi.put,
     (form, entity) => {
       entity.title = form.title
-      entity.body = form.body
+      entity.content = form.content
       showSuccessToast(toast, 'Updated', 'News', form.title)
     },
     toast

@@ -33,7 +33,7 @@ import type { TabContent } from '@/api/resources/settingsApi.ts'
 import { type Ref, ref } from 'vue'
 import { required } from '@/validation/rules/untypedRules.ts'
 import { createFormValidation } from '@/validation/types/formValidation.ts'
-import { InputText, Textarea } from 'primevue'
+import { InputText, Textarea } from 'openvue'
 import { notEmptyArray } from '@/validation/rules/arrayRules.ts'
 
 const welcomeSettings = useWelcomeSettingsStore()

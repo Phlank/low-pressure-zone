@@ -21,7 +21,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primevue'
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'openvue'
 import NewsTab from '@/components/views/home/NewsTab.vue'
 import AboutTab from '@/components/views/home/AboutTab.vue'
 

@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Divider } from 'primevue'
+import { Divider } from 'openvue'
 import { computed, inject, type Ref, ref, useTemplateRef, watch } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
 import ExpandableContent from '@/components/controls/ExpandableContent.vue'

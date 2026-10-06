@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Button } from 'primevue'
+import { Button } from 'openvue'
 import { computed, inject, ref, type Ref } from 'vue'
 import { type GridAction, type GridActionEmits, gridActions } from './gridAction'
 import GridActionsDrawer from './GridActionsDrawer.vue'

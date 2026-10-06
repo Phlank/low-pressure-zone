@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primevue'
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'openvue'
 import { ref, type Ref } from 'vue'
 import ActiveUsersTab from '@/components/views/dashboard/users/ActiveUsersTab.vue'
 import PendingInvitesTab from '@/components/views/dashboard/users/PendingInvitesTab.vue'

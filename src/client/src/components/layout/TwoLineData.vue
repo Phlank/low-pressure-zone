@@ -1,22 +1,31 @@
 <template>
   <div class="two-line-data">
-    <div :class="{ 'two-line-data__top': true, 'two-line-data__top__wrapped': wrapTop }">{{ above }}</div>
+    <div :class="{ 'two-line-data__top': true, 'two-line-data__top__wrapped': wrapTop }">
+      <slot name="above">
+        {{ above }}
+      </slot>
+    </div>
     <div
-      v-if="below"
+      v-if="below || $slots.below"
       class="two-line-data__bottom">
-      {{ below }}
+      <slot name="below">
+        {{ below }}
+      </slot>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-withDefaults(defineProps<{
-  above: string
-  below: string
-  wrapTop?: boolean
-}>(), {
-  wrapTop: false
-})
+withDefaults(
+  defineProps<{
+    above: string
+    below: string
+    wrapTop?: boolean
+  }>(),
+  {
+    wrapTop: false
+  }
+)
 </script>
 
 <style lang="scss">

@@ -11,7 +11,7 @@ public class DeleteClashSlot(DataContext dataContext, ClashSlotRules rules) : En
 {
     public override void Configure()
     {
-        Delete("/schedules/{scheduleId}/clashSlots/{id}");
+        Delete("/schedules/{scheduleId}/clash-slots/{id}");
         Description(builder => builder.Produces(204)
                                       .Produces(404));
         Roles(RoleNames.Admin, RoleNames.Organizer);

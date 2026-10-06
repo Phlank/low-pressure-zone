@@ -1,4 +1,4 @@
-import type { ToastServiceMethods } from 'primevue'
+import type { ToastServiceMethods } from 'openvue'
 
 const TOAST_DURATION = 5000
 

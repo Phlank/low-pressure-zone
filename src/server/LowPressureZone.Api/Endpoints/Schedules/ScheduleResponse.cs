@@ -17,4 +17,6 @@ public sealed class ScheduleResponse : ITimeRange
     public required bool IsHourlyAllowed { get; set; }
     public required bool IsClashAllowed { get; set; }
     public required bool IsVisibleToPublic { get; set; }
+    public required bool IsHourlySlotCreationAllowed { get; set; }
+    public required bool IsClashSlotCreationAllowed { get; set; }
 }

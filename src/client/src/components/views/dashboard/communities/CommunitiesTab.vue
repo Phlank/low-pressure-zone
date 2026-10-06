@@ -38,7 +38,7 @@ import FormDrawer from '@/components/form/FormDrawer.vue'
 import CommunityForm from '@/components/form/requestForms/CommunityForm.vue'
 import {type Ref, ref, useTemplateRef} from 'vue'
 import type {CommunityResponse} from '@/api/resources/communitiesApi.ts'
-import {Skeleton} from 'primevue'
+import {Skeleton} from 'openvue'
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
 
 const communities = useCommunityStore()

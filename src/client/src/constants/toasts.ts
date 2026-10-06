@@ -1,4 +1,4 @@
-import type { ToastMessageOptions } from 'primevue'
+import type { ToastMessageOptions } from 'openvue'
 
 export const noStatsToast: ToastMessageOptions = {
   severity: 'warn',

@@ -123,7 +123,7 @@
 <script lang="ts" setup>
 import { inject, ref, type Ref } from 'vue'
 import { useBroadcastStore } from '@/stores/broadcastStore.ts'
-import { Button, Column, DataTable, DataView, Dialog, Divider, Skeleton, useToast } from 'primevue'
+import { Button, Column, DataTable, DataView, Dialog, Divider, Skeleton, useToast } from 'openvue'
 import broadcastsApi, { type BroadcastResponse } from '@/api/resources/broadcastsApi.ts'
 import {
   formatDurationTimestamp,

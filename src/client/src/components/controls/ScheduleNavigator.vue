@@ -89,7 +89,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Button, Select } from 'primevue'
+import { Button, Select } from 'openvue'
 import { computed, type Ref, ref, watch } from 'vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import FormField from '@/components/form/FormField.vue'

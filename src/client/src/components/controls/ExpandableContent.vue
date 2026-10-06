@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Button } from 'primevue'
+import { Button } from 'openvue'
 import { computed, ref } from 'vue'
 import { useMutationObserver, useResizeObserver } from '@vueuse/core'
 

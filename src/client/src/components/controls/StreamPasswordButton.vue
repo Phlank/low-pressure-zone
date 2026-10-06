@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Button, Dialog, InputText, useToast } from 'primevue'
+import { Button, Dialog, InputText, useToast } from 'openvue'
 import { onMounted, type Ref, ref } from 'vue'
 import { useConnectionInfoStore } from '@/stores/connectionInfoStore.ts'
 import usersApi from '@/api/resources/usersApi.ts'

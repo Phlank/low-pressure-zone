@@ -25,7 +25,7 @@
 <script lang="ts" setup>
 import FormArea from '@/components/form/FormArea.vue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
-import { Button, InputText, useToast } from 'primevue'
+import { Button, InputText, useToast } from 'openvue'
 import { onMounted, type Ref, ref } from 'vue'
 import { streamerRequestRules } from '@/validation/requestRules.ts'
 import { createFormValidation } from '@/validation/types/formValidation.ts'

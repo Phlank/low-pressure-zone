@@ -2,7 +2,7 @@
 import { computed, type ComputedRef, type Ref, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { useRefresh } from '@/composables/useRefresh.ts'
-import { useToast } from 'primevue'
+import { useToast } from 'openvue'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import { err, ok, type Result } from '@/types/result.ts'
 import { showSuccessToast } from '@/utils/toastUtils.ts'

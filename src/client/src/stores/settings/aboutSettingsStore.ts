@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import settingsApi from '@/api/resources/settingsApi.ts'
-import { useToast } from 'primevue'
+import { useToast } from 'openvue'
 import { useRefresh } from '@/composables/useRefresh.ts'
 import { useUpdateSettingFn } from '@/utils/storeFns.ts'
 import { showEditSuccessToast } from '@/utils/toastUtils.ts'

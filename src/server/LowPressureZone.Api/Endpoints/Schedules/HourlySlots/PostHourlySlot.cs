@@ -21,7 +21,7 @@ public class PostHourlySlot(
 {
     public override void Configure()
     {
-        Post("/schedules/{id}/hourly-slots");
+        Post("/schedules/{id}/hourlySlots");
         AllowFormData();
         AllowFileUploads();
         Description(b => b.Produces(201));

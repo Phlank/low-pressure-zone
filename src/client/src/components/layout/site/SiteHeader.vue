@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Toolbar } from 'primevue'
+import { Toolbar } from 'openvue'
 import DarkModeToggle from '../../controls/DarkModeToggle.vue'
 import SiteNavMenu from '../../controls/SiteNavMenu.vue'
 import ChatButton from '@/components/controls/ChatButton.vue'

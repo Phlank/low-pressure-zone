@@ -11,10 +11,11 @@ const props = withDefaults(
   defineProps<{
     for: string
     text?: string
-    message: string
+    message?: string
     optional?: boolean
   }>(),
   {
+    message: undefined,
     optional: false
   }
 )

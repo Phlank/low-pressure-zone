@@ -14,23 +14,6 @@
           @update:model-value="val.validateIfDirty('name')" />
       </IftaFormField>
       <IftaFormField
-        :message="val.message('type')"
-        input-id="typeInput"
-        label="Type"
-        size="m">
-        <Select
-          id="typeInput"
-          v-model:model-value="state.type"
-          :disabled="isSubmitting || props.schedule !== undefined"
-          :invalid="!val.isValid('type')"
-          :option-label="(data) => data.value"
-          :option-value="(data) => data.key"
-          :options="entriesToKeyValueArray(scheduleTypes)"
-          autofocus
-          @update:model-value="val.validateIfDirty('type')">
-        </Select>
-      </IftaFormField>
-      <IftaFormField
         :message="val.message('communityId')"
         input-id="communityInput"
         label="Community"
@@ -79,6 +62,24 @@
           show-time
           @update:model-value="val.validateIfDirty('endsAt')" />
       </IftaFormField>
+      <InlineFormField
+        label="Hourly Slots"
+        input-id="isHourlyAllowedInput"
+        size="xs">
+        <ToggleSwitch
+          v-model="state.isHourlyAllowed"
+          :invalid="!val.isValid('isHourlyAllowed')"
+          input-id="isHourlyAllowedInput" />
+      </InlineFormField>
+      <InlineFormField
+        label="Clash Slots"
+        input-id="isClashAllowedInput"
+        size="xs">
+        <ToggleSwitch
+          v-model="state.isClashAllowed"
+          :invalid="!val.isValid('isClashAllowed')"
+          input-id="isClashAllowedInput" />
+      </InlineFormField>
       <IftaFormField
         :message="val.message('description')"
         input-id="descriptionInput"
@@ -93,12 +94,12 @@
           auto-resize />
       </IftaFormField>
       <InlineFormField
-        input-id="isOrganizersOnlyInput"
+        input-id="isVisibleToPublicInput"
         label="Visible to Organizers Only"
         size="xs">
         <ToggleSwitch
-          v-model="state.isOrganizersOnly"
-          input-id="isOrganizersOnlyInput" />
+          v-model="state.isVisibleToPublic"
+          input-id="isVisibleToPublicInput" />
       </InlineFormField>
     </FormArea>
     <MarkdownPreview
@@ -108,7 +109,7 @@
 </template>
 
 <script lang="ts" setup>
-import { DatePicker, InputText, Select, Textarea, ToggleSwitch } from 'primevue'
+import { DatePicker, InputText, Select, Textarea, ToggleSwitch } from 'openvue'
 import { computed, onMounted, type Ref, ref } from 'vue'
 import { MS_PER_MINUTE } from '@/constants/times'
 import { minimumDate, parseDate } from '@/utils/dateUtils'
@@ -120,8 +121,6 @@ import IftaFormField from '@/components/form/IftaFormField.vue'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
 import { useEntityForm } from '@/composables/useEntityForm.ts'
 import { alwaysValid } from '@/validation/rules/untypedRules.ts'
-import entriesToKeyValueArray from '@/utils/entriesToKeyValueArray.ts'
-import { scheduleTypes } from '@/constants/scheduleTypes.ts'
 import InlineFormField from '@/components/form/InlineFormField.vue'
 import MarkdownPreview from '@/components/controls/MarkdownPreview.vue'
 
@@ -178,7 +177,6 @@ const { state, val, isSubmitting, submit, reset } = useEntityForm<
   entity: props.schedule,
   formStateInitializeFn: (schedule) => {
     const stateRef: Ref<ScheduleFormState> = ref({
-      type: schedule?.type ?? scheduleTypes.Hourly,
       communityId: schedule?.community.id ?? '',
       startTime: computed({
         get: () => parseDate(stateRef.value.startsAt),
@@ -198,7 +196,9 @@ const { state, val, isSubmitting, submit, reset } = useEntityForm<
       endsAt:
         schedule?.endsAt ??
         new Date(resetStartTime.getTime() + defaultMinutes * MS_PER_MINUTE).toISOString(),
-      isOrganizersOnly: schedule?.isOrganizersOnly ?? false
+      isHourlyAllowed: schedule?.isHourlyAllowed ?? true,
+      isClashAllowed: schedule?.isClashAllowed ?? false,
+      isVisibleToPublic: schedule?.isVisibleToPublic ?? false
     })
     return stateRef
   },

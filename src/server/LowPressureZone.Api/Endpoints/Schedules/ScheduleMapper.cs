@@ -52,8 +52,11 @@ public sealed class ScheduleMapper(
             IsVisibleToPublic = schedule.IsVisibleToPublic,
             IsEditable = rules.IsEditAuthorized(schedule),
             IsDeletable = rules.IsDeleteAuthorized(schedule),
-            IsHourlyAllowed = rules.IsAddingHourlySlotsAllowed(schedule),
-            IsClashAllowed = rules.IsAddingClashSlotsAllowed(schedule),
+            IsHourlyAllowed = schedule.AllowedSlotTypes.IsHourlyAllowed,
+            IsClashAllowed = schedule.AllowedSlotTypes.IsClashAllowed,
+            IsHourlySlotCreationAllowed = rules.IsAddingHourlySlotsAllowed(schedule),
+            IsClashSlotCreationAllowed = rules.IsAddingClashSlotsAllowed(schedule),
+            
         };
     }
 }

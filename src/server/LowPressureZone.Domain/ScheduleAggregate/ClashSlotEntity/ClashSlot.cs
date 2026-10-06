@@ -133,6 +133,7 @@ public class ClashSlot : Entity, ITimeRange
 
     public static void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<ClashSlot>().Property(e => e.Id).ValueGeneratedNever();
         modelBuilder.Entity<ClashSlot>()
                     .ComplexProperty(clash => clash.TimeRange);
 

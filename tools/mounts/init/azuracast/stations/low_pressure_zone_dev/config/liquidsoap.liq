@@ -10,14 +10,14 @@ init.daemon.pidfile.path := "/var/azuracast/stations/low_pressure_zone_dev/confi
 
 settings.init.compact_before_start := true
 
-environment.set("TZ", "UTC") 
+environment.set("TZ", {str_ncewf|UTC|str_ncewf}) 
 
-settings.azuracast.liquidsoap_api_port := 8004
-settings.azuracast.api_url := "http://127.0.0.1:6010/api/internal/1/liquidsoap"
-settings.azuracast.api_key := "01f44527810f628fc5d46c29236dd8aff4ccda01c0bf0982f960b3410860a9c546c8470a57951c1d36ad290912aa2a7d8673"
+settings.azuracast.liquidsoap_api_port := 8024
+settings.azuracast.api_url := {str_lzktv|http://127.0.0.1:6010/api/internal/1/liquidsoap|str_lzktv}
+settings.azuracast.api_key := {str_fwxih|c4ac878496212b817fc499653388e30fe009243ac2d603c89ea82f269fdbb75851bcc33f3657968f69eba865c65523575363|str_fwxih}
 settings.azuracast.media_path := "/var/azuracast/stations/low_pressure_zone_dev/media"
-settings.azuracast.fallback_path := "/usr/local/share/icecast/web/error.mp3"
-settings.azuracast.temp_path := "/var/azuracast/stations/low_pressure_zone_dev/temp"
+settings.azuracast.fallback_path := {str_kwmlr|/usr/local/share/icecast/web/error.mp3|str_kwmlr}
+settings.azuracast.temp_path := {str_jiqiy|/var/azuracast/stations/low_pressure_zone_dev/temp|str_jiqiy}
 
 settings.azuracast.compute_autocue := false
 
@@ -25,17 +25,20 @@ settings.azuracast.default_fade := 2.00
 settings.azuracast.default_cross := 3.00
 settings.azuracast.enable_crossfade := true
 settings.azuracast.crossfade_type := "normal"
+settings.azuracast.crossfade_smart_high := -15.00
+settings.azuracast.crossfade_smart_medium := -32.00
+settings.azuracast.crossfade_smart_margin := 8.00
 
-settings.azuracast.live_broadcast_text := "Live Broadcast"
+settings.azuracast.live_broadcast_text := {str_lgpnd|Live Broadcast|str_lgpnd}
 
 # Start HTTP API Server
 azuracast.start_http_api()
 
 
-playlist_archives = playlist(id="playlist_archives",mime_type="audio/x-mpegurl",mode="randomize",reload_mode="watch","/var/azuracast/stations/low_pressure_zone_dev/playlists/playlist_archives.m3u")
+playlist_rotation = playlist(id={str_hfpmr|playlist_rotation|str_hfpmr},mime_type="audio/x-mpegurl",mode="randomize",reload_mode="watch","/var/azuracast/stations/low_pressure_zone_dev/playlists/playlist_rotation.m3u")
 
 # Standard Playlists
-radio = random(id="standard_playlists", weights=[3], [playlist_archives])
+radio = random(id="standard_playlists", weights=[3], [playlist_rotation])
 
 radio = azuracast.enable_autodj(radio)
 
@@ -64,7 +67,7 @@ radio_without_live = radio
 ignore(radio_without_live)
 
 # Live Broadcasting
-live = input.harbor("/live", id = "input_streamer", port = 8030, auth = azuracast.dj_auth, icy = true, icy_metadata_charset = "UTF-8", metadata_charset = "UTF-8", buffer = 5.00, max = 10.00)
+live = input.harbor({str_moiez|/live|str_moiez}, id = "input_streamer", port = 8030, auth = azuracast.dj_auth, icy = true, icy_metadata_charset = {str_phcda|UTF-8|str_phcda}, metadata_charset = {str_znvou|UTF-8|str_znvou}, buffer = 5.00, max = 10.00)
 live.on_connect(synchronous=false, azuracast.live_connected)
 live.on_disconnect(synchronous=false, azuracast.live_disconnected)
 
@@ -113,28 +116,6 @@ end
 # Continuously check on live.
 source.methods(radio).on_frame(synchronous=true, check_live)
 
-# Record Live Broadcasts
-output.file(
-    %ffmpeg(format="mp3", %audio(codec="libmp3lame", ac=2, ar=44100, b="320k")),
-    fun () -> begin
-        if (azuracast.live_enabled()) then
-            time.string("#{settings.azuracast.temp_path()}/#{azuracast.live_dj()}/stream_%Y%m%d-%H%M%S.mp3.tmp")
-        else
-            ""
-        end
-    end,
-    live,
-    fallible=true,
-    on_close=fun (tempPath) -> begin
-        newPath = string.replace(pattern=".tmp$", (fun(_) -> ""), tempPath)
-
-        log("Recording stopped: Switching from #{tempPath} to #{newPath}")
-
-        process.run("mv #{tempPath} #{newPath}")
-        ()
-    end
-)
-
 # Allow for Telnet-driven insertion of custom metadata.
 azuracast.utilities.add_custom_metadata_command(id="custom_metadata", radio)
 
@@ -148,6 +129,6 @@ source.methods(radio).on_metadata(synchronous=false, azuracast.send_feedback)
 radio = azuracast.handle_jingle_mode(radio)
 
 # Local Broadcasts
-output.icecast(%ffmpeg(format="mp3", %audio(codec="libmp3lame", ac=2, ar=44100, b="320k")), id="local_1", host = "127.0.0.1", port = 8000, password = "DExGYGJJ", mount = "/live-320", name = "Low Pressure Zone DEV", description = "", genre = "", public = false, encoding = "UTF-8", radio)
+output.icecast(%ffmpeg(format="mp3", %audio(codec="libmp3lame", ac=2, ar=44100, b="320k")), id="local_1", host = {str_vugas|127.0.0.1|str_vugas}, port = 8020, password = {str_myexy|qrEE7aHQ|str_myexy}, mount = {str_ygnml|/live-320|str_ygnml}, name = {str_breqq|Low Pressure Zone Dev|str_breqq}, description = {str_aesrx||str_aesrx}, genre = {str_axhuc||str_axhuc}, public = false, encoding = {str_wrzih|UTF-8|str_wrzih}, radio)
 
 # Remote Relays

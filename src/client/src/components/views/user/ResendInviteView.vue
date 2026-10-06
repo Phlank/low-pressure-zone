@@ -37,7 +37,7 @@
 import { emailAddress } from '@/validation/rules/stringRules'
 import { createFormValidation } from '@/validation/types/formValidation'
 import { combineRules } from '@/validation/types/validationRule'
-import { Button, InputText, Message, useToast } from 'primevue'
+import { Button, InputText, Message, useToast } from 'openvue'
 import { reactive, ref } from 'vue'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import invitesApi from '@/api/resources/invitesApi.ts'

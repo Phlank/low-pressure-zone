@@ -9,23 +9,28 @@ const string bindMountDir = "../../../tools/mounts";
 var builder = DistributedApplication.CreateBuilder(args);
 
 var postgres = builder.AddPostgres("lpz-postgres", port: 4000)
-                      .WithDataVolume();
+                      .WithDataVolume("lpz-data"); 
 var domainDatabase = postgres.AddDatabase("lpz-domain");
 var identityDatabase = postgres.AddDatabase("lpz-identity");
 var pgAdmin = postgres.WithPgAdmin(cfg => { cfg.WithHostPort(4002); }, 
                                    containerName: "lpz-pgAdmin");
 
-var azuracast = builder.AddContainer("azuracast", "ghcr.io/azuracast/azuracast", "0.23.3")
+var azuracast = builder.AddContainer("azuracast", "ghcr.io/azuracast/azuracast", "0.23.8")
                        .WithBindMount($"{bindMountDir}/azuracast/stations",
-                                      "/var/azuracast/stations")
+                                      "/var/azuracast/stations",
+                                      isReadOnly: false)
                        .WithBindMount($"{bindMountDir}/azuracast/backups",
-                                      "/var/azuracast/backups")
-                       .WithBindMount($"{bindMountDir}/azuracast/database",
-                                      "/var/lib/mysql")
+                                      "/var/azuracast/backups",
+                                      isReadOnly: false)
+                       .WithBindMount($"{bindMountDir}/azuracast/mysql",
+                                      "/var/lib/mysql",
+                                      isReadOnly: false)
                        .WithBindMount($"{bindMountDir}/azuracast/uploads",
-                                      "/var/lib/azuracast/storage/uploads")
-                       .WithHttpEndpoint(8147, 80, "Web")
-                       .WithHttpEndpoint(8030, 8030, "Streaming")
+                                      "/var/lib/azuracast/storage/uploads",
+                                      isReadOnly: false)
+                       .WithHttpEndpoint(8147, 80, "Web", isProxied: false)
+                       .WithHttpEndpoint(8030, 8030, "Streaming", isProxied: false)
+                       .WithHttpEndpoint(8020, 8020, "Broadcasting", isProxied: false)
                        .WithEndpoint(8149, 2022, name: "SFTP", scheme: "sftp", isExternal: true)
                        .WithExternalHttpEndpoints()
                        .WithEnvironment(environment =>

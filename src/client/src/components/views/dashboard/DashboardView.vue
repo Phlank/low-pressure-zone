@@ -48,8 +48,8 @@
 <script lang="ts" setup>
 import TitledNavMenu from '@/components/controls/TitledNavMenu.vue'
 import { useAuthStore } from '@/stores/authStore'
-import { Menu, Panel } from 'primevue'
-import type { MenuItem } from 'primevue/menuitem'
+import { Menu, Panel } from 'openvue'
+import type { MenuItem } from 'openvue/menuitem'
 import { inject, onMounted, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { roles } from '@/constants/roles.ts'

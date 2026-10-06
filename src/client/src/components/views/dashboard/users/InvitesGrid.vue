@@ -63,7 +63,7 @@
 
 <script lang="ts" setup>
 import ListItem from '@/components/data/ListItem.vue'
-import { Column, DataTable, DataView, Divider } from 'primevue'
+import { Column, DataTable, DataView, Divider } from 'openvue'
 import { inject, type Ref } from 'vue'
 import { type InviteResponse } from '@/api/resources/invitesApi.ts'
 import { useInviteStore } from '@/stores/inviteStore.ts'

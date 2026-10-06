@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Toolbar } from 'primevue'
+import { Toolbar } from 'openvue'
 import PlayButton from '../../controls/PlayButton.vue'
 </script>
 

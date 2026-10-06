@@ -75,7 +75,7 @@
 <script lang="ts" setup>
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import ListItem from '@/components/data/ListItem.vue'
-import { Button, Column, DataTable, DataView, Divider } from 'primevue'
+import { Button, Column, DataTable, DataView, Divider } from 'openvue'
 import { inject, type Ref } from 'vue'
 import { type PerformerResponse } from '@/api/resources/performersApi.ts'
 import { mobilePaginatorTemplate } from '@/constants/componentTemplates.ts'

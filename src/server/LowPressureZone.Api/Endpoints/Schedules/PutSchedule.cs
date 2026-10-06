@@ -1,4 +1,5 @@
 ﻿using FastEndpoints;
+using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Core.Domain;
 using LowPressureZone.Data;
@@ -22,8 +23,7 @@ public class PutSchedule(DataContext dataContext, ScheduleRules rules)
     {
         var id = Route<Guid>("id");
         
-        var schedule = await dataContext.Schedules
-                                        .FirstOrDefaultAsync(schedule => schedule.Id == id, ct);
+        var schedule = await dataContext.Schedules.FirstOrDefaultAsync(schedule => schedule.Id == id, ct);
         if (schedule is null)
         {
             await Send.NotFoundAsync(ct);
@@ -42,8 +42,8 @@ public class PutSchedule(DataContext dataContext, ScheduleRules rules)
                                           schedule.ChangeVisibility(req.IsVisibleToPublic),
                                           schedule.ChangeTime(req.StartsAt, req.EndsAt));
         
+        this.ThrowIfDomainError(result);
         await dataContext.SaveChangesAsync(ct);
-
         await Send.NoContentAsync(ct);
     }
 }

@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Tab, TabList, TabPanel, TabPanels, Tabs, useToast } from 'primevue'
+import { Tab, TabList, TabPanel, TabPanels, Tabs, useToast } from 'openvue'
 import { onMounted, ref, type Ref } from 'vue'
 import SoftwareStreamingDirections from '@/components/views/dashboard/streaming/SoftwareStreamingDirections.vue'
 import ExternalStreamingDirections from '@/components/views/dashboard/streaming/ExternalStreamingDirections.vue'

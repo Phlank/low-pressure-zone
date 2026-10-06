@@ -12,7 +12,7 @@ public class PutClashSlot(DataContext dataContext, ClashSlotRules rules) : Endpo
 {
     public override void Configure()
     {
-        Put("/schedules/{scheduleId}/clashSlots/{id}");
+        Put("/schedules/{scheduleId}/clash-slots/{id}");
         Description(b => b.Produces(204)
                           .Produces(404));
         Roles(RoleNames.Admin, RoleNames.Organizer);

@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primevue'
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'openvue'
 import { ref } from 'vue'
 import AboutContentTab from '@/components/views/admin/content-areas/AboutContentTab.vue'
 import WelcomeContentTab from '@/components/views/admin/content-areas/WelcomeContentTab.vue'

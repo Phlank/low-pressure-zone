@@ -12,13 +12,13 @@ export default {
 
 export interface CommunityRequest {
   name: string
-  url: string
+  socialUrl: string
 }
 
 export interface CommunityResponse {
   id: string
   name: string
-  url: string
+  socialUrl: string
   isPerformable: boolean
   isEditable: boolean
   isDeletable: boolean

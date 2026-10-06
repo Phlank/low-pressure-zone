@@ -126,7 +126,7 @@ export const formatElapsedTime = (
 
 const formatTwoDigits = (value: number) => ('0' + value.toFixed(0)).slice(-2)
 
-export const isDateInTimeslot = (date: Date, timespan: { startsAt: string; endsAt: string }) => {
+export const isDateInSlot = (date: Date, timespan: { startsAt: string; endsAt: string }) => {
   const time = date.getTime()
   const startsAt = parseTime(timespan.startsAt)
   const endsAt = parseTime(timespan.endsAt)

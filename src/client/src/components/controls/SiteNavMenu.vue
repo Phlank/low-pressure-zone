@@ -73,8 +73,8 @@
 
 <script lang="ts" setup>
 import { useAuthStore } from '@/stores/authStore'
-import { Button, Menu } from 'primevue'
-import type { MenuItem } from 'primevue/menuitem'
+import { Button, Menu } from 'openvue'
+import type { MenuItem } from 'openvue/menuitem'
 import { inject, onMounted, ref, type Ref, useTemplateRef } from 'vue'
 import { RouterLink } from 'vue-router'
 import { roles } from '@/constants/roles.ts'

@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Button, Dialog } from 'primevue'
+import { Button, Dialog } from 'openvue'
 
 defineProps<{
   header: string

@@ -1,6 +1,6 @@
 {
   "name": "low-pressure-zone",
-  "version": "0.0.0",
+  "version": "1.6.7",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,21 +11,19 @@
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix",
     "stylelint": "stylelint \"**/*.vue\"",
-    "format": "prettier --write src/",
-    "generate-api": "wait-on https://localhost:5002/swagger/v1/swagger.json && dotnet tool install --global Microsoft.OpenApi.Kiota && kiota generate --language typescript --openapi https://localhost:5002/swagger/v1/swagger.json --disable-ssl-validation --output src/api/client"
+    "format": "prettier --write src/"
   },
   "dependencies": {
     "@date-fns/tz": "^1.5.0",
-    "@microsoft/kiota-bundle": "^1.0.0-preview.106",
-    "@primevue/core": "^4.5.5",
-    "@primevue/themes": "^4.5.4",
+    "@openvue/core": "1.0.0",
+    "@openvue/themes": "1.0.0",
     "@vueuse/core": "^14.4.0",
     "date-fns": "^4.4.0",
     "dompurify": "^3.4.13",
     "marked": "^18.0.9",
+    "openvue": "1.0.0",
     "pinia": "^4.0.3",
     "primeicons": "^7.0.0",
-    "primevue": "^4.5.5",
     "vue": "^3.5.41",
     "vue-eslint-parser": "^10.4.1",
     "vue-router": "^5.2.0"
@@ -59,5 +57,5 @@
     "vite-plugin-vue-devtools": "^8.2.1",
     "vue-tsc": "^3.3.10"
   },
-  "packageManager": "yarn@4.12.0"
+  "packageManager": "yarn@4.18.1"
 }

@@ -1,9 +1,9 @@
 import './assets/main.scss'
 
-import { PrimeVue } from '@primevue/core'
-import Aura from '@primevue/themes/aura'
+import { PrimeVue } from '@openvue/core'
+import Aura from '@openvue/themes/aura'
 import { createPinia } from 'pinia'
-import { Ripple, ToastService } from 'primevue'
+import { Ripple, ToastService } from 'openvue'
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'

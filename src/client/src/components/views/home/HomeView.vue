@@ -10,7 +10,7 @@
 
 <script lang="ts" setup>
 import UpcomingSchedules from './UpcomingSchedules.vue'
-import { Divider, Panel } from 'primevue'
+import { Divider, Panel } from 'openvue'
 import InfoArea from '@/components/views/home/InfoArea.vue'
 </script>
 

@@ -15,16 +15,16 @@
           @update:model-value="val.validateIfDirty('name')" />
       </IftaFormField>
       <IftaFormField
-        :message="val.message('url')"
+        :message="val.message('socialUrl')"
         input-id="urlInput"
         label="URL"
         size="m">
         <InputText
           id="urlInput"
-          v-model:model-value="state.url"
+          v-model:model-value="state.socialUrl"
           :disabled="isSubmitting"
-          :invalid="!val.isValid('url')"
-          @update:model-value="val.validateIfDirty('url')" />
+          :invalid="!val.isValid('socialUrl')"
+          @update:model-value="val.validateIfDirty('socialUrl')" />
       </IftaFormField>
       <template #actions>
         <slot name="actions"></slot>
@@ -34,7 +34,7 @@
 </template>
 
 <script lang="ts" setup>
-import { InputText } from 'primevue'
+import { InputText } from 'openvue'
 import { onMounted, ref } from 'vue'
 import { communityRequestRules } from '@/validation/requestRules'
 import { type CommunityResponse } from '@/api/resources/communitiesApi.ts'
@@ -54,21 +54,19 @@ const props = withDefaults(
   }
 )
 
-const { state, val, isSubmitting, submit, reset } = useEntityForm(
-  {
-    validationRules: communityRequestRules,
-    entity: props.community,
-    formStateInitializeFn: (community) => {
-      return ref({
-        name: community?.name ?? '',
-        url: community?.url ?? ''
-      })
-    },
-    createPersistentEntityFn: communities.createCommunity,
-    updatePersistentEntityFn: communities.updateCommunity,
-    onSubmitted: () => emit('submitted')
-  }
-)
+const { state, val, isSubmitting, submit, reset } = useEntityForm({
+  validationRules: communityRequestRules,
+  entity: props.community,
+  formStateInitializeFn: (community) => {
+    return ref({
+      name: community?.name ?? '',
+      socialUrl: community?.socialUrl ?? ''
+    })
+  },
+  createPersistentEntityFn: communities.createCommunity,
+  updatePersistentEntityFn: communities.updateCommunity,
+  onSubmitted: () => emit('submitted')
+})
 
 defineExpose({
   formState: state,

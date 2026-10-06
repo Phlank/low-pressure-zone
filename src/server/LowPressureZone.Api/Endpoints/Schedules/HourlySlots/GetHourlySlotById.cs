@@ -8,7 +8,7 @@ public class GetHourlySlotById(DataContext dataContext) : EndpointWithoutRequest
 {
     public override void Configure()
     {
-        Get("/schedules/{scheduleId}/hourly-slots/{id}");
+        Get("/schedules/{scheduleId}/hourlySlots/{id}");
         Description(builder => builder.Produces(404));
         AllowAnonymous();
     }

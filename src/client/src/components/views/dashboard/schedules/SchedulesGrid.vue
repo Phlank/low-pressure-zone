@@ -2,7 +2,7 @@
   <div class="schedules-grid">
     <div>
       <DataTable
-        :expanded-rows="expandedRows"
+        v-model:expanded-rows="expandedRows"
         :paginator-template="isMobile ? mobilePaginatorTemplate : undefined"
         :rows="isMobile ? undefined : 10"
         :value="schedules"
@@ -28,7 +28,9 @@
             field="start"
             header="Date">
             <template #body="{ data }: { data: ScheduleResponse }">
-              {{ parseDate(data.startsAt).toLocaleDateString(undefined, scheduleDateStringOptions) }}
+              {{
+                parseDate(data.startsAt).toLocaleDateString(undefined, scheduleDateStringOptions)
+              }}
             </template>
           </Column>
           <Column
@@ -44,7 +46,9 @@
             <template #body="{ data }: { data: ScheduleResponse }">
               <TwoLineData
                 :above="data.name"
-                :below="parseDate(data.startsAt).toLocaleDateString(undefined, scheduleDateStringOptions)" />
+                :below="
+                  parseDate(data.startsAt).toLocaleDateString(undefined, scheduleDateStringOptions)
+                " />
             </template>
           </Column>
           <!-- Only show the action col for grids with schedules in the future -->
@@ -66,12 +70,10 @@
           </Column>
         </template>
         <template #expansion="rowProps: { data: ScheduleResponse }">
-          <SoundclashGrid
-            v-if="rowProps.data.type === scheduleTypes.Soundclash"
-            :schedule="rowProps.data" />
-          <TimeslotsGrid
-            v-if="rowProps.data.type === scheduleTypes.Hourly"
-            :schedule="rowProps.data" />
+          <MarkdownContent
+            v-if="rowProps.data.description"
+            :content="rowProps.data.description" />
+          <SlotsGrid :schedule="rowProps.data" />
         </template>
         <template #paginatorstart>
           <Button
@@ -79,10 +81,9 @@
             label="Create Schedule"
             @click="emit('create')" />
         </template>
-        <template
-          v-if="!hideActions && isMobile"
-          #footer>
+        <template #footer>
           <Button
+            v-if="!hideActions && isMobile"
             label="Create Schedule"
             style="width: 100%"
             @click="emit('create')" />
@@ -95,13 +96,10 @@
 <script lang="ts" setup>
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import { formatReadableTime, parseDate, parseTime } from '@/utils/dateUtils'
-import { Button, Column, DataTable, useToast } from 'primevue'
+import { Button, Column, DataTable, useToast } from 'openvue'
 import { computed, inject, ref, type Ref } from 'vue'
-import TimeslotsGrid from './TimeslotsGrid.vue'
 import { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
 import { mobilePaginatorTemplate } from '@/constants/componentTemplates.ts'
-import { scheduleTypes } from '@/constants/scheduleTypes.ts'
-import SoundclashGrid from '@/components/views/dashboard/schedules/SoundclashGrid.vue'
 import { useCommunityStore } from '@/stores/communityStore.ts'
 import { roles } from '@/constants/roles.ts'
 import copyToClipboard from '@/utils/copyToClipboard.ts'
@@ -109,6 +107,8 @@ import { scheduleToRedditMarkdown } from '@/utils/markdown.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
 import TwoLineData from '@/components/layout/TwoLineData.vue'
 import { scheduleDateStringOptions } from '@/constants/dateFormats.ts'
+import SlotsGrid from '@/components/views/dashboard/schedules/SlotsGrid.vue'
+import MarkdownContent from '@/components/controls/MarkdownContent.vue'
 
 const communities = useCommunityStore()
 const auth = useAuthStore()

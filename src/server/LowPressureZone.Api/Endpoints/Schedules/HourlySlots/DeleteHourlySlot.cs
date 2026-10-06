@@ -12,7 +12,7 @@ public class DeleteHourlySlot(HourlySlotRules rules, DataContext dataContext) : 
 {
     public override void Configure()
     {
-        Delete("/schedules/{scheduleId}/hourly-slots/{id}");
+        Delete("/schedules/{scheduleId}/hourlySlots/{id}");
         Description(builder => builder.Produces(204));
         Roles(RoleNames.AllRoles);
     }

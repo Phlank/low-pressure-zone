@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Button } from 'primevue'
+import { Button } from 'openvue'
 
 const discordInvite = import.meta.env.VITE_DISCORD_INVITE_LINK
 </script>

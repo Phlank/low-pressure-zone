@@ -1,6 +1,6 @@
 <template>
   <TwoLineData
-    :below="name"
+    :below="`${isPrerecorded ? 'Prerecorded' : 'Live'}${name ? `: ${name}` : ''}`"
     :above="performer" />
 </template>
 
@@ -9,8 +9,9 @@ import TwoLineData from '@/components/layout/TwoLineData.vue'
 
 withDefaults(
   defineProps<{
-    name?: string
+    name?: string | null
     performer: string
+    isPrerecorded: boolean
   }>(),
   {
     name: ''

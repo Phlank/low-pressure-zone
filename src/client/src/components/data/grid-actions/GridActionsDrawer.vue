@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Button, Drawer } from 'primevue'
+import { Button, Drawer } from 'openvue'
 import type { Ref } from 'vue'
 import type { GridAction } from './gridAction'
 

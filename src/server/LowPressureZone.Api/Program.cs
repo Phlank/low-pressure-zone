@@ -31,6 +31,7 @@ app.UseCors("Frontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseStaticFiles();
+app.UseResponseCaching();
 if (app.Environment.IsDevelopment())
 {
     app.UseHangfireDashboard();

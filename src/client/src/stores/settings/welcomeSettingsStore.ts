@@ -4,7 +4,7 @@ import { ref, type Ref } from 'vue'
 import { defineStore } from 'pinia'
 import { useAuthStore } from '@/stores/authStore.ts'
 import { useUpdateSettingFn } from '@/utils/storeFns.ts'
-import { useToast } from 'primevue'
+import { useToast } from 'openvue'
 import { showEditSuccessToast } from '@/utils/toastUtils.ts'
 
 export const useWelcomeSettingsStore = defineStore('welcomeSettingsStore', () => {

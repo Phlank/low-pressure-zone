@@ -37,8 +37,8 @@
 
 <script lang="ts" setup>
 import { inject, type Ref } from 'vue'
-import type { MenuItem } from 'primevue/menuitem'
-import { Menu, Panel } from 'primevue'
+import type { MenuItem } from 'openvue/menuitem'
+import { Menu, Panel } from 'openvue'
 import TitledNavMenu from '@/components/controls/TitledNavMenu.vue'
 import { useRouter } from 'vue-router'
 

@@ -12,8 +12,8 @@ public class ClashSlotMapper(PerformerMapper performerMapper, ClashSlotRules rul
     {
         Id = entity.Id,
         ScheduleId = entity.ScheduleId,
-        PerformerOne = performerMapper.FromEntity(entity.PerformerOne),
-        PerformerTwo = performerMapper.FromEntity(entity.PerformerTwo),
+        PerformerOneId = entity.PerformerOneId,
+        PerformerTwoId = entity.PerformerTwoId,
         Rounds = entity.Rounds,
         StartsAt = entity.TimeRange.StartsAt,
         Duration = entity.TimeRange.Duration,

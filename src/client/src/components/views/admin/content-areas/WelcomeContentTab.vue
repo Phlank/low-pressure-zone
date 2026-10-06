@@ -56,7 +56,7 @@
 import { useWelcomeSettingsStore } from '@/stores/settings/welcomeSettingsStore.ts'
 import type { TabContent } from '@/api/resources/settingsApi.ts'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
-import { type DataTableRowReorderEvent, Divider, Tabs, TabList, Tab, TabPanels, TabPanel, DataTable, Column, Button } from 'primevue'
+import { type DataTableRowReorderEvent, Divider, Tabs, TabList, Tab, TabPanels, TabPanel, DataTable, Column, Button } from 'openvue'
 import FormDrawer from '@/components/form/FormDrawer.vue'
 import WelcomeSettingsTabForm from '@/components/form/requestForms/WelcomeSettingsTabForm.vue'
 import { type Ref, ref, useTemplateRef } from 'vue'

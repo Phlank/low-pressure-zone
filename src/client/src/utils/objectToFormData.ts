@@ -3,6 +3,8 @@ const objectToFormData = <T extends object>(
   form?: FormData,
   parentKey?: string
 ): FormData => {
+  if (obj instanceof FormData) return obj
+
   const formData = form || new FormData()
 
   Object.entries(obj).forEach(([key, value]) => {

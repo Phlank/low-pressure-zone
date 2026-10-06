@@ -8,7 +8,7 @@ import communityRelationshipsApi, {
   type CommunityRelationshipRequest,
   type CommunityRelationshipResponse
 } from '@/api/resources/communityRelationshipsApi.ts'
-import { useToast } from 'primevue'
+import { useToast } from 'openvue'
 import tryHandleUnsuccessfulResponse from '@/api/tryHandleUnsuccessfulResponse.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
 import { type Role, roles } from '@/constants/roles.ts'
@@ -95,7 +95,7 @@ export const useCommunityStore = defineStore('communityStore', () => {
     const entity = getEntity(communities.value, id)
     if (!entity) return err()
     entity.name = formState.value.name
-    entity.url = formState.value.url
+    entity.socialUrl = formState.value.socialUrl
     return ok()
   }
 

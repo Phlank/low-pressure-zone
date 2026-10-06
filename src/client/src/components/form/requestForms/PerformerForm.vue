@@ -15,16 +15,16 @@
           @update:model-value="val.validateIfDirty('name')" />
       </IftaFormField>
       <IftaFormField
-        :message="val.message('url')"
+        :message="val.message('socialUrl')"
         input-id="urlInput"
         label="URL"
         size="l">
         <InputText
           id="urlInput"
-          v-model:model-value="state.url"
+          v-model:model-value="state.socialUrl"
           :disabled="isSubmitting"
-          :invalid="!val.isValid('url')"
-          @update:model-value="val.validateIfDirty('url')" />
+          :invalid="!val.isValid('socialUrl')"
+          @update:model-value="val.validateIfDirty('socialUrl')" />
       </IftaFormField>
       <template #actions>
         <slot name="actions"></slot>
@@ -34,7 +34,7 @@
 </template>
 
 <script lang="ts" setup>
-import { InputText } from 'primevue'
+import { InputText } from 'openvue'
 import { onMounted, ref } from 'vue'
 import { performerRequestRules } from '@/validation/requestRules'
 import { type PerformerResponse } from '@/api/resources/performersApi.ts'
@@ -55,7 +55,7 @@ const { state, val, isSubmitting, submit, reset } = useEntityForm({
   formStateInitializeFn: (performer) =>
     ref({
       name: performer?.name ?? '',
-      url: performer?.url ?? ''
+      socialUrl: performer?.socialUrl ?? ''
     }),
   createPersistentEntityFn: performers.create,
   updatePersistentEntityFn: performers.update,

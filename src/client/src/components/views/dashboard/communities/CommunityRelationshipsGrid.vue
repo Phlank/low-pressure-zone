@@ -79,7 +79,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Button, Column, DataTable, DataView, Divider } from 'primevue'
+import { Button, Column, DataTable, DataView, Divider } from 'openvue'
 import { type CommunityRelationshipResponse } from '@/api/resources/communityRelationshipsApi.ts'
 import { computed, type ComputedRef, inject, type Ref } from 'vue'
 import type { UserResponse } from '@/api/resources/usersApi.ts'

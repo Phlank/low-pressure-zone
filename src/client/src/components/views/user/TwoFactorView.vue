@@ -43,7 +43,7 @@
 import { KeyName } from '@/constants/keys'
 import { Routes } from '@/router/routes'
 import { onKeyDown } from '@vueuse/core'
-import { Button, InputText, Message, ToggleSwitch } from 'primevue'
+import { Button, InputText, Message, ToggleSwitch } from 'openvue'
 import { type Ref, ref } from 'vue'
 import { type TwoFactorRequest } from '@/api/resources/authApi.ts'
 import FormArea from '@/components/form/FormArea.vue'

@@ -5,6 +5,7 @@ import { getPublicSlotHours, getSlotForTime } from '@/utils/scheduleUtils.ts'
 import { TZDate } from '@date-fns/tz'
 import ianaTimezones from '@/constants/ianaTimezones.ts'
 import { formatReadableTime } from '@/utils/dateUtils.ts'
+import { usePerformerStore } from '@/stores/performerStore.ts'
 
 export const parseMarkdownAsync = async (markdown: string): Promise<string> => {
   const parsed = await marked.parse(markdown)
@@ -52,7 +53,7 @@ export const scheduleToRedditMarkdown = (schedule: ScheduleResponse) => {
   const rowsMarkdown: string[] = []
   const shouldUseDetails = rows.some((row) => row.subtitle !== '')
   if (shouldUseDetails) {
-    titleRow += ` ${schedule.type === 'Hourly' ? 'Details' : 'Rounds'} |`
+    titleRow += ` Details |`
     separatorRow += '---|'
   }
 
@@ -76,6 +77,7 @@ export const scheduleToRedditMarkdown = (schedule: ScheduleResponse) => {
 const getRowsForRedditMarkdownSchedule = (schedule: ScheduleResponse) => {
   const rows: { start: Date; title: string; subtitle: string }[] = []
   const hours = getPublicSlotHours(schedule)
+  const performers = usePerformerStore()
 
   hours.forEach((hour) => {
     const slot = getSlotForTime(schedule, hour)
@@ -83,18 +85,18 @@ const getRowsForRedditMarkdownSchedule = (schedule: ScheduleResponse) => {
       rows.push({ start: hour, title: '', subtitle: '' })
       return
     }
-    // TimeslotResponse check
-    if ('performer' in slot) {
+    // HourlySlotResponse check
+    if (slot.type === 'Hourly') {
       rows.push({
         start: hour,
-        title: slot.performer.name,
+        title: performers.getById(slot.performerId)?.name ?? '',
         subtitle: slot.subtitle || ''
       })
-    } else {
+    } else if (slot.type === 'Clash') {
       rows.push({
         start: hour,
-        title: `${slot.performerOne.name} vs. ${slot.performerTwo.name}`,
-        subtitle: `${slot.roundOne} - ${slot.roundTwo} - ${slot.roundThree}`
+        title: `${performers.getById(slot.performerOneId)!.name} vs. ${performers.getById(slot.performerTwoId)!.name}`,
+        subtitle: slot.rounds.join(' - ')
       })
     }
   })

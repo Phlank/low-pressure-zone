@@ -49,7 +49,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs } from 'primevue'
+import { Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs } from 'openvue'
 import { ref, type Ref, useTemplateRef } from 'vue'
 import SchedulesGrid from './SchedulesGrid.vue'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
@@ -85,7 +85,7 @@ const handleDeleteAction = (schedule: ScheduleResponse) => {
 }
 const handleConfirmDelete = async () => {
   isDeleteSubmitting.value = true
-  const result = await schedules.removeSchedule(deletingSchedule.value!.id)
+  const result = await schedules.deleteSchedule(deletingSchedule.value!.id)
   isDeleteSubmitting.value = false
   if (!result.isSuccess) return
   showDeleteDialog.value = false

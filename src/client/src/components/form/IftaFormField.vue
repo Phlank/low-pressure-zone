@@ -19,7 +19,7 @@
 <script lang="ts" setup>
 import FormField from '@/components/form/FormField.vue'
 import ValidationLabel from '@/components/form/ValidationLabel.vue'
-import { IftaLabel } from 'primevue'
+import { IftaLabel } from 'openvue'
 import { type FormFieldProps, formFieldPropsDefaults } from '@/components/form/formFieldProps.ts'
 
 withDefaults(defineProps<FormFieldProps>(), formFieldPropsDefaults)

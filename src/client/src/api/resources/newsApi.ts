@@ -12,12 +12,12 @@ export default {
 
 export interface NewsRequest {
   title: string
-  body: string
+  content: string
 }
 
 export interface NewsResponse {
   id: string
   title: string
-  body: string
-  createdAt: string
+  content: string
+  publishedAt: string
 }

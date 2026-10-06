@@ -1,7 +1,7 @@
 import { sendDelete, sendGet, sendPost, sendPut } from '../fetchFunctions'
 import type { CommunityResponse } from '@/api/resources/communitiesApi.ts'
-import type { TimeslotResponse } from '@/api/resources/timeslotsApi.ts'
-import type {SoundclashResponse} from "@/api/resources/soundclashApi.ts";
+import type { HourlySlotResponse } from '@/api/resources/hourlySlotsApi.ts'
+import type { ClashSlotResponse } from '@/api/resources/clashSlotsApi.ts'
 
 const route = (scheduleId?: string) => `/schedules${scheduleId ? '/' + scheduleId : ''}`
 
@@ -18,52 +18,57 @@ export default {
 }
 
 export interface ScheduleRequest {
-  type: string
-  startsAt: string
-  endsAt: string
   name: string
   description: string
   communityId: string
-  isOrganizersOnly: boolean
+  startsAt: string
+  endsAt: string
+  isHourlyAllowed: boolean
+  isClashAllowed: boolean
+  isVisibleToPublic: boolean
 }
 
 export interface ScheduleResponse {
   id: string
-  type: string
   startsAt: string
   endsAt: string
   name: string
   description: string
   community: CommunityResponse
-  timeslots: TimeslotResponse[]
-  soundclashes: SoundclashResponse[]
+  slots: SlotResponse[]
   isEditable: boolean
   isDeletable: boolean
-  isTimeslotCreationAllowed: boolean
-  isSoundclashCreationAllowed: boolean
-  isOrganizersOnly: boolean
+  isHourlyAllowed: boolean
+  isClashAllowed: boolean
+  isVisibleToPublic: boolean
+  isHourlySlotCreationAllowed: boolean
+  isClashSlotCreationAllowed: boolean
 }
+
+export type SlotResponse = HourlySlotResponse | ClashSlotResponse
 
 const mapRequest = <TSchedule extends ScheduleRequest>(schedule: TSchedule): ScheduleRequest => {
   return {
-    type: schedule.type,
+    name: schedule.name,
+    description: schedule.description,
     communityId: schedule.communityId,
     startsAt: schedule.startsAt,
     endsAt: schedule.endsAt,
-    name: schedule.name,
-    description: schedule.description,
-    isOrganizersOnly: schedule.isOrganizersOnly
+    isHourlyAllowed: schedule.isHourlyAllowed,
+    isClashAllowed: schedule.isClashAllowed,
+    isVisibleToPublic: schedule.isVisibleToPublic
   }
 }
 
 const mapResponseToRequest = (response: ScheduleResponse): ScheduleRequest => {
   return {
-    type: response.type,
     communityId: response.community.id,
     startsAt: response.startsAt,
     endsAt: response.endsAt,
     name: response.name,
     description: response.description,
-    isOrganizersOnly: response.isOrganizersOnly
+    isHourlyAllowed: response.isHourlyAllowed,
+    isClashAllowed: response.isClashAllowed,
+    isVisibleToPublic: response.isVisibleToPublic
   }
 }

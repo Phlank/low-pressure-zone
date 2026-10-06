@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Toast } from 'primevue'
+import { Toast } from 'openvue'
 import { computed, onMounted, provide, ref, type Ref } from 'vue'
 import SiteLayout from './components/layout/site/SiteLayout.vue'
 import { useLocalStorage, useResizeObserver } from '@vueuse/core'

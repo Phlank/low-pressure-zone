@@ -13,20 +13,19 @@
         <burst-size>65535</burst-size>
     </limits>
     <authentication>
-        <source-password>DExGYGJJ</source-password>
-        <relay-password>3CCjkkPx</relay-password>
+        <source-password>qrEE7aHQ</source-password>
+        <relay-password>d9meAtxW</relay-password>
         <admin-user>admin</admin-user>
-        <admin-password>FpWQRdkj</admin-password>
+        <admin-password>HYzEjpcE</admin-password>
     </authentication>
     <listen-socket>
-        <port>8000</port>
+        <port>8020</port>
     </listen-socket>
     <mount type="normal">
         <mount-name>/live-320</mount-name>
         <charset>UTF8</charset>
-        <stream-name>Low Pressure Zone DEV</stream-name>
-        <listenurl>http://localhost:8147/listen/low_pressure_zone_dev/live-320</listenurl>
-        <limit-rate>330180</limit-rate>
+        <stream-name>Low Pressure Zone Dev</stream-name>
+        <listenurl>http://localhost/listen/low_pressure_zone_dev/live-320</listenurl>
         <fallback-mount>/fallback-[320].mp3</fallback-mount>
         <fallback-override>1</fallback-override>
     </mount>

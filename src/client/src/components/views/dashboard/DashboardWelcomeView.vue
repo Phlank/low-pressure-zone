@@ -25,7 +25,7 @@
 import { useWelcomeSettingsStore } from '@/stores/settings/welcomeSettingsStore.ts'
 import { ref, watch } from 'vue'
 import MarkdownContent from '@/components/controls/MarkdownContent.vue'
-import { Tab, TabPanel, TabPanels, Tabs, TabList } from 'primevue'
+import { Tab, TabPanel, TabPanels, Tabs, TabList } from 'openvue'
 
 const welcomeSettings = useWelcomeSettingsStore()
 const currentTab = ref(welcomeSettings.tabs[0]?.title ?? '')

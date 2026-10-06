@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import type { PerformerRequest, PerformerResponse } from '@/api/resources/performersApi.ts'
 import performersApi from '@/api/resources/performersApi.ts'
 import { computed, type Ref, ref } from 'vue'
-import { useToast } from 'primevue'
+import { useToast } from 'openvue'
 import { addAlphabetically, getEntityMap, removeEntity } from '@/utils/arrayUtils.ts'
 import {
   useCreatePersistentItemFn,
@@ -19,7 +19,7 @@ import { useAuthStore } from '@/stores/authStore.ts'
 
 export const usePerformerStore = defineStore('performerStore', () => {
   const performers: Ref<PerformerResponse[]> = ref([])
-  const performersMap = ref(getEntityMap(performers.value))
+  const performersMap = computed(() => getEntityMap(performers.value))
   const toast = useToast()
   const auth = useAuthStore()
 
@@ -27,7 +27,6 @@ export const usePerformerStore = defineStore('performerStore', () => {
     performersApi.get,
     (data) => {
       performers.value = data
-      performersMap.value = getEntityMap(performers.value)
     },
     { permissionFn: () => auth.isLoggedIn }
   )
@@ -69,7 +68,6 @@ export const usePerformerStore = defineStore('performerStore', () => {
     performers,
     performersApi.delete,
     (entity) => {
-      performersMap.value[entity.id] = undefined
       removeEntity(performers.value, entity.id)
       showDeleteSuccessToast(toast, 'Performer', entity.name)
     },
@@ -85,6 +83,7 @@ export const usePerformerStore = defineStore('performerStore', () => {
     isLoading: isLoading,
     performers: getPerformers,
     linkablePerformers: getLinkablePerformers,
+    performersMap,
     getById,
     create,
     update,

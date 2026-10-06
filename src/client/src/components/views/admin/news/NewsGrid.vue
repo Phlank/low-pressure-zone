@@ -14,7 +14,7 @@
         field="date"
         header="Date">
         <template #body="{ data }: { data: NewsResponse }">
-          {{ parseDate(data.createdAt).toLocaleDateString() }}
+          {{ parseDate(data.publishedAt).toLocaleDateString() }}
         </template>
       </Column>
       <Column class="grid-action-col grid-action-col--2">
@@ -50,7 +50,7 @@
           <ListItem>
             <template #left>
               <span>{{ newsItem.title }}</span>
-              <span>{{ parseDate(newsItem.createdAt).toLocaleDateString() }}</span>
+              <span>{{ parseDate(newsItem.publishedAt).toLocaleDateString() }}</span>
             </template>
             <template #right>
               <GridActions
@@ -74,7 +74,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Button, Column, DataTable, DataView, Divider } from 'primevue'
+import { Button, Column, DataTable, DataView, Divider } from 'openvue'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import ListItem from '@/components/data/ListItem.vue'
 import type { NewsResponse } from '@/api/resources/newsApi.ts'

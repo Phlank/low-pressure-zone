@@ -33,7 +33,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Button, Drawer } from 'primevue'
+import { Button, Drawer } from 'openvue'
 import { computed, inject, type Ref } from 'vue'
 
 const isMobile: Ref<boolean> | undefined = inject('isMobile')

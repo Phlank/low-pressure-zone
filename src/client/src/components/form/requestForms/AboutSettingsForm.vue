@@ -39,7 +39,7 @@
 
 <script lang="ts" setup>
 import IftaFormField from '@/components/form/IftaFormField.vue'
-import { Button, Textarea } from 'primevue'
+import { Button, Textarea } from 'openvue'
 import FormArea from '@/components/form/FormArea.vue'
 import { ref, type Ref, watch } from 'vue'
 import type { AboutSettingsRequest } from '@/api/resources/settingsApi.ts'

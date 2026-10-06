@@ -75,7 +75,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Message } from 'primevue'
+import { Message } from 'openvue'
 import { useConnectionInfoStore } from '@/stores/connectionInfoStore.ts'
 import { onMounted } from 'vue'
 import LiveConnectionInformation from '@/components/views/dashboard/streaming/LiveConnectionInformation.vue'

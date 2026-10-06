@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Panel } from 'primevue'
+import { Panel } from 'openvue'
 
 defineProps<{
   header?: string

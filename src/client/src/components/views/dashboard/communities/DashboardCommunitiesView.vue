@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primevue'
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'openvue'
 import { ref } from 'vue'
 import CommunityRelationshipsTab from '@/components/views/dashboard/communities/CommunityRelationshipsTab.vue'
 import CommunitiesTab from '@/components/views/dashboard/communities/CommunitiesTab.vue'

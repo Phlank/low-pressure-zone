@@ -12,8 +12,8 @@
         <NewsPost
           v-for="newsItem in items"
           :key="newsItem.id"
-          :body="newsItem.body"
-          :post-date="parseDate(newsItem.createdAt)"
+          :body="newsItem.content"
+          :post-date="parseDate(newsItem.publishedAt)"
           :title="newsItem.title" />
       </template>
     </DataView>
@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts" setup>
-import { DataView } from 'primevue'
+import { DataView } from 'openvue'
 import { useNewsStore } from '@/stores/newsStore.ts'
 import type { NewsResponse } from '@/api/resources/newsApi.ts'
 import { parseDate } from '@/utils/dateUtils.ts'

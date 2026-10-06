@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Select, Skeleton } from 'primevue'
+import { Select, Skeleton } from 'openvue'
 import type { CommunityResponse } from '@/api/resources/communitiesApi.ts'
 import { ref, type Ref, useTemplateRef, watch } from 'vue'
 import CommunityRelationshipsGrid from '@/components/views/dashboard/communities/CommunityRelationshipsGrid.vue'

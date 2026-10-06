@@ -50,7 +50,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs } from 'primevue'
+import { Skeleton, Tab, TabList, TabPanel, TabPanels, Tabs } from 'openvue'
 import { ref, type Ref, useTemplateRef } from 'vue'
 import PerformersGrid from './PerformersGrid.vue'
 import { usePerformerStore } from '@/stores/performerStore.ts'

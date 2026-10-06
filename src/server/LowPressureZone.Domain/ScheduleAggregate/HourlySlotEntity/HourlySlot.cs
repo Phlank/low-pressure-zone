@@ -127,6 +127,10 @@ public class HourlySlot : Entity, ITimeRange
     public static void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<HourlySlot>()
+                    .Property(slot => slot.Id)
+                    .ValueGeneratedNever();
+        
+        modelBuilder.Entity<HourlySlot>()
                     .ComplexProperty(slot => slot.Prerecord);
 
         modelBuilder.Entity<HourlySlot>()

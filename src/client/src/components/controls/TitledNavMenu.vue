@@ -37,8 +37,8 @@
 </template>
 
 <script lang="ts" setup>
-import { Menubar } from 'primevue'
-import type { MenuItem } from 'primevue/menuitem'
+import { Menubar } from 'openvue'
+import type { MenuItem } from 'openvue/menuitem'
 import { RouterLink, useRouter } from 'vue-router'
 
 const router = useRouter()

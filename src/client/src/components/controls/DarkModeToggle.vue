@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ToggleSwitch } from 'primevue'
+import { ToggleSwitch } from 'openvue'
 import { inject, onMounted, ref, type Ref } from 'vue'
 
 const isDarkMode: Ref<boolean> = inject('isDarkMode', ref(true))

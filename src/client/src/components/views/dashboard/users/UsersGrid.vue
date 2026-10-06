@@ -102,7 +102,7 @@
 <script lang="ts" setup>
 import ListItem from '@/components/data/ListItem.vue'
 import { parseDate } from '@/utils/dateUtils'
-import { Button, Column, DataTable, DataView, Divider } from 'primevue'
+import { Button, Column, DataTable, DataView, Divider } from 'openvue'
 import { computed, inject, type Ref } from 'vue'
 import usersApi, { type UserResponse } from '@/api/resources/usersApi.ts'
 import { mobilePaginatorTemplate } from '@/constants/componentTemplates.ts'

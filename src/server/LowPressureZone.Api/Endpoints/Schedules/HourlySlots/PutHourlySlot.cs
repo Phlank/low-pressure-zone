@@ -11,7 +11,7 @@ public class PutHourlySlot(DataContext dataContext, HourlySlotPrerecordedMixHand
 {
     public override void Configure()
     {
-        Put("/schedules/{scheduleId}/hourly-slots/{id}");
+        Put("/schedules/{scheduleId}/hourlySlots/{id}");
         AllowFormData();
         AllowFileUploads();
         Description(b => b.Produces(201));

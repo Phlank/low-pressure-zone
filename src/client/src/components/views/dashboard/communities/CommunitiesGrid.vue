@@ -76,7 +76,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Button, Column, DataTable, DataView, Divider } from 'primevue'
+import { Button, Column, DataTable, DataView, Divider } from 'openvue'
 import { inject, type Ref } from 'vue'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import ListItem from '@/components/data/ListItem.vue'

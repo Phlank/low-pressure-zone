@@ -46,7 +46,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Divider } from 'primevue'
+import { Divider } from 'openvue'
 import ListItem from '@/components/data/ListItem.vue'
 import { useConnectionInfoStore } from '@/stores/connectionInfoStore.ts'
 import { inject, type Ref } from 'vue'

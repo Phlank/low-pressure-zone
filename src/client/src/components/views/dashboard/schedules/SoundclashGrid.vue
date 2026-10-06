@@ -23,7 +23,7 @@
       <Column class="grid-action-col grid-action-col--2">
         <template #body="{ data }: { data: SoundclashRow }">
           <GridActions
-            :show-create="schedule.isSoundclashCreationAllowed && data.soundclash === undefined"
+            :show-create="schedule.isClashAllowed && data.soundclash === undefined"
             :show-delete="data.soundclash?.isDeletable"
             :show-edit="data.soundclash?.isEditable"
             @create="handleCreate(data)"
@@ -54,7 +54,7 @@
             </template>
             <template #right>
               <GridActions
-                :show-create="schedule.isSoundclashCreationAllowed && data.soundclash === undefined"
+                :show-create="schedule.isClashAllowed && data.soundclash === undefined"
                 :show-delete="data.soundclash?.isDeletable"
                 :show-edit="data.soundclash?.isEditable"
                 @create="handleCreate(data)"
@@ -73,7 +73,7 @@
       :title="selectedRow.soundclash ? 'Create Soundclash' : 'Edit Soundclash'"
       @reset="soundclashFormRef?.reset()"
       @submit="soundclashFormRef?.submit()">
-      <SoundclashForm
+      <ClashSlotForm
         ref="soundclashFormRef"
         :schedule-id="schedule.id"
         :soundclash="selectedRow.soundclash"
@@ -97,15 +97,15 @@
 
 <script lang="ts" setup>
 import type { ScheduleResponse } from '@/api/resources/schedulesApi.ts'
-import { Column, DataTable, DataView, Divider } from 'primevue'
-import type { SoundclashResponse } from '@/api/resources/soundclashApi.ts'
+import { Column, DataTable, DataView, Divider } from 'openvue'
+import type { SoundclashResponse } from '@/api/resources/clashSlotsApi.ts'
 import { inject, onMounted, type Ref, ref, useTemplateRef, watch } from 'vue'
 import { formatReadableTime, parseDate, parseTime, timesBetween } from '@/utils/dateUtils.ts'
 import SlotTime from '@/components/controls/SlotTime.vue'
 import TwoLineData from '@/components/layout/TwoLineData.vue'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import FormDrawer from '@/components/form/FormDrawer.vue'
-import SoundclashForm from '@/components/form/requestForms/SoundclashForm.vue'
+import ClashSlotForm from '@/components/form/requestForms/ClashSlotForm.vue'
 import DeleteDialog from '@/components/dialogs/DeleteDialog.vue'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
 import ListItem from '@/components/data/ListItem.vue'
@@ -173,7 +173,7 @@ const handleDelete = (row: SoundclashRow) => {
 const handleConfirmDelete = async () => {
   if (!selectedRow.value?.soundclash) return
   isDeleteSubmitting.value = true
-  const result = await schedules.deleteSoundclash(selectedRow.value.soundclash.id)
+  const result = await schedules.deleteClashSlot(selectedRow.value.soundclash.id)
   showDeleteDialog.value = false
   if (result.isSuccess) {
     showDeleteDialog.value = false

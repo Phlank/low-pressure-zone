@@ -9,21 +9,21 @@ import {
   requireAnyOtherCharacter,
   url
 } from './rules/stringRules'
-import { alwaysValid, applyRuleIf, oneOf, required } from './rules/untypedRules'
+import { alwaysValid, applyRuleIf, equalTo, oneOf, required } from './rules/untypedRules'
 import type { PropertyRules } from './types/propertyRules'
 import { combineRules } from './types/validationRule'
 import type { CommunityRequest } from '@/api/resources/communitiesApi.ts'
 import type { PerformerRequest } from '@/api/resources/performersApi.ts'
 import type { ScheduleRequest } from '@/api/resources/schedulesApi.ts'
-import type { TimeslotRequest } from '@/api/resources/timeslotsApi.ts'
+import type { HourlySlotRequest } from '@/api/resources/hourlySlotsApi.ts'
 import type { LoginRequest, RegisterRequest } from '@/api/resources/authApi.ts'
 import type { InviteRequest } from '@/api/resources/invitesApi.ts'
 import type { StreamerRequest } from '@/api/resources/usersApi.ts'
 import { maxSize, mimeType } from '@/validation/rules/fileRules.ts'
 import { audioMimeTypes } from '@/constants/audioMimeTypes.ts'
-import { scheduleTypes } from '@/constants/scheduleTypes.ts'
-import type { SoundclashRequest } from '@/api/resources/soundclashApi.ts'
 import type { Ref } from 'vue'
+import type { ClashSlotRequest } from '@/api/resources/clashSlotsApi.ts'
+import { arrayLength, each, notEmptyArray } from '@/validation/rules/arrayRules.ts'
 
 export const communityRequestRules: PropertyRules<CommunityRequest> = {
   name: combineRules(required(), maximumLength(64)),
@@ -39,10 +39,8 @@ export const scheduleRequestRules = (
   formState: Ref<ScheduleRequest>
 ): PropertyRules<ScheduleRequest> => {
   return {
-    type: combineRules(
-      required(),
-      oneOf([scheduleTypes.Hourly, scheduleTypes.Soundclash], 'Invalid schedule type')
-    ),
+    name: combineRules(required(), maximumLength(64)),
+    description: alwaysValid(),
     communityId: required(),
     startsAt: combineRules(required(), hourOnly()),
     endsAt: combineRules(
@@ -50,51 +48,54 @@ export const scheduleRequestRules = (
       hourOnly(),
       withinRangeOf(() => formState.value.startsAt, 60, 1440, '1 - 24h allowed')
     ),
-    name: combineRules(required(), maximumLength(64)),
-    description: alwaysValid(),
-    isOrganizersOnly: alwaysValid()
+    isVisibleToPublic: alwaysValid(),
+    isHourlyAllowed: applyRuleIf(
+      equalTo(() => true, 'At least one slot type must be enabled'),
+      () => !formState.value.isClashAllowed
+    ),
+    isClashAllowed: alwaysValid()
   }
 }
 
-export const timeslotRequestRules = (
-  formState: Ref<TimeslotRequest>
-): PropertyRules<TimeslotRequest> => {
+export const hourlySlotRequestRules = (
+  formState: Ref<HourlySlotRequest>
+): PropertyRules<HourlySlotRequest> => {
   return {
-    scheduleId: required(),
     performerId: required(),
-    performanceType: required(),
     startsAt: combineRules(required(), hourOnly()),
-    endsAt: combineRules(
-      required(),
-      hourOnly(),
-      withinRangeOf(() => formState.value.startsAt, 60, 180, '1 - 3h allowed')
-    ),
+    duration: combineRules(required(), oneOf([1, 2, 3], 'Allowed values are 1, 2, or 3')),
     subtitle: maximumLength(64),
     file: combineRules<File | null>(
       mimeType(audioMimeTypes, 'Allowed audio types: wav, flac, mp3, m4a, vorbis, and opus.'),
       maxSize(1024 * 1024 * 1024, 'Max file size is 1GB.'),
-      applyRuleIf(required(), () => formState.value.performanceType === 'Prerecorded DJ Set')
+      applyRuleIf(required(), () => formState.value.replaceMedia)
     ),
-    replaceMedia: alwaysValid()
+    replaceMedia: applyRuleIf(
+      oneOf([false], 'Cannot replace and delete media simultaneously'),
+      () => formState.value.deleteMedia
+    ),
+    deleteMedia: applyRuleIf(
+      oneOf([false], 'Cannot replace and delete media simultaneously'),
+      () => formState.value.replaceMedia
+    )
   }
 }
 
-export const soundclashRequestRules = (
-  formState: Ref<SoundclashRequest>
-): PropertyRules<SoundclashRequest> => ({
-  roundOne: combineRules(required()),
-  roundTwo: combineRules(required()),
-  roundThree: combineRules(required()),
+export const clashSlotRequestRules: PropertyRules<ClashSlotRequest> = {
+  rounds: combineRules<string[]>(
+    required(),
+    notEmptyArray(),
+    arrayLength(3, 3, 'Must have three rounds'),
+    each(required())
+  ),
   performerOneId: required(),
   performerTwoId: required(),
-  scheduleId: required(),
   startsAt: combineRules(required(), hourOnly()),
-  endsAt: combineRules(
+  duration: combineRules(
     required(),
-    hourOnly(),
-    withinRangeOf(() => formState.value.startsAt, 120, 120, '2h allowed')
+    equalTo(() => 2)
   )
-})
+}
 
 export const loginRequestRules: PropertyRules<LoginRequest> = {
   username: required(),

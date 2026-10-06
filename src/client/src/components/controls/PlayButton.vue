@@ -63,7 +63,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Button, Slider, useToast, SelectButton } from 'primevue'
+import { Button, Slider, useToast, SelectButton } from 'openvue'
 import { computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue'
 import clamp from '@/utils/clamp.ts'
 import { useDebounceFn, useLocalStorage, useResizeObserver } from '@vueuse/core'

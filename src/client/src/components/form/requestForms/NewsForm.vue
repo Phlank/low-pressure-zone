@@ -14,15 +14,15 @@
           autofocus />
       </IftaFormField>
       <IftaFormField
-        :message="val.message('body')"
+        :message="val.message('content')"
         input-id="bodyInput"
         label="Body"
         size="full">
         <Textarea
           id="bodyInput"
-          v-model:model-value="state.body"
+          v-model:model-value="state.content"
           :disabled="isSubmitting"
-          :invalid="!val.isValid('body')"
+          :invalid="!val.isValid('content')"
           :rows="5"
           auto-resize />
       </IftaFormField>
@@ -41,7 +41,7 @@ import FormArea from '@/components/form/FormArea.vue'
 import type { NewsResponse } from '@/api/resources/newsApi.ts'
 import { onMounted, ref, watch } from 'vue'
 import { required } from '@/validation/rules/untypedRules.ts'
-import { InputText, Textarea } from 'primevue'
+import { InputText, Textarea } from 'openvue'
 import IftaFormField from '@/components/form/IftaFormField.vue'
 import { useDebounceFn } from '@vueuse/core'
 import { parseMarkdownAsync } from '@/utils/markdown.ts'
@@ -58,13 +58,13 @@ const props = defineProps<{
 const { state, val, isSubmitting, submit, reset } = useEntityForm({
   validationRules: {
     title: required(),
-    body: required()
+    content: required()
   },
   entity: props.newsItem,
   formStateInitializeFn: (newsItem) =>
     ref({
       title: newsItem?.title ?? '',
-      body: newsItem?.body ?? ''
+      content: newsItem?.content ?? ''
     }),
   createPersistentEntityFn: news.create,
   updatePersistentEntityFn: news.update,
@@ -83,10 +83,10 @@ const previewTitle = ref('')
 const previewBody = ref('')
 const updatePreview = useDebounceFn(async () => {
   previewTitle.value = state.value.title
-  previewBody.value = await parseMarkdownAsync(state.value.body)
+  previewBody.value = await parseMarkdownAsync(state.value.content)
 }, 200)
 watch(
-  () => [state.value.title, state.value.body],
+  () => [state.value.title, state.value.content],
   () => {
     updatePreview()
   },
