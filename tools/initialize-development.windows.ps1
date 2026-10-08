@@ -5,7 +5,7 @@ $admin_email = Read-Host "Admin user email"
 $admin_username = Read-Host "Admin username"
 $admin_displayname = Read-Host "Admin display name"
 
-$aspirePath = "src/server/LowPressureZone.Aspire"
+$aspirePath = "src/LowPressureZone.Aspire"
 
 $aspireDevSettings = Join-Path $aspirePath "appsettings.Development.json"
 $aspireDevSettingsTemplate = Join-Path $aspirePath "appsettings-template.Development.json"
@@ -28,4 +28,4 @@ if (Test-Path $icecastPath) { Remove-Item -Recurse -Force $icecastPath }
 
 Copy-Item -Recurse -Force "tools/mounts/init/*" "tools/mounts"
 
-Write-Host "Configuration is complete. Run the application using the LowPressureZone.Aspire project located in src/server/LowPressureZone.Aspire"
+Write-Host "Configuration is complete. Run the application using the LowPressureZone.Aspire project located in src/LowPressureZone.Aspire"

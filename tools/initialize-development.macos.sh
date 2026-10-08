@@ -7,16 +7,16 @@ read -r admin_username
 echo "Admin display name:"
 read -r admin_displayname
 
-rm -f "src/server/LowPressureZone.Aspire/appsettings.Development.json"
+rm -f "src/LowPressureZone.Aspire/appsettings.Development.json"
 
-cp "src/server/LowPressureZone.Aspire/appsettings-template.Development.json" "src/server/LowPressureZone.Aspire/appsettings.Development.json"
-sed -i '' "s/{AdminUsername}/$admin_username/g" "src/server/LowPressureZone.Aspire/appsettings.Development.json"
-sed -i '' "s/{AdminDisplayName}/$admin_displayname/g" "src/server/LowPressureZone.Aspire/appsettings.Development.json"
-sed -i '' "s/{AdminEmail}/$admin_email/g" "src/server/LowPressureZone.Aspire/appsettings.Development.json"
+cp "src/LowPressureZone.Aspire/appsettings-template.Development.json" "src/LowPressureZone.Aspire/appsettings.Development.json"
+sed -i '' "s/{AdminUsername}/$admin_username/g" "src/LowPressureZone.Aspire/appsettings.Development.json"
+sed -i '' "s/{AdminDisplayName}/$admin_displayname/g" "src/LowPressureZone.Aspire/appsettings.Development.json"
+sed -i '' "s/{AdminEmail}/$admin_email/g" "src/LowPressureZone.Aspire/appsettings.Development.json"
 
 rm -rf "tools/mounts/azuracast"
 rm -rf "tools/mounts/icecast2"
 cp -r "tools/mounts/init/"* "tools/mounts"
 
-echo "Configuration is complete. Run the application using the LowPressureZone.Aspire project located in src/server/LowPressureZone.Aspire"
+echo "Configuration is complete. Run the application using the LowPressureZone.Aspire project located in src/LowPressureZone.Aspire"
 
