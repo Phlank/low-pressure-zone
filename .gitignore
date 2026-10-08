@@ -51,3 +51,4 @@ LowPressureZone.sln.DotSettings.user
 wwwroot
 .idea/**
 package.g.props
+package-lock.json
