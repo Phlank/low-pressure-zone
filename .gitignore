@@ -45,7 +45,9 @@ temporaryFiles
 # Mount files
 tools/mounts/azuracast
 tools/mounts/icecast2
-/LowPressureZone.sln.DotSettings.user
+
+# Other items
+LowPressureZone.sln.DotSettings.user
 wwwroot
 .idea/**
 package.g.props
