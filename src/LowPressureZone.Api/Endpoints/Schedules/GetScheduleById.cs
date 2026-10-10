@@ -1,0 +1,34 @@
+﻿using FastEndpoints;
+using LowPressureZone.Api.Rules;
+using LowPressureZone.Data;
+using LowPressureZone.Identity.Extensions;
+using Microsoft.EntityFrameworkCore;
+
+namespace LowPressureZone.Api.Endpoints.Schedules;
+
+public class GetScheduleById(DataContext dataContext, ScheduleRules rules)
+    : EndpointWithoutRequest<ScheduleResponse, ScheduleMapper>
+{
+    public override void Configure()
+    {
+        Get("/schedules/{id}");
+        Description(builder => builder.Produces(404));
+    }
+
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        var id = Route<Guid>("id");
+        var schedule = await dataContext.Schedules
+                                        .GetSchedulesForResponse(User.GetIdOrDefault())
+                                        .Where(schedule => schedule.Id == id)
+                                        .FirstOrDefaultAsync(ct);
+
+        if (schedule == null || rules.IsHiddenFromApi(schedule))
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        await Send.OkAsync(Map.FromEntity(schedule), ct);
+    }
+}

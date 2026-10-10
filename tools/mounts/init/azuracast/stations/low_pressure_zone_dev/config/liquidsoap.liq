@@ -10,14 +10,14 @@ init.daemon.pidfile.path := "/var/azuracast/stations/low_pressure_zone_dev/confi
 
 settings.init.compact_before_start := true
 
-environment.set("TZ", "UTC") 
+environment.set("TZ", {str_ffsun|UTC|str_ffsun}) 
 
-settings.azuracast.liquidsoap_api_port := 8004
-settings.azuracast.api_url := "http://127.0.0.1:6010/api/internal/1/liquidsoap"
-settings.azuracast.api_key := "01f44527810f628fc5d46c29236dd8aff4ccda01c0bf0982f960b3410860a9c546c8470a57951c1d36ad290912aa2a7d8673"
+settings.azuracast.liquidsoap_api_port := 8024
+settings.azuracast.api_url := {str_tpweb|http://127.0.0.1:6010/api/internal/1/liquidsoap|str_tpweb}
+settings.azuracast.api_key := {str_zbfkr|c4ac878496212b817fc499653388e30fe009243ac2d603c89ea82f269fdbb75851bcc33f3657968f69eba865c65523575363|str_zbfkr}
 settings.azuracast.media_path := "/var/azuracast/stations/low_pressure_zone_dev/media"
-settings.azuracast.fallback_path := "/usr/local/share/icecast/web/error.mp3"
-settings.azuracast.temp_path := "/var/azuracast/stations/low_pressure_zone_dev/temp"
+settings.azuracast.fallback_path := {str_ccewr|/usr/local/share/icecast/web/error.mp3|str_ccewr}
+settings.azuracast.temp_path := {str_ssgwv|/var/azuracast/stations/low_pressure_zone_dev/temp|str_ssgwv}
 
 settings.azuracast.compute_autocue := false
 
@@ -25,17 +25,20 @@ settings.azuracast.default_fade := 2.00
 settings.azuracast.default_cross := 3.00
 settings.azuracast.enable_crossfade := true
 settings.azuracast.crossfade_type := "normal"
+settings.azuracast.crossfade_smart_high := -15.00
+settings.azuracast.crossfade_smart_medium := -32.00
+settings.azuracast.crossfade_smart_margin := 8.00
 
-settings.azuracast.live_broadcast_text := "Live Broadcast"
+settings.azuracast.live_broadcast_text := {str_shqux|Live Broadcast|str_shqux}
 
 # Start HTTP API Server
 azuracast.start_http_api()
 
 
-playlist_archives = playlist(id="playlist_archives",mime_type="audio/x-mpegurl",mode="randomize",reload_mode="watch","/var/azuracast/stations/low_pressure_zone_dev/playlists/playlist_archives.m3u")
+playlist_rotation = playlist(id={str_ginra|playlist_rotation|str_ginra},mime_type="audio/x-mpegurl",mode="randomize",reload_mode="watch","/var/azuracast/stations/low_pressure_zone_dev/playlists/playlist_rotation.m3u")
 
 # Standard Playlists
-radio = random(id="standard_playlists", weights=[3], [playlist_archives])
+radio = random(id="standard_playlists", weights=[3], [playlist_rotation])
 
 radio = azuracast.enable_autodj(radio)
 
@@ -64,7 +67,7 @@ radio_without_live = radio
 ignore(radio_without_live)
 
 # Live Broadcasting
-live = input.harbor("/live", id = "input_streamer", port = 8030, auth = azuracast.dj_auth, icy = true, icy_metadata_charset = "UTF-8", metadata_charset = "UTF-8", buffer = 5.00, max = 10.00)
+live = input.harbor({str_lqodx|/live|str_lqodx}, id = "input_streamer", port = 8030, auth = azuracast.dj_auth, icy = true, icy_metadata_charset = {str_wdkdp|UTF-8|str_wdkdp}, metadata_charset = {str_anmch|UTF-8|str_anmch}, buffer = 5.00, max = 10.00)
 live.on_connect(synchronous=false, azuracast.live_connected)
 live.on_disconnect(synchronous=false, azuracast.live_disconnected)
 
@@ -113,28 +116,6 @@ end
 # Continuously check on live.
 source.methods(radio).on_frame(synchronous=true, check_live)
 
-# Record Live Broadcasts
-output.file(
-    %ffmpeg(format="mp3", %audio(codec="libmp3lame", ac=2, ar=44100, b="320k")),
-    fun () -> begin
-        if (azuracast.live_enabled()) then
-            time.string("#{settings.azuracast.temp_path()}/#{azuracast.live_dj()}/stream_%Y%m%d-%H%M%S.mp3.tmp")
-        else
-            ""
-        end
-    end,
-    live,
-    fallible=true,
-    on_close=fun (tempPath) -> begin
-        newPath = string.replace(pattern=".tmp$", (fun(_) -> ""), tempPath)
-
-        log("Recording stopped: Switching from #{tempPath} to #{newPath}")
-
-        process.run("mv #{tempPath} #{newPath}")
-        ()
-    end
-)
-
 # Allow for Telnet-driven insertion of custom metadata.
 azuracast.utilities.add_custom_metadata_command(id="custom_metadata", radio)
 
@@ -148,6 +129,9 @@ source.methods(radio).on_metadata(synchronous=false, azuracast.send_feedback)
 radio = azuracast.handle_jingle_mode(radio)
 
 # Local Broadcasts
-output.icecast(%ffmpeg(format="mp3", %audio(codec="libmp3lame", ac=2, ar=44100, b="320k")), id="local_1", host = "127.0.0.1", port = 8000, password = "DExGYGJJ", mount = "/live-320", name = "Low Pressure Zone DEV", description = "", genre = "", public = false, encoding = "UTF-8", radio)
+output.icecast(%ffmpeg(format="mp3", %audio(codec="libmp3lame", ac=2, ar=44100, b="320k")), id="local_1", host = {str_hjpgh|127.0.0.1|str_hjpgh}, port = 8020, password = {str_cmoyn|qrEE7aHQ|str_cmoyn}, mount = {str_mnyjx|/live-320|str_mnyjx}, name = {str_ssvza|Low Pressure Zone Dev|str_ssvza}, description = {str_owdrv||str_owdrv}, genre = {str_xlael||str_xlael}, public = false, encoding = {str_fwktt|UTF-8|str_fwktt}, radio)
+output.icecast(%ffmpeg(format="mp3", %audio(codec="libmp3lame", ac=2, ar=44100, b="256k")), id="local_2", host = {str_hfjob|127.0.0.1|str_hfjob}, port = 8020, password = {str_anelo|qrEE7aHQ|str_anelo}, mount = {str_sgexp|/live-256|str_sgexp}, name = {str_mvcgz|Low Pressure Zone Dev|str_mvcgz}, description = {str_pulvn||str_pulvn}, genre = {str_odudn||str_odudn}, public = true, encoding = {str_tkxyc|UTF-8|str_tkxyc}, radio)
+output.icecast(%ffmpeg(format="mp3", %audio(codec="libmp3lame", ac=2, ar=44100, b="192k")), id="local_3", host = {str_gsdcp|127.0.0.1|str_gsdcp}, port = 8020, password = {str_rxihh|qrEE7aHQ|str_rxihh}, mount = {str_rcvcg|/live-192|str_rcvcg}, name = {str_ucqcm|Low Pressure Zone Dev|str_ucqcm}, description = {str_tiqgj||str_tiqgj}, genre = {str_erwmm||str_erwmm}, public = true, encoding = {str_uwksq|UTF-8|str_uwksq}, radio)
+output.icecast(%ffmpeg(format="mp3", %audio(codec="libmp3lame", ac=2, ar=44100, b="128k")), id="local_4", host = {str_fsxnz|127.0.0.1|str_fsxnz}, port = 8020, password = {str_lgazh|qrEE7aHQ|str_lgazh}, mount = {str_lbrxn|/live-128|str_lbrxn}, name = {str_aoulv|Low Pressure Zone Dev|str_aoulv}, description = {str_kzljk||str_kzljk}, genre = {str_gzmeu||str_gzmeu}, public = true, encoding = {str_gxzdw|UTF-8|str_gxzdw}, radio)
 
 # Remote Relays

@@ -5,7 +5,7 @@
     <limits>
         <clients>2500</clients>
         <max-listeners>-1</max-listeners>
-        <sources>1</sources>
+        <sources>4</sources>
         <queue-size>524288</queue-size>
         <client-timeout>30</client-timeout>
         <header-timeout>15</header-timeout>
@@ -13,21 +13,44 @@
         <burst-size>65535</burst-size>
     </limits>
     <authentication>
-        <source-password>DExGYGJJ</source-password>
-        <relay-password>3CCjkkPx</relay-password>
+        <source-password>qrEE7aHQ</source-password>
+        <relay-password>d9meAtxW</relay-password>
         <admin-user>admin</admin-user>
-        <admin-password>FpWQRdkj</admin-password>
+        <admin-password>HYzEjpcE</admin-password>
     </authentication>
     <listen-socket>
-        <port>8000</port>
+        <port>8020</port>
     </listen-socket>
     <mount type="normal">
         <mount-name>/live-320</mount-name>
         <charset>UTF8</charset>
-        <stream-name>Low Pressure Zone DEV</stream-name>
+        <stream-name>Low Pressure Zone Dev</stream-name>
         <listenurl>http://localhost:8147/listen/low_pressure_zone_dev/live-320</listenurl>
-        <limit-rate>330180</limit-rate>
         <fallback-mount>/fallback-[320].mp3</fallback-mount>
+        <fallback-override>1</fallback-override>
+    </mount>
+    <mount type="normal">
+        <mount-name>/live-256</mount-name>
+        <charset>UTF8</charset>
+        <stream-name>Low Pressure Zone Dev</stream-name>
+        <listenurl>http://localhost:8147/listen/low_pressure_zone_dev/live-256</listenurl>
+        <fallback-mount>/error.mp3</fallback-mount>
+        <fallback-override>1</fallback-override>
+    </mount>
+    <mount type="normal">
+        <mount-name>/live-192</mount-name>
+        <charset>UTF8</charset>
+        <stream-name>Low Pressure Zone Dev</stream-name>
+        <listenurl>http://localhost:8147/listen/low_pressure_zone_dev/live-192</listenurl>
+        <fallback-mount>/error.mp3</fallback-mount>
+        <fallback-override>1</fallback-override>
+    </mount>
+    <mount type="normal">
+        <mount-name>/live-128</mount-name>
+        <charset>UTF8</charset>
+        <stream-name>Low Pressure Zone Dev</stream-name>
+        <listenurl>http://localhost:8147/listen/low_pressure_zone_dev/live-128</listenurl>
+        <fallback-mount>/error.mp3</fallback-mount>
         <fallback-override>1</fallback-override>
     </mount>
     <fileserve>1</fileserve>

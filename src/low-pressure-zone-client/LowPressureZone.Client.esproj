@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.5906584">
+    <PropertyGroup>
+        <DefaultItemExcludes>$(DefaultItemExcludes);node_modules\**;dist\**;.yarn\**</DefaultItemExcludes>
+        <PublishAdditionalItemsForReferencingProjects>false</PublishAdditionalItemsForReferencingProjects>
+        <ShouldPublishStaticWebAssets>false</ShouldPublishStaticWebAssets>
+    </PropertyGroup>
+</Project>
