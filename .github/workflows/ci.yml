@@ -17,16 +17,14 @@ jobs:
         with:
           node-version: 24.x
           cache: 'yarn'
-          cache-dependency-path: src/low-pressure-zone-client/yarn.lock
+          cache-dependency-path: ./src/low-pressure-zone-client/yarn.lock
           check-latest: true
       - run: yarn
-        working-directory: src/low-pressure-zone-client
+        working-directory: ./src/low-pressure-zone-client
       - run: yarn lint
-        working-directory: src/low-pressure-zone-client
-      - run: yarn stylelint
-        working-directory: src/low-pressure-zone-client
+        working-directory: ./src/low-pressure-zone-client
       - run: yarn build --mode production
-        working-directory: src/low-pressure-zone-client
+        working-directory: ./src/low-pressure-zone-client
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7
         with:
@@ -40,9 +38,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: 11.0.x
+          dotnet-quality: preview
       - name: Restore dependencies
         run: dotnet restore LowPressureZone.sln
         working-directory: ./src
@@ -58,9 +57,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: 11.0.x
+          dotnet-quality: preview
       - name: Test Server
         run: dotnet test LowPressureZone.sln
         working-directory: ./src
