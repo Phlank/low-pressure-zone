@@ -41,7 +41,7 @@
           <div v-else-if="data.slot?.type === 'Hourly'">
             <SlotName
               :performer="performers.getById(data.slot.performerId)?.name || ''"
-              :is-prerecorded="!data.slot.isPrerecorded"
+              :is-prerecorded="data.slot.isPrerecorded"
               :name="data.slot.subtitle" />
           </div>
         </template>
@@ -80,16 +80,14 @@ const setupRows = () => {
   }
   const slots = schedule.value.slots
   const startFirst = new Date(slots[0]!.startsAt)
-  const endLast = new Date(slots.at(-1)!.startsAt)
+  const endLast = new Date(slots.at(-1)!.endsAt)
   const hours = timesBetween(startFirst, endLast, 60)
 
   for (const hour of hours) {
     const slot = slots.find((s) => isDateInSlot(hour, s))
 
     // Middle of a clash, we don't use multiple rows for clashes, skip iteration
-    if (slot?.type === 'Clash') {
-      if (parseDate(slot.startsAt) !== hour) continue
-    }
+    if (slot?.type === 'Clash' && parseDate(slot.startsAt) !== hour) continue
 
     newRows.push({
       start: hour,

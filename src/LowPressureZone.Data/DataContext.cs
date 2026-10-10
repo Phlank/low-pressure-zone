@@ -18,13 +18,18 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     public DbSet<News> News { get; set; }
     public DbSet<Performer> Performers { get; set; }
     public DbSet<Domain.CommunityAggregate.Community> Communities { get; set; }
+
     public IQueryable<Relationship> Relationships => Set<Relationship>().AsQueryable()
                                                                         .AsNoTracking();
+
     public DbSet<Schedule> Schedules { get; set; }
+
     public IQueryable<HourlySlot> HourlySlots => Set<HourlySlot>().AsQueryable()
                                                                   .AsNoTracking();
+
     public IQueryable<ClashSlot> ClashSlots => Set<ClashSlot>().AsQueryable()
                                                                .AsNoTracking();
+
     public DbSet<Setting> Settings { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -34,7 +39,6 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
         HourlySlot.OnModelCreating(modelBuilder);
         ClashSlot.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<Setting>()
-                    .HasIndex(nameof(Setting.Key)).IsUnique();
+        modelBuilder.Entity<Setting>().HasIndex(nameof(Setting.Key)).IsUnique();
     }
 }

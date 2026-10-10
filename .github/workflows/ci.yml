@@ -17,21 +17,21 @@ jobs:
         with:
           node-version: 24.x
           cache: 'yarn'
-          cache-dependency-path: src/client/yarn.lock
+          cache-dependency-path: src/low-pressure-zone-client/yarn.lock
           check-latest: true
       - run: yarn
-        working-directory: src/client
+        working-directory: src/low-pressure-zone-client
       - run: yarn lint
-        working-directory: src/client
+        working-directory: src/low-pressure-zone-client
       - run: yarn stylelint
-        working-directory: src/client
+        working-directory: src/low-pressure-zone-client
       - run: yarn build --mode production
-        working-directory: src/client
+        working-directory: src/low-pressure-zone-client
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7
         with:
           name: client-build
-          path: ./src/server/LowPressureZone.Api/wwwroot/
+          path: ./src/LowPressureZone.Api/wwwroot/
   
   build-server:
     name: Build Server
@@ -45,9 +45,11 @@ jobs:
           dotnet-version: 10.0.x
       - name: Restore dependencies
         run: dotnet restore
+        working-directory: src
       - name: Build
         run: dotnet build --no-restore -c Release
-  
+        working-directory: src
+        
   test-server:
     name: Test Server
     runs-on: ubuntu-latest
@@ -61,4 +63,5 @@ jobs:
           dotnet-version: 10.0.x
       - name: Test Server
         run: dotnet test
+        working-directory: src
   

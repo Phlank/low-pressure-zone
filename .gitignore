@@ -52,3 +52,5 @@ wwwroot
 .idea/**
 package.g.props
 package-lock.json
+/src/.idea/.idea.LowPressureZone/.idea/dataSources.xml
+obj**

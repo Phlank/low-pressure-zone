@@ -10,15 +10,15 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Commands.Broadcasts.SyncBroadcasts;
 
+[RegisterService<SyncBroadcastsHandler>(LifeTime.Scoped)]
 public class SyncBroadcastsHandler(
     DataContext dataContext,
     IAzuraCastClient azuraCastClient,
-    Logger<SyncBroadcastsHandler> logger) : ICommandHandler<SyncBroadcastsCommand, List<Broadcast>>
+    ILogger<SyncBroadcastsHandler> logger) : ICommandHandler<SyncBroadcastsCommand, List<Broadcast>>
 {
     public async Task<List<Broadcast>> ExecuteAsync(SyncBroadcastsCommand command, CancellationToken ct)
     {
-        var domainBroadcasts = await dataContext.Broadcasts
-                                                .ToDictionaryAsync(broadcast => broadcast.AzuraCastBroadcastId, ct);
+        var domainBroadcasts = await dataContext.Broadcasts.ToDictionaryAsync(broadcast => broadcast.AzuraCastBroadcastId, ct);
         var remoteBroadcastsResult = await azuraCastClient.GetBroadcastsAsync();
         if (remoteBroadcastsResult.IsError)
         {
@@ -27,6 +27,7 @@ public class SyncBroadcastsHandler(
 
             return [ ..domainBroadcasts.Values];
         }
+        logger.LogInformation("Fetched {Count} remote broadcasts from AzuraCast", remoteBroadcastsResult.Value.Count);
 
         var remoteBroadcasts = remoteBroadcastsResult.Value.ToDictionary(broadcast => broadcast.Id);
 
@@ -51,6 +52,7 @@ public class SyncBroadcastsHandler(
             UpdateBroadcastInDomain(domainBroadcasts[id], remoteBroadcasts[id]);
         }
         
+        await dataContext.SaveChangesAsync(ct);
         return await dataContext.Broadcasts.ToListAsync(ct);
     }
     

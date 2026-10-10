@@ -8,6 +8,7 @@ using LowPressureZone.Adapter.AzuraCast.Extensions;
 using LowPressureZone.Api.Auth;
 using LowPressureZone.Api.Models.Configuration;
 using LowPressureZone.Api.Models.Configuration.Streaming;
+using LowPressureZone.Api.Services.AzuraCast;
 using LowPressureZone.Data;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;
@@ -50,14 +51,15 @@ public static class WebApplicationBuilderExtensions
         services.SwaggerDocument();
         services.AddCors(options =>
         {
-            options.AddPolicy("Frontend", policyBuilder =>
-            {
-                var siteUrl = builder.Configuration.GetValue<string>("Url:SiteUrl");
-                policyBuilder.WithOrigins(siteUrl!)
-                             .AllowAnyHeader()
-                             .WithMethods("GET", "PUT", "POST", "DELETE")
-                             .AllowCredentials();
-            });
+            options.AddPolicy("Frontend",
+                              policyBuilder =>
+                              {
+                                  var siteUrl = builder.Configuration.GetValue<string>("Url:SiteUrl");
+                                  policyBuilder.WithOrigins(siteUrl!)
+                                               .AllowAnyHeader()
+                                               .WithMethods("GET", "PUT", "POST", "DELETE")
+                                               .AllowCredentials();
+                              });
         });
     }
 
@@ -71,6 +73,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddFastEndpoints();
         builder.Services.AddHostedService<NightlyTaskService>();
+        builder.Services.AddHostedService<BroadcastSyncService>();
         builder.Services.RegisterServicesFromLowPressureZoneApi();
     }
 
