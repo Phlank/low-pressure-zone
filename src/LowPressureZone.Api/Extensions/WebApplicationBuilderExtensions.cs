@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using FastEndpoints;
-using FastEndpoints.Swagger;
+using FastEndpoints.OpenApi;
 using Hangfire;
 using Hangfire.PostgreSql;
 using LowPressureZone.Adapter.AzuraCast.Extensions;
@@ -48,7 +48,6 @@ public static class WebApplicationBuilderExtensions
         services.Configure<AzuraCastInstallationConfiguration>(builder.Configuration
                                                                       .GetSection(AzuraCastInstallationConfiguration
                                                                                       .Name));
-        services.SwaggerDocument();
         services.AddCors(options =>
         {
             options.AddPolicy("Frontend",
@@ -72,6 +71,7 @@ public static class WebApplicationBuilderExtensions
         builder.AddFluentEmail();
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddFastEndpoints();
+        builder.Services.OpenApiDocument();
         builder.Services.AddHostedService<NightlyTaskService>();
         builder.Services.AddHostedService<BroadcastSyncService>();
         builder.Services.RegisterServicesFromLowPressureZoneApi();

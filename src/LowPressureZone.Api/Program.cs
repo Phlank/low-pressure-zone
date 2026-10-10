@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using FastEndpoints;
-using FastEndpoints.Swagger;
 using Hangfire;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Data.Extensions;
@@ -9,6 +8,7 @@ using LowPressureZone.Identity.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Minerals.StringCases;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +36,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseHangfireDashboard();
 }
+
 app.UseFastEndpoints(config =>
 {
     config.Endpoints.RoutePrefix = "api";
@@ -63,7 +64,9 @@ app.UseFastEndpoints(config =>
     };
     config.Endpoints.Configurator = endpoints => { endpoints.Throttle(60, 60); };
     config.Errors.ProducesMetadataType = typeof(ValidationProblemDetails);
-}).UseSwaggerGen(uiConfig: uiSettings => { uiSettings.CustomStylesheetPath = "/swagger-ui/swagger-dark.css"; });
+});
+app.MapOpenApi();
+app.MapScalarApiReference();
 
 // Map any non-valid route to index.html, which serves the website. Any navigation to the site via a route that is
 // invalid to the API would fail, but this routes the browser to the client, which may have a router implementation for

@@ -3,7 +3,7 @@
     "https-development": {
       "commandName": "Project",
       "launchBrowser": false,
-      "launchUrl": "swagger",
+      "launchUrl": "scalar",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
