@@ -18,7 +18,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.19.1" />
+        <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.23.0" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="11.0.0-preview.6" />
         <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="11.0.0-preview.6.26359.118" />
     </ItemGroup>
