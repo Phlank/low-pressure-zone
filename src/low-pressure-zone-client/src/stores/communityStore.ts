@@ -29,9 +29,9 @@ export const useCommunityStore = defineStore('communityStore', () => {
 
   const { isLoading } = useRefresh(
     communitiesApi.get,
-    (data) => {
+    async (data) => {
       communities.value = data
-      refreshRelationships().then(() => {})
+      await refreshRelationships()
     },
     { permissionFn: () => auth.isLoggedIn }
   )

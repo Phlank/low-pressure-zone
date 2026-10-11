@@ -17,13 +17,13 @@
         <PackageReference Include="Ardalis.SmartEnum" Version="8.2.0"/>
         <PackageReference Include="Ardalis.SmartEnum.EFCore" Version="8.2.0"/>
         <PackageReference Include="Ardalis.SmartEnum.SystemTextJson" Version="8.1.0"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="11.0.0-preview.6.26359.118" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="11.0.0-preview.6.26359.118" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="11.0.0-preview.6.26359.118">
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="11.0.0-rc.1.26425.128" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="11.0.0-rc.1.26425.128" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="11.0.0-rc.1.26425.128">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="11.0.0-preview.6" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="11.0.0-rc.1.1" />
     </ItemGroup>
 
     <ItemGroup>

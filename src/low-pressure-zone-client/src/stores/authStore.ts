@@ -41,7 +41,7 @@ export const useAuthStore = defineStore('authStore', () => {
     isInitialized = true
   }
   if (!isInitialized) {
-    initializeAsync().then(() => {})
+    initializeAsync().then(() => {}).catch(() => {})
   }
 
   const loginAsync = async (

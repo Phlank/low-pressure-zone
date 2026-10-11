@@ -65,7 +65,7 @@ export const sendDelete = async (route: string) => {
   return await sendRequest<void, void>('DELETE', route)
 }
 
-export const sendDownload = async (route: string): Promise<Result> => {
+export const sendDownload = (route: string): Result => {
   try {
     const url = `${API_URL}${route}`
     const anchor = document.createElement('a')

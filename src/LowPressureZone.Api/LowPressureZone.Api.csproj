@@ -25,8 +25,8 @@
         <PackageReference Include="Hangfire.PostgreSql" Version="1.21.1"/>
         <PackageReference Include="jcamp.FluentEmail.Mailgun" Version="4.0.0"/>
         <PackageReference Include="jcamp.FluentEmail.Smtp" Version="4.0.0"/>
-        <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="11.0.0-preview.6.26359.118" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="11.0.0-preview.6.26359.118">
+        <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="11.0.0-rc.1.26425.128" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="11.0.0-rc.1.26425.128">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

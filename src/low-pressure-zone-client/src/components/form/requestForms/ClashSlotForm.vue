@@ -20,7 +20,7 @@
         :options="['2 Hours']"
         default-value="2 Hours"
         disabled
-        input-id="durationInput" />
+        id="durationInput" />
     </IftaFormField>
     <IftaFormField
       :message="val.message('performerOneId')"
@@ -31,7 +31,7 @@
         v-model="state.performerOneId"
         :invalid="!val.isValid('performerOneId')"
         :options="performers.performers"
-        input-id="performerOneInput"
+        id="performerOneInput"
         option-label="name"
         option-value="id"
         placeholder="Select Performer One"
@@ -46,7 +46,7 @@
         v-model="state.performerTwoId"
         :invalid="!val.isValid('performerTwoId')"
         :options="performers.performers"
-        input-id="performerTwoInput"
+        id="performerTwoInput"
         option-label="name"
         option-value="id"
         placeholder="Select Performer Two"
@@ -59,6 +59,7 @@
       size="xl"
       style="width: 100%">
       <InputText
+        id="roundOneInput"
         v-model="state.rounds[0]"
         :invalid="!val.isValid('rounds')"
         @update:model-value="val.validateIfDirty('rounds')" />
@@ -69,6 +70,7 @@
       label="Round Two"
       size="m">
       <InputText
+        id="roundTwoInput"
         v-model="state.rounds[1]"
         :invalid="!val.isValid('rounds')"
         @update:model-value="val.validateIfDirty('rounds')" />
@@ -79,6 +81,7 @@
       label="Round Three"
       size="m">
       <InputText
+        id="roundThreeInput"
         v-model="state.rounds[2]"
         :invalid="!val.isValid('rounds')"
         @update:model-value="val.validateIfDirty('rounds')" />
