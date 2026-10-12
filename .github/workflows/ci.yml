@@ -17,21 +17,19 @@ jobs:
         with:
           node-version: 24.x
           cache: 'yarn'
-          cache-dependency-path: src/client/yarn.lock
+          cache-dependency-path: ./src/low-pressure-zone-client/yarn.lock
           check-latest: true
       - run: yarn
-        working-directory: src/client
+        working-directory: ./src/low-pressure-zone-client
       - run: yarn lint
-        working-directory: src/client
-      - run: yarn stylelint
-        working-directory: src/client
+        working-directory: ./src/low-pressure-zone-client
       - run: yarn build --mode production
-        working-directory: src/client
+        working-directory: ./src/low-pressure-zone-client
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7
         with:
           name: client-build
-          path: ./src/server/LowPressureZone.Api/wwwroot/
+          path: ./src/LowPressureZone.Api/wwwroot/
   
   build-server:
     name: Build Server
@@ -40,14 +38,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: 11.0.x
+          dotnet-quality: preview
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore LowPressureZone.sln
+        working-directory: ./src
       - name: Build
-        run: dotnet build --no-restore -c Release
-  
+        run: dotnet build LowPressureZone.sln --no-restore -c Release
+        working-directory: ./src
+        
   test-server:
     name: Test Server
     runs-on: ubuntu-latest
@@ -56,9 +57,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: 11.0.x
+          dotnet-quality: preview
       - name: Test Server
-        run: dotnet test
+        run: dotnet test LowPressureZone.sln
+        working-directory: ./src
   

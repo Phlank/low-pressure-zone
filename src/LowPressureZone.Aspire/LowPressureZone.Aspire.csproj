@@ -1,0 +1,31 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.6.0">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net11.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <UserSecretsId>d52e7478-4814-40f1-87a7-1ae658827aff</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Aspire.Hosting.AppHost" Version="13.6.1" />
+        <PackageReference Include="Aspire.Hosting.JavaScript" Version="13.6.1" />
+        <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.6.1" />
+        <PackageReference Include="CommunityToolkit.Aspire.Hosting.MailPit" Version="13.6.0" />
+        <PackageReference Include="MessagePack" Version="3.1.11" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="../LowPressureZone.Api/LowPressureZone.Api.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Update="appsettings-template.Development.json">
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
+    </ItemGroup>
+
+</Project>
