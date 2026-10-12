@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
-public class PostSchedule(DataContext dataContext, CommunityRules communityRules)
+public class PostSchedule(DataContext dataContext, CommunityPermissions communityPermissions)
     : Endpoint<ScheduleRequest>
 {
     public override void Configure()
@@ -25,7 +25,7 @@ public class PostSchedule(DataContext dataContext, CommunityRules communityRules
                                          .Include(community => community.Relationships)
                                          .FirstAsync(ct);
 
-        if (!communityRules.IsOrganizingAuthorized(community))
+        if (!communityPermissions.IsOrganizingAuthorized(community))
         {
             await Send.UnauthorizedAsync(ct);
             return;

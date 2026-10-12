@@ -11,7 +11,7 @@ namespace LowPressureZone.Api.Endpoints.Users;
 public class GetUsers(
     IdentityContext identityContext,
     DataContext dataContext,
-    UserRules rules)
+    UserPermissions permissions)
     : EndpointWithoutRequest<IEnumerable<UserResponse>>
 {
     public override void Configure() => Get("/users");
@@ -56,9 +56,9 @@ public class GetUsers(
             if (relationships is null) continue;
             var isOrganizer = relationships.Any(relationship => relationship.IsOrganizer);
             response.CanBeDisabled = response.CanBeDisabled &&
-                                     rules.UserHasAdequateEditPermission(response.Id, response.IsAdmin, isOrganizer);
+                                     permissions.UserHasAdequateEditPermission(response.Id, response.IsAdmin, isOrganizer);
             response.CanBeEnabled = response.CanBeEnabled &&
-                                    rules.UserHasAdequateEditPermission(response.Id, response.IsAdmin, isOrganizer);
+                                    permissions.UserHasAdequateEditPermission(response.Id, response.IsAdmin, isOrganizer);
         }
 
         await Send.OkAsync(responses, ct);

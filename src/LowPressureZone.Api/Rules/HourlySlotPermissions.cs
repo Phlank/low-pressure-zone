@@ -8,8 +8,8 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Rules;
 
-[RegisterService<HourlySlotRules>(LifeTime.Singleton)]
-public sealed class HourlySlotRules(IHttpContextAccessor contextAccessor)
+[RegisterService<HourlySlotPermissions>(LifeTime.Singleton)]
+public sealed class HourlySlotPermissions(IHttpContextAccessor contextAccessor)
 {
     private ClaimsPrincipal? User => contextAccessor.GetAuthenticatedUserOrDefault();
 

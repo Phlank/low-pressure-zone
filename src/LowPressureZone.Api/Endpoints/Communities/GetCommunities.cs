@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Communities;
 
-public sealed class GetCommunities(DataContext dataContext, CommunityRules rules)
+public sealed class GetCommunities(DataContext dataContext, CommunityPermissions permissions)
     : EndpointWithoutRequest<IEnumerable<CommunityResponse>, CommunityMapper>
 {
     public override void Configure() => Get("/communities");
@@ -22,7 +22,7 @@ public sealed class GetCommunities(DataContext dataContext, CommunityRules rules
                                            .OrderBy(community => community.Name)
                                            .ToListAsync(ct);
 
-        communities.RemoveAll(rules.IsHiddenFromApi);
+        communities.RemoveAll(permissions.IsHiddenFromApi);
 
         var responses = communities.Select(Map.FromEntity);
         await Send.OkAsync(responses, ct);

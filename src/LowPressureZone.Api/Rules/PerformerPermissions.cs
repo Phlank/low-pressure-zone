@@ -7,8 +7,8 @@ using LowPressureZone.Identity.Extensions;
 
 namespace LowPressureZone.Api.Rules;
 
-[RegisterService<PerformerRules>(LifeTime.Singleton)]
-public sealed class PerformerRules(IHttpContextAccessor contextAccessor)
+[RegisterService<PerformerPermissions>(LifeTime.Singleton)]
+public sealed class PerformerPermissions(IHttpContextAccessor contextAccessor)
 {
     private ClaimsPrincipal? User => contextAccessor.GetAuthenticatedUserOrDefault();
 

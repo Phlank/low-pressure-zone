@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Performers;
 
-public class DeletePerformer(DataContext dataContext, PerformerRules rules) : EndpointWithoutRequest
+public class DeletePerformer(DataContext dataContext, PerformerPermissions permissions) : EndpointWithoutRequest
 {
     public override void Configure()
     {
@@ -26,7 +26,7 @@ public class DeletePerformer(DataContext dataContext, PerformerRules rules) : En
             return;
         }
 
-        if (!rules.IsDeleteAuthorized(performer))
+        if (!permissions.IsDeleteAuthorized(performer))
         {
             await Send.UnauthorizedAsync(ct);
             return;

@@ -21,7 +21,7 @@ public sealed class GetPerformerById(DataContext dataContext)
                                          .AsNoTracking()
                                          .Where(p => p.Id == id)
                                          .FirstOrDefaultAsync(ct);
-        if (performer == null || PerformerRules.IsHiddenFromApi(performer))
+        if (performer == null || PerformerPermissions.IsHiddenFromApi(performer))
         {
             await Send.NotFoundAsync(ct);
             return;

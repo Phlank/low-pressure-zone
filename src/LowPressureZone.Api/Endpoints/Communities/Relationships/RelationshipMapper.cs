@@ -6,7 +6,7 @@ using LowPressureZone.Domain.CommunityAggregate.RelationshipEntity;
 namespace LowPressureZone.Api.Endpoints.Communities.Relationships;
 
 [RegisterService<RelationshipMapper>(LifeTime.Singleton)]
-public sealed class RelationshipMapper(IHttpContextAccessor contextAccessor, RelationshipRules rules)
+public sealed class RelationshipMapper(IHttpContextAccessor contextAccessor, RelationshipPermissions permissions)
     : IResponseMapper
 {
     public RelationshipResponse FromEntity(
@@ -22,7 +22,7 @@ public sealed class RelationshipMapper(IHttpContextAccessor contextAccessor, Rel
             DisplayName = displayName,
             IsOrganizer = relationship.IsOrganizer,
             IsPerformer = relationship.IsPerformer,
-            IsEditable = rules.IsEditable(relationship, userRelationship)
+            IsEditable = permissions.IsEditable(relationship, userRelationship)
         };
     }
 }

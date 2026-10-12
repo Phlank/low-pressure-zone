@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.HourlySlots;
 
-public class DeleteHourlySlot(HourlySlotRules rules, DataContext dataContext) : EndpointWithoutRequest
+public class DeleteHourlySlot(HourlySlotPermissions permissions, DataContext dataContext) : EndpointWithoutRequest
 {
     public override void Configure()
     {
@@ -31,7 +31,7 @@ public class DeleteHourlySlot(HourlySlotRules rules, DataContext dataContext) : 
             return;
         }
 
-        if (!rules.IsDeleteAuthorized(slot))
+        if (!permissions.IsDeleteAuthorized(slot))
         {
             await Send.UnauthorizedAsync(ct);
             return;

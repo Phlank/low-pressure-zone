@@ -14,7 +14,7 @@ public sealed class ScheduleMapper(
     HourlySlotMapper hourlySlotMapper,
     ClashSlotMapper clashSlotMapper,
     CommunityMapper communityMapper,
-    ScheduleRules rules)
+    SchedulePermissions permissions)
     : IResponseMapper
 {
     public ScheduleResponse FromEntity(Schedule schedule)
@@ -50,12 +50,12 @@ public sealed class ScheduleMapper(
                 HourlySlotResponse hourlySlot => hourlySlot.StartsAt,
             }),
             IsVisibleToPublic = schedule.IsVisibleToPublic,
-            IsEditable = rules.IsEditAuthorized(schedule),
-            IsDeletable = rules.IsDeleteAuthorized(schedule),
+            IsEditable = permissions.IsEditAuthorized(schedule),
+            IsDeletable = permissions.IsDeleteAuthorized(schedule),
             IsHourlyAllowed = schedule.AllowedSlotTypes.IsHourlyAllowed,
             IsClashAllowed = schedule.AllowedSlotTypes.IsClashAllowed,
-            IsHourlySlotCreationAllowed = rules.IsAddingHourlySlotsAllowed(schedule),
-            IsClashSlotCreationAllowed = rules.IsAddingClashSlotsAllowed(schedule),
+            IsHourlySlotCreationAllowed = permissions.IsAddingHourlySlotsAllowed(schedule),
+            IsClashSlotCreationAllowed = permissions.IsAddingClashSlotsAllowed(schedule),
             
         };
     }

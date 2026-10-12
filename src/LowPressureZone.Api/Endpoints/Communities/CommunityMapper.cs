@@ -5,7 +5,7 @@ using LowPressureZone.Domain.CommunityAggregate;
 namespace LowPressureZone.Api.Endpoints.Communities;
 
 [RegisterService<CommunityMapper>(LifeTime.Singleton)]
-public sealed class CommunityMapper(CommunityRules rules)
+public sealed class CommunityMapper(CommunityPermissions permissions)
     : IResponseMapper
 {
     public CommunityResponse FromEntity(Community community)
@@ -14,9 +14,9 @@ public sealed class CommunityMapper(CommunityRules rules)
             Id = community.Id,
             Name = community.Name,
             SocialUrl = community.SocialUrl,
-            IsPerformable = rules.IsPerformanceAuthorized(community),
-            IsOrganizable = rules.IsOrganizingAuthorized(community),
-            IsEditable = rules.IsEditAuthorized(community),
-            IsDeletable = rules.IsDeleteAuthorized(community) && !community.IsDeleted
+            IsPerformable = permissions.IsPerformanceAuthorized(community),
+            IsOrganizable = permissions.IsOrganizingAuthorized(community),
+            IsEditable = permissions.IsEditAuthorized(community),
+            IsDeletable = permissions.IsDeleteAuthorized(community) && !community.IsDeleted
         };
 }

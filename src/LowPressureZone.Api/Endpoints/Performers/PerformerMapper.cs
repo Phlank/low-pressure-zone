@@ -10,7 +10,7 @@ using Shouldly;
 namespace LowPressureZone.Api.Endpoints.Performers;
 
 [RegisterService<PerformerMapper>(LifeTime.Singleton)]
-public sealed class PerformerMapper(IHttpContextAccessor contextAccessor, PerformerRules rules)
+public sealed class PerformerMapper(IHttpContextAccessor contextAccessor, PerformerPermissions permissions)
     : IRequestMapper, IResponseMapper
 {
     private ClaimsPrincipal? User => contextAccessor.GetAuthenticatedUserOrDefault();
@@ -27,8 +27,8 @@ public sealed class PerformerMapper(IHttpContextAccessor contextAccessor, Perfor
             Id = performer.Id,
             Name = performer.Name,
             SocialUrl = performer.SocialUrl,
-            IsDeletable = rules.IsDeleteAuthorized(performer) && !performer.IsDeleted,
-            IsEditable = rules.IsEditAuthorized(performer),
-            IsLinkableToTimeslot = rules.IsHourlySlotLinkAuthorized(performer)
+            IsDeletable = permissions.IsDeleteAuthorized(performer) && !performer.IsDeleted,
+            IsEditable = permissions.IsEditAuthorized(performer),
+            IsLinkableToTimeslot = permissions.IsHourlySlotLinkAuthorized(performer)
         };
 }

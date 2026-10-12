@@ -8,8 +8,8 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Rules;
 
-[RegisterService<CommunityRules>(LifeTime.Singleton)]
-public sealed class CommunityRules(IHttpContextAccessor contextAccessor)
+[RegisterService<CommunityPermissions>(LifeTime.Singleton)]
+public sealed class CommunityPermissions(IHttpContextAccessor contextAccessor)
 {
     private ClaimsPrincipal? User => contextAccessor.GetAuthenticatedUserOrDefault();
 

@@ -7,7 +7,7 @@ namespace LowPressureZone.Api.Endpoints.Schedules.HourlySlots;
 
 [RegisterService<HourlySlotMapper>(LifeTime.Singleton)]
 public sealed class HourlySlotMapper(
-    HourlySlotRules rules,
+    HourlySlotPermissions permissions,
     PerformerMapper performerMapper)
     : IResponseMapper
 {
@@ -22,7 +22,7 @@ public sealed class HourlySlotMapper(
         PerformerId = slot.PerformerId,
         UploadedFileName = slot.Prerecord.UploadedFileName,
         IsPrerecorded = slot.Prerecord.IsPrerecorded,
-        IsEditable = rules.IsEditAuthorized(slot),
-        IsDeletable = rules.IsDeleteAuthorized(slot)
+        IsEditable = permissions.IsEditAuthorized(slot),
+        IsDeletable = permissions.IsDeleteAuthorized(slot)
     };
 }

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Performers;
 
-public sealed class PutPerformer(DataContext dataContext, PerformerRules rules)
+public sealed class PutPerformer(DataContext dataContext, PerformerPermissions permissions)
     : EndpointWithMapper<PerformerRequest, PerformerMapper>
 {
     public override void Configure()
@@ -24,13 +24,13 @@ public sealed class PutPerformer(DataContext dataContext, PerformerRules rules)
                                          .Where(p => p.Id == id)
                                          .FirstOrDefaultAsync(ct);
 
-        if (performer is null || PerformerRules.IsHiddenFromApi(performer))
+        if (performer is null || PerformerPermissions.IsHiddenFromApi(performer))
         {
             await Send.NotFoundAsync(ct);
             return;
         }
 
-        if (!rules.IsEditAuthorized(performer))
+        if (!permissions.IsEditAuthorized(performer))
         {
             await Send.UnauthorizedAsync(ct);
             return;

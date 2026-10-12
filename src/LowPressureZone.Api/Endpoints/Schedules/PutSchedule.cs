@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
-public class PutSchedule(DataContext dataContext, ScheduleRules rules)
+public class PutSchedule(DataContext dataContext, SchedulePermissions permissions)
     : Endpoint<ScheduleRequest>
 {
     public override void Configure()
@@ -30,7 +30,7 @@ public class PutSchedule(DataContext dataContext, ScheduleRules rules)
             return;
         }
 
-        if (!rules.IsEditAuthorized(schedule))
+        if (!permissions.IsEditAuthorized(schedule))
         {
             await Send.UnauthorizedAsync(ct);
             return;

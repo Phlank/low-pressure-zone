@@ -8,8 +8,8 @@ using Shouldly;
 
 namespace LowPressureZone.Api.Rules;
 
-[RegisterService<ClashSlotRules>(LifeTime.Singleton)]
-public sealed class ClashSlotRules(IHttpContextAccessor contextAccessor)
+[RegisterService<ClashSlotPermissions>(LifeTime.Singleton)]
+public sealed class ClashSlotPermissions(IHttpContextAccessor contextAccessor)
 {
     private ClaimsPrincipal? User => contextAccessor.GetAuthenticatedUserOrDefault();
 

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.ClashSlots;
 
-public class PutClashSlot(DataContext dataContext, ClashSlotRules rules) : Endpoint<ClashSlotRequest>
+public class PutClashSlot(DataContext dataContext, ClashSlotPermissions permissions) : Endpoint<ClashSlotRequest>
 {
     public override void Configure()
     {
@@ -32,7 +32,7 @@ public class PutClashSlot(DataContext dataContext, ClashSlotRules rules) : Endpo
             return;
         }
 
-        if (!rules.IsEditAuthorized(slot))
+        if (!permissions.IsEditAuthorized(slot))
         {
             await Send.UnauthorizedAsync(ct);
             return;

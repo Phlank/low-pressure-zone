@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
-public class DeleteSchedule(DataContext dataContext, ScheduleRules rules) : EndpointWithoutRequest
+public class DeleteSchedule(DataContext dataContext, SchedulePermissions permissions) : EndpointWithoutRequest
 {
     public override void Configure()
     {
@@ -30,7 +30,7 @@ public class DeleteSchedule(DataContext dataContext, ScheduleRules rules) : Endp
             return;
         }
 
-        if (!rules.IsDeleteAuthorized(schedule))
+        if (!permissions.IsDeleteAuthorized(schedule))
         {
             await Send.UnauthorizedAsync(ct);
             return;

@@ -15,8 +15,8 @@ namespace LowPressureZone.Api.Endpoints.Schedules.HourlySlots;
 
 public class PostHourlySlot(
     DataContext dataContext,
-    ScheduleRules scheduleRules,
-    PerformerRules performerRules,
+    SchedulePermissions schedulePermissions,
+    PerformerPermissions performerPermissions,
     HourlySlotPrerecordedMixHandler mixHandler) : Endpoint<HourlySlotRequest>
 {
     public override void Configure()
@@ -42,7 +42,7 @@ public class PostHourlySlot(
             return;
         }
 
-        if (!scheduleRules.IsAddingHourlySlotsAllowed(schedule))
+        if (!schedulePermissions.IsAddingHourlySlotsAllowed(schedule))
         {
             await Send.UnauthorizedAsync(ct);
             return;
@@ -51,7 +51,7 @@ public class PostHourlySlot(
         var performer = await dataContext.Performers
                                          .Where(performer => performer.Id == request.PerformerId)
                                          .FirstOrDefaultAsync(ct);
-        if (performer is null || !performerRules.IsHourlySlotLinkAuthorized(performer))
+        if (performer is null || !performerPermissions.IsHourlySlotLinkAuthorized(performer))
         {
             await Send.UnauthorizedAsync(ct);
             return;

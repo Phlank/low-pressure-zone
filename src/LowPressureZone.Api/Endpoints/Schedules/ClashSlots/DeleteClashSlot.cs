@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.ClashSlots;
 
-public class DeleteClashSlot(DataContext dataContext, ClashSlotRules rules) : EndpointWithoutRequest
+public class DeleteClashSlot(DataContext dataContext, ClashSlotPermissions permissions) : EndpointWithoutRequest
 {
     public override void Configure()
     {
@@ -31,7 +31,7 @@ public class DeleteClashSlot(DataContext dataContext, ClashSlotRules rules) : En
             return;
         }
         
-        if (!rules.IsDeleteAuthorized(slot))
+        if (!permissions.IsDeleteAuthorized(slot))
         {
             await Send.UnauthorizedAsync(ct);
             return;

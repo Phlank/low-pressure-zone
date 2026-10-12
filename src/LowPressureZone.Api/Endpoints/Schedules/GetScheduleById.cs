@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
-public class GetScheduleById(DataContext dataContext, ScheduleRules rules)
+public class GetScheduleById(DataContext dataContext, SchedulePermissions permissions)
     : EndpointWithoutRequest<ScheduleResponse, ScheduleMapper>
 {
     public override void Configure()
@@ -23,7 +23,7 @@ public class GetScheduleById(DataContext dataContext, ScheduleRules rules)
                                         .Where(schedule => schedule.Id == id)
                                         .FirstOrDefaultAsync(ct);
 
-        if (schedule == null || rules.IsHiddenFromApi(schedule))
+        if (schedule == null || permissions.IsHiddenFromApi(schedule))
         {
             await Send.NotFoundAsync(ct);
             return;

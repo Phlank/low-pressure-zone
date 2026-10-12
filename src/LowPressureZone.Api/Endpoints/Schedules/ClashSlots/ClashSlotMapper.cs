@@ -6,7 +6,7 @@ using LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity;
 namespace LowPressureZone.Api.Endpoints.Schedules.ClashSlots;
 
 [RegisterService<ClashSlotMapper>(LifeTime.Singleton)]
-public class ClashSlotMapper(PerformerMapper performerMapper, ClashSlotRules rules) : IResponseMapper
+public class ClashSlotMapper(PerformerMapper performerMapper, ClashSlotPermissions permissions) : IResponseMapper
 {
     public ClashSlotResponse FromEntity(ClashSlot entity) => new()
     {
@@ -18,7 +18,7 @@ public class ClashSlotMapper(PerformerMapper performerMapper, ClashSlotRules rul
         StartsAt = entity.TimeRange.StartsAt,
         Duration = entity.TimeRange.Duration,
         EndsAt = entity.TimeRange.EndsAt,
-        IsEditable = rules.IsEditAuthorized(entity),
-        IsDeletable = rules.IsDeleteAuthorized(entity)
+        IsEditable = permissions.IsEditAuthorized(entity),
+        IsDeletable = permissions.IsDeleteAuthorized(entity)
     };
 }

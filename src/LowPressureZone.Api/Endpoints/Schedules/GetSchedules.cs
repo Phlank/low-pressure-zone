@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules;
 
-public class GetSchedules(DataContext dataContext, ScheduleRules rules)
+public class GetSchedules(DataContext dataContext, SchedulePermissions permissions)
     : Endpoint<GetSchedulesRequest, IEnumerable<ScheduleResponse>, ScheduleMapper>
 {
     public override void Configure()
@@ -27,7 +27,7 @@ public class GetSchedules(DataContext dataContext, ScheduleRules rules)
             scheduleQuery = scheduleQuery.Where(schedule => schedule.TimeRange.EndsAt > req.After.Value.ToUniversalTime());
 
         var schedules = await scheduleQuery.ToListAsync(ct);
-        schedules.RemoveAll(rules.IsHiddenFromApi);
+        schedules.RemoveAll(permissions.IsHiddenFromApi);
 
         await Send.OkAsync(schedules.Select(Map.FromEntity), ct);
     }

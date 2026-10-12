@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Communities;
 
-public class DeleteCommunity(DataContext dataContext, CommunityRules rules) : EndpointWithoutRequest
+public class DeleteCommunity(DataContext dataContext, CommunityPermissions permissions) : EndpointWithoutRequest
 {
     public override void Configure()
     {
@@ -29,7 +29,7 @@ public class DeleteCommunity(DataContext dataContext, CommunityRules rules) : En
             return;
         }
 
-        if (!rules.IsDeleteAuthorized(community))
+        if (!permissions.IsDeleteAuthorized(community))
         {
             await Send.UnauthorizedAsync(ct);
             return;

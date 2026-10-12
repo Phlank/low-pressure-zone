@@ -6,8 +6,8 @@ using LowPressureZone.Identity.Constants;
 
 namespace LowPressureZone.Api.Rules;
 
-[RegisterService<ScheduleRules>(LifeTime.Singleton)]
-public sealed class ScheduleRules(IHttpContextAccessor contextAccessor)
+[RegisterService<SchedulePermissions>(LifeTime.Singleton)]
+public sealed class SchedulePermissions(IHttpContextAccessor contextAccessor)
 {
     private ClaimsPrincipal? User => contextAccessor.GetAuthenticatedUserOrDefault();
 
