@@ -1,6 +1,7 @@
 ﻿using LowPressureZone.Identity.Entities;
 using LowPressureZone.Identity.Extensions;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,5 +18,11 @@ public class IdentityContext(DbContextOptions<IdentityContext> options)
         if (optionsBuilder.IsConfigured) return;
         
         optionsBuilder.ConfigureIdentitySeeding();
+    }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+        Invitation<Guid, AppUser>.OnModelCreated(builder);
     }
 }

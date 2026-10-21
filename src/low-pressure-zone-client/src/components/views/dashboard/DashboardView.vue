@@ -93,7 +93,7 @@ const menuItems: MenuItem[] = [
     label: 'Stream Setup',
     icon: 'pi pi-wave-pulse',
     route: '/dashboard/streaming',
-    visible: true
+    visible: authStore.isStreamer
   },
   {
     label: 'Users',

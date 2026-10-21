@@ -1,12 +1,11 @@
 using FastEndpoints;
-using LowPressureZone.Api.Endpoints.Performers;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.ClashSlots;
 
 [RegisterService<ClashSlotMapper>(LifeTime.Singleton)]
-public class ClashSlotMapper(PerformerMapper performerMapper, ClashSlotPermissions permissions) : IResponseMapper
+public class ClashSlotMapper(ClashSlotPermissions permissions) : IResponseMapper
 {
     public ClashSlotResponse FromEntity(ClashSlot entity) => new()
     {

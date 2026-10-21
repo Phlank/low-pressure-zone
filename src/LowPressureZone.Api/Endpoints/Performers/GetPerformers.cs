@@ -8,7 +8,11 @@ namespace LowPressureZone.Api.Endpoints.Performers;
 public sealed class GetPerformers(DataContext dataContext)
     : EndpointWithoutRequest<IEnumerable<PerformerResponse>, PerformerMapper>
 {
-    public override void Configure() => Get("/performers");
+    public override void Configure()
+    {
+        Get("/performers");
+        AllowAnonymous();
+    }
 
     public override async Task HandleAsync(CancellationToken ct)
     {

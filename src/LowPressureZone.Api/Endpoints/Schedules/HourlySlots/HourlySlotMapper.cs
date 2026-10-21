@@ -1,5 +1,4 @@
 ﻿using FastEndpoints;
-using LowPressureZone.Api.Endpoints.Performers;
 using LowPressureZone.Api.Rules;
 using HourlySlot = LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlot;
 
@@ -7,8 +6,7 @@ namespace LowPressureZone.Api.Endpoints.Schedules.HourlySlots;
 
 [RegisterService<HourlySlotMapper>(LifeTime.Singleton)]
 public sealed class HourlySlotMapper(
-    HourlySlotPermissions permissions,
-    PerformerMapper performerMapper)
+    HourlySlotPermissions permissions)
     : IResponseMapper
 {
     public HourlySlotResponse FromEntity(HourlySlot slot) => new()

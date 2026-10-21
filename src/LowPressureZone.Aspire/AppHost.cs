@@ -15,7 +15,7 @@ var identityDatabase = postgres.AddDatabase("lpz-identity");
 var pgAdmin = postgres.WithPgAdmin(cfg => { cfg.WithHostPort(4002); }, 
                                    containerName: "lpz-pgAdmin");
 
-var azuracast = builder.AddContainer("azuracast", "ghcr.io/azuracast/azuracast", "0.23.8")
+var azuracast = builder.AddContainer("azuracast", "ghcr.io/azuracast/azuracast", "0.23.9")
                        .WithBindMount($"{bindMountDir}/azuracast/stations",
                                       "/var/azuracast/stations",
                                       isReadOnly: false)

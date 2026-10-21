@@ -102,6 +102,8 @@ export const useAuthStore = defineStore('authStore', () => {
     return userInfo.value.roles.includes(roleToCheck)
   }
 
+  const isStreamer = computed(() => userInfo.value.streamerId !== null)
+
   const isInAnyRoles = (...rolesToCheck: string[]): boolean => {
     if (rolesToCheck.length === 0) return true
 
@@ -127,6 +129,7 @@ export const useAuthStore = defineStore('authStore', () => {
     logoutAsync,
     isInRole,
     isInAnyRoles,
+    isStreamer,
     reset
   }
 })

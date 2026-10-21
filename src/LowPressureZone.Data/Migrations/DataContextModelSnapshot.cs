@@ -17,13 +17,13 @@ partial class DataContextModelSnapshot : ModelSnapshot
     // If you encounter a merge conflict in the line below, it means you need to
     // discard one of the migration branches and recreate its migrations on top of
     // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-    public override string LastMigrationId => "20260831041152_EnhanceBroadcastAggregate";
+    public override string LastMigrationId => "20261020205724_IncludeAdditionalOnModelCreated";
 
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
 #pragma warning disable 612, 618
         modelBuilder
-            .HasAnnotation("ProductVersion", "11.0.0-preview.6.26359.118")
+            .HasAnnotation("ProductVersion", "11.0.0-rc.2.26504.105")
             .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
         NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -89,6 +89,12 @@ partial class DataContextModelSnapshot : ModelSnapshot
                     .HasColumnType("character varying(512)");
 
                 b.HasKey("Id");
+
+                b.HasIndex("Name")
+                    .IsUnique();
+
+                b.HasIndex("SocialUrl")
+                    .IsUnique();
 
                 b.ToTable("Communities");
             });
@@ -171,7 +177,6 @@ partial class DataContextModelSnapshot : ModelSnapshot
         modelBuilder.Entity("LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity.ClashSlot", b =>
             {
                 b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
                     .HasColumnType("uuid");
 
                 b.Property<Guid>("PerformerOneId")
@@ -218,7 +223,6 @@ partial class DataContextModelSnapshot : ModelSnapshot
         modelBuilder.Entity("LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlot", b =>
             {
                 b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
                     .HasColumnType("uuid");
 
                 b.Property<Guid>("PerformerId")

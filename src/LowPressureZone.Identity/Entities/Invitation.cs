@@ -1,4 +1,6 @@
-﻿namespace LowPressureZone.Identity.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace LowPressureZone.Identity.Entities;
 
 public sealed class Invitation<TKey, TUser> where TUser : class
 {
@@ -11,4 +13,9 @@ public sealed class Invitation<TKey, TUser> where TUser : class
     public DateTime? RegistrationDate { get; set; }
     public bool IsCancelled { get; set; }
     public DateTime? CancellationDate { get; set; }
+
+    public static void OnModelCreated(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Invitation<TKey, TUser>>().Property(e => e.Id).ValueGeneratedNever();
+    }
 }

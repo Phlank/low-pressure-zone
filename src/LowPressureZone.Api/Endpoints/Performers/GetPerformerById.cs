@@ -12,6 +12,7 @@ public sealed class GetPerformerById(DataContext dataContext)
     {
         Get("/performers/{id}");
         Description(builder => builder.Produces(404));
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

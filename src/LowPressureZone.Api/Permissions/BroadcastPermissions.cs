@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using FastEndpoints;
-using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Domain.BroadcastAggregate;
 using LowPressureZone.Identity.Constants;

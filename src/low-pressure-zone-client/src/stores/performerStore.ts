@@ -28,7 +28,6 @@ export const usePerformerStore = defineStore('performerStore', () => {
     (data) => {
       performers.value = data
     },
-    { permissionFn: () => auth.isLoggedIn }
   )
 
   const getById = (id: string) => performersMap.value[id]
@@ -78,6 +77,8 @@ export const usePerformerStore = defineStore('performerStore', () => {
   const getLinkablePerformers = computed(() =>
     performers.value.filter((performer) => performer.isLinkableToTimeslot)
   )
+
+
 
   return {
     isLoading: isLoading,

@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using FastEndpoints;
 using Hangfire;
 using LowPressureZone.Api.Extensions;
+using LowPressureZone.Api.Utilities;
 using LowPressureZone.Data.Extensions;
 using LowPressureZone.Identity.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -73,7 +74,16 @@ app.MapScalarApiReference();
 // that particular route.
 app.MapFallbackToFile("index.html").AllowAnonymous();
 
-await app.MigrateDataContextAsync();
-await app.MigrateIdentityContextAsync();
+if (!AppDomain.CurrentDomain.IsTestRunner())
+{
+    app.Logger.LogInformation("Migrating databases...");
+    await app.MigrateDataContextAsync();
+    await app.MigrateIdentityContextAsync();
+    app.Logger.LogInformation("Finished migrating databases.");
+}
+else
+{
+    app.Logger.LogInformation("Skipping database migrations because the application is running in a test runner.");
+}
 
 await app.RunAsync();

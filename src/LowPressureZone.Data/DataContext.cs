@@ -1,5 +1,6 @@
 ﻿using LowPressureZone.Data.Extensions;
 using LowPressureZone.Domain.BroadcastAggregate;
+using LowPressureZone.Domain.CommunityAggregate;
 using LowPressureZone.Domain.CommunityAggregate.RelationshipEntity;
 using LowPressureZone.Domain.NewsAggregate;
 using LowPressureZone.Domain.PerformerAggregate;
@@ -17,7 +18,7 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     public DbSet<Broadcast> Broadcasts { get; set; }
     public DbSet<News> News { get; set; }
     public DbSet<Performer> Performers { get; set; }
-    public DbSet<Domain.CommunityAggregate.Community> Communities { get; set; }
+    public DbSet<Community> Communities { get; set; }
 
     public IQueryable<Relationship> Relationships => Set<Relationship>().AsQueryable()
                                                                         .AsNoTracking();
@@ -35,9 +36,13 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         Broadcast.OnModelCreating(modelBuilder);
+        
+        Community.OnModelCreating(modelBuilder);
+        
         Schedule.OnModelCreating(modelBuilder);
         HourlySlot.OnModelCreating(modelBuilder);
         ClashSlot.OnModelCreating(modelBuilder);
+        
 
         modelBuilder.Entity<Setting>().HasIndex(nameof(Setting.Key)).IsUnique();
     }
