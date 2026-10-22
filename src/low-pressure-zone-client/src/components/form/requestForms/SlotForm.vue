@@ -38,7 +38,9 @@ import type { SlotResponse } from '@/api/resources/schedulesApi.ts'
 import HourlySlotForm from '@/components/form/requestForms/HourlySlotForm.vue'
 import ClashSlotForm from '@/components/form/requestForms/ClashSlotForm.vue'
 import { defaultPromise } from '@/utils/defaults.ts'
+import {useAuthStore} from "@/stores/authStore.ts";
 
+const auth = useAuthStore()
 const schedules = useScheduleStore()
 
 const props = defineProps<{ scheduleId: string; start: Date; existingSlot?: SlotResponse }>()
@@ -52,8 +54,8 @@ watch(
   schedule,
   () => {
     if (slotTypeSelections.value.length > 0) return
-    if (schedule.value?.isHourlyAllowed) slotTypeSelections.value.push('Hourly')
-    if (schedule.value?.isClashAllowed) slotTypeSelections.value.push('Clash')
+    if (schedule.value?.isHourlySlotCreationAllowed) slotTypeSelections.value.push('Hourly')
+    if (schedule.value?.isClashSlotCreationAllowed) slotTypeSelections.value.push('Clash')
     if (slotType.value === '' && schedule.value) slotType.value = slotTypeSelections.value[0]
   },
   { immediate: true }

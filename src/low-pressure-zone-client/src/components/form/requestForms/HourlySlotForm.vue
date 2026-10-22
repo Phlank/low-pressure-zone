@@ -319,12 +319,11 @@ const durationOptions = computed((): DropdownItem<number>[] => {
     timeslotsFollowingCurrent.length > 0
       ? parseTime(timeslotsFollowingCurrent[0]!.startsAt)
       : endOfSchedule
-
   const maxDurationHours = Math.floor(
     (nextBoundaryTime - parseTime(timeslotForm.state.value.startsAt)) / 3600000 // to N of hours
   )
   for (let i = 1; i <= 3; i++) {
-    if (maxDurationHours >= 1) {
+    if (maxDurationHours >= i) {
       options.push({
         label: `${i} hour${i > 1 ? 's' : ''}`,
         value: i
