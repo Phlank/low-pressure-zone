@@ -51,8 +51,7 @@ public sealed partial class NightlyTaskService(
             }
             catch (Exception ex)
             {
-                await emailService.SendAdminMessage("Exception in Nightly Tasks",
-                                                    "An exception was thrown while executing nightly tasks. Please check the logs for more details.");
+                await emailService.SendAdminException(ex, "Nightly tasks");
                 logger.LogError(ex, "Exception thrown while executing nightly tasks");
             }
     }

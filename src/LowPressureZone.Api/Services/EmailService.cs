@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 using FastEndpoints;
 using FluentEmail.Core;
 using FluentEmail.Core.Models;
@@ -77,5 +78,17 @@ public sealed class EmailService(
         var result = await SendAsync(adminEmail, subject, message);
         if (!result.IsSuccess) return Result.Err<bool, SendResponse>(result.Error);
         return Result.Ok<bool, SendResponse>(true);
+    }
+
+    public async Task<Result<NoValue, SendResponse>> SendAdminException(Exception ex, string process)
+    {
+        var subject = "Exception thrown in LPZ | Admin Message | Low Pressure Zone";
+        var message = new StringBuilder($"An exception was thrown in Low Pressure Zone during the {process} process.")
+            .AppendLine("Exception details:")
+            .AppendLine(ex.ToString())
+            .ToString();
+        var result = await SendAsync(options.Value.AdminEmail, subject, message);
+        if (!result.IsSuccess) return Result.Err<NoValue, SendResponse>(result.Error);
+        return Result.Ok<NoValue, SendResponse>(NoValue.Instance);
     }
 }

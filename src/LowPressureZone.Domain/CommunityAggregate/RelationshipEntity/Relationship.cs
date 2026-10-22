@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Domain.CommunityAggregate.RelationshipEntity;
 
@@ -26,7 +27,8 @@ public class Relationship : Entity
         IsPerformer = isPerformer;
     }
 
-    internal static DomainResult<Relationship> Create(Guid communityId, Guid userId, bool isOrganizer, bool isPerformer) =>
+    internal static DomainResult<Relationship>
+        Create(Guid communityId, Guid userId, bool isOrganizer, bool isPerformer) =>
         DomainResult.Ok(new Relationship(communityId, userId, isOrganizer, isPerformer));
 
     internal DomainResult<NoValue> SetRoles(bool isPerformer, bool isOrganizer)
@@ -34,5 +36,12 @@ public class Relationship : Entity
         IsPerformer = isPerformer;
         IsOrganizer = isOrganizer;
         return DomainResult.Ok();
+    }
+
+    public static void OnModelCreating(ModelBuilder builder)
+    {
+        builder.Entity<Relationship>()
+               .Property(r => r.Id)
+               .ValueGeneratedNever();
     }
 }

@@ -38,6 +38,7 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
         Broadcast.OnModelCreating(modelBuilder);
         
         Community.OnModelCreating(modelBuilder);
+        Relationship.OnModelCreating(modelBuilder);
         
         Schedule.OnModelCreating(modelBuilder);
         HourlySlot.OnModelCreating(modelBuilder);
