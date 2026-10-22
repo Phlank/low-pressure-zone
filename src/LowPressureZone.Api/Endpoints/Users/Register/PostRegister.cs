@@ -103,11 +103,8 @@ public class PostRegister(
 
         var createStreamerResult = await userManager.LinkToNewStreamer(user, radioClient);
         if (!createStreamerResult.IsSuccess)
-            _ =
-                await
-                    emailService
-                        .SendAdminMessage($"Failure to create streamer for new user: {createStreamerResult.Error}",
-                                          "Streamer creation failed");
+            await emailService.SendAdminMessage($"Failure to create streamer for new user: {createStreamerResult.Error}",
+                                                "Streamer creation failed");
 
         invitation.IsRegistered = true;
         invitation.RegistrationDate = DateTime.UtcNow;

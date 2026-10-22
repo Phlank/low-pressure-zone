@@ -22,7 +22,7 @@ h3 {
 body {
   margin: 0;
   overflow: hidden;
-  background-image: url(./bg-invert.jpg);
+  background-image: url(/bg-invert.jpg);
   background-attachment: fixed;
   background-size: cover;
   background-repeat: no-repeat;
@@ -40,7 +40,7 @@ body {
 
 body.dark-mode-toggle {
   background-color: #222;
-  background-image: url(./bg.jpg);
+  background-image: url(/bg.jpg);
 
   .drop-shadow {
     filter: drop-shadow(0 0 0.5rem variables.$drop-shadow-color-dark);

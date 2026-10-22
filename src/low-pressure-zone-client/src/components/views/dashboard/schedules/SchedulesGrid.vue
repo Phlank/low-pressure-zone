@@ -77,13 +77,13 @@
         </template>
         <template #paginatorstart>
           <Button
-            v-if="!hideActions && !isMobile"
+            v-if="!hideActions && !isMobile && auth.isInAnyRoles(roles.admin, roles.organizer)"
             label="Create Schedule"
             @click="emit('create')" />
         </template>
         <template #footer>
           <Button
-            v-if="!hideActions && isMobile"
+            v-if="!hideActions && isMobile && auth.isInAnyRoles(roles.admin, roles.organizer)"
             label="Create Schedule"
             style="width: 100%"
             @click="emit('create')" />

@@ -20,10 +20,12 @@
   <component name="ChangeListManager">
     <list default="true" id="03c67732-74bc-4592-9df9-2d635ee53a25" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.LowPressureZone/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.LowPressureZone/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LowPressureZone.Api/Services/EmailService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/LowPressureZone.Api/Services/EmailService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LowPressureZone.Api/Services/NightlyTasks/NightlyTaskService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/LowPressureZone.Api/Services/NightlyTasks/NightlyTaskService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LowPressureZone.Data/DataContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/LowPressureZone.Data/DataContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LowPressureZone.Domain/CommunityAggregate/RelationshipEntity/Relationship.cs" beforeDir="false" afterPath="$PROJECT_DIR$/LowPressureZone.Domain/CommunityAggregate/RelationshipEntity/Relationship.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LowPressureZone.Api/Endpoints/Users/Register/PostRegister.cs" beforeDir="false" afterPath="$PROJECT_DIR$/LowPressureZone.Api/Endpoints/Users/Register/PostRegister.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/low-pressure-zone-client/src/assets/bg-invert.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/low-pressure-zone-client/public/bg-invert.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/low-pressure-zone-client/src/assets/bg.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/low-pressure-zone-client/public/bg.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/low-pressure-zone-client/src/assets/main.scss" beforeDir="false" afterPath="$PROJECT_DIR$/low-pressure-zone-client/src/assets/main.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/low-pressure-zone-client/src/components/layout/site/SiteLayout.vue" beforeDir="false" afterPath="$PROJECT_DIR$/low-pressure-zone-client/src/components/layout/site/SiteLayout.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/low-pressure-zone-client/src/components/views/dashboard/schedules/SchedulesGrid.vue" beforeDir="false" afterPath="$PROJECT_DIR$/low-pressure-zone-client/src/components/views/dashboard/schedules/SchedulesGrid.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,6 +46,8 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f4d6a8dbbc6414b0395d6bebbaaa59cdaf926625063315619a7d76c156f50/IdentityPasskeyData.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/fa15a5077d185cdf62ac0c5da6fbc565970a7a7431cdb1634d7e5edb3b21b5/IdentityDbContext.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/LowPressureZone.Api/Utilities/RuntimeCheck.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///home/phlank/source/repos/lpz-extra/low-pressure-zone/src/LowPressureZone.Data/DataContext.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///home/phlank/source/repos/lpz-extra/low-pressure-zone/src/LowPressureZone.Domain/CommunityAggregate/RelationshipEntity/Relationship.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
@@ -322,7 +326,8 @@
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="Update azuracast version and init mount files, add migration to identity context" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update azuracast version and init mount files, add migration to identity context" />
+    <MESSAGE value="Fix relationship failing to insert on POST /users/invites" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix relationship failing to insert on POST /users/invites" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
