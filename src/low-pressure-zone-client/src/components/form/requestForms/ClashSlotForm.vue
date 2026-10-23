@@ -106,7 +106,7 @@ const schedules = useScheduleStore()
 const performers = usePerformerStore()
 
 const props = defineProps<{
-  clashSlot?: ClashSlotResponse
+  existingSlot?: ClashSlotResponse
   scheduleId: string
   start: Date
 }>()
@@ -138,7 +138,7 @@ const { state, val, isSubmitting, submit, reset } = useEntityForm<
   SoundclashFormState,
   ClashSlotResponse
 >({
-  entity: props.clashSlot,
+  entity: props.existingSlot,
   formStateInitializeFn: (entity) => formStateInitializeFn(entity),
   validationRules: {
     ...clashSlotRequestRules,

@@ -14,14 +14,14 @@
       </IftaFormField>
     </FormArea>
     <HourlySlotForm
-      v-if="slotType === 'Hourly'"
+      v-if="slotType === 'Hourly' && (existingSlot === undefined || existingSlot.type === 'Hourly')"
       ref="hourlySlotFormComponent"
       :schedule-id="scheduleId"
       :start="start"
-      :existing-slot="existingSlot as HourlySlotResponse | undefined"
+      :existing-slot="existingSlot"
       @submitted="emit('submitted')" />
     <ClashSlotForm
-      v-if="slotType === 'Clash'"
+      v-if="slotType === 'Clash' && (existingSlot === undefined || existingSlot.type === 'Clash')"
       ref="clashSlotFormComponent"
       :schedule-id="scheduleId"
       :start="start"
@@ -40,7 +40,6 @@ import type { SlotResponse } from '@/api/resources/schedulesApi.ts'
 import HourlySlotForm from '@/components/form/requestForms/HourlySlotForm.vue'
 import ClashSlotForm from '@/components/form/requestForms/ClashSlotForm.vue'
 import { defaultPromise } from '@/utils/defaults.ts'
-import type { HourlySlotResponse } from '@/api/resources/hourlySlotsApi.ts'
 
 const schedules = useScheduleStore()
 
