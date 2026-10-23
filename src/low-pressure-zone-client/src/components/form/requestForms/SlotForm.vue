@@ -43,7 +43,6 @@ import { defaultPromise } from '@/utils/defaults.ts'
 import {useAuthStore} from "@/stores/authStore.ts";
 import type {HourlySlotResponse} from "@/api/resources/hourlySlotsApi.ts";
 
-const auth = useAuthStore()
 const schedules = useScheduleStore()
 
 const props = defineProps<{ scheduleId: string; start: Date; existingSlot?: SlotResponse }>()

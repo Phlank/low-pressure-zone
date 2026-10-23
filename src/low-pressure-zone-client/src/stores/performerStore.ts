@@ -21,7 +21,6 @@ export const usePerformerStore = defineStore('performerStore', () => {
   const performers: Ref<PerformerResponse[]> = ref([])
   const performersMap = computed(() => getEntityMap(performers.value))
   const toast = useToast()
-  const auth = useAuthStore()
 
   const { isLoading } = useRefresh(
     performersApi.get,
