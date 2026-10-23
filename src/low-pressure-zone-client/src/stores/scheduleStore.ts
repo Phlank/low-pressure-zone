@@ -255,10 +255,10 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
       toast
     )
 
-  const deleteClashSlot = (scheduleId: string) =>
+  const deleteClashSlot = (slot: ClashSlotResponse) =>
     useRemovePersistentItemFn<ClashSlotResponse>(
       clashSlots,
-      clashSlotsApi.delete(scheduleId),
+      clashSlotsApi.delete(slot.scheduleId),
       (entity) => {
         removeEntity(getScheduleById(entity.scheduleId)!.slots, entity.id)
         showDeleteSuccessToast(
@@ -267,7 +267,7 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
           `${performers.getById(entity.performerOneId)?.name} vs. ${performers.getById(entity.performerTwoId)?.name}`
         )
       }
-    )
+    )(slot.id)
 
   return {
     isLoading,

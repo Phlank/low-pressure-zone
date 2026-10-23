@@ -8,7 +8,7 @@
         field="start"
         header="Start">
         <template #body="{ data }: { data: Row }">
-          <SlotTime :date="data.start" />
+          <SlotTime :date="data.start"/>
         </template>
       </Column>
       <Column>
@@ -17,12 +17,12 @@
             <SlotName
               :is-prerecorded="data.slot.isPrerecorded"
               :name="data.slot.subtitle"
-              :performer="getHourlyPerformerName(data.slot)" />
+              :performer="getHourlyPerformerName(data.slot)"/>
           </div>
           <div v-else-if="data.slot?.type === 'Clash'">
             <TwoLineData
               :above="getPerformersClashText(data.slot)"
-              :below="getRoundsClashText(data.slot)" />
+              :below="getRoundsClashText(data.slot)"/>
           </div>
         </template>
       </Column>
@@ -37,7 +37,7 @@
             :show-edit="data.slot?.isEditable"
             @create="onCreateSlotClicked(data)"
             @delete="onDeleteSlotClicked(data)"
-            @edit="onEditSlotClicked(data)" />
+            @edit="onEditSlotClicked(data)"/>
         </template>
       </Column>
     </DataTable>
@@ -72,10 +72,10 @@
                 :show-edit="row.isFirstRowOfSlot && row.slot?.isEditable"
                 @create="onCreateSlotClicked(row)"
                 @delete="onDeleteSlotClicked(row)"
-                @edit="onEditSlotClicked(row)" />
+                @edit="onEditSlotClicked(row)"/>
             </template>
           </ListItem>
-          <Divider v-if="index < items.length - 1" />
+          <Divider v-if="index < items.length - 1"/>
         </div>
       </template>
     </DataView>
@@ -91,15 +91,16 @@
         :schedule-id="schedule.id"
         :start="selectedRow?.start ?? new Date()"
         :existing-slot="selectedRow?.slot"
-        @submitted="showSlotFormDrawer = false" />
+        @submitted="showSlotFormDrawer = false"/>
     </FormDrawer>
+    <DeleteDialog header="Delete Slot" :is-submitting="isDeleting" entity-type="Slot" v-model:visible="showDeleteDialog" @delete="onDeleteDialogConfirmed" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Column, DataTable, DataView, Divider } from 'openvue'
-import type { ScheduleResponse, SlotResponse } from '@/api/resources/schedulesApi.ts'
-import { inject, onMounted, onUnmounted, type Ref, ref, useTemplateRef, watch } from 'vue'
+import {Column, DataTable, DataView, Divider} from 'openvue'
+import type {ScheduleResponse, SlotResponse} from '@/api/resources/schedulesApi.ts'
+import {inject, onMounted, onUnmounted, type Ref, ref, useTemplateRef, watch} from 'vue'
 import {
   formatReadableTime,
   isDateInSlot,
@@ -108,18 +109,22 @@ import {
   timesBetween
 } from '@/utils/dateUtils.ts'
 import SlotTime from '@/components/controls/SlotTime.vue'
-import { usePerformerStore } from '@/stores/performerStore.ts'
+import {usePerformerStore} from '@/stores/performerStore.ts'
 import SlotName from '@/components/controls/SlotName.vue'
 import TwoLineData from '@/components/layout/TwoLineData.vue'
-import type { ClashSlotResponse } from '@/api/resources/clashSlotsApi.ts'
+import type {ClashSlotResponse} from '@/api/resources/clashSlotsApi.ts'
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
 import ListItem from '@/components/data/ListItem.vue'
-import type { HourlySlotResponse } from '@/api/resources/hourlySlotsApi.ts'
+import type {HourlySlotResponse} from '@/api/resources/hourlySlotsApi.ts'
 import FormDrawer from '@/components/form/FormDrawer.vue'
 import SlotForm from '@/components/form/requestForms/SlotForm.vue'
+import DeleteDialog from "@/components/dialogs/DeleteDialog.vue";
+import {useScheduleStore} from "@/stores/scheduleStore.ts";
+import type {Result} from "@/types/result.ts";
 
 const isMobile = inject<boolean>('isMobile')
 const performers = usePerformerStore()
+const schedules = useScheduleStore()
 const slotForm = useTemplateRef('slotFormComponent')
 const props = defineProps<{ schedule: ScheduleResponse }>()
 
@@ -153,7 +158,7 @@ watch(
   () => {
     setupRows()
   },
-  { immediate: true, deep: true }
+  {immediate: true, deep: true}
 )
 
 const getHourlyPerformerName = (hourly: HourlySlotResponse) => {
@@ -177,8 +182,26 @@ const onEditSlotClicked = (row: Row) => {
   showSlotFormDrawer.value = true
 }
 
+let deleteFn: undefined | (() => Promise<Result>) = undefined
+const isDeleting = ref(false)
+const showDeleteDialog = ref(false)
 const onDeleteSlotClicked = (row: Row) => {
+  if (row.slot === undefined) return
   selectedRow.value = row
+  const slot = row.slot
+  if (slot.type === 'Hourly') {
+    deleteFn = () => schedules.deleteHourlySlot(slot)
+  } else if (slot.type === 'Clash') {
+    deleteFn = () => schedules.deleteClashSlot(slot)
+  }
+  showDeleteDialog.value = true
+}
+const onDeleteDialogConfirmed = async () => {
+  if (!deleteFn) return
+  isDeleting.value = true
+  await deleteFn()
+  isDeleting.value = false
+  showDeleteDialog.value = false
 }
 
 onMounted(() => {
@@ -190,6 +213,7 @@ onUnmounted(() => {
 
 <style lang="scss">
 @use '@/assets/styles/variables';
+
 .slot-grid {
   &__item {
     padding: variables.$space-m;

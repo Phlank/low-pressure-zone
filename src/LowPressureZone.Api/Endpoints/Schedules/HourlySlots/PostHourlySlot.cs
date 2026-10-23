@@ -86,6 +86,6 @@ public class PostHourlySlot(
 
         await dataContext.SaveChangesAsync(ct);
         HttpContext.ExposeLocation();
-        await Send.CreatedAtAsync<GetHourlySlotById>(new { slotResult.Value.Id }, cancellation: ct);
+        await Send.CreatedAtAsync<GetHourlySlotById>(new { ScheduleId = id, slotResult.Value.Id }, cancellation: ct);
     }
 }

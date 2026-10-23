@@ -23,10 +23,12 @@ export const useCreatePersistentItemFn =
     if (progressRef && apiFunction.length === 2)
       response = await apiFunction(formState.value, progressRef)
     else response = await apiFunction(formState.value)
+
     if (!response.isSuccess()) {
       if (toast) tryHandleUnsuccessfulResponse(response, toast, validation)
       return err()
     }
+
     onSuccess(response.getCreatedId(), formState.value)
     return ok()
   }

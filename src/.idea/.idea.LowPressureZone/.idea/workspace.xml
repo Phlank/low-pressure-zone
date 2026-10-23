@@ -20,15 +20,9 @@
   <component name="ChangeListManager">
     <list default="true" id="03c67732-74bc-4592-9df9-2d635ee53a25" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.LowPressureZone/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.LowPressureZone/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LowPressureZone.Api/Commands/Broadcasts/SyncBroadcasts/SyncBroadcastsHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/LowPressureZone.Api/Commands/Broadcasts/SyncBroadcasts/SyncBroadcastsHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LowPressureZone.Api/Endpoints/Schedules/HourlySlots/HourlySlotPrerecordedMixHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/LowPressureZone.Api/Endpoints/Schedules/HourlySlots/HourlySlotPrerecordedMixHandler.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LowPressureZone.Api/Endpoints/Schedules/HourlySlots/PostHourlySlot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/LowPressureZone.Api/Endpoints/Schedules/HourlySlots/PostHourlySlot.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LowPressureZone.Domain/ScheduleAggregate/HourlySlotEntity/HourlySlotTimeRangeObject/HourlySlotTimeRange.cs" beforeDir="false" afterPath="$PROJECT_DIR$/LowPressureZone.Domain/ScheduleAggregate/HourlySlotEntity/HourlySlotTimeRangeObject/HourlySlotTimeRange.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LowPressureZone.Domain/ScheduleAggregate/HourlySlotEntity/PrerecordedMixObject/PrerecordedMix.cs" beforeDir="false" afterPath="$PROJECT_DIR$/LowPressureZone.Domain/ScheduleAggregate/HourlySlotEntity/PrerecordedMixObject/PrerecordedMix.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LowPressureZone.Domain/ScheduleAggregate/HourlySlotEntity/PrerecordedMixObject/Rules/FileNameRequiredWhenPrerecordedRule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/LowPressureZone.Domain/ScheduleAggregate/HourlySlotEntity/PrerecordedMixObject/Rules/FileNameRequiredWhenPrerecordedRule.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/low-pressure-zone-client/src/components/form/requestForms/HourlySlotForm.vue" beforeDir="false" afterPath="$PROJECT_DIR$/low-pressure-zone-client/src/components/form/requestForms/HourlySlotForm.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/low-pressure-zone-client/src/components/form/requestForms/SlotForm.vue" beforeDir="false" afterPath="$PROJECT_DIR$/low-pressure-zone-client/src/components/form/requestForms/SlotForm.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/low-pressure-zone-client/src/composables/useEntityForm.ts" beforeDir="false" afterPath="$PROJECT_DIR$/low-pressure-zone-client/src/composables/useEntityForm.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/low-pressure-zone-client/src/components/views/dashboard/schedules/SlotsGrid.vue" beforeDir="false" afterPath="$PROJECT_DIR$/low-pressure-zone-client/src/components/views/dashboard/schedules/SlotsGrid.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/low-pressure-zone-client/src/stores/scheduleStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/low-pressure-zone-client/src/stores/scheduleStore.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,7 +60,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     ".NET Project.LowPressureZone.Testing.executor": "Run",
-    "Aspire.LowPressureZone.Aspire: http.executor": "Debug",
+    "Aspire.LowPressureZone.Aspire: http.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
@@ -333,7 +327,8 @@
     <MESSAGE value="Fix relationship failing to insert on POST /users/invites" />
     <MESSAGE value="Move bg to public files, hide create schedule button when not an admin or organizer, remove autofocus on play button text input" />
     <MESSAGE value="Fix display of slot type picker for non-organizer/admins, fix available durations in hourly slot form" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix display of slot type picker for non-organizer/admins, fix available durations in hourly slot form" />
+    <MESSAGE value="Fixes for hourly slots" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixes for hourly slots" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

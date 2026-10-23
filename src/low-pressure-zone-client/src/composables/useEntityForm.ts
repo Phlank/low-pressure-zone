@@ -91,13 +91,10 @@ export const useEntityForm = <
 
   const apiAction = async (entity?: TEntity) => {
     let result: Result | undefined = undefined
-    console.log(entity)
     if (entity !== undefined && updatePersistentEntityFn) {
-      console.log('Updating entity')
       if (useProgress) result = await updatePersistentEntityFn(entity.id, state, val, progress)
       else result = await updatePersistentEntityFn(entity.id, state, val)
     } else if (entity === undefined && createPersistentEntityFn) {
-      console.log('Creating entity')
       if (useProgress) result = await createPersistentEntityFn(state, val, progress)
       else result = await createPersistentEntityFn(state, val)
     }
