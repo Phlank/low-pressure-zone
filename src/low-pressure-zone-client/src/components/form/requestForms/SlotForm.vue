@@ -18,7 +18,7 @@
       ref="hourlySlotFormComponent"
       :schedule-id="scheduleId"
       :start="start"
-      :existing-slot="existingSlot as (HourlySlotResponse | undefined)"
+      :existing-slot="existingSlot as HourlySlotResponse | undefined"
       @submitted="emit('submitted')" />
     <ClashSlotForm
       v-if="slotType === 'Clash'"
@@ -40,8 +40,7 @@ import type { SlotResponse } from '@/api/resources/schedulesApi.ts'
 import HourlySlotForm from '@/components/form/requestForms/HourlySlotForm.vue'
 import ClashSlotForm from '@/components/form/requestForms/ClashSlotForm.vue'
 import { defaultPromise } from '@/utils/defaults.ts'
-import {useAuthStore} from "@/stores/authStore.ts";
-import type {HourlySlotResponse} from "@/api/resources/hourlySlotsApi.ts";
+import type { HourlySlotResponse } from '@/api/resources/hourlySlotsApi.ts'
 
 const schedules = useScheduleStore()
 

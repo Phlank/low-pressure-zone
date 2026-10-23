@@ -15,7 +15,6 @@ import {
   showDeleteSuccessToast,
   showEditSuccessToast
 } from '@/utils/toastUtils.ts'
-import { useAuthStore } from '@/stores/authStore.ts'
 
 export const usePerformerStore = defineStore('performerStore', () => {
   const performers: Ref<PerformerResponse[]> = ref([])
