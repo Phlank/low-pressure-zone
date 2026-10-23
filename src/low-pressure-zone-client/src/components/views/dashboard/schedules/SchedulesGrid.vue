@@ -13,14 +13,14 @@
         <template>
           <Column
             expander
-            style="width: fit-content" />
+            style="width: fit-content"/>
           <Column
             v-if="!isMobile"
             field="name">
             <template #body="{ data }: { data: ScheduleResponse }">
               <TwoLineData
                 :above="data.name"
-                :below="data.community.name" />
+                :below="data.community.name"/>
             </template>
           </Column>
           <Column
@@ -48,7 +48,7 @@
                 :above="data.name"
                 :below="
                   parseDate(data.startsAt).toLocaleDateString(undefined, scheduleDateStringOptions)
-                " />
+                "/>
             </template>
           </Column>
           <!-- Only show the action col for grids with schedules in the future -->
@@ -65,28 +65,27 @@
                 :show-edit="data.isEditable"
                 @clipboard="handleClipboard(data)"
                 @delete="emit('delete', data)"
-                @edit="emit('edit', data)" />
+                @edit="emit('edit', data)"/>
             </template>
           </Column>
         </template>
         <template #expansion="rowProps: { data: ScheduleResponse }">
           <MarkdownContent
             v-if="rowProps.data.description"
-            :content="rowProps.data.description" />
-          <SlotsGrid :schedule="rowProps.data" />
+            :content="rowProps.data.description"/>
+          <SlotsGrid :schedule="rowProps.data"/>
         </template>
         <template #paginatorstart>
           <Button
             v-if="!hideActions && !isMobile && auth.isInAnyRoles(roles.admin, roles.organizer)"
             label="Create Schedule"
-            @click="emit('create')" />
+            @click="emit('create')"/>
         </template>
-        <template #footer>
+        <template #footer v-if="!hideActions && isMobile && auth.isInAnyRoles(roles.admin, roles.organizer)">
           <Button
-            v-if="!hideActions && isMobile && auth.isInAnyRoles(roles.admin, roles.organizer)"
             label="Create Schedule"
             style="width: 100%"
-            @click="emit('create')" />
+            @click="emit('create')"/>
         </template>
       </DataTable>
     </div>
@@ -95,18 +94,18 @@
 
 <script lang="ts" setup>
 import GridActions from '@/components/data/grid-actions/GridActions.vue'
-import { formatReadableTime, parseDate, parseTime } from '@/utils/dateUtils'
-import { Button, Column, DataTable, useToast } from 'openvue'
-import { computed, inject, ref, type Ref } from 'vue'
-import { type ScheduleResponse } from '@/api/resources/schedulesApi.ts'
-import { mobilePaginatorTemplate } from '@/constants/componentTemplates.ts'
-import { useCommunityStore } from '@/stores/communityStore.ts'
-import { roles } from '@/constants/roles.ts'
+import {formatReadableTime, parseDate, parseTime} from '@/utils/dateUtils'
+import {Button, Column, DataTable, useToast} from 'openvue'
+import {computed, inject, ref, type Ref} from 'vue'
+import {type ScheduleResponse} from '@/api/resources/schedulesApi.ts'
+import {mobilePaginatorTemplate} from '@/constants/componentTemplates.ts'
+import {useCommunityStore} from '@/stores/communityStore.ts'
+import {roles} from '@/constants/roles.ts'
 import copyToClipboard from '@/utils/copyToClipboard.ts'
-import { scheduleToRedditMarkdown } from '@/utils/markdown.ts'
-import { useAuthStore } from '@/stores/authStore.ts'
+import {scheduleToRedditMarkdown} from '@/utils/markdown.ts'
+import {useAuthStore} from '@/stores/authStore.ts'
 import TwoLineData from '@/components/layout/TwoLineData.vue'
-import { scheduleDateStringOptions } from '@/constants/dateFormats.ts'
+import {scheduleDateStringOptions} from '@/constants/dateFormats.ts'
 import SlotsGrid from '@/components/views/dashboard/schedules/SlotsGrid.vue'
 import MarkdownContent from '@/components/controls/MarkdownContent.vue'
 
