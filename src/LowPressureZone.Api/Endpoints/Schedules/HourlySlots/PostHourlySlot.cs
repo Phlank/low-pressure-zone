@@ -17,7 +17,8 @@ public class PostHourlySlot(
     DataContext dataContext,
     SchedulePermissions schedulePermissions,
     PerformerPermissions performerPermissions,
-    HourlySlotPrerecordedMixHandler mixHandler) : Endpoint<HourlySlotRequest>
+    HourlySlotPrerecordedMixHandler mixHandler,
+    ILogger<PostHourlySlot> logger) : Endpoint<HourlySlotRequest>
 {
     public override void Configure()
     {
@@ -56,12 +57,20 @@ public class PostHourlySlot(
             await Send.UnauthorizedAsync(ct);
             return;
         }
+        
+        logger.LogInformation("Processing file for hourly slot...");
 
         var prerecordedMixResult = request.File is not null
                                        ? await mixHandler.AddNewMixFile(this, schedule, request, ct)
                                        : null;
+
         if (prerecordedMixResult is not null)
+        {
+            logger.LogInformation("File processing failed...");
             await this.PublishOrThrowAsync(prerecordedMixResult);
+        }
+        
+        logger.LogInformation("File processed; persisting slot with prerecorded mix details...");
 
         var slotResult = HourlySlot.Create(schedule.Id,
                                            request.PerformerId,

@@ -17,23 +17,23 @@ public readonly record struct PrerecordedMix
                                                       string? uploadedFileName,
                                                       int? azuraCastMediaId) =>
         Rule.ApplyIntoResult(new PrerecordedMix
-                                          {
-                                              IsPrerecorded = isPrerecorded,
-                                              UploadedFileName = uploadedFileName?.Trim(),
-                                              AzuraCastMediaId = azuraCastMediaId
-                                          },
-                                          new FileNameRequiredWhenPrerecordedRule(isPrerecorded, uploadedFileName),
-                                          new MediaRequiredWhenPrerecordedRule(isPrerecorded, azuraCastMediaId),
-                                          new FileNameLengthCannotExceed2048Rule(uploadedFileName));
+                             {
+                                 IsPrerecorded = isPrerecorded,
+                                 UploadedFileName = uploadedFileName?.Trim(),
+                                 AzuraCastMediaId = azuraCastMediaId
+                             },
+                             new FileNameRequiredWhenPrerecordedRule(isPrerecorded, uploadedFileName),
+                             new MediaRequiredWhenPrerecordedRule(isPrerecorded, azuraCastMediaId),
+                             new FileNameLengthCannotExceed2048Rule(uploadedFileName));
 
     public static DomainResult<PrerecordedMix> Cleanup =>
         Rule.ApplyIntoResult(new PrerecordedMix
-                                          {
-                                              IsPrerecorded = false,
-                                              UploadedFileName = null,
-                                              AzuraCastMediaId = null
-                                          },
-                                          new FileNameRequiredWhenPrerecordedRule(false, null),
-                                          new MediaRequiredWhenPrerecordedRule(false, null),
-                                          new FileNameLengthCannotExceed2048Rule(null));
+                             {
+                                 IsPrerecorded = false,
+                                 UploadedFileName = null,
+                                 AzuraCastMediaId = null
+                             },
+                             new FileNameRequiredWhenPrerecordedRule(false, null),
+                             new MediaRequiredWhenPrerecordedRule(false, null),
+                             new FileNameLengthCannotExceed2048Rule(null));
 }

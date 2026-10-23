@@ -44,8 +44,8 @@ interface UseEntityFormReturn<TFormState extends object> {
  * @param validationRules The validation rules for the given TFormState.
  * @param entity The entity being edited, if it exists.
  * @param formStateInitializeFn Function to map a `TEntity` instance to a `Ref<TEntity>`.
- * @param createPersistentFn Function to create a new persistent entity in the store. See `useCreatePersistentItemFn`.
- * @param updatePersistentFn Function to update an existing persistent entity in the store. See
+ * @param createPersistentEntityFn Function to create a new persistent entity in the store. See `useCreatePersistentItemFn`.
+ * @param updatePersistentEntityFn Function to update an existing persistent entity in the store. See
  *   `useUpdatePersistentItemFn`.
  * @param onSubmitted Callback function to be called after successful submission.
  * @param useProgress Will provide a progress `Ref<number>` to the create/update functions if `true`. Only applies to
@@ -91,10 +91,13 @@ export const useEntityForm = <
 
   const apiAction = async (entity?: TEntity) => {
     let result: Result | undefined = undefined
+    console.log(entity)
     if (entity !== undefined && updatePersistentEntityFn) {
+      console.log('Updating entity')
       if (useProgress) result = await updatePersistentEntityFn(entity.id, state, val, progress)
       else result = await updatePersistentEntityFn(entity.id, state, val)
     } else if (entity === undefined && createPersistentEntityFn) {
+      console.log('Creating entity')
       if (useProgress) result = await createPersistentEntityFn(state, val, progress)
       else result = await createPersistentEntityFn(state, val)
     }

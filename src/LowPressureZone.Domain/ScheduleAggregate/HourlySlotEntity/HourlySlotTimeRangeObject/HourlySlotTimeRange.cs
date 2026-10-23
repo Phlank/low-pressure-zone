@@ -1,6 +1,5 @@
 using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
-using LowPressureZone.Core.Interfaces;
 using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlotTimeRangeObject.Rules;
 
 namespace LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlotTimeRangeObject;

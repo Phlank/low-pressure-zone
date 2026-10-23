@@ -38,7 +38,7 @@ public class HourlySlotPrerecordedMixHandler(
             endpoint.ThrowError(enqueueResult.Error);
         }
 
-        return PrerecordedMix.Create(true, Path.GetFileName(request.File.FileName), enqueueResult.Value);
+        return PrerecordedMix.Create(true, request.File.FileName, enqueueResult.Value);
     }
 
     public async Task<DomainResult<PrerecordedMix>> ReplaceMixFile<TRequest, TResponse>(

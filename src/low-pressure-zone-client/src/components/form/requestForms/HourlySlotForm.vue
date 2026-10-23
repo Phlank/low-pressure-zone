@@ -269,7 +269,7 @@ const performerForm = useEntityForm<PerformerRequest, PerformerRequest, Performe
       socialUrl: ''
     })
   },
-  createPersistentEntityFn: performers.create
+  createPersistentEntityFn: performers.create,
 })
 
 const isSubmitting = ref(false)

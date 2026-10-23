@@ -107,7 +107,7 @@ public class SyncBroadcastsHandler(
         if (composedResult.IsError)
         {
             logger.LogWarning("Domain errors while updating broadcast: {ErrorMessages}",
-                              string.Join(",", composedResult.Errors.Select(e => e.Message)));
+                              string.Join(",", composedResult.Errors.Select(e => $"{e.Field}: {e.Message}")));
         }
     }
 }

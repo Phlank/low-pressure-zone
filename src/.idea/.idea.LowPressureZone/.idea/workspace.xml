@@ -20,12 +20,15 @@
   <component name="ChangeListManager">
     <list default="true" id="03c67732-74bc-4592-9df9-2d635ee53a25" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.LowPressureZone/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.LowPressureZone/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LowPressureZone.Api/Endpoints/Users/Register/PostRegister.cs" beforeDir="false" afterPath="$PROJECT_DIR$/LowPressureZone.Api/Endpoints/Users/Register/PostRegister.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/low-pressure-zone-client/src/assets/bg-invert.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/low-pressure-zone-client/public/bg-invert.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/low-pressure-zone-client/src/assets/bg.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/low-pressure-zone-client/public/bg.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/low-pressure-zone-client/src/assets/main.scss" beforeDir="false" afterPath="$PROJECT_DIR$/low-pressure-zone-client/src/assets/main.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/low-pressure-zone-client/src/components/layout/site/SiteLayout.vue" beforeDir="false" afterPath="$PROJECT_DIR$/low-pressure-zone-client/src/components/layout/site/SiteLayout.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/low-pressure-zone-client/src/components/views/dashboard/schedules/SchedulesGrid.vue" beforeDir="false" afterPath="$PROJECT_DIR$/low-pressure-zone-client/src/components/views/dashboard/schedules/SchedulesGrid.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LowPressureZone.Api/Commands/Broadcasts/SyncBroadcasts/SyncBroadcastsHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/LowPressureZone.Api/Commands/Broadcasts/SyncBroadcasts/SyncBroadcastsHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LowPressureZone.Api/Endpoints/Schedules/HourlySlots/HourlySlotPrerecordedMixHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/LowPressureZone.Api/Endpoints/Schedules/HourlySlots/HourlySlotPrerecordedMixHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LowPressureZone.Api/Endpoints/Schedules/HourlySlots/PostHourlySlot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/LowPressureZone.Api/Endpoints/Schedules/HourlySlots/PostHourlySlot.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LowPressureZone.Domain/ScheduleAggregate/HourlySlotEntity/HourlySlotTimeRangeObject/HourlySlotTimeRange.cs" beforeDir="false" afterPath="$PROJECT_DIR$/LowPressureZone.Domain/ScheduleAggregate/HourlySlotEntity/HourlySlotTimeRangeObject/HourlySlotTimeRange.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LowPressureZone.Domain/ScheduleAggregate/HourlySlotEntity/PrerecordedMixObject/PrerecordedMix.cs" beforeDir="false" afterPath="$PROJECT_DIR$/LowPressureZone.Domain/ScheduleAggregate/HourlySlotEntity/PrerecordedMixObject/PrerecordedMix.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LowPressureZone.Domain/ScheduleAggregate/HourlySlotEntity/PrerecordedMixObject/Rules/FileNameRequiredWhenPrerecordedRule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/LowPressureZone.Domain/ScheduleAggregate/HourlySlotEntity/PrerecordedMixObject/Rules/FileNameRequiredWhenPrerecordedRule.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/low-pressure-zone-client/src/components/form/requestForms/HourlySlotForm.vue" beforeDir="false" afterPath="$PROJECT_DIR$/low-pressure-zone-client/src/components/form/requestForms/HourlySlotForm.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/low-pressure-zone-client/src/components/form/requestForms/SlotForm.vue" beforeDir="false" afterPath="$PROJECT_DIR$/low-pressure-zone-client/src/components/form/requestForms/SlotForm.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/low-pressure-zone-client/src/composables/useEntityForm.ts" beforeDir="false" afterPath="$PROJECT_DIR$/low-pressure-zone-client/src/composables/useEntityForm.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,6 +49,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f4d6a8dbbc6414b0395d6bebbaaa59cdaf926625063315619a7d76c156f50/IdentityPasskeyData.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/fa15a5077d185cdf62ac0c5da6fbc565970a7a7431cdb1634d7e5edb3b21b5/IdentityDbContext.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/LowPressureZone.Api/Utilities/RuntimeCheck.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Immediate Window" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///home/phlank/source/repos/lpz-extra/low-pressure-zone/src/LowPressureZone.Data/DataContext.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///home/phlank/source/repos/lpz-extra/low-pressure-zone/src/LowPressureZone.Domain/CommunityAggregate/RelationshipEntity/Relationship.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
@@ -59,33 +63,33 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET Project.LowPressureZone.Testing.executor&quot;: &quot;Run&quot;,
-    &quot;Aspire.LowPressureZone.Aspire: http.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;com.jetbrains.opentelemetry.toolwindow.stripe.promo&quot;: &quot;true&quot;,
-    &quot;efce9d1c-3264-43da-b181-ad24c40b0308.executor&quot;: &quot;Debug&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feature/new-domain&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;yarn&quot;,
-    &quot;rider.unittesting.toolwindow.stripe.button.shown&quot;: &quot;true&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/home/phlank/source/repos/lpz-extra/low-pressure-zone/src/low-pressure-zone-client/node_modules/typescript/lib&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET Project.LowPressureZone.Testing.executor": "Run",
+    "Aspire.LowPressureZone.Aspire: http.executor": "Debug",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "cidr.known.project.marker": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "com.jetbrains.opentelemetry.toolwindow.stripe.promo": "true",
+    "efce9d1c-3264-43da-b181-ad24c40b0308.executor": "Debug",
+    "git-widget-placeholder": "feature/new-domain",
+    "junie.onboarding.icon.badge.shown": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "yarn",
+    "rider.unittesting.toolwindow.stripe.button.shown": "true",
+    "to.speed.mode.migration.done": "true",
+    "ts.external.directory.path": "/home/phlank/source/repos/lpz-extra/low-pressure-zone/src/low-pressure-zone-client/node_modules/typescript/lib"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="Aspire.LowPressureZone.Aspire: http">
     <configuration name="LowPressureZone.Aspire: http" type="AspireHostConfiguration" factoryName="Aspire Host" activateToolWindowBeforeRun="false">
       <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/LowPressureZone.Aspire/LowPressureZone.Aspire.csproj" />
@@ -327,7 +331,9 @@
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="Update azuracast version and init mount files, add migration to identity context" />
     <MESSAGE value="Fix relationship failing to insert on POST /users/invites" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix relationship failing to insert on POST /users/invites" />
+    <MESSAGE value="Move bg to public files, hide create schedule button when not an admin or organizer, remove autofocus on play button text input" />
+    <MESSAGE value="Fix display of slot type picker for non-organizer/admins, fix available durations in hourly slot form" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix display of slot type picker for non-organizer/admins, fix available durations in hourly slot form" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -344,6 +350,19 @@
           <properties exception="System.Threading.ThreadAbortException" breakIfHandledByOtherCode="false" displayValue="System.Threading.ThreadAbortException" />
           <option name="timeStamp" value="3" />
         </breakpoint>
+        <line-breakpoint type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/LowPressureZone.Api/Endpoints/Schedules/HourlySlots/PostHourlySlot.cs</url>
+          <line>66</line>
+          <properties documentPath="$PROJECT_DIR$/LowPressureZone.Api/Endpoints/Schedules/HourlySlots/PostHourlySlot.cs" containingFunctionPresentation="Method 'HandleAsync'">
+            <startOffsets>
+              <option value="2354" />
+            </startOffsets>
+            <endOffsets>
+              <option value="2391" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>

@@ -4,7 +4,7 @@ namespace LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.PrerecordedM
 
 public class FileNameRequiredWhenPrerecordedRule(bool isPrerecorded, string? fileName) : IRule
 {
-    public bool IsBroken() => isPrerecorded && !string.IsNullOrWhiteSpace(fileName);
+    public bool IsBroken() => isPrerecorded && string.IsNullOrWhiteSpace(fileName);
 
     public RuleError Error => new("Required", nameof(PrerecordedMix.UploadedFileName));
 }
