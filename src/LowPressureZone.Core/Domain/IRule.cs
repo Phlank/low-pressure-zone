@@ -2,6 +2,8 @@ namespace LowPressureZone.Core.Domain;
 
 public interface IRule
 {
-    public bool IsBroken();
-    public RuleError Error { get; }
+    bool IsBroken();
+    RuleError Error { get; }
+    
+    public string ToString() => $"{Error.Field}: {Error.Message}";
 }

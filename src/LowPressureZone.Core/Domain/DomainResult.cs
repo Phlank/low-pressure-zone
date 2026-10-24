@@ -7,7 +7,7 @@ public class DomainResult<T> : Result<T, List<RuleError>>
 {
     public List<IEvent> Events { get; private init; } = [];
 
-    internal DomainResult(T? value, List<IEvent>? events, List<RuleError>? error) : base(value, error)
+    internal DomainResult(T? value, List<IEvent>? events, List<RuleError>? error) : base(value, error is not null && !error.IsEmpty ? error : null)
     {
         if (events is not null)
             Events = events;
