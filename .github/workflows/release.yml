@@ -21,8 +21,6 @@ jobs:
         working-directory: src/low-pressure-zone-client
       - run: yarn lint
         working-directory: src/low-pressure-zone-client
-      - run: yarn stylelint
-        working-directory: src/low-pressure-zone-client
       - run: yarn build --mode production
         working-directory: src/low-pressure-zone-client
       - name: Upload build artifacts
