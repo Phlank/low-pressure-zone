@@ -84,13 +84,15 @@ public class SyncBroadcastsHandler(
         remoteBroadcast.Streamer.ShouldNotBeNull();
         List<DomainResult<NoValue>> results = [];
 
-        if (!domainBroadcast.HasFile && remoteBroadcast.Recording?.DownloadUrl is not null)
+        var timeSinceEnd = domainBroadcast.Time.EndsAt.HasValue
+                               ? DateTimeOffset.Now - domainBroadcast.Time.EndsAt.Value
+                               : TimeSpan.Zero;
+
+        if (timeSinceEnd.TotalMinutes > 3 || domainBroadcast.HasFile) return;
+
+        if (remoteBroadcast.Recording?.DownloadUrl is not null)
         {
             results.Add(domainBroadcast.SetHasFile(true));
-        }
-        else if (domainBroadcast.HasFile && remoteBroadcast.Recording?.DownloadUrl is null)
-        {
-            results.Add(domainBroadcast.SetHasFile(false));
         }
 
         if (!domainBroadcast.Time.EndsAt.HasValue && remoteBroadcast.TimestampEnd.HasValue)
