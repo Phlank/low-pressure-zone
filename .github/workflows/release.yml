@@ -55,9 +55,9 @@ jobs:
       - name: Publish to Folder
         run: dotnet publish ./src/LowPressureZone.Api/LowPressureZone.Api.csproj -c Release -o ./publish
       - name: Zip Publish Output
-        run: zip -r low-pressure-zone-${{ github.event.release.tag_name }}.zip ./publish/* ./deploy.sh
+        run: zip -r low-pressure-zone-${{ github.ref_name }}.zip ./publish/* ./deploy.sh
       - name: Upload zip to release
         uses: softprops/action-gh-release@v3
         with:
-          files: low-pressure-zone-${{ github.event.release.tag_name }}.zip
+          files: low-pressure-zone-${{ github.ref_name }}.zip
           token: '${{ secrets.RELEASE_ASSET_TOKEN }}'
