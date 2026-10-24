@@ -1,7 +1,7 @@
 import { sendDelete, sendPost, sendPut } from '../fetchFunctions'
 
 const route = (scheduleId: string, id?: string) =>
-  `/schedules/${scheduleId}/clash-slots${id ? `/${id}` : ''}`
+  `/schedules/${scheduleId}/clash-slots/${id ? id : ''}`
 
 export default {
   delete: (scheduleId: string) => (id: string) => sendDelete(route(scheduleId, id)),

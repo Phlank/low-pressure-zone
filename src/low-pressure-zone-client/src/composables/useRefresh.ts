@@ -37,12 +37,30 @@ export const useRefresh = <TResponse, TParams = void>(
   const isAutoRefreshing = ref(options?.useAutoRefresh ?? DEFAULT_USE_AUTO_REFRESH)
   const isLoading = ref(true)
 
+  let autoRefreshController: AbortController | null = null
   const autoRefresh = async () => {
-    // noinspection InfiniteLoopJS
+    autoRefreshController = new AbortController()
     while (isAutoRefreshing.value) {
-      await delay(options?.autoRefreshInterval ?? DEFAULT_AUTO_REFRESH_INTERVAL)
-      if (isAutoRefreshing.value) await refresh()
+      await Promise.all([
+        delay(options?.autoRefreshInterval ?? DEFAULT_AUTO_REFRESH_INTERVAL, autoRefreshController),
+        refresh()
+      ])
     }
+  }
+
+  const stopAutoRefresh = () => {
+    if (isAutoRefreshing.value) {
+      isAutoRefreshing.value = false
+    }
+
+    if (autoRefreshController !== null && autoRefreshController.signal.aborted) {
+      autoRefreshController.abort()
+      autoRefreshController = null
+    }
+  }
+
+  const startAutoRefresh = () => {
+    if (!isAutoRefreshing.value) {}
   }
 
   const refresh = async () => {
@@ -53,18 +71,22 @@ export const useRefresh = <TResponse, TParams = void>(
     onRefresh(response.data())
   }
 
-  watch(() => (options?.permissionFn ?? DEFAULT_PERMISSION_FN)(), async (newVal) => {
-    if (newVal) {
-      await refresh()
-      isLoading.value = false
-      if (isAutoRefreshing.value) {
-        await autoRefresh()
+  watch(
+    () => (options?.permissionFn ?? DEFAULT_PERMISSION_FN)(),
+    async (newVal) => {
+      if (newVal) {
+        await refresh()
+        isLoading.value = false
+        if (isAutoRefreshing.value) {
+          await autoRefresh()
+        }
+      } else {
+        isLoading.value = false
+        isAutoRefreshing.value = false
       }
-    } else {
-      isLoading.value = false
-      isAutoRefreshing.value = false
-    }
-  }, { immediate: true })
+    },
+    { immediate: true }
+  )
 
   const getIsLoading = computed(() => isLoading.value)
   return { isLoading: getIsLoading, refresh, isAutoRefreshing }

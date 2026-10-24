@@ -5,24 +5,31 @@ public static class Rule
     public static List<RuleError> Apply(params List<IRule> rules)
     {
         List<RuleError> errors = [];
-        foreach (var rule in rules)
+        var brokenRules = rules.Where(rule => rule.IsBroken());
+        foreach (var rule in brokenRules)
         {
-            if (rule.IsBroken()) errors.Add(rule.Error);
+            errors.Add(rule.Error);
         }
 
         return errors;
     }
 
-    public static DomainResult<NoValue> ApplyIntoResult(params List<IRule> rules) =>
+    public static DomainResult<NoValue> ApplyIntoEmptyResult(params List<IRule> rules) =>
         ApplyIntoResult(NoValue.Instance, [], rules);
 
     public static DomainResult<T> ApplyIntoResult<T>(T valueIfSuccess, params List<IRule> rules) =>
         ApplyIntoResult(valueIfSuccess, [], rules);
 
+    public static DomainResult<NoValue> ApplyIntoEmptyResult(IEvent eventIfSuccess, params List<IRule> rules) =>
+        ApplyIntoResult(NoValue.Instance, [eventIfSuccess], rules);
+
     public static DomainResult<T> ApplyIntoResult<T>(T valueIfSuccess,
                                                      IEvent eventIfSuccess,
                                                      params List<IRule> rules) =>
         ApplyIntoResult(valueIfSuccess, [eventIfSuccess], rules);
+    
+    public static DomainResult<NoValue> ApplyIntoEmptyResult(List<IEvent> events, params List<IRule> rules) =>
+        ApplyIntoResult(NoValue.Instance, events, rules);
 
     public static DomainResult<T> ApplyIntoResult<T>(T valueIfSuccess,
                                                      List<IEvent> eventsIfSuccess,

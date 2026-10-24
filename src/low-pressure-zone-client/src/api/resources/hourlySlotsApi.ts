@@ -3,7 +3,7 @@ import { sendDelete } from '@/api/fetchFunctions.ts'
 import type { Ref } from 'vue'
 
 const route = (scheduleId: string, id?: string) =>
-  `/schedules/${scheduleId}/hourlySlots${id ? `/${id}` : ''}`
+  `/schedules/${scheduleId}/hourlySlots/${id ? id : ''}`
 
 export const hourlySlotsApi = {
   delete: (scheduleId: string) => (id: string) => sendDelete(route(scheduleId, id)),

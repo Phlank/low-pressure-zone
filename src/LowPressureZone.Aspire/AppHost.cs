@@ -1,5 +1,6 @@
 using LowPressureZone.Aspire.Extensions;
 using Projects;
+
 #pragma warning disable ASPIRECERTIFICATES001
 
 // ReSharper disable UnusedVariable
@@ -9,10 +10,10 @@ const string bindMountDir = "../../tools/mounts";
 var builder = DistributedApplication.CreateBuilder(args);
 
 var postgres = builder.AddPostgres("lpz-postgres", port: 4000)
-                      .WithDataVolume("lpz-data"); 
+                      .WithDataVolume("lpz-data");
 var domainDatabase = postgres.AddDatabase("lpz-domain");
 var identityDatabase = postgres.AddDatabase("lpz-identity");
-var pgAdmin = postgres.WithPgAdmin(cfg => { cfg.WithHostPort(4002); }, 
+var pgAdmin = postgres.WithPgAdmin(cfg => { cfg.WithHostPort(4002); },
                                    containerName: "lpz-pgAdmin");
 
 var azuracast = builder.AddContainer("azuracast", "ghcr.io/azuracast/azuracast", "0.23.9")
