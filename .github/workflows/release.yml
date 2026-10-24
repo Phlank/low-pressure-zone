@@ -15,21 +15,21 @@ jobs:
         with:
           node-version: 24.x
           cache: 'yarn'
-          cache-dependency-path: src/client/yarn.lock
+          cache-dependency-path: src/low-pressure-zone-client/yarn.lock
           check-latest: true
       - run: yarn
-        working-directory: src/client
+        working-directory: src/low-pressure-zone-client
       - run: yarn lint
-        working-directory: src/client
+        working-directory: src/low-pressure-zone-client
       - run: yarn stylelint
-        working-directory: src/client
+        working-directory: src/low-pressure-zone-client
       - run: yarn build --mode production
-        working-directory: src/client
+        working-directory: src/low-pressure-zone-client
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7
         with:
           name: client-build
-          path: ./src/server/LowPressureZone.Api/wwwroot/
+          path: ./src/LowPressureZone.Api/wwwroot/
 
   publish:
     name: Publish App
@@ -42,18 +42,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: 11.0.x
+          dotnet-quality: preview
       - name: Download Client Build Artifacts
         uses: actions/download-artifact@v8
         with:
           name: client-build
-          path: ./src/server/LowPressureZone.Api/wwwroot
+          path: ./src/LowPressureZone.Api/wwwroot
       - name: Update launchSettings.json to production information
-        run: mv ./src/server/LowPressureZone.Api/Properties/launchSettings-production.json ./src/server/LowPressureZone.Api/Properties/launchSettings.json
+        run: mv ./src/LowPressureZone.Api/Properties/launchSettings-production.json ./src/LowPressureZone.Api/Properties/launchSettings.json
       - name: Publish to Folder
-        run: dotnet publish ./src/server/LowPressureZone.Api/LowPressureZone.Api.csproj -c Release -o ./publish
+        run: dotnet publish ./src/LowPressureZone.Api/LowPressureZone.Api.csproj -c Release -o ./publish
       - name: Zip Publish Output
         run: zip -r low-pressure-zone-${{ github.event.release.tag_name }}.zip ./publish/* ./deploy.sh
       - name: Upload zip to release
@@ -61,4 +62,3 @@ jobs:
         with:
           files: low-pressure-zone-${{ github.event.release.tag_name }}.zip
           token: '${{ secrets.RELEASE_ASSET_TOKEN }}'
-
