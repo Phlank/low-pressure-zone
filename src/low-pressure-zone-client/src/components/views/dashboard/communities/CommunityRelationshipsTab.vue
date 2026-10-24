@@ -14,8 +14,8 @@
       </IftaFormField>
     </FormArea>
     <CommunityRelationshipsGrid
-      v-if="!communities.isLoading"
-      :community="selectedCommunity!"
+      v-if="!communities.isLoading && selectedCommunity"
+      :community="selectedCommunity"
       @create="handleCreate"
       @edit="handleEdit" />
     <Skeleton

@@ -55,7 +55,7 @@ import { DataTable, Column, Divider } from 'openvue'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
 import { computed, inject, type Ref, ref, watch } from 'vue'
 import type { SlotResponse } from '@/api/resources/schedulesApi.ts'
-import { isDateInSlot, parseDate, timesBetween } from '@/utils/dateUtils.ts'
+import { isTimeInSlot, parseDate, timesBetween } from '@/utils/dateUtils.ts'
 import SlotTime from '@/components/controls/SlotTime.vue'
 import { usePerformerStore } from '@/stores/performerStore.ts'
 import SlotName from '@/components/controls/SlotName.vue'
@@ -84,7 +84,7 @@ const setupRows = () => {
   const hours = timesBetween(startFirst, endLast, 60)
 
   for (const hour of hours) {
-    const slot = slots.find((s) => isDateInSlot(hour, s))
+    const slot = slots.find((s) => isTimeInSlot(hour, s))
 
     // Middle of a clash, we don't use multiple rows for clashes, skip iteration
     if (slot?.type === 'Clash' && parseDate(slot.startsAt) !== hour) continue

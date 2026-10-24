@@ -33,8 +33,8 @@
               !data.slot &&
               (schedule.isHourlySlotCreationAllowed || schedule.isClashSlotCreationAllowed)
             "
-            :show-delete="data.slot?.isDeletable"
-            :show-edit="data.slot?.isEditable"
+            :show-delete="data.slot?.isDeletable && data.isFirstRowOfSlot"
+            :show-edit="data.slot?.isEditable && data.isFirstRowOfSlot"
             @create="onCreateSlotClicked(data)"
             @delete="onDeleteSlotClicked(data)"
             @edit="onEditSlotClicked(data)"/>
@@ -103,7 +103,7 @@ import type {ScheduleResponse, SlotResponse} from '@/api/resources/schedulesApi.
 import {inject, onMounted, onUnmounted, type Ref, ref, useTemplateRef, watch} from 'vue'
 import {
   formatReadableTime,
-  isDateInSlot,
+  isTimeInSlot,
   parseDate,
   parseTime,
   timesBetween
@@ -144,15 +144,16 @@ const setupRows = () => {
     60
   )
   rowTimes.forEach((time) => {
-    const slot = props.schedule.slots.find((s) => isDateInSlot(time, s))
+    const slot = props.schedule.slots.find((s) => isTimeInSlot(time, s))
     newRows.push({
       start: time,
-      isFirstRowOfSlot: slot ? parseTime(slot.startsAt) === time.getTime() : false,
+      isFirstRowOfSlot: slot !== undefined ? parseTime(slot.startsAt) === time.getTime() : false,
       slot: slot
     })
   })
   rows.value = newRows
 }
+
 watch(
   () => props.schedule,
   () => {
