@@ -8,7 +8,7 @@
         <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
         <AnalysisLevel>latest-recommended</AnalysisLevel>
         <LangVersion>preview</LangVersion>
-        <Version>1.6.7</Version>
+        <Version>1.6.9</Version>
     </PropertyGroup>
 
     <ItemGroup>
