@@ -14,7 +14,5 @@ public readonly record struct BroadcastTime
                                  StartsAt = startsAt,
                                  EndsAt = endsAt
                              },
-                             new StartsAtMustBeInThePastRule(startsAt),
-                             new EndsAtMustBeInThePastRule(endsAt),
                              new EndMustBeLaterThanStartIfProvidedRule(startsAt, endsAt));
 }
