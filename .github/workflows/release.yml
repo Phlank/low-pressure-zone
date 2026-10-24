@@ -1,7 +1,7 @@
 name: Low Pressure Zone Release
 on:
   release:
-    types: [ unpublished ]
+    types: [ created ]
 
 jobs:
   build-client:
