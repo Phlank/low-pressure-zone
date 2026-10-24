@@ -34,7 +34,7 @@ export const useRefresh = <TResponse, TParams = void>(
   onRefresh: (data: TResponse) => void,
   options?: UseRefreshOptions<TParams>
 ) => {
-  const isAutoRefreshing = ref(options?.useAutoRefresh ?? DEFAULT_USE_AUTO_REFRESH)
+  const isAutoRefreshing = ref(false)
   const isLoading = ref(true)
 
   let autoRefreshController: AbortController | null = null
@@ -53,14 +53,20 @@ export const useRefresh = <TResponse, TParams = void>(
       isAutoRefreshing.value = false
     }
 
-    if (autoRefreshController !== null && autoRefreshController.signal.aborted) {
+    if (autoRefreshController !== null && !autoRefreshController.signal.aborted) {
       autoRefreshController.abort()
       autoRefreshController = null
     }
   }
 
   const startAutoRefresh = () => {
-    if (!isAutoRefreshing.value) {}
+    if (!isAutoRefreshing.value) {
+      isAutoRefreshing.value = true
+      autoRefresh().then().catch(() => {
+        isAutoRefreshing.value = false
+        startAutoRefresh()
+      })
+    }
   }
 
   const refresh = async () => {
@@ -75,19 +81,17 @@ export const useRefresh = <TResponse, TParams = void>(
     () => (options?.permissionFn ?? DEFAULT_PERMISSION_FN)(),
     async (newVal) => {
       if (newVal) {
-        await refresh()
         isLoading.value = false
-        if (isAutoRefreshing.value) {
-          await autoRefresh()
+        if (options?.useAutoRefresh ?? DEFAULT_USE_AUTO_REFRESH) {
+          startAutoRefresh()
         }
       } else {
         isLoading.value = false
-        isAutoRefreshing.value = false
       }
     },
     { immediate: true }
   )
 
   const getIsLoading = computed(() => isLoading.value)
-  return { isLoading: getIsLoading, refresh, isAutoRefreshing }
+  return { isLoading: getIsLoading, refresh, isAutoRefreshing, startAutoRefresh, stopAutoRefresh }
 }
