@@ -53,7 +53,7 @@ public class SyncBroadcastsHandler(
         }
         
         await dataContext.SaveChangesAsync(ct);
-        return await dataContext.Broadcasts.ToListAsync(ct);
+        return await dataContext.Broadcasts.OrderByDescending(bc => bc.Time.StartsAt).ToListAsync(ct);
     }
     
     private void DeleteBroadcastFromDomain(Broadcast domainBroadcast)
