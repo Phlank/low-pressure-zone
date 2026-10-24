@@ -145,7 +145,10 @@ public class Schedule : Entity
 
         var result = Rule.ApplyIntoResult(NoValue.Instance,
                                           new SlotsMustBeWithinScheduleTimeRange(timeRangeResult.Value,
-                                                                                 [.. HourlySlots, .. ClashSlots]));
+                                          [
+                                              .. HourlySlots.Select(slot => slot.TimeRange),
+                                              .. ClashSlots.Select(slot => slot.TimeRange)
+                                          ]));
         if (result.IsSuccess)
             TimeRange = timeRangeResult.Value;
 
@@ -155,8 +158,11 @@ public class Schedule : Entity
     public DomainResult<NoValue> AddHourlySlot(HourlySlot slot)
     {
         var errors = Rule.Apply(new SlotsMustBeWithinScheduleTimeRange(TimeRange,
-                                                                       [slot, .. HourlySlots, .. ClashSlots]),
-                                new SlotsCannotHaveOverlappingTimeRangesRule(SlotTimeRanges, slot));
+                                [
+                                    slot.TimeRange, .. HourlySlots.Select(s => s.TimeRange),
+                                    .. ClashSlots.Select(s => s.TimeRange)
+                                ]),
+                                new SlotsCannotHaveOverlappingTimeRangesRule(SlotTimeRanges, slot.TimeRange));
         if (errors.Count > 0) return DomainResult.Err<NoValue>(errors);
 
         HourlySlots.Add(slot);
@@ -166,8 +172,11 @@ public class Schedule : Entity
     public DomainResult<NoValue> AddClashSlot(ClashSlot slot)
     {
         var errors = Rule.Apply(new SlotsMustBeWithinScheduleTimeRange(TimeRange,
-                                                                       [slot, .. HourlySlots, .. ClashSlots]),
-                                new SlotsCannotHaveOverlappingTimeRangesRule(SlotTimeRanges, slot));
+                                [
+                                    slot.TimeRange, .. HourlySlots.Select(h => h.TimeRange),
+                                    .. ClashSlots.Select(c => c.TimeRange)
+                                ]),
+                                new SlotsCannotHaveOverlappingTimeRangesRule(SlotTimeRanges, slot.TimeRange));
         if (errors.Count > 0) return DomainResult.Err<NoValue>(errors);
 
         ClashSlots.Add(slot);

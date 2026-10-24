@@ -17,7 +17,7 @@ public sealed class HourlySlotPermissions(IHttpContextAccessor contextAccessor)
     {
         slot.Performer.ShouldNotBeNull();
         if (User == null) return false;
-        if (slot.StartsAt < DateTime.UtcNow) return false;
+        if (slot.TimeRange.StartsAt < DateTime.UtcNow) return false;
         if (User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Organizer)) return true;
         return slot.Performer.CreatorUserId == User.GetIdOrDefault();
     }
@@ -26,7 +26,7 @@ public sealed class HourlySlotPermissions(IHttpContextAccessor contextAccessor)
     {
         slot.Performer.ShouldNotBeNull();
         if (User == null) return false;
-        if (slot.StartsAt < DateTime.UtcNow) return false;
+        if (slot.TimeRange.StartsAt < DateTime.UtcNow) return false;
         if (User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Organizer)) return true;
         return slot.Performer.CreatorUserId == User.GetIdOrDefault();
     }

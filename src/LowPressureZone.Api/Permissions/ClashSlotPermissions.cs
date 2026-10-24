@@ -20,7 +20,7 @@ public sealed class ClashSlotPermissions(IHttpContextAccessor contextAccessor)
         slot.Schedule.Community.Relationships.ShouldNotBeNull();
 
         if (User == null) return false;
-        if (slot.EndsAt < DateTime.UtcNow) return false;
+        if (slot.TimeRange.EndsAt < DateTime.UtcNow) return false;
         if (User.IsInRole(RoleNames.Admin)) return true;
         return slot.Schedule.Community.Relationships.Any(r => r.IsOrganizer && r.UserId == User.GetIdOrDefault());
     }
@@ -32,7 +32,7 @@ public sealed class ClashSlotPermissions(IHttpContextAccessor contextAccessor)
         slot.Schedule.Community.Relationships.ShouldNotBeNull();
 
         if (User == null) return false;
-        if (slot.StartsAt < DateTime.UtcNow) return false;
+        if (slot.TimeRange.StartsAt < DateTime.UtcNow) return false;
         if (User.IsInRole(RoleNames.Admin)) return true;
         return slot.Schedule.Community.Relationships.Any(r => r.IsOrganizer && r.UserId == User.GetIdOrDefault());
     }

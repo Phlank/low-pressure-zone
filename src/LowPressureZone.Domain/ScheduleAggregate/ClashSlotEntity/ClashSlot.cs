@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity;
 
 [Table("ClashSlots")]
-public class ClashSlot : Entity, ITimeRange
+public class ClashSlot : Entity
 {
     public Guid ScheduleId { get; private init; }
     public Schedule Schedule { get; private init; } = null!;
@@ -30,10 +30,6 @@ public class ClashSlot : Entity, ITimeRange
     } = [];
 
     public ClashTimeRange TimeRange { get; private set; }
-
-    public DateTimeOffset StartsAt => TimeRange.StartsAt;
-    public DateTimeOffset EndsAt => TimeRange.EndsAt;
-    public TimeSpan TimeSpan => TimeRange.TimeSpan;
 
     // EF Core constructor
     private ClashSlot()
@@ -108,7 +104,7 @@ public class ClashSlot : Entity, ITimeRange
 
     public DomainResult<NoValue> ChangeTime(DateTimeOffset startsAt, int duration)
     {
-        var additionalErrors = Rule.Apply(new CannotChangeSlotAfterItEndsRule(this));
+        var additionalErrors = Rule.Apply(new CannotChangeSlotAfterItEndsRule(TimeRange));
         var result = ClashTimeRange.Create(startsAt, duration)
                                    .WithAdditionalErrors(additionalErrors);
         if (result.IsSuccess)
@@ -122,7 +118,7 @@ public class ClashSlot : Entity, ITimeRange
 
     public DomainResult<NoValue> Delete()
     {
-        var result = Rule.ApplyIntoResult(NoValue.Instance, new CannotChangeSlotAfterItEndsRule(this));
+        var result = Rule.ApplyIntoResult(NoValue.Instance, new CannotChangeSlotAfterItEndsRule(TimeRange));
         if (result.IsSuccess)
         {
             Schedule.ClashSlots.Remove(this);

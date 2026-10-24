@@ -15,6 +15,7 @@ dotnet_diagnostic.IDE0005.severity = warning
 
 
 dotnet_diagnostic.CA1873.severity = none
+dotnet_diagnostic.CA1707.severity = none
 
 [*.{js,jsx,mjs,cjs,ts,tsx,mts,cts,vue}]
 charset = utf-8

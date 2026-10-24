@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 namespace LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity;
 
 [Table("HourlySlots")]
-public class HourlySlot : Entity, ITimeRange
+public class HourlySlot : Entity
 {
     [MaxLength(128)]
     public string? Subtitle { get; private set; }
@@ -23,9 +23,6 @@ public class HourlySlot : Entity, ITimeRange
     public Schedule Schedule { get; init; } = null!;
     public PrerecordedMix Prerecord { get; private set; }
     public HourlySlotTimeRange TimeRange { get; private set; }
-    public DateTimeOffset StartsAt => TimeRange.StartsAt;
-    public DateTimeOffset EndsAt => TimeRange.EndsAt;
-    public TimeSpan TimeSpan => TimeRange.TimeSpan;
 
     public static DomainResult<HourlySlot> Create(
         Guid scheduleId,
@@ -104,7 +101,7 @@ public class HourlySlot : Entity, ITimeRange
     public DomainResult<NoValue> ChangeTime(DateTimeOffset startsAt, int duration)
     {
         var timeRangeResult = HourlySlotTimeRange.Create(startsAt, duration)
-                                                 .WithAdditionalRules(new CannotChangeSlotAfterItEndsRule(this));
+                                                 .WithAdditionalRules(new CannotChangeSlotAfterItEndsRule(TimeRange));
         
         if (timeRangeResult.IsSuccess)
             TimeRange = timeRangeResult.Value;
@@ -115,7 +112,7 @@ public class HourlySlot : Entity, ITimeRange
     public DomainResult<NoValue> Delete()
     {
         var result = Rule.ApplyIntoResult(NoValue.Instance,
-                                                       new CannotChangeSlotAfterItEndsRule(this));
+                                                       new CannotChangeSlotAfterItEndsRule(TimeRange));
         if (result.IsSuccess)
         {
             Schedule.HourlySlots.Remove(this);

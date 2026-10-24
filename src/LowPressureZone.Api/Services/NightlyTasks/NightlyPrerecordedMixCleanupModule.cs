@@ -21,7 +21,7 @@ public sealed partial class NightlyPrerecordedMixCleanupModule(
 
         var prerecordedSlots = await dataContext.HourlySlots
                                                     .Where(hourlySlot => hourlySlot.Prerecord.AzuraCastMediaId.HasValue
-                                                                         && hourlySlot.EndsAt <= CutoffTime)
+                                                                         && hourlySlot.TimeRange.EndsAt <= CutoffTime)
                                                     .ToListAsync();
 
         LogDeletingMediaAndPlaylistsForTimeslotCountPastTimeslots(logger, prerecordedSlots.Count);
