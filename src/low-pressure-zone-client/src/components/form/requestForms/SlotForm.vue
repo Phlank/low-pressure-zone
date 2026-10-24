@@ -88,5 +88,3 @@ const emit = defineEmits<{
 
 defineExpose({ isSubmitting, reset, submit })
 </script>
-
-<style scoped lang="scss"></style>
