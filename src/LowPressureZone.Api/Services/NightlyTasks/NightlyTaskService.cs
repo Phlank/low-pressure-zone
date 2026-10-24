@@ -7,43 +7,26 @@ public sealed partial class NightlyTaskService(
     NightlyBroadcastDeletionModule nightlyBroadcastDeletionModule,
     NightlyPrerecordedMixCleanupModule nightlyPrerecordedMixCleanupModule,
     ILogger<NightlyTaskService> logger)
-    : IHostedService, IDisposable
+    : BackgroundService
 {
     private const int RunHour = 5;
-    private readonly PeriodicTimer _timer = new(TimeSpanToFirst);
-
-    private bool _isFirstTick = true;
-    private bool _isStarted;
 
     private static TimeSpan TimeSpanToFirst => DateTimeUtilities.GetNextHour(RunHour) - DateTime.UtcNow;
 
-    public void Dispose() => _timer.Dispose();
-
-    public Task StartAsync(CancellationToken cancellationToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _isStarted = true;
-        _isFirstTick = true;
-        _ = ContinuallyExecuteNightlyTasksAsync();
-        LogNightlyTaskServiceStarted(logger, TimeSpanToFirst.TotalMinutes);
+        var timeToFirstRun = TimeSpanToFirst;
+        using var timer = new PeriodicTimer(timeToFirstRun);
+        var isFirstRun = true;
+        LogNightlyTaskServiceStarted(logger, timeToFirstRun.TotalMinutes);
 
-        return Task.CompletedTask;
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        _isStarted = false;
-        return Task.CompletedTask;
-    }
-
-    private async Task ContinuallyExecuteNightlyTasksAsync()
-    {
-        while (await _timer.WaitForNextTickAsync() && _isStarted)
+        while (await timer.WaitForNextTickAsync(stoppingToken))
             try
             {
-                if (_isFirstTick)
+                if (isFirstRun)
                 {
-                    _isFirstTick = false;
-                    _timer.Period = TimeSpan.FromDays(1);
+                    isFirstRun = false;
+                    timer.Period = TimeSpan.FromDays(1);
                 }
 
                 await nightlyBroadcastDeletionModule.DeleteOutOfDateBroadcastsAsync();
