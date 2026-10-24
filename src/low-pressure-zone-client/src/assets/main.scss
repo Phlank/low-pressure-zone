@@ -1,0 +1,86 @@
+@use 'styles/variables';
+@use 'styles/forms';
+@use 'styles/layouts';
+@use 'styles/primevueOverrides';
+
+@import 'primeicons/primeicons.css';
+
+@font-face {
+  font-family: 'Nunito Sans';
+  font-stretch: 100%;
+  font-style: normal;
+  font-weight: 400;
+  src: url('fonts/Nunito_Sans.woff2') format('woff2');
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Helvetica Neue', sans-serif;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background-image: url(/bg-invert.jpg);
+  background-attachment: fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
+  font-family: 'Nunito Sans', 'Helvetica Neue', sans-serif;
+  text-rendering: optimizeLegibility;
+  overflow-y: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+
+  .drop-shadow {
+    filter: drop-shadow(0 0 0.5rem variables.$drop-shadow-color-light);
+  }
+}
+
+body.dark-mode-toggle {
+  background-color: #222;
+  background-image: url(/bg.jpg);
+
+  .drop-shadow {
+    filter: drop-shadow(0 0 0.5rem variables.$drop-shadow-color-dark);
+  }
+}
+
+body:has(.p-drawer-mask) {
+  overflow: hidden !important;
+}
+
+#app {
+  width: 100%;
+}
+
+.header {
+  font-family: variables.$font-family-header;
+}
+
+@media screen and (max-width: variables.$mobile-transition-width) {
+  .app {
+    overflow-x: hidden;
+  }
+}
+
+.desktop-only {
+  @include variables.mobile {
+    display: none;
+  }
+}
+
+.text-s {
+  font-size: small;
+}
+
+.ellipsis {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
