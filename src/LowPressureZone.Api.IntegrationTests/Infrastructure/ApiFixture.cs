@@ -8,6 +8,9 @@ using LowPressureZone.Domain.BroadcastAggregate;
 using LowPressureZone.Domain.CommunityAggregate;
 using LowPressureZone.Domain.CommunityAggregate.RelationshipEntity;
 using LowPressureZone.Domain.PerformerAggregate;
+using LowPressureZone.Domain.ScheduleAggregate;
+using LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity;
+using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Entities;
@@ -92,6 +95,9 @@ public sealed class ApiFixture : AppFixture<Program>
         var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
         await dataContext.Broadcasts.ExecuteDeleteAsync();
         await dataContext.News.ExecuteDeleteAsync();
+        await dataContext.ClashSlots.ExecuteDeleteAsync();
+        await dataContext.HourlySlots.ExecuteDeleteAsync();
+        await dataContext.Schedules.ExecuteDeleteAsync();
         await dataContext.Performers.ExecuteDeleteAsync();
         await dataContext.Set<Relationship>().ExecuteDeleteAsync();
         await dataContext.Communities.ExecuteDeleteAsync();
@@ -195,6 +201,66 @@ public sealed class ApiFixture : AppFixture<Program>
     {
         await using var scope = Services.CreateAsyncScope();
         return await scope.ServiceProvider.GetRequiredService<DataContext>().Performers.AsNoTracking().ToListAsync();
+    }
+
+    public async Task<Schedule> AddScheduleAsync(
+        Guid communityId,
+        string name = "Schedule",
+        DateTimeOffset? startsAt = null,
+        DateTimeOffset? endsAt = null,
+        bool isHourlyAllowed = true,
+        bool isClashAllowed = true,
+        bool isVisibleToPublic = false)
+    {
+        var start = startsAt ?? DateTimeOffset.UtcNow.AddDays(10);
+        var end = endsAt ?? start.AddHours(8);
+        var schedule = Schedule.Create(name, "Description", communityId, start, end,
+                                       isHourlyAllowed, isClashAllowed, isVisibleToPublic).Value;
+
+        await using var scope = Services.CreateAsyncScope();
+        var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+        dataContext.Schedules.Add(schedule);
+        await dataContext.SaveChangesAsync();
+        return schedule;
+    }
+
+    public async Task<HourlySlot> AddHourlySlotAsync(
+        Guid scheduleId,
+        Guid performerId,
+        DateTimeOffset startsAt,
+        int duration = 1,
+        string? subtitle = null)
+    {
+        var slot = HourlySlot.Create(scheduleId, performerId, startsAt, duration, subtitle).Value;
+
+        await using var scope = Services.CreateAsyncScope();
+        var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+        dataContext.Set<HourlySlot>().Add(slot);
+        await dataContext.SaveChangesAsync();
+        return slot;
+    }
+
+    public async Task<ClashSlot> AddClashSlotAsync(
+        Guid scheduleId,
+        Guid performerOneId,
+        Guid performerTwoId,
+        DateTimeOffset startsAt,
+        int duration = 2,
+        params string[] rounds)
+    {
+        var slot = ClashSlot.Create(scheduleId, performerOneId, performerTwoId, [.. rounds], startsAt, duration).Value;
+
+        await using var scope = Services.CreateAsyncScope();
+        var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+        dataContext.Set<ClashSlot>().Add(slot);
+        await dataContext.SaveChangesAsync();
+        return slot;
+    }
+
+    public async Task<List<Schedule>> GetSchedulesAsync()
+    {
+        await using var scope = Services.CreateAsyncScope();
+        return await scope.ServiceProvider.GetRequiredService<DataContext>().Schedules.AsNoTracking().ToListAsync();
     }
 
     public async Task AddBroadcastsAsync(params Broadcast[] broadcasts)

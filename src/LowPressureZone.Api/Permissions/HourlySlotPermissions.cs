@@ -18,8 +18,8 @@ public sealed class HourlySlotPermissions(IHttpContextAccessor contextAccessor)
         slot.Performer.ShouldNotBeNull();
         if (User == null) return false;
         if (slot.TimeRange.StartsAt < DateTime.UtcNow) return false;
-        if (User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Organizer)) return true;
-        return slot.Performer.CreatorUserId == User.GetIdOrDefault();
+        if (User.IsInRole(RoleNames.Admin)) return true;
+        return slot.Performer.CreatorUserId == User.GetIdOrDefault() || IsCommunityOrganizer(slot);
     }
 
     public bool IsDeleteAuthorized(HourlySlot slot)
@@ -27,7 +27,12 @@ public sealed class HourlySlotPermissions(IHttpContextAccessor contextAccessor)
         slot.Performer.ShouldNotBeNull();
         if (User == null) return false;
         if (slot.TimeRange.StartsAt < DateTime.UtcNow) return false;
-        if (User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Organizer)) return true;
-        return slot.Performer.CreatorUserId == User.GetIdOrDefault();
+        if (User.IsInRole(RoleNames.Admin)) return true;
+        return slot.Performer.CreatorUserId == User.GetIdOrDefault() || IsCommunityOrganizer(slot);
     }
+
+    private bool IsCommunityOrganizer(HourlySlot slot)
+        => slot.Schedule.Community.Relationships.Any(relationship =>
+                                                        relationship.UserId == User!.GetIdOrDefault()
+                                                        && relationship.IsOrganizer);
 }

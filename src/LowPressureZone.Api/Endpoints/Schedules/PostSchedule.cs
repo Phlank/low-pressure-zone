@@ -23,7 +23,13 @@ public class PostSchedule(DataContext dataContext, CommunityPermissions communit
         var community = await dataContext.Communities
                                          .Where(community => community.Id == request.CommunityId)
                                          .Include(community => community.Relationships)
-                                         .FirstAsync(ct);
+                                         .FirstOrDefaultAsync(ct);
+
+        if (community is null || community.IsDeleted)
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
 
         if (!communityPermissions.IsOrganizingAuthorized(community))
         {
@@ -47,7 +53,7 @@ public class PostSchedule(DataContext dataContext, CommunityPermissions communit
         HttpContext.ExposeLocation();
         await Send.CreatedAtAsync<GetScheduleById>(new
         {
-            result.Value.Id
+            id = result.Value.Id
         }, Response, cancellation: ct);
     }
 }
