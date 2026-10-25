@@ -1,5 +1,6 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Data;
+using LowPressureZone.Identity.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Communities;
@@ -18,6 +19,10 @@ public sealed class GetCommunityById(DataContext dataContext)
         var id = Route<Guid>("id");
         var community = await dataContext.Communities
                                          .AsNoTracking()
+                                         .Include(community =>
+                                                      community.Relationships.Where(relationship =>
+                                                                                        relationship.UserId ==
+                                                                                        User.GetIdOrDefault()))
                                          .Where(community => community.Id == id && !community.IsDeleted)
                                          .FirstOrDefaultAsync(ct);
         if (community == null)

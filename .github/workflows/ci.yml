@@ -49,19 +49,18 @@ jobs:
         run: dotnet build LowPressureZone.sln --no-restore -c Release
         working-directory: ./src
         
-#  test-server:
-#    name: Test Server
-#    runs-on: ubuntu-latest
-#    needs: build-server
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v6
-#      - name: Setup .NET
-#        uses: actions/setup-dotnet@v6
-#        with:
-#          dotnet-version: 11.0.x
-#          dotnet-quality: preview
-#      - name: Test Server
-#        run: dotnet test LowPressureZone.sln
-#        working-directory: ./src
-  
+  test-server:
+    name: Test Server
+    runs-on: ubuntu-latest
+    needs: build-server
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 11.0.x
+          dotnet-quality: preview
+      - name: Run integration tests
+        run: dotnet test LowPressureZone.sln
+        working-directory: ./src

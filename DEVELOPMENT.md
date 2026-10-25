@@ -96,3 +96,13 @@ To ensure database information was seeded correctly, we will log into the applic
 ## Credentials for other development services
 
 - AzuraCast: `none@email.com`, `SecretSauce1!`
+
+## Running tests
+
+API integration tests live in `src/LowPressureZone.Api.IntegrationTests`. They host the API in-memory with
+FastEndpoints.Testing, use SQLite in-memory databases and a mocked AzuraCast client, so no external services are needed.
+
+```shell
+cd src
+dotnet test --project LowPressureZone.Api.IntegrationTests
+```

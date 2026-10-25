@@ -21,7 +21,7 @@ public sealed class PutCommunity(DataContext dataContext) : Endpoint<CommunityRe
         var id = Route<Guid>("id");
         var community = await dataContext.Communities.FirstOrDefaultAsync(community => community.Id == id, ct);
 
-        if (community is null)
+        if (community is null || community.IsDeleted)
         {
             await Send.NotFoundAsync(ct);
             return;
@@ -30,7 +30,9 @@ public sealed class PutCommunity(DataContext dataContext) : Endpoint<CommunityRe
         var result = DomainResult.Compose(community.Rename(request.Name),
                                           community.ChangeSocialUrl(request.SocialUrl));
 
-        await this.PublishOrThrowAsync(result);
+        this.ThrowIfDomainError(result);
+        await this.ThrowIfNotUniqueAsync(dataContext, community, ct);
+        await this.PublishEventsAsync(result);
         await dataContext.SaveChangesAsync(ct);
         await Send.NoContentAsync(ct);
     }

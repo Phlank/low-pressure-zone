@@ -26,12 +26,24 @@ public class UpdateRelationship(
         var communityId = Route<Guid>("communityId");
         var userId = Route<Guid>("userId");
 
-        var community = await dataContext.Communities.FirstOrDefaultAsync(community => community.Id == communityId, ct);
+        var community = await dataContext.Communities
+                                         .Include(community => community.Relationships)
+                                         .FirstOrDefaultAsync(community => community.Id == communityId
+                                                                           && !community.IsDeleted, ct);
         var relationshipUser = await userManager.FindByIdAsync(userId.ToString());
 
         if (community is null || relationshipUser is null)
         {
             await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        var isCommunityOrganizer = community.Relationships.Any(relationship =>
+                                                                   relationship.UserId == User.GetIdOrDefault()
+                                                                   && relationship.IsOrganizer);
+        if (!User.IsInRole(RoleNames.Admin) && !isCommunityOrganizer)
+        {
+            await Send.ForbiddenAsync(ct);
             return;
         }
 
@@ -43,9 +55,8 @@ public class UpdateRelationship(
         }
 
         var result = community.SetRolesForUser(userId, request.IsPerformer, request.IsOrganizer);
-        if (result.IsSuccess)
-        {
-            await Send.NoContentAsync(ct);
-        }
+        await this.PublishOrThrowAsync(result);
+        await dataContext.SaveChangesAsync(ct);
+        await Send.NoContentAsync(ct);
     }
 }
