@@ -1,14 +1,22 @@
 name: Low Pressure Zone CI
 on:
   pull_request:
-    branches: [ "main", "develop" ]
+    branches: [ "main" ]
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "main" ]
 
 jobs:
   codeql:
-    name: CodeQL Analysis
+    name: CodeQL (${{ matrix.language }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: csharp
+            build-mode: none
+          - language: javascript
+            build-mode: none
     permissions:
       actions: read
       contents: read
@@ -16,13 +24,16 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+      - if: matrix.language == 'csharp'
+        name: Build C# Code
+        run: |
+          wget https://dot.net/v1/dotnet-install.sh
+          bash ./dotnet-install.sh -Channel 11.0 -Quality preview
+          /home/runner/.dotnet/dotnet build ./src/LowPressureZone.sln -c Release
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
-          languages: csharp, javascript
-          build-mode: none
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v4
+          languages: ${{ matrix.language }}
 
   build-client:
     name: Build Client
