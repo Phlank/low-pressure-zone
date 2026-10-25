@@ -24,7 +24,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-      - name: Build C# Code
+      - if: matrix.language == 'csharp'
+        name: Build C# Code
         run: |
           wget https://dot.net/v1/dotnet-install.sh
           bash ./dotnet-install.sh -Channel 11.0 -Quality preview
