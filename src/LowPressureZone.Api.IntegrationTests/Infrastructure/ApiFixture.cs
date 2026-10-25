@@ -7,6 +7,7 @@ using LowPressureZone.Data;
 using LowPressureZone.Domain.BroadcastAggregate;
 using LowPressureZone.Domain.CommunityAggregate;
 using LowPressureZone.Domain.CommunityAggregate.RelationshipEntity;
+using LowPressureZone.Domain.PerformerAggregate;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Entities;
@@ -91,6 +92,7 @@ public sealed class ApiFixture : AppFixture<Program>
         var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
         await dataContext.Broadcasts.ExecuteDeleteAsync();
         await dataContext.News.ExecuteDeleteAsync();
+        await dataContext.Performers.ExecuteDeleteAsync();
         await dataContext.Set<Relationship>().ExecuteDeleteAsync();
         await dataContext.Communities.ExecuteDeleteAsync();
 
@@ -170,6 +172,29 @@ public sealed class ApiFixture : AppFixture<Program>
     {
         await using var scope = Services.CreateAsyncScope();
         return await scope.ServiceProvider.GetRequiredService<DataContext>().News.AsNoTracking().ToListAsync();
+    }
+
+    public async Task<Performer> AddPerformerAsync(
+        Guid creatorUserId,
+        string name,
+        string? socialUrl = null,
+        bool isDeleted = false)
+    {
+        var performer = Performer.Create(creatorUserId, name, socialUrl).Value;
+        if (isDeleted)
+            performer.Delete();
+
+        await using var scope = Services.CreateAsyncScope();
+        var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+        dataContext.Performers.Add(performer);
+        await dataContext.SaveChangesAsync();
+        return performer;
+    }
+
+    public async Task<List<Performer>> GetPerformersAsync()
+    {
+        await using var scope = Services.CreateAsyncScope();
+        return await scope.ServiceProvider.GetRequiredService<DataContext>().Performers.AsNoTracking().ToListAsync();
     }
 
     public async Task AddBroadcastsAsync(params Broadcast[] broadcasts)
