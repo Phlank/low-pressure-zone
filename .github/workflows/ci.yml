@@ -1,14 +1,22 @@
 name: Low Pressure Zone CI
 on:
   pull_request:
-    branches: [ "main", "develop" ]
+    branches: [ "main" ]
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "main" ]
 
 jobs:
   codeql:
-    name: CodeQL Analysis
+    name: CodeQL (${{ matrix.language }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: csharp
+            build-mode: autobuild
+          - language: javascript
+            build-mode: none
     permissions:
       actions: read
       contents: read
@@ -19,10 +27,12 @@ jobs:
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
-          languages: csharp, javascript
-          build-mode: none
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{ matrix.language }}"
 
   build-client:
     name: Build Client
