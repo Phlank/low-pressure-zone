@@ -22,6 +22,8 @@ using Microsoft.Extensions.Hosting;
 
 namespace LowPressureZone.Api.IntegrationTests.Infrastructure;
 
+using NewsItem = LowPressureZone.Domain.NewsAggregate.News;
+
 /// <summary>
 ///     Hosts the API in memory with SQLite in-memory databases, a faked AzuraCast client, in-memory Hangfire storage,
 ///     and header based test authentication. No background services are started.
@@ -88,6 +90,7 @@ public sealed class ApiFixture : AppFixture<Program>
         await using var scope = Services.CreateAsyncScope();
         var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
         await dataContext.Broadcasts.ExecuteDeleteAsync();
+        await dataContext.News.ExecuteDeleteAsync();
         await dataContext.Set<Relationship>().ExecuteDeleteAsync();
         await dataContext.Communities.ExecuteDeleteAsync();
 
@@ -145,6 +148,28 @@ public sealed class ApiFixture : AppFixture<Program>
                           .Communities.AsNoTracking()
                           .Include(community => community.Relationships)
                           .ToListAsync();
+    }
+
+    /// <summary>
+    ///     <see cref="NewsItem.PublishedAt" /> is init-only and defaults to now, so it is overridden through EF when given.
+    /// </summary>
+    public async Task<NewsItem> AddNewsAsync(string title, string content = "Content", DateTimeOffset? publishedAt = null)
+    {
+        var news = NewsItem.Create(title, content).Value;
+
+        await using var scope = Services.CreateAsyncScope();
+        var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+        dataContext.News.Add(news);
+        if (publishedAt is not null)
+            dataContext.Entry(news).Property(n => n.PublishedAt).CurrentValue = publishedAt.Value;
+        await dataContext.SaveChangesAsync();
+        return news;
+    }
+
+    public async Task<List<NewsItem>> GetNewsAsync()
+    {
+        await using var scope = Services.CreateAsyncScope();
+        return await scope.ServiceProvider.GetRequiredService<DataContext>().News.AsNoTracking().ToListAsync();
     }
 
     public async Task AddBroadcastsAsync(params Broadcast[] broadcasts)

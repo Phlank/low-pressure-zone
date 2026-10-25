@@ -69,6 +69,9 @@ app.UseFastEndpoints(config =>
 app.MapOpenApi();
 app.MapScalarApiReference();
 
+// Unmatched API routes must not fall through to the client below; they are simply not found.
+app.MapFallback("/api/{**path}", () => Results.NotFound()).AllowAnonymous();
+
 // Map any non-valid route to index.html, which serves the website. Any navigation to the site via a route that is
 // invalid to the API would fail, but this routes the browser to the client, which may have a router implementation for
 // that particular route.
