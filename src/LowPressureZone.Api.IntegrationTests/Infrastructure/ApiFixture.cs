@@ -3,6 +3,8 @@ using Hangfire.InMemory;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Services.AzuraCast;
 using LowPressureZone.Api.Services.NightlyTasks;
+using LowPressureZone.Api.Models.Configuration.Streaming;
+using LowPressureZone.Api.Services.StreamStatus;
 using LowPressureZone.Data;
 using LowPressureZone.Domain.BroadcastAggregate;
 using LowPressureZone.Domain.CommunityAggregate;
@@ -39,6 +41,8 @@ public sealed class ApiFixture : AppFixture<Program>
 
     public IAzuraCastClient AzuraCast => Services.GetRequiredService<IAzuraCastClient>();
 
+    public TestStreamStatusService StreamStatus => Services.GetRequiredService<TestStreamStatusService>();
+
     public JobStorage JobStorage => HangfireStorage;
 
     protected override void ConfigureApp(IWebHostBuilder a) => a.UseEnvironment("Testing");
@@ -51,6 +55,27 @@ public sealed class ApiFixture : AppFixture<Program>
 
         s.RemoveAll<IAzuraCastClient>();
         s.AddSingleton(A.Fake<IAzuraCastClient>());
+
+        s.RemoveAll<IStreamStatusService>();
+        s.AddSingleton<TestStreamStatusService>();
+        s.AddSingleton<IStreamStatusService>(provider => provider.GetRequiredService<TestStreamStatusService>());
+        s.PostConfigure<StreamingConfiguration>(configuration =>
+        {
+            configuration.Live = new AzuraCastStreamConfiguration
+            {
+                Host = "live.example.test",
+                Port = "8000",
+                Mount = "/radio.mp3"
+            };
+            configuration.Test = new IcecastStreamConfiguration
+            {
+                Host = "test.example.test",
+                Port = "8001",
+                Mount = "/test.mp3",
+                Username = "test-user",
+                Password = "test-password"
+            };
+        });
 
         JobStorage.Current = HangfireStorage;
         s.RemoveAll<JobStorage>();
@@ -86,6 +111,7 @@ public sealed class ApiFixture : AppFixture<Program>
     public async Task ResetAsync()
     {
         FakeItEasy.Fake.Reset(AzuraCast);
+        StreamStatus.Reset();
 
         var jobClient = new BackgroundJobClient(HangfireStorage);
         foreach (var job in HangfireStorage.GetMonitoringApi().ScheduledJobs(0, int.MaxValue))

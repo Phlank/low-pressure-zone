@@ -41,9 +41,9 @@ public sealed class PostArchiveBroadcastTests(ApiFixture app) : ApiTestBase(app)
              Weight = 3
          }));
         A.CallTo(() => AzuraCast.DownloadBroadcastFileAsync(StreamerId, BroadcastId))
-         .ReturnsLazily(() => Ok<HttpContent>(new ByteArrayContent([1, 2, 3])));
-        A.CallTo(() => AzuraCast.UploadMediaViaSftpAsync(A<Stream>._, A<string>._))
-         .ReturnsLazily((Stream _, string path) =>
+         .ReturnsLazily(() => Ok<HttpContent>(new ByteArrayContent(new byte[] { 1, 2, 3 })));
+        A.CallTo(() => AzuraCast.UploadMediaViaSftpAsync(A<System.IO.Stream>._, A<string>._))
+         .ReturnsLazily((System.IO.Stream _, string path) =>
          {
              _uploadedPath = path;
              return Result.Ok(path);
@@ -140,7 +140,7 @@ public sealed class PostArchiveBroadcastTests(ApiFixture app) : ApiTestBase(app)
         var response = await PostAsAdminAsync(broadcastId: 999);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-        A.CallTo(() => AzuraCast.UploadMediaViaSftpAsync(A<Stream>._, A<string>._)).MustNotHaveHappened();
+        A.CallTo(() => AzuraCast.UploadMediaViaSftpAsync(A<System.IO.Stream>._, A<string>._)).MustNotHaveHappened();
     }
 
     [Fact]
@@ -153,7 +153,7 @@ public sealed class PostArchiveBroadcastTests(ApiFixture app) : ApiTestBase(app)
 
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
         (await IsArchivedAsync()).ShouldBeFalse();
-        A.CallTo(() => AzuraCast.UploadMediaViaSftpAsync(A<Stream>._, A<string>._)).MustNotHaveHappened();
+        A.CallTo(() => AzuraCast.UploadMediaViaSftpAsync(A<System.IO.Stream>._, A<string>._)).MustNotHaveHappened();
     }
 
     [Fact]
@@ -165,7 +165,7 @@ public sealed class PostArchiveBroadcastTests(ApiFixture app) : ApiTestBase(app)
         var response = await PostAsAdminAsync();
 
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
-        A.CallTo(() => AzuraCast.UploadMediaViaSftpAsync(A<Stream>._, A<string>._)).MustNotHaveHappened();
+        A.CallTo(() => AzuraCast.UploadMediaViaSftpAsync(A<System.IO.Stream>._, A<string>._)).MustNotHaveHappened();
     }
 
     [Fact]
@@ -212,7 +212,7 @@ public sealed class PostArchiveBroadcastTests(ApiFixture app) : ApiTestBase(app)
         (await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken))
             .ShouldContain("Unable to archive broadcast: Playlist not found");
         (await IsArchivedAsync()).ShouldBeFalse();
-        A.CallTo(() => AzuraCast.UploadMediaViaSftpAsync(A<Stream>._, A<string>._)).MustNotHaveHappened();
+        A.CallTo(() => AzuraCast.UploadMediaViaSftpAsync(A<System.IO.Stream>._, A<string>._)).MustNotHaveHappened();
     }
 
     [Fact]
