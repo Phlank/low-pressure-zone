@@ -4,6 +4,7 @@ using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Data;
 using LowPressureZone.Identity.Constants;
+using LowPressureZone.Identity.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.HourlySlots;
@@ -22,7 +23,13 @@ public class DeleteHourlySlot(HourlySlotPermissions permissions, DataContext dat
         var scheduleId = Route<Guid>("scheduleId");
         var id = Route<Guid>("id");
         
-        var schedule = await dataContext.Schedules.FirstOrDefaultAsync(schedule => schedule.Id == scheduleId, ct);
+        var schedule = await dataContext.Schedules
+                                        .Include(schedule => schedule.Community)
+                                        .ThenInclude(community => community.Relationships
+                                                                           .Where(relationship =>
+                                                                                      relationship.UserId ==
+                                                                                      User.GetIdOrDefault()))
+                                        .FirstOrDefaultAsync(schedule => schedule.Id == scheduleId, ct);
         var slot = schedule?.HourlySlots.FirstOrDefault(slot => slot.Id == id);
 
         if (schedule is null || slot is null)

@@ -4,6 +4,7 @@ using LowPressureZone.Api.Rules;
 using LowPressureZone.Data;
 using LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity;
 using LowPressureZone.Identity.Constants;
+using LowPressureZone.Identity.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.ClashSlots;
@@ -21,7 +22,13 @@ public class PostClashSlot(DataContext dataContext, SchedulePermissions schedule
     public override async Task HandleAsync(ClashSlotRequest req, CancellationToken ct)
     {
         var scheduleId = Route<Guid>("scheduleId");
-        var schedule = await dataContext.Schedules.FirstOrDefaultAsync(schedule => schedule.Id == scheduleId, ct);
+        var schedule = await dataContext.Schedules
+                                        .Include(schedule => schedule.Community)
+                                        .ThenInclude(community => community.Relationships
+                                                                           .Where(relationship =>
+                                                                                      relationship.UserId ==
+                                                                                      User.GetIdOrDefault()))
+                                        .FirstOrDefaultAsync(schedule => schedule.Id == scheduleId, ct);
 
         if (schedule is null)
         {
@@ -47,6 +54,10 @@ public class PostClashSlot(DataContext dataContext, SchedulePermissions schedule
 
         await dataContext.SaveChangesAsync(ct);
         HttpContext.ExposeLocation();
-        await Send.CreatedAtAsync<GetClashSlotById>(new { slotResult.Value.Id }, cancellation: ct);
+        await Send.CreatedAtAsync<GetClashSlotById>(new
+        {
+            scheduleId,
+            id = slotResult.Value.Id
+        }, cancellation: ct);
     }
 }

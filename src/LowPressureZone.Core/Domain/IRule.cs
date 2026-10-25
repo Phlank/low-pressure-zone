@@ -5,5 +5,5 @@ public interface IRule
     bool IsBroken();
     RuleError Error { get; }
     
-    public string ToString() => $"{Error.Field}: {Error.Message}";
+    public string? ToString() => $"{Error.Field}: {Error.Message}";
 }

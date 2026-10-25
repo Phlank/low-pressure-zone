@@ -61,10 +61,7 @@ public class PostArchiveBroadcast(
         }
 
         if (string.IsNullOrEmpty(externalBroadcast.Recording?.DownloadUrl))
-            ThrowError(nameof(req.Id), "Broadcast recording is not available");
-
-        if (broadcast is { IsArchived: true })
-            ThrowError(nameof(req.Id), "Broadcast is already archived.");
+            ThrowError(r => r.Id, "Broadcast recording is not available");
 
         var playlistResult = await azuraCastClient.GetPlaylistByNameAsync(_archivePlaylistName);
         this.ThrowIfError(playlistResult, ArchiveError);

@@ -24,7 +24,7 @@ public sealed class PostPerformer(DataContext dataContext) : EndpointWithMapper<
         HttpContext.ExposeLocation();
         await Send.CreatedAtAsync<GetPerformerById>(new
         {
-            result.Value.Id
+            id = result.Value.Id
         }, Response, cancellation: ct);
     }
 }

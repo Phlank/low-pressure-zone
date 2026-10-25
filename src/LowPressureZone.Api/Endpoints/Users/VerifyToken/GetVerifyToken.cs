@@ -40,7 +40,12 @@ public class GetVerifyToken(UserManager<AppUser> userManager, IdentityContext id
         catch (JsonException)
         {
             await this.SendDelayedForbiddenAsync(_start, ct);
-            throw;
+            return;
+        }
+        catch (FormatException)
+        {
+            await this.SendDelayedForbiddenAsync(_start, ct);
+            return;
         }
 
         var user = await userManager.FindByEmailAsync(inviteTokenContext.Email);

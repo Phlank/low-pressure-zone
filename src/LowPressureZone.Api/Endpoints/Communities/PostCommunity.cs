@@ -18,15 +18,17 @@ public sealed class PostCommunity(DataContext dataContext) : Endpoint<CommunityR
     public override async Task HandleAsync(CommunityRequest req, CancellationToken ct)
     {
         var result = Community.Create(req.Name, req.SocialUrl);
-        await this.PublishOrThrowAsync(result);
+        this.ThrowIfDomainError(result);
+        await this.ThrowIfNotUniqueAsync(dataContext, result.Value, ct);
+        await this.PublishEventsAsync(result);
         
         dataContext.Communities.Add(result.Value);
         await dataContext.SaveChangesAsync(ct);
         
         HttpContext.ExposeLocation();
-        await Send.CreatedAtAsync<GetCommunities>(new
+        await Send.CreatedAtAsync<GetCommunityById>(new
         {
-            result.Value.Id
+            id = result.Value.Id
         }, Response, cancellation: ct);
     }
 }

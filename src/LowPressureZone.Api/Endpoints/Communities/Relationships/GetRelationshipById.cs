@@ -3,7 +3,6 @@ using LowPressureZone.Data;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Extensions;
 using Microsoft.EntityFrameworkCore;
-using Shouldly;
 
 namespace LowPressureZone.Api.Endpoints.Communities.Relationships;
 
@@ -46,7 +45,12 @@ public class GetRelationshipById(DataContext dataContext, IdentityContext identi
                                                .Where(user => user.Id == userId)
                                                .Select(user => user.DisplayName)
                                                .FirstOrDefaultAsync(ct);
-        displayName.ShouldNotBeNull();
+        if (displayName is null)
+        {
+            await Send.NotFoundAsync(ct);
+            return;
+        }
+
         await Send.OkAsync(Map.FromEntity(requestRelationship, displayName, userRelationship), ct);
     }
 }

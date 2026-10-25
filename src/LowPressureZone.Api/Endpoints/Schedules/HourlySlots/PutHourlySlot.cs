@@ -1,13 +1,19 @@
 using FastEndpoints;
 using LowPressureZone.Api.Extensions;
+using LowPressureZone.Api.Rules;
 using LowPressureZone.Core.Domain;
 using LowPressureZone.Data;
 using LowPressureZone.Identity.Constants;
+using LowPressureZone.Identity.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.HourlySlots;
 
-public class PutHourlySlot(DataContext dataContext, HourlySlotPrerecordedMixHandler mixHandler) : Endpoint<HourlySlotRequest>
+public class PutHourlySlot(
+    DataContext dataContext,
+    HourlySlotPermissions permissions,
+    PerformerPermissions performerPermissions,
+    HourlySlotPrerecordedMixHandler mixHandler) : Endpoint<HourlySlotRequest>
 {
     public override void Configure()
     {
@@ -24,6 +30,11 @@ public class PutHourlySlot(DataContext dataContext, HourlySlotPrerecordedMixHand
         var id = Route<Guid>("id");
 
         var schedule = await dataContext.Schedules
+                                        .Include(schedule => schedule.Community)
+                                        .ThenInclude(community => community.Relationships
+                                                                           .Where(relationship =>
+                                                                                      relationship.UserId ==
+                                                                                      User.GetIdOrDefault()))
                                         .Where(schedule => schedule.Id == scheduleId)
                                         .FirstOrDefaultAsync(ct);
         
@@ -32,6 +43,19 @@ public class PutHourlySlot(DataContext dataContext, HourlySlotPrerecordedMixHand
         if (schedule is null || slot is null)
         {
             await Send.NotFoundAsync(ct);
+            return;
+        }
+
+        if (!permissions.IsEditAuthorized(slot))
+        {
+            await Send.UnauthorizedAsync(ct);
+            return;
+        }
+
+        var performer = await dataContext.Performers.FirstOrDefaultAsync(p => p.Id == request.PerformerId, ct);
+        if (performer is null || !performerPermissions.IsHourlySlotLinkAuthorized(performer))
+        {
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 

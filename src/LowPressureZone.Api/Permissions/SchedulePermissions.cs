@@ -3,6 +3,7 @@ using FastEndpoints;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Domain.ScheduleAggregate;
 using LowPressureZone.Identity.Constants;
+using LowPressureZone.Identity.Extensions;
 
 namespace LowPressureZone.Api.Rules;
 
@@ -24,30 +25,34 @@ public sealed class SchedulePermissions(IHttpContextAccessor contextAccessor)
         if (!schedule.AllowedSlotTypes.IsClashAllowed) return false;
         if (schedule.TimeRange.EndsAt < DateTime.UtcNow) return false;
         if (User == null) return false;
-        return User.IsInRole(RoleNames.Organizer) || User.IsInRole(RoleNames.Admin);
+        return User.IsInRole(RoleNames.Admin) || IsCommunityOrganizer(schedule);
     }
 
     public bool IsEditAuthorized(Schedule schedule)
     {
         if (User == null) return false;
         if (schedule.TimeRange.EndsAt < DateTime.UtcNow) return false;
-        return User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Organizer);
+        return User.IsInRole(RoleNames.Admin) || IsCommunityOrganizer(schedule);
     }
 
     public bool IsDeleteAuthorized(Schedule schedule)
     {
         if (User == null) return false;
         if (schedule.TimeRange.EndsAt < DateTime.UtcNow) return false;
-        return User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Organizer);
+        return User.IsInRole(RoleNames.Admin) || IsCommunityOrganizer(schedule);
     }
 
     public bool IsHiddenFromApi(Schedule schedule)
     {
         var isUserAdminOrOrganizer =
-            User != null && (User.IsInRole(RoleNames.Admin) || User.IsInRole(RoleNames.Organizer));
+            User != null && (User.IsInRole(RoleNames.Admin) || IsCommunityOrganizer(schedule));
         var isScheduleInPast = schedule.TimeRange.EndsAt < DateTime.UtcNow;
         return !isUserAdminOrOrganizer
-               && (isScheduleInPast 
-                   || schedule.IsVisibleToPublic);
+               && (isScheduleInPast || !schedule.IsVisibleToPublic);
     }
+
+    private bool IsCommunityOrganizer(Schedule schedule)
+        => schedule.Community.Relationships.Any(relationship =>
+                                                    relationship.UserId == User!.GetIdOrDefault()
+                                                    && relationship.IsOrganizer);
 }
