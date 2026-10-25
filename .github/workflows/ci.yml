@@ -39,7 +39,7 @@ jobs:
           category: "/language:${{ matrix.language }}"
       - if: ${{ matrix.build-mode == 'manual' }}
         name: Build C# Code
-        run: bash $HOME/.dotnet/dotnet build ./src/LowPressureZone.sln -c Release
+        run: /home/runner/.dotnet/dotnet build ./src/LowPressureZone.sln -c Release
 
   build-client:
     name: Build Client
