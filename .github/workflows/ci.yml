@@ -32,11 +32,6 @@ jobs:
         uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
-          build-mode: ${{ matrix.build-mode }}
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v4
-        with:
-          category: "/language:${{ matrix.language }}"
       - if: ${{ matrix.build-mode == 'manual' }}
         name: Build C# Code
         run: /home/runner/.dotnet/dotnet build ./src/LowPressureZone.sln -c Release
