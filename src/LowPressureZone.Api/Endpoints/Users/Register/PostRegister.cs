@@ -45,7 +45,12 @@ public class PostRegister(
         catch (JsonException)
         {
             await this.SendDelayedForbiddenAsync(_requestTime, ct);
-            throw;
+            return;
+        }
+        catch (FormatException)
+        {
+            await this.SendDelayedForbiddenAsync(_requestTime, ct);
+            return;
         }
 
         var user = await userManager.FindByEmailAsync(context.Email);

@@ -1,5 +1,7 @@
 using Hangfire;
 using Hangfire.InMemory;
+using FluentEmail.Core;
+using FluentEmail.Core.Models;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Services.AzuraCast;
 using LowPressureZone.Api.Services.NightlyTasks;
@@ -55,6 +57,17 @@ public sealed class ApiFixture : AppFixture<Program>
 
         s.RemoveAll<IAzuraCastClient>();
         s.AddSingleton(A.Fake<IAzuraCastClient>());
+
+        var emailFactory = A.Fake<IFluentEmailFactory>();
+        var email = A.Fake<IFluentEmail>();
+        A.CallTo(() => email.SetFrom(A<string>._, A<string>._)).Returns(email);
+        A.CallTo(() => email.To(A<string>._, A<string>._)).Returns(email);
+        A.CallTo(() => email.Subject(A<string>._)).Returns(email);
+        A.CallTo(() => email.Body(A<string>._, A<bool>._)).Returns(email);
+        A.CallTo(() => email.SendAsync()).Returns(new SendResponse());
+        A.CallTo(() => emailFactory.Create()).Returns(email);
+        s.RemoveAll<IFluentEmailFactory>();
+        s.AddSingleton(emailFactory);
 
         s.RemoveAll<IStreamStatusService>();
         s.AddSingleton<TestStreamStatusService>();

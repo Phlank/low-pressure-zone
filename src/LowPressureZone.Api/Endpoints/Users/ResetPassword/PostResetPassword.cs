@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using FastEndpoints;
+using FluentValidation.Results;
 using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Identity;
@@ -33,7 +34,12 @@ public class PostResetPassword(UserManager<AppUser> userManager) : Endpoint<Post
         catch (JsonException)
         {
             await this.SendDelayedForbiddenAsync(_start, ct);
-            throw;
+            return;
+        }
+        catch (FormatException)
+        {
+            await this.SendDelayedForbiddenAsync(_start, ct);
+            return;
         }
 
         var user = await userManager.FindByEmailAsync(tokenContext.Email);
@@ -58,10 +64,26 @@ public class PostResetPassword(UserManager<AppUser> userManager) : Endpoint<Post
             return;
         }
 
-        await userManager.RemovePasswordAsync(user);
-        await userManager.AddPasswordAsync(user, req.Password);
-        user.LockoutEnabled = false;
-        await userManager.UpdateAsync(user);
+        var resetResult = await userManager.ResetPasswordAsync(user, tokenContext.Token, req.Password);
+        if (!resetResult.Succeeded)
+        {
+            foreach (var error in resetResult.Errors)
+                AddError(new ValidationFailure(nameof(req.Password), error.Description));
+            ThrowIfAnyErrors();
+        }
+
+        if (user.LockoutEnabled)
+        {
+            user.LockoutEnabled = false;
+            var updateResult = await userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                foreach (var error in updateResult.Errors)
+                    AddError(new ValidationFailure(nameof(req.Password), error.Description));
+                ThrowIfAnyErrors();
+            }
+        }
+
         await Send.NoContentAsync(ct);
     }
 }
