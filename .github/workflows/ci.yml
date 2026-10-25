@@ -14,7 +14,7 @@ jobs:
       matrix:
         include:
           - language: csharp
-            build-mode: manual
+            build-mode: none
           - language: javascript
             build-mode: none
     permissions:
@@ -24,16 +24,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v4
-        with:
-          languages: ${{ matrix.language }}
-      - if: ${{ matrix.build-mode == 'manual' }}
-        name: Build C# Code
+      - name: Build C# Code
         run: |
           wget https://dot.net/v1/dotnet-install.sh
           bash ./dotnet-install.sh -Channel 11.0 -Quality preview
           /home/runner/.dotnet/dotnet build ./src/LowPressureZone.sln -c Release
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
 
   build-client:
     name: Build Client
