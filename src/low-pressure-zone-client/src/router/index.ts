@@ -75,6 +75,11 @@ const router = createRouter({
           name: 'Users',
           component: () => import('@/components/views/dashboard/users/DashboardUsersView.vue'),
           meta: { auth: true, roles: [roles.admin, roles.organizer] }
+        },
+        {
+          path: 'account',
+          name: 'Account',
+          component: () => import('@/components/views/dashboard/account/DashboardAccountView.vue'),
         }
       ],
       meta: {
@@ -118,7 +123,7 @@ router.beforeEach(async (to) => {
     return Routes.Login
   }
 
-  const allowedRoles = (meta.roles ?? [])
+  const allowedRoles = meta.roles ?? []
   if (allowedRoles.length === 0 || authStore.isInAnyRoles(...allowedRoles)) {
     return
   }

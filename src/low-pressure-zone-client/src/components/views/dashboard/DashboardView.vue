@@ -100,6 +100,11 @@ const menuItems: MenuItem[] = [
     icon: 'pi pi-user',
     route: '/dashboard/users',
     visible: authStore.isInRole(roles.admin) || authStore.isInRole(roles.organizer)
+  },
+  {
+    label: 'My Account',
+    icon: 'pi pi-user',
+    route: '/dashboard/account',
   }
 ]
 

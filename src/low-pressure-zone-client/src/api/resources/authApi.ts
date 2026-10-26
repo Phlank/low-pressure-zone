@@ -8,7 +8,7 @@ export default {
     sendPost<LoginRequest, LoginResponse>(`${route}/login`, request),
   getLogout: () => sendGet<never>(`${route}/logout`),
   postTwoFactor: (request: TwoFactorRequest) => sendPost(`${route}/twoFactor`, request),
-  getResetPassword: (email: string) => sendGet(`${route}/resetPassword`, { email: email }),
+  getResetPassword: (email?: string) => sendGet(`${route}/resetPassword`, { email: email }),
   postResetPassword: (request: ResetPasswordRequest) => sendPost(`${route}/resetPassword`, request),
   postRegister: (request: RegisterRequest) => sendPost(`${route}/register`, request),
   getVerifyToken: (request: VerifyTokenRequest) => sendGet(`${route}/verifyToken`, { ...request })
