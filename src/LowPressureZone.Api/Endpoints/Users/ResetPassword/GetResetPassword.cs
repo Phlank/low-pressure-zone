@@ -21,8 +21,17 @@ public class GetPasswordReset(UserManager<AppUser> userManager, EmailService ema
 
     public override async Task HandleAsync(GetResetPasswordRequest req, CancellationToken ct)
     {
-        var user = await userManager.FindByEmailAsync(req.Email);
-        if (user == null)
+        AppUser? user;
+        if (req.Email is null)
+        {
+            user = await userManager.GetUserAsync(User);
+        }
+        else
+        {
+            user = await userManager.FindByEmailAsync(req.Email);
+        }
+        
+        if (user is null)
         {
             await this.SendDelayedNoContentAsync(_start, ct);
             return;
