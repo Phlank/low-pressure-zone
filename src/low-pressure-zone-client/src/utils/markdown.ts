@@ -48,7 +48,7 @@ const domPurifyConfig: Config = {
 
 export const scheduleToRedditMarkdown = (schedule: ScheduleResponse) => {
   const rows = getRowsForRedditMarkdownSchedule(schedule)
-  let titleRow = '| Pacific Time | Eastern Time | UK Time | Performer |'
+  let titleRow = '| UTC | Pacific Time | Eastern Time | UK Time | Performer |'
   let separatorRow = '|---|---|---|---|'
   const rowsMarkdown: string[] = []
   const shouldUseDetails = rows.some((row) => row.subtitle !== '')
@@ -58,10 +58,11 @@ export const scheduleToRedditMarkdown = (schedule: ScheduleResponse) => {
   }
 
   rows.forEach((row) => {
+    const utc = formatReadableTime(new TZDate(row.start, '+00:00'))
     const pacific = formatReadableTime(new TZDate(row.start, ianaTimezones.Pacific))
     const eastern = formatReadableTime(new TZDate(row.start, ianaTimezones.Eastern))
     const uk = formatReadableTime(new TZDate(row.start, ianaTimezones.UK))
-    let rowMarkdown = `| ${pacific} | ${eastern} | ${uk} |`
+    let rowMarkdown = `| ${utc} | ${pacific} | ${eastern} | ${uk} |`
     if (row.title === '') rowMarkdown += '  |'
     else rowMarkdown += ` **${row.title}** |`
     if (shouldUseDetails) {
