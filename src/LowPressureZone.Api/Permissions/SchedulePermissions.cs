@@ -17,7 +17,7 @@ public sealed class SchedulePermissions(IHttpContextAccessor contextAccessor)
         if (!schedule.AllowedSlotTypes.IsHourlyAllowed) return false;
         if (schedule.TimeRange.EndsAt < DateTime.UtcNow) return false;
         if (User == null) return false;
-        return User.IsInRole(RoleNames.Performer);
+         return User.IsInRole(RoleNames.Performer) || User.IsInRole(RoleNames.Admin);
     }
 
     public bool IsAddingClashSlotsAllowed(Schedule schedule)
