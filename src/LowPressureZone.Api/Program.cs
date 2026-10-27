@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using FastEndpoints;
 using Hangfire;
 using LowPressureZone.Api.Extensions;
+using LowPressureZone.Api.Filters;
 using LowPressureZone.Api.Utilities;
 using LowPressureZone.Data.Extensions;
 using LowPressureZone.Identity.Extensions;
@@ -63,7 +64,11 @@ app.UseFastEndpoints(config =>
             }
         };
     };
-    config.Endpoints.Configurator = endpoints => { endpoints.Throttle(60, 60); };
+    config.Endpoints.Configurator = endpoints =>
+    {
+        endpoints.Throttle(60, 60);
+        endpoints.Options(x => x.AddEndpointFilter<AdminEmailExceptionFilter>());
+    };
     config.Errors.ProducesMetadataType = typeof(ValidationProblemDetails);
 });
 app.MapOpenApi();

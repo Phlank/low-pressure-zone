@@ -41,8 +41,7 @@ public sealed class EmailService(
             _ = await SendAdminMessage(adminEmailBody, "Error sending email");
         return Result.Err<SendResponse, SendResponse>(sendResponse);
     }
-
-
+    
     public async Task SendTwoFactorEmailAsync(string toAddress, string username, string code)
     {
         var subject = "2FA | Low Pressure Zone";
@@ -80,7 +79,7 @@ public sealed class EmailService(
         return Result.Ok<bool, SendResponse>(true);
     }
 
-    public async Task<Result<NoValue, SendResponse>> SendAdminException(Exception ex, string process)
+    public async Task<Result<NoValue, SendResponse>> SendAdminExceptionAsync(Exception ex, string process)
     {
         var subject = "Exception thrown in LPZ | Admin Message | Low Pressure Zone";
         var message = new StringBuilder($"An exception was thrown in Low Pressure Zone during the {process} process.")
