@@ -198,7 +198,7 @@ const { state, val, isSubmitting, submit, reset } = useEntityForm<
         new Date(resetStartTime.getTime() + defaultMinutes * MS_PER_MINUTE).toISOString(),
       isHourlyAllowed: schedule?.isHourlyAllowed ?? true,
       isClashAllowed: schedule?.isClashAllowed ?? false,
-      isVisibleToPublic: schedule?.isVisibleToPublic ?? false
+      isVisibleToPublic: schedule?.isVisibleToPublic ?? true
     })
     return stateRef
   },
