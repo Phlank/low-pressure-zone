@@ -42,14 +42,7 @@ public sealed class SchedulePermissions(IHttpContextAccessor contextAccessor)
         return User.IsInRole(RoleNames.Admin) || IsCommunityOrganizer(schedule);
     }
 
-    public bool IsHiddenFromApi(Schedule schedule)
-    {
-        var isUserAdminOrOrganizer =
-            User != null && (User.IsInRole(RoleNames.Admin) || IsCommunityOrganizer(schedule));
-        var isScheduleInPast = schedule.TimeRange.EndsAt < DateTime.UtcNow;
-        return !isUserAdminOrOrganizer
-               && (isScheduleInPast || !schedule.IsVisibleToPublic);
-    }
+    public bool IsHiddenFromApi(Schedule schedule) => User is null && !schedule.IsVisibleToPublic;
 
     private bool IsCommunityOrganizer(Schedule schedule)
         => schedule.Community.Relationships.Any(relationship =>
