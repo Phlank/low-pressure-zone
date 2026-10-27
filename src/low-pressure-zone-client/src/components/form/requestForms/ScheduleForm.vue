@@ -95,7 +95,7 @@
       </IftaFormField>
       <InlineFormField
         input-id="isVisibleToPublicInput"
-        label="Visible to Organizers Only"
+        label="Visible to Public"
         size="xs">
         <ToggleSwitch
           v-model="state.isVisibleToPublic"
