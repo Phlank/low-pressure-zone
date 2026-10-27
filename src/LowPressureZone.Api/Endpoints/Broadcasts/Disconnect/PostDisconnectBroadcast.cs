@@ -6,7 +6,8 @@ using LowPressureZone.Identity.Constants;
 
 namespace LowPressureZone.Api.Endpoints.Broadcasts.Disconnect;
 
-public class PostDisconnectBroadcast(IAzuraCastClient client) : Endpoint<PostDisconnectBroadcastRequest>
+public class PostDisconnectBroadcast(IAzuraCastClient client, IBackgroundJobClient backgroundJobClient)
+    : Endpoint<PostDisconnectBroadcastRequest>
 {
     public override void Configure()
     {
@@ -49,8 +50,8 @@ public class PostDisconnectBroadcast(IAzuraCastClient client) : Endpoint<PostDis
         {
             var timespan = TimeSpan.FromMinutes(minutes);
             var enableTime = DateTimeOffset.UtcNow.Add(timespan);
-            BackgroundJob.Schedule<IAzuraCastClient>(azuraCast => azuraCast.EnableStreamerAsync(streamerId.Value),
-                                                     enableTime);
+            backgroundJobClient.Schedule<IAzuraCastClient>(azuraCast => azuraCast.EnableStreamerAsync(streamerId.Value),
+                                                           enableTime);
         }
     }
 }

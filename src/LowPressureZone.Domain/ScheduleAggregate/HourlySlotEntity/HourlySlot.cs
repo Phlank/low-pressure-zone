@@ -3,10 +3,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
 using LowPressureZone.Domain.PerformerAggregate;
+using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.Events;
 using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlotTimeRangeObject;
 using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.PrerecordedMixObject;
 using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.Rules;
 using LowPressureZone.Domain.ScheduleAggregate.Rules;
+using LowPressureZone.Domain.Shared.ReminderValueObject;
+using LowPressureZone.Domain.Shared.ReminderValueObject.Rules;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity;
@@ -23,6 +26,7 @@ public class HourlySlot : Entity
     public Schedule Schedule { get; init; } = null!;
     public PrerecordedMix Prerecord { get; private set; }
     public HourlySlotTimeRange TimeRange { get; private set; }
+    public Reminder Reminder { get; private set; } = Reminder.Create(null).Value;
 
     public static DomainResult<HourlySlot> Create(
         Guid scheduleId,
@@ -32,37 +36,47 @@ public class HourlySlot : Entity
         string? subtitle = null,
         string? uploadedFileName = null,
         int? azuraCastMediaId = null,
+        DateTimeOffset? reminderTime = null,
         Guid? id = null)
     {
         var prerecordedMixResult = PrerecordedMix.Create(uploadedFileName is not null,
                                                          uploadedFileName,
                                                          azuraCastMediaId);
         var timeRangeResult = HourlySlotTimeRange.Create(startsAt, duration);
+        var reminderResult = Reminder.Create(reminderTime);
         List<RuleError> errors =
         [
             .. Rule.Apply(new SubtitleLengthCannotExceed128Rule(subtitle)),
             .. prerecordedMixResult.Errors,
-            .. timeRangeResult.Errors
+            .. timeRangeResult.Errors,
+            .. reminderResult.Errors,
         ];
 
         if (errors.Count > 0)
             return DomainResult.Err<HourlySlot>(errors);
 
-        return DomainResult.Ok(new HourlySlot
+        var value = new HourlySlot
         {
             Subtitle = subtitle?.Trim(),
             PerformerId = performerId,
             ScheduleId = scheduleId,
             Prerecord = prerecordedMixResult.Value,
             TimeRange = timeRangeResult.Value,
+            Reminder = reminderResult.Value,
             Id = id ?? Guid.NewGuid()
-        });
+        };
+
+        var events = new List<IEvent>();
+        if (reminderTime.HasValue)
+            events.Add(new HourlySlotReminderSet(value.Id, null));
+
+        return DomainResult.Ok(value, events);
     }
 
     public DomainResult<NoValue> ChangeSubtitle(string? subtitle)
     {
         var result = Rule.ApplyIntoResult(NoValue.Instance,
-                                                       new SubtitleLengthCannotExceed128Rule(subtitle));
+                                          new SubtitleLengthCannotExceed128Rule(subtitle));
         if (result.IsSuccess)
             Subtitle = subtitle;
 
@@ -89,7 +103,7 @@ public class HourlySlot : Entity
     {
         if (!Prerecord.IsPrerecorded)
             return DomainResult.Err<NoValue>(new RuleError("No mix to delete"));
-        
+
         var result = PrerecordedMix.Create(false, null, null);
 
         if (result.IsSuccess)
@@ -102,17 +116,39 @@ public class HourlySlot : Entity
     {
         var timeRangeResult = HourlySlotTimeRange.Create(startsAt, duration)
                                                  .WithAdditionalRules(new CannotChangeSlotAfterItEndsRule(TimeRange));
-        
+
         if (timeRangeResult.IsSuccess)
             TimeRange = timeRangeResult.Value;
 
         return timeRangeResult.ToNoValue();
     }
 
+    public DomainResult<NoValue> SetReminder(DateTimeOffset reminderTime)
+    {
+        var @event = new HourlySlotReminderSet(Id, Reminder.JobId);
+        if (Reminder.ReminderTime == reminderTime)
+            return DomainResult.Ok();
+
+        var createResult = Reminder.Create(reminderTime);
+        if (createResult.IsError)
+            return createResult.ToNoValue();
+
+        Reminder = createResult.Value;
+        return DomainResult.Ok();
+    }
+
+    public void LinkReminder(string jobId)
+    {
+        if (!Reminder.ReminderTime.HasValue)
+            throw new InvalidOperationException("Cannot link a reminder when no reminder time is set.");
+
+        Reminder = Reminder.Create(Reminder.ReminderTime, jobId).Value;
+    }
+
     public DomainResult<NoValue> Delete()
     {
         var result = Rule.ApplyIntoResult(NoValue.Instance,
-                                                       new CannotChangeSlotAfterItEndsRule(TimeRange));
+                                          new CannotChangeSlotAfterItEndsRule(TimeRange));
         if (result.IsSuccess)
         {
             Schedule.HourlySlots.Remove(this);
@@ -126,7 +162,7 @@ public class HourlySlot : Entity
         modelBuilder.Entity<HourlySlot>()
                     .Property(slot => slot.Id)
                     .ValueGeneratedNever();
-        
+
         modelBuilder.Entity<HourlySlot>()
                     .ComplexProperty(slot => slot.Prerecord);
 
@@ -140,5 +176,7 @@ public class HourlySlot : Entity
         modelBuilder.Entity<HourlySlot>().HasOne(slot => slot.Performer).WithMany()
                     .HasForeignKey(slot => slot.PerformerId).ExcludeForeignKeyFromMigrations();
         modelBuilder.Entity<HourlySlot>().Navigation(slot => slot.Performer).AutoInclude();
+
+        modelBuilder.Entity<HourlySlot>().ComplexProperty(slot => slot.Reminder);
     }
 }

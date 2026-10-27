@@ -7,7 +7,11 @@ public class DomainResult<T> : Result<T, List<RuleError>>
 {
     public List<IEvent> Events { get; private init; } = [];
 
-    internal DomainResult(T? value, List<IEvent>? events, List<RuleError>? error) : base(value, error is not null && !error.IsEmpty ? error : null)
+    internal DomainResult(T? value, List<IEvent>? events, List<RuleError>? error) : base(value,
+                                                                                         error is not null &&
+                                                                                         !error.IsEmpty
+                                                                                             ? error
+                                                                                             : null)
     {
         if (events is not null)
             Events = events;
@@ -45,4 +49,7 @@ public static class DomainResult
 
     public static DomainResult<T> WithAdditionalRules<T>(this DomainResult<T> result, params List<IRule> rules) =>
         result.WithAdditionalErrors(Rule.Apply(rules));
+
+    public static DomainResult<T> WithAdditionalEvents<T>(this DomainResult<T> result, params List<IEvent> events) =>
+        result.IsError ? Err<T>(result.Errors) : Ok(result.Value, [.. result.Events, .. events]);
 }

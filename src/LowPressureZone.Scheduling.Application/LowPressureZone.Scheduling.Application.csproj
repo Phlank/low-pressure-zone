@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net11.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="FastEndpoints" Version="9.0.0-beta.2" />
+        <PackageReference Include="FastEndpoints.Messaging" Version="9.0.0-beta.2" />
+        <PackageReference Include="Hangfire.Core" Version="1.8.25" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\LowPressureZone.Data\LowPressureZone.Data.csproj" />
+      <ProjectReference Include="..\LowPressureZone.Domain\LowPressureZone.Domain.csproj" />
+      <ProjectReference Include="..\LowPressureZone.Identity\LowPressureZone.Identity.csproj" />
+    </ItemGroup>
+
+</Project>

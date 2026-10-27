@@ -15,7 +15,7 @@ public sealed class EmailService(
     IOptions<EmailServiceConfiguration> options,
     UriService uriService,
     IFluentEmailFactory emailFactory,
-    ILogger<EmailService> logger)
+    ILogger<EmailService> logger) : IEmailService
 {
     private static readonly Action<ILogger, string, Exception?> LogEmailFailure =
         LoggerMessage.Define<string>(LogLevel.Error, new EventId(0, nameof(LogEmailFailure)),
