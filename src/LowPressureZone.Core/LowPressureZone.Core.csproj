@@ -8,10 +8,7 @@
 
     <ItemGroup>
         <PackageReference Include="FluentValidation" Version="12.2.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\LowPressureZone.Identity\LowPressureZone.Identity.csproj" />
+        <PackageReference Include="jcamp.FluentEmail.Core" Version="4.0.0" />
     </ItemGroup>
 
 </Project>

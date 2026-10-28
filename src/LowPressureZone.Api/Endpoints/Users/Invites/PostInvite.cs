@@ -6,6 +6,7 @@ using LowPressureZone.Data;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Entities;
+using LowPressureZone.Infrastructure.Emails;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

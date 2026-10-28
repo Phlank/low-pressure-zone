@@ -5,6 +5,7 @@ using FluentValidation.Results;
 using LowPressureZone.Api.Utilities;
 using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
+using LowPressureZone.Infrastructure.Events;
 
 namespace LowPressureZone.Api.Extensions;
 
@@ -88,6 +89,14 @@ public static class EndpointExtensions
     {
         endpoint.ThrowIfDomainError(result);
         await endpoint.PublishEventsAsync(result);
+    }
+    
+    public static void EnqueueOrThrow<T, TRequest, TResponse>(
+        this Endpoint<TRequest, TResponse> endpoint,
+        DomainResult<T> result) where TRequest : notnull
+    {
+        endpoint.ThrowIfDomainError(result);
+        endpoint.HttpContext.RequestServices.GetRequiredService<IEventQueue>().Enqueue(result.Events);
     }
 
     public static async Task PublishEventsAsync<T, TRequest, TResponse>(

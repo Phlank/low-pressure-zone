@@ -42,6 +42,7 @@
         <ProjectReference Include="..\LowPressureZone.Domain\LowPressureZone.Domain.csproj"/>
         <ProjectReference Include="..\LowPressureZone.Identity\LowPressureZone.Identity.csproj"/>
         <ProjectReference Include="..\LowPressureZone.Adapter.AzuraCast\LowPressureZone.Adapter.AzuraCast.csproj"/>
+        <ProjectReference Include="..\LowPressureZone.Infrastructure\LowPressureZone.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

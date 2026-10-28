@@ -1,8 +1,8 @@
 using FluentEmail.Core.Models;
 using LowPressureZone.Core;
-using LowPressureZone.Identity;
+using LowPressureZone.Infrastructure.Identity;
 
-namespace LowPressureZone.Api.Services;
+namespace LowPressureZone.Infrastructure.Emails;
 
 public interface IEmailService
 {
@@ -11,4 +11,5 @@ public interface IEmailService
     Task SendResetPasswordEmailAsync(string toAddress, string username, TokenContext context);
     Task<Result<bool, SendResponse>> SendAdminMessage(string message, string subject);
     Task<Result<NoValue, SendResponse>> SendAdminException(Exception ex, string process);
+    Task SendSlotReminderEmailAsync(string toAddress, TimeSpan timeUntilStart, DateTimeOffset slotStartTime);
 }

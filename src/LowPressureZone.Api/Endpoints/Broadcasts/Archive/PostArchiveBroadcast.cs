@@ -3,11 +3,11 @@ using System.Text;
 using FastEndpoints;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Api.Models.Configuration;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Api.Services.AzuraCast;
 using LowPressureZone.Data;
 using LowPressureZone.Identity.Constants;
+using LowPressureZone.Infrastructure.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 

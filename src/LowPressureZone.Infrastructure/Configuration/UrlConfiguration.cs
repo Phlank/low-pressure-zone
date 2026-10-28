@@ -1,4 +1,4 @@
-﻿namespace LowPressureZone.Api.Models.Configuration;
+﻿namespace LowPressureZone.Infrastructure.Configuration;
 
 public sealed class UrlConfiguration
 {

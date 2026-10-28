@@ -9,5 +9,5 @@ public class HourlySlotRequest
     public bool ReplaceMedia { get; set; }
     public bool DeleteMedia { get; set; }
     public IFormFile? File { get; set; }
-    public bool SendReminder { get; set; }
+    public DateTimeOffset? ReminderTime { get; set; }
 }

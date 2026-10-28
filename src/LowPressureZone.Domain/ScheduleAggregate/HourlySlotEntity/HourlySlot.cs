@@ -114,6 +114,9 @@ public class HourlySlot : Entity
 
     public DomainResult<NoValue> ChangeTime(DateTimeOffset startsAt, int duration)
     {
+        if (startsAt == TimeRange.StartsAt && duration == TimeRange.Duration)
+            return DomainResult.Ok();
+
         var timeRangeResult = HourlySlotTimeRange.Create(startsAt, duration)
                                                  .WithAdditionalRules(new CannotChangeSlotAfterItEndsRule(TimeRange));
 
@@ -123,18 +126,20 @@ public class HourlySlot : Entity
         return timeRangeResult.ToNoValue();
     }
 
-    public DomainResult<NoValue> SetReminder(DateTimeOffset reminderTime)
+    public DomainResult<NoValue> SetReminder(DateTimeOffset? reminderTime)
     {
-        var @event = new HourlySlotReminderSet(Id, Reminder.JobId);
+        var result = DomainResult.Ok();
         if (Reminder.ReminderTime == reminderTime)
-            return DomainResult.Ok();
+            return result;
+
+        var @event = new HourlySlotReminderSet(Id, Reminder.JobId);
 
         var createResult = Reminder.Create(reminderTime);
         if (createResult.IsError)
             return createResult.ToNoValue();
 
         Reminder = createResult.Value;
-        return DomainResult.Ok();
+        return DomainResult.Ok().WithAdditionalEvents(@event);
     }
 
     public void LinkReminder(string jobId)

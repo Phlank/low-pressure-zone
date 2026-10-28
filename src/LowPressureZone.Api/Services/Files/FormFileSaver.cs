@@ -1,5 +1,6 @@
 using FastEndpoints;
 using LowPressureZone.Core;
+using LowPressureZone.Infrastructure.Emails;
 
 namespace LowPressureZone.Api.Services.Files;
 

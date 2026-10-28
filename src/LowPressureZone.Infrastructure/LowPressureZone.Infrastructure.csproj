@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net11.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Hangfire.Core" Version="1.8.25" />
+        <PackageReference Include="FastEndpoints" Version="9.0.0-beta.2" />
+        <PackageReference Include="FastEndpoints.Attributes" Version="9.0.0-beta.2" />
+        <PackageReference Include="FastEndpoints.Generator" Version="9.0.0-beta.2" />
+        <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.23.0" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\LowPressureZone.Core\LowPressureZone.Core.csproj" />
+    </ItemGroup>
+
+</Project>

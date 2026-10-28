@@ -10,6 +10,8 @@ using LowPressureZone.Api.Services;
 using LowPressureZone.Api.Utilities;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;
+using LowPressureZone.Infrastructure.Emails;
+using LowPressureZone.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace LowPressureZone.Identity;
+namespace LowPressureZone.Infrastructure.Identity;
 
 public static class PasswordGenerator
 {

@@ -2,7 +2,7 @@
 using System.Text.Json.Serialization;
 using Microsoft.IdentityModel.Tokens;
 
-namespace LowPressureZone.Identity;
+namespace LowPressureZone.Infrastructure.Identity;
 
 public sealed class TokenContext
 {

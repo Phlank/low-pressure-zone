@@ -3,17 +3,19 @@ using System.Text.Json;
 using FastEndpoints;
 using FluentEmail.Core;
 using FluentEmail.Core.Models;
-using LowPressureZone.Api.Models.Configuration;
 using LowPressureZone.Core;
-using LowPressureZone.Identity;
+using LowPressureZone.Infrastructure.Configuration;
+using LowPressureZone.Infrastructure.Identity;
+using LowPressureZone.Infrastructure.Resolvers;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace LowPressureZone.Api.Services;
+namespace LowPressureZone.Infrastructure.Emails;
 
 [RegisterService<EmailService>(LifeTime.Singleton)]
 public sealed class EmailService(
     IOptions<EmailServiceConfiguration> options,
-    UriService uriService,
+    UriResolver uriResolver,
     IFluentEmailFactory emailFactory,
     ILogger<EmailService> logger) : IEmailService
 {
@@ -53,7 +55,7 @@ public sealed class EmailService(
 
     public async Task SendInviteEmailAsync(string toAddress, TokenContext context)
     {
-        var uri = uriService.GetInviteUrl(context);
+        var uri = uriResolver.GetInviteUrl(context);
         var subject = "Welcome | Low Pressure Zone";
         var message =
             $"You've been invited to register a new user at Low Pressure Zone. Follow the link below to create your user.\n\n{uri}\n\nThis link will be valid for 24 hours.";
@@ -62,7 +64,7 @@ public sealed class EmailService(
 
     public async Task SendResetPasswordEmailAsync(string toAddress, string username, TokenContext context)
     {
-        var uri = uriService.GetResetPasswordUrl(context);
+        var uri = uriResolver.GetResetPasswordUrl(context);
         var subject = "Reset Password | Low Pressure Zone";
         var message =
             $"A password reset was requested from Low Pressure Zone for your user, {username}. Click on the link below to reset your password.\n\n{uri}\n\nIf you did not initiate this request, you can ignore this message.";
@@ -90,5 +92,29 @@ public sealed class EmailService(
         var result = await SendAsync(options.Value.AdminEmail, subject, message);
         if (!result.IsSuccess) return Result.Err<NoValue, SendResponse>(result.Error);
         return Result.Ok<NoValue, SendResponse>(NoValue.Instance);
+    }
+
+    public Task SendSlotReminderEmailAsync(string toAddress, TimeSpan timeUntilStart, DateTimeOffset slotStartTime)
+    {
+        var subject = "Slot Reminder | Low Pressure Zone";
+        var message = new StringBuilder().Append("This is an automated reminder that you have a slot scheduled to start in ");
+        if (timeUntilStart.Days > 0)
+        {
+            message.Append(timeUntilStart.Days)
+                   .Append(" days, ");
+        }
+
+        if (timeUntilStart.TotalHours > 0)
+        {
+            message.Append(timeUntilStart.Hours)
+                   .Append(" hours and ");
+        }
+
+        message.Append(timeUntilStart.Minutes)
+               .Append(" minutes.");
+        
+        message.AppendLine().AppendLine("Looking forward to the sounds you bring :)");
+        
+        return SendAsync(toAddress, subject, message.ToString());
     }
 }

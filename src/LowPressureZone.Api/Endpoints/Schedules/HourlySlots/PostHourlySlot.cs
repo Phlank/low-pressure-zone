@@ -1,13 +1,10 @@
 using FastEndpoints;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
-using LowPressureZone.Api.Services.Files;
-using LowPressureZone.Core.Domain;
 using LowPressureZone.Data;
-using LowPressureZone.Domain.ScheduleAggregate;
 using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity;
-using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.PrerecordedMixObject;
 using LowPressureZone.Identity.Constants;
+using LowPressureZone.Infrastructure.Events;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.HourlySlots;
@@ -17,6 +14,7 @@ public class PostHourlySlot(
     SchedulePermissions schedulePermissions,
     PerformerPermissions performerPermissions,
     HourlySlotPrerecordedMixHandler mixHandler,
+    IEventQueue eventQueue,
     ILogger<PostHourlySlot> logger) : Endpoint<HourlySlotRequest>
 {
     public override void Configure()
@@ -78,11 +76,11 @@ public class PostHourlySlot(
                                            request.Subtitle,
                                            prerecordedMixResult?.Value.UploadedFileName,
                                            prerecordedMixResult?.Value.AzuraCastMediaId);
-        await this.PublishOrThrowAsync(slotResult);
+        this.EnqueueOrThrow(slotResult);
 
         var addResult = schedule.AddHourlySlot(slotResult.Value);
-        await this.PublishOrThrowAsync(addResult);
-
+        this.EnqueueOrThrow(addResult);
+        
         await dataContext.SaveChangesAsync(ct);
         HttpContext.ExposeLocation();
         await Send.CreatedAtAsync<GetHourlySlotById>(new { ScheduleId = id, slotResult.Value.Id }, cancellation: ct);

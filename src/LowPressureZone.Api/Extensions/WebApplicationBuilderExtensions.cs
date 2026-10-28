@@ -3,15 +3,17 @@ using System.Text.Json.Serialization;
 using FastEndpoints;
 using FastEndpoints.OpenApi;
 using Hangfire;
+using Hangfire.AspNetCore;
 using Hangfire.PostgreSql;
 using LowPressureZone.Adapter.AzuraCast.Extensions;
 using LowPressureZone.Api.Auth;
-using LowPressureZone.Api.Models.Configuration;
-using LowPressureZone.Api.Models.Configuration.Streaming;
 using LowPressureZone.Api.Services.AzuraCast;
 using LowPressureZone.Data;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;
+using LowPressureZone.Infrastructure.Configuration;
+using LowPressureZone.Infrastructure.Configuration.Streaming;
+using LowPressureZone.Infrastructure.JobActivator;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
@@ -98,11 +100,9 @@ public static class WebApplicationBuilderExtensions
     {
         // Use the main database for hangfire, it stores its data in a separate schema
         var hangfireConnectionString = builder.Configuration.GetConnectionString("Data");
-        builder.Services.AddHangfire(config =>
+        builder.Services.AddHangfire(c =>
         {
-            config.UsePostgreSqlStorage(pgsqlConfig =>
-                                            pgsqlConfig
-                                                .UseNpgsqlConnection(hangfireConnectionString));
+            c.UsePostgreSqlStorage(cf => cf.UseNpgsqlConnection(hangfireConnectionString));
         });
         builder.Services.AddHangfireServer();
     }

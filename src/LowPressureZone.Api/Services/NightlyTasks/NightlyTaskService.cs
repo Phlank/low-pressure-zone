@@ -1,4 +1,5 @@
 using LowPressureZone.Api.Utilities;
+using LowPressureZone.Infrastructure.Emails;
 
 namespace LowPressureZone.Api.Services.NightlyTasks;
 

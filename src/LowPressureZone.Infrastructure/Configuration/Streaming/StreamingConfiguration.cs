@@ -1,4 +1,4 @@
-﻿namespace LowPressureZone.Api.Models.Configuration.Streaming;
+﻿namespace LowPressureZone.Infrastructure.Configuration.Streaming;
 
 public sealed class StreamingConfiguration
 {

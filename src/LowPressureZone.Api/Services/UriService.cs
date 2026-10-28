@@ -1,6 +1,7 @@
 ﻿using FastEndpoints;
-using LowPressureZone.Api.Models.Configuration;
 using LowPressureZone.Identity;
+using LowPressureZone.Infrastructure.Configuration;
+using LowPressureZone.Infrastructure.Identity;
 using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Api.Services;
