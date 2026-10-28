@@ -1,12 +1,13 @@
 using FastEndpoints;
-using Hangfire;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Clients;
+using LowPressureZone.Api.Commands.Users.EnableStreamer;
 using LowPressureZone.Identity.Constants;
+using Quartz;
 
 namespace LowPressureZone.Api.Endpoints.Broadcasts.Disconnect;
 
-public class PostDisconnectBroadcast(IAzuraCastClient client, IBackgroundJobClient backgroundJobClient)
+public class PostDisconnectBroadcast(IAzuraCastClient client, IScheduler scheduler)
     : Endpoint<PostDisconnectBroadcastRequest>
 {
     public override void Configure()
@@ -50,8 +51,10 @@ public class PostDisconnectBroadcast(IAzuraCastClient client, IBackgroundJobClie
         {
             var timespan = TimeSpan.FromMinutes(minutes);
             var enableTime = DateTimeOffset.UtcNow.Add(timespan);
-            backgroundJobClient.Schedule<IAzuraCastClient>(azuraCast => azuraCast.EnableStreamerAsync(streamerId.Value),
-                                                           enableTime);
+            await scheduler.ScheduleJob<IJob<EnableStreamerJob>, EnableStreamerCommand>(new(streamerId.Value),
+                                                                                       enableTime,
+                                                                                       OneOffJobOptions.Replacing(EnableStreamerJob.JobName(streamerId.Value)),
+                                                                                       cancellationToken: ct);
         }
     }
 }

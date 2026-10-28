@@ -7,6 +7,7 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AIdentityDbContext_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003F_002Econfig_003FJetBrains_003FRider2026_002E2_003Fresharper_002Dhost_003FSourcesCache_003Ffa15a5077d185cdf62ac0c5da6fbc565970a7a7431cdb1634d7e5edb3b21b5_003FIdentityDbContext_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/Environment/AssemblyExplorer/XmlDocument/@EntryValue">&lt;AssemblyExplorer&gt;
   &lt;Assembly Path="/home/phlank/.nuget/packages/npgsql/10.0.3/lib/net10.0/Npgsql.dll" /&gt;
+  &lt;Assembly Path="/home/phlank/.nuget/packages/hangfire.core/1.8.25/lib/netstandard2.0/Hangfire.Core.dll" /&gt;
 &lt;/AssemblyExplorer&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=332981f9_002D7f56_002D45dd_002Daf4f_002Df1bbc83dec74/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;5. Tests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;Project Location="/home/phlank/source/repos/low-pressure-zone/src" Presentation="&amp;lt;5. Tests&amp;gt;" /&gt;

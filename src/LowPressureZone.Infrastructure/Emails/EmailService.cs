@@ -94,8 +94,9 @@ public sealed class EmailService(
         return Result.Ok<NoValue, SendResponse>(NoValue.Instance);
     }
 
-    public Task SendSlotReminderEmailAsync(string toAddress, TimeSpan timeUntilStart, DateTimeOffset slotStartTime)
+    public Task SendSlotReminderEmailAsync(string toAddress, DateTimeOffset reminderTime, DateTimeOffset slotStartTime)
     {
+        var timeUntilStart = slotStartTime - reminderTime;
         var subject = "Slot Reminder | Low Pressure Zone";
         var message = new StringBuilder().Append("This is an automated reminder that you have a slot scheduled to start in ");
         if (timeUntilStart.Days > 0)

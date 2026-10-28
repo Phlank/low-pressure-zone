@@ -11,5 +11,5 @@ public interface IEmailService
     Task SendResetPasswordEmailAsync(string toAddress, string username, TokenContext context);
     Task<Result<bool, SendResponse>> SendAdminMessage(string message, string subject);
     Task<Result<NoValue, SendResponse>> SendAdminException(Exception ex, string process);
-    Task SendSlotReminderEmailAsync(string toAddress, TimeSpan timeUntilStart, DateTimeOffset slotStartTime);
+    Task SendSlotReminderEmailAsync(string toAddress, DateTimeOffset reminderTime, DateTimeOffset slotStartTime);
 }

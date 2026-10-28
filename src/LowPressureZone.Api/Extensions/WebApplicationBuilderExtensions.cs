@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 using FastEndpoints;
 using FastEndpoints.OpenApi;
 using Hangfire;
-using Hangfire.AspNetCore;
 using Hangfire.PostgreSql;
 using LowPressureZone.Adapter.AzuraCast.Extensions;
 using LowPressureZone.Api.Auth;
@@ -13,7 +12,6 @@ using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;
 using LowPressureZone.Infrastructure.Configuration;
 using LowPressureZone.Infrastructure.Configuration.Streaming;
-using LowPressureZone.Infrastructure.JobActivator;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
@@ -21,6 +19,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Quartz;
 using NightlyTaskService = LowPressureZone.Api.Services.NightlyTasks.NightlyTaskService;
 
 namespace LowPressureZone.Api.Extensions;
@@ -68,7 +67,7 @@ public static class WebApplicationBuilderExtensions
     {
         builder.AddAzuraCast();
         builder.AddDatabases();
-        builder.AddHangfire();
+        builder.AddQuartz();
         builder.ConfigureAndAddIdentity();
         builder.AddFluentEmail();
         builder.Services.AddHttpContextAccessor();
@@ -96,15 +95,18 @@ public static class WebApplicationBuilderExtensions
         });
     }
 
-    private static void AddHangfire(this WebApplicationBuilder builder)
+    private static void AddQuartz(this WebApplicationBuilder builder)
     {
-        // Use the main database for hangfire, it stores its data in a separate schema
-        var hangfireConnectionString = builder.Configuration.GetConnectionString("Data");
-        builder.Services.AddHangfire(c =>
+        builder.Services.AddQuartz(q =>
         {
-            c.UsePostgreSqlStorage(cf => cf.UseNpgsqlConnection(hangfireConnectionString));
+            q.UsePersistentStore(store =>
+            {
+                store.UsePostgres(pg =>
+                {
+                    pg.ConnectionStringName = "Data";
+                });
+            });
         });
-        builder.Services.AddHangfireServer();
     }
 
     private static void ConfigureAndAddIdentity(this WebApplicationBuilder builder)

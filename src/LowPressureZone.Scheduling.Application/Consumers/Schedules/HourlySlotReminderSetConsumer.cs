@@ -1,23 +1,26 @@
 using FastEndpoints;
-using Hangfire;
 using LowPressureZone.Data;
 using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.Events;
 using LowPressureZone.Identity;
 using LowPressureZone.Scheduling.Application.Commands.Schedules.SendReminder;
+using LowPressureZone.Scheduling.Application.Jobs;
 using Microsoft.EntityFrameworkCore;
+using Quartz;
 
 namespace LowPressureZone.Scheduling.Application.Consumers.Schedules;
 
 public class HourlySlotReminderSetConsumer(
-    IBackgroundJobClient backgroundJobClient,
+    IScheduler scheduler,
     DataContext dataContext,
     IdentityContext identityContext,
     ICommandHandler<SendReminderCommand> job) : IEventHandler<HourlySlotReminderSet>
 {
     public async Task HandleAsync(HourlySlotReminderSet eventModel, CancellationToken ct)
     {
+        var jobName = SendSlotReminderJob.JobName(eventModel.HourlySlotId);
+        
         if (eventModel.OldJobId is not null)
-            backgroundJobClient.Delete(eventModel.OldJobId);
+            await scheduler.DeleteJob(new JobKey(jobName), ct);
 
         if (eventModel.NewReminderTime is null)
             return;
@@ -35,10 +38,12 @@ public class HourlySlotReminderSetConsumer(
                                          .Select(user => user.Email)
                                          .FirstOrDefaultAsync(ct);
         if (email is null) return;
-
-        var jobId = backgroundJobClient.Schedule(() => job.ExecuteAsync(new SendReminderCommand(slot.Id), ct),
-                                                 slot.Reminder.ReminderTime.Value);
-        slot.LinkReminder(jobId);
+        
+        var job = await scheduler.ScheduleJob<IJob<SendReminderCommand>, SendReminderCommand>(new(eventModel.HourlySlotId),
+                                                                                        eventModel.NewReminderTime.Value,
+                                                                                        OneOffJobOptions.Replacing(jobName),
+                                                                                        cancellationToken: ct);
+        slot.LinkReminder(job.TriggerKey.Name);
         await dataContext.SaveChangesAsync(ct);
     }
 }
