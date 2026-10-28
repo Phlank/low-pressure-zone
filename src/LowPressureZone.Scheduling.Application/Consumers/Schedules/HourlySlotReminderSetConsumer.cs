@@ -17,24 +17,27 @@ public class HourlySlotReminderSetConsumer(
     public async Task HandleAsync(HourlySlotReminderSet eventModel, CancellationToken ct)
     {
         if (eventModel.OldJobId is not null)
-        {
             backgroundJobClient.Delete(eventModel.OldJobId);
-        }
+
+        if (eventModel.NewReminderTime is null)
+            return;
 
         var slot = await dataContext.HourlySlots
                                     .Where(slot => slot.Id == eventModel.HourlySlotId)
                                     .Include(slot => slot.Performer)
                                     .FirstOrDefaultAsync(ct);
-        if (slot is null || !slot.Reminder.ReminderTime.HasValue) return;
+
+        if (slot?.Reminder.ReminderTime == null)
+            return;
 
         var email = await identityContext.Users
-                                        .Where(user => user.Id == slot.Performer.CreatorUserId)
-                                        .Select(user => user.Email)
-                                        .FirstOrDefaultAsync(ct);
+                                         .Where(user => user.Id == slot.Performer.CreatorUserId)
+                                         .Select(user => user.Email)
+                                         .FirstOrDefaultAsync(ct);
         if (email is null) return;
-        
-        var jobId = backgroundJobClient.Schedule(() => job.ExecuteAsync(new(slot.Id), ct), slot.Reminder.ReminderTime.Value);
-        
+
+        var jobId = backgroundJobClient.Schedule(() => job.ExecuteAsync(new SendReminderCommand(slot.Id), ct),
+                                                 slot.Reminder.ReminderTime.Value);
         slot.LinkReminder(jobId);
         await dataContext.SaveChangesAsync(ct);
     }

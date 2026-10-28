@@ -68,7 +68,7 @@ public class HourlySlot : Entity
 
         var events = new List<IEvent>();
         if (reminderTime.HasValue)
-            events.Add(new HourlySlotReminderSet(value.Id, null));
+            events.Add(new HourlySlotReminderSet(value.Id, null, reminderTime));
 
         return DomainResult.Ok(value, events);
     }
@@ -132,7 +132,7 @@ public class HourlySlot : Entity
         if (Reminder.ReminderTime == reminderTime)
             return result;
 
-        var @event = new HourlySlotReminderSet(Id, Reminder.JobId);
+        var @event = new HourlySlotReminderSet(Id, Reminder.JobId, reminderTime);
 
         var createResult = Reminder.Create(reminderTime);
         if (createResult.IsError)
