@@ -12,7 +12,7 @@ using Microsoft.Extensions.Options;
 
 namespace LowPressureZone.Infrastructure.Emails;
 
-[RegisterService<EmailService>(LifeTime.Singleton)]
+[RegisterService<IEmailService>(LifeTime.Singleton)]
 public sealed class EmailService(
     IOptions<EmailServiceConfiguration> options,
     UriResolver uriResolver,

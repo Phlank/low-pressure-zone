@@ -2,23 +2,31 @@ using FastEndpoints;
 using LowPressureZone.Data;
 using LowPressureZone.Identity;
 using LowPressureZone.Infrastructure.Emails;
+using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Scheduling.Application.Commands.Schedules.SendReminder;
 
 [RegisterService<ICommandHandler<SendReminderCommand>>(LifeTime.Scoped)]
-public class SendSlotReminderHandler(IEmailService emailService, DataContext dataContext, IdentityContext identityContext) : ICommandHandler<SendReminderCommand>
+public class SendSlotReminderHandler(
+    IEmailService emailService,
+    DataContext dataContext,
+    IdentityContext identityContext) : ICommandHandler<SendReminderCommand>
 {
-    public Task ExecuteAsync(SendReminderCommand command, CancellationToken ct)
+    public async Task ExecuteAsync(SendReminderCommand command, CancellationToken ct)
     {
-        var slot = dataContext.HourlySlots.FirstOrDefault(slot => slot.Id == command.SlotId);
-        if (slot is null) return Task.CompletedTask;
+        var slot = await dataContext.HourlySlots
+                                    .Include(slot => slot.Performer)
+                                    .FirstOrDefaultAsync(slot => slot.Id == command.SlotId, cancellationToken: ct);
+        if (slot?.Reminder.ReminderTime is null) return;
 
-        var performer = dataContext.Performers.FirstOrDefault(performer => performer.Id == slot.PerformerId);
-        if (performer is null) return Task.CompletedTask;
+        var email = await identityContext.Users
+                                         .Where(u => u.Id == slot.Performer.CreatorUserId)
+                                         .Select(u => u.Email)
+                                         .FirstOrDefaultAsync(ct);
+        if (email is null) return;
 
-        var user = identityContext.Users.FirstOrDefault(user => user.Id == performer.CreatorUserId);
-        if (user is null) return Task.CompletedTask;
-
-        return emailService.SendSlotReminderEmailAsync(user.Email!, slot.TimeRange.StartsAt - slot.Reminder.ReminderTime!.Value, slot.TimeRange.StartsAt);
+        await emailService.SendSlotReminderEmailAsync(email,
+                                                      slot.Reminder.ReminderTime.Value,
+                                                      slot.TimeRange.StartsAt);
     }
 }

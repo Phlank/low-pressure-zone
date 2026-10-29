@@ -1,5 +1,3 @@
-using Hangfire;
-using Hangfire.InMemory;
 using FluentEmail.Core;
 using FluentEmail.Core.Models;
 using LowPressureZone.Adapter.AzuraCast.Clients;
@@ -27,25 +25,23 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Quartz;
 
 namespace LowPressureZone.Api.IntegrationTests.Infrastructure;
 
 using NewsItem = LowPressureZone.Domain.NewsAggregate.News;
 
 /// <summary>
-///     Hosts the API in memory with SQLite in-memory databases, a faked AzuraCast client, in-memory Hangfire storage,
+///     Hosts the API in memory with SQLite in-memory databases, a faked AzuraCast client, an in-memory Quartz scheduler,
 ///     and header based test authentication. No background services are started.
 /// </summary>
 public sealed class ApiFixture : AppFixture<Program>
 {
-    // Hangfire's static BackgroundJob API binds to JobStorage.Current once, so the storage must be process-wide.
-    private static readonly InMemoryStorage HangfireStorage = new();
-
     public IAzuraCastClient AzuraCast => Services.GetRequiredService<IAzuraCastClient>();
 
     public TestStreamStatusService StreamStatus => Services.GetRequiredService<TestStreamStatusService>();
 
-    public JobStorage JobStorage => HangfireStorage;
+    public ValueTask<IScheduler> Scheduler => Services.GetRequiredService<ISchedulerFactory>().GetScheduler();
 
     protected override void ConfigureApp(IWebHostBuilder a) => a.UseEnvironment("Testing");
 
@@ -90,9 +86,7 @@ public sealed class ApiFixture : AppFixture<Program>
             };
         });
 
-        JobStorage.Current = HangfireStorage;
-        s.RemoveAll<JobStorage>();
-        s.AddSingleton<JobStorage>(HangfireStorage);
+        s.AddQuartz(q => q.UseInMemoryStore());
 
         s.AddAuthentication(options =>
          {
@@ -119,16 +113,14 @@ public sealed class ApiFixture : AppFixture<Program>
     }
 
     /// <summary>
-    ///     Clears all per-test state: database rows, scheduled Hangfire jobs, and the AzuraCast fake.
+    ///     Clears all per-test state: database rows, scheduled Quartz jobs, and the AzuraCast fake.
     /// </summary>
     public async Task ResetAsync()
     {
         FakeItEasy.Fake.Reset(AzuraCast);
         StreamStatus.Reset();
 
-        var jobClient = new BackgroundJobClient(HangfireStorage);
-        foreach (var job in HangfireStorage.GetMonitoringApi().ScheduledJobs(0, int.MaxValue))
-            jobClient.Delete(job.Key);
+        await (await Scheduler).Clear();
 
         await using var scope = Services.CreateAsyncScope();
         var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
@@ -332,14 +324,11 @@ public sealed class ApiFixture : AppFixture<Program>
 
     private static void RemoveBackgroundServices(IServiceCollection services)
     {
-        var hangfireAssembly = typeof(BackgroundJobServerHostedService).Assembly;
         var toRemove = services.Where(descriptor =>
                                           descriptor.ServiceType == typeof(IHostedService)
                                           && !descriptor.IsKeyedService
                                           && (descriptor.ImplementationType == typeof(BroadcastSyncService)
-                                              || descriptor.ImplementationType == typeof(NightlyTaskService)
-                                              || descriptor.ImplementationFactory?.Method.DeclaringType?.Assembly
-                                              == hangfireAssembly))
+                                              || descriptor.ImplementationType == typeof(NightlyTaskService)))
                                .ToList();
         foreach (var descriptor in toRemove)
             services.Remove(descriptor);

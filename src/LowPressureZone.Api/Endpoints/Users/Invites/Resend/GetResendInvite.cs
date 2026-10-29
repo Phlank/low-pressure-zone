@@ -13,7 +13,7 @@ namespace LowPressureZone.Api.Endpoints.Users.Invites.Resend;
 public class GetResendInvite(
     UserManager<AppUser> userManager,
     IdentityContext identityContext,
-    EmailService emailService) : Endpoint<GetResendInviteRequest>
+    IEmailService emailService) : Endpoint<GetResendInviteRequest>
 {
     private readonly DateTime _start = DateTime.UtcNow;
 

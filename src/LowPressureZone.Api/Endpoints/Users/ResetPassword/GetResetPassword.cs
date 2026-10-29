@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.Endpoints.Users.ResetPassword;
 
-public class GetPasswordReset(UserManager<AppUser> userManager, EmailService emailService)
+public class GetPasswordReset(UserManager<AppUser> userManager, IEmailService emailService)
     : Endpoint<GetResetPasswordRequest, GetResetPasswordResponse>
 {
     private readonly DateTime _start = DateTime.UtcNow;

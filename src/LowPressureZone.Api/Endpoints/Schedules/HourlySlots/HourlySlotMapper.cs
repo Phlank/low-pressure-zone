@@ -20,6 +20,7 @@ public sealed class HourlySlotMapper(
         PerformerId = slot.PerformerId,
         UploadedFileName = slot.Prerecord.UploadedFileName,
         IsPrerecorded = slot.Prerecord.IsPrerecorded,
+        ReminderTime = slot.Reminder.ReminderTime,
         IsEditable = permissions.IsEditAuthorized(slot),
         IsDeletable = permissions.IsDeleteAuthorized(slot)
     };

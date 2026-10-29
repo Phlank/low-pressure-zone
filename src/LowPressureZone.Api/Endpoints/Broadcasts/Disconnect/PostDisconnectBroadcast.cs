@@ -1,13 +1,16 @@
 using FastEndpoints;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Clients;
-using LowPressureZone.Api.Commands.Users.EnableStreamer;
+using LowPressureZone.Identity;
+using LowPressureZone.Identity.Application.Commands.EnableStreamer;
+using LowPressureZone.Identity.Application.Jobs;
 using LowPressureZone.Identity.Constants;
+using Microsoft.EntityFrameworkCore;
 using Quartz;
 
 namespace LowPressureZone.Api.Endpoints.Broadcasts.Disconnect;
 
-public class PostDisconnectBroadcast(IAzuraCastClient client, IScheduler scheduler)
+public class PostDisconnectBroadcast(IAzuraCastClient client, IdentityContext identityContext, IScheduler scheduler)
     : Endpoint<PostDisconnectBroadcastRequest>
 {
     public override void Configure()
@@ -47,14 +50,20 @@ public class PostDisconnectBroadcast(IAzuraCastClient client, IScheduler schedul
         if (!disableRequest.IsSuccess)
             ThrowError($"Error disabling streamer: {disableRequest.Error.ReasonPhrase ?? disableRequest.Error.StatusCode.ToString()}");
 
-        if (minutes > 0)
+        var userId = await identityContext.Users
+                                          .AsNoTracking()
+                                          .Where(u => u.StreamerId == streamerId.Value)
+                                          .Select(u => u.Id)
+                                          .FirstOrDefaultAsync();
+
+        if (minutes > 0 && userId != Guid.Empty)
         {
             var timespan = TimeSpan.FromMinutes(minutes);
             var enableTime = DateTimeOffset.UtcNow.Add(timespan);
-            await scheduler.ScheduleJob<IJob<EnableStreamerJob>, EnableStreamerCommand>(new(streamerId.Value),
-                                                                                       enableTime,
-                                                                                       OneOffJobOptions.Replacing(EnableStreamerJob.JobName(streamerId.Value)),
-                                                                                       cancellationToken: ct);
+            var options = OneOffJobOptions.Replacing(EnableStreamerJob.JobKey(userId));
+            await scheduler.ScheduleJob<IJob<EnableStreamerCommand>, EnableStreamerCommand>(new(userId),
+                                                                                            enableTime,
+                                                                                            options);
         }
     }
 }

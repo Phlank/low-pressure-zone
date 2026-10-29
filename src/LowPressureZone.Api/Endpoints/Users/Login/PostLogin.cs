@@ -11,7 +11,7 @@ namespace LowPressureZone.Api.Endpoints.Users.Login;
 public sealed class PostLogin(
     SignInManager<AppUser> signInManager,
     UserManager<AppUser> userManager,
-    EmailService emailService) : Endpoint<LoginRequest, LoginResponse>
+    IEmailService emailService) : Endpoint<LoginRequest, LoginResponse>
 {
     private readonly DateTime _requestStart = DateTime.UtcNow;
 

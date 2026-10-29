@@ -2,7 +2,7 @@ using FastEndpoints;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 
-namespace LowPressureZone.Api.Commands.Users.Unlock;
+namespace LowPressureZone.Identity.Application.Commands.Unlock;
 
 public class UnlockUserHandler(UserManager<AppUser> userManager) : ICommandHandler<UnlockUserCommand>
 {

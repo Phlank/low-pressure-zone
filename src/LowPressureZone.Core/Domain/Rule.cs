@@ -1,3 +1,5 @@
+using FastEndpoints;
+
 namespace LowPressureZone.Core.Domain;
 
 public static class Rule

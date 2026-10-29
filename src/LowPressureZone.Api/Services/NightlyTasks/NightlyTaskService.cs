@@ -4,7 +4,7 @@ using LowPressureZone.Infrastructure.Emails;
 namespace LowPressureZone.Api.Services.NightlyTasks;
 
 public sealed partial class NightlyTaskService(
-    EmailService emailService,
+    IEmailService emailService,
     NightlyBroadcastDeletionModule nightlyBroadcastDeletionModule,
     NightlyPrerecordedMixCleanupModule nightlyPrerecordedMixCleanupModule,
     ILogger<NightlyTaskService> logger)

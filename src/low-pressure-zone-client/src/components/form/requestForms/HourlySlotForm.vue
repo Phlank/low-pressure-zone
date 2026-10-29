@@ -78,6 +78,19 @@
           :disabled="isSubmitting"
           :invalid="!timeslotForm.val.isValid('subtitle')" />
       </IftaFormField>
+      <IftaFormField
+        input-id="reminderInput"
+        label="Email Reminder"
+        optional
+        size="m">
+        <Select
+          id="reminderInput"
+          v-model:model-value="timeslotForm.state.value.reminderTime"
+          :disabled="isSubmitting"
+          :options="reminderOptions"
+          option-label="label"
+          option-value="value" />
+      </IftaFormField>
     </FormArea>
     <Divider />
     <FormArea v-if="existingSlot === undefined || existingSlot.isPrerecorded">
@@ -178,7 +191,7 @@ import { alwaysValid } from '@/validation/rules/untypedRules.ts'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
 import FormField from '@/components/form/FormField.vue'
 import { useEntityForm } from '@/composables/useEntityForm.ts'
-import { addHours } from 'date-fns'
+import { addDays, addHours, addMinutes } from 'date-fns'
 import { err, ok, type Result } from '@/types/result.ts'
 import type { DropdownItem } from '@/types/dropdownItem.ts'
 
@@ -203,6 +216,15 @@ const selectablePerformers = computed(() => {
   }
   return performers.linkablePerformers
 })
+
+const reminderOptions: DropdownItem<string | null>[] = [
+  { label: 'No Reminder', value: null },
+  { label: '30 minutes', value: addMinutes(props.start, -30).toISOString() },
+  { label: '1 hour', value: addHours(props.start, -1).toISOString() },
+  { label: '3 hours', value: addHours(props.start, -3).toISOString() },
+  { label: '12 hours', value: addHours(props.start, -12).toISOString() },
+  { label: '1 day', value: addDays(props.start, -1).toISOString() }
+]
 
 type HourlySlotFormState = HourlySlotRequest & {
   duration: number
@@ -229,7 +251,8 @@ const timeslotForm = useEntityForm<HourlySlotRequest, HourlySlotFormState, Hourl
       subtitle: entity?.subtitle ?? '',
       file: null,
       replaceMedia: false,
-      deleteMedia: false
+      deleteMedia: false,
+      reminderTime: entity?.reminderTime ?? null
     })
   },
   createPersistentEntityFn: schedules.createHourlySlot(props.scheduleId),
@@ -269,7 +292,7 @@ const performerForm = useEntityForm<PerformerRequest, PerformerRequest, Performe
       socialUrl: ''
     })
   },
-  createPersistentEntityFn: performers.create,
+  createPersistentEntityFn: performers.create
 })
 
 const isSubmitting = ref(false)

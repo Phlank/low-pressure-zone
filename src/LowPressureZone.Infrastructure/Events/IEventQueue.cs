@@ -1,4 +1,4 @@
-using LowPressureZone.Core.Domain;
+using FastEndpoints;
 
 namespace LowPressureZone.Infrastructure.Events;
 

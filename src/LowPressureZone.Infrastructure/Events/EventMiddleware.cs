@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace LowPressureZone.Infrastructure.Events;
 
-public class EventMiddleware : IMiddleware
+public class EventMiddleware(IEventQueue queue) : IMiddleware
 {
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {

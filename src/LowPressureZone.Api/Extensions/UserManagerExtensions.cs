@@ -19,7 +19,7 @@ public static class UserManagerExtensions
     public static async Task SendWelcomeEmail(
         this UserManager<AppUser> userManager,
         AppUser user,
-        EmailService emailService)
+        IEmailService emailService)
     {
         var inviteToken = await userManager.GenerateUserTokenAsync(user, TokenProviders.Default, TokenPurposes.Invite);
         var tokenContext = new TokenContext

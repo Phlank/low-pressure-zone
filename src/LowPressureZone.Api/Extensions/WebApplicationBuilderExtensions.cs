@@ -1,17 +1,19 @@
-﻿using System.Text.Json;
+﻿using System.Reflection;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using FastEndpoints;
 using FastEndpoints.OpenApi;
-using Hangfire;
-using Hangfire.PostgreSql;
 using LowPressureZone.Adapter.AzuraCast.Extensions;
 using LowPressureZone.Api.Auth;
 using LowPressureZone.Api.Services.AzuraCast;
 using LowPressureZone.Data;
 using LowPressureZone.Identity;
+using LowPressureZone.Identity.Application;
 using LowPressureZone.Identity.Entities;
+using LowPressureZone.Infrastructure;
 using LowPressureZone.Infrastructure.Configuration;
 using LowPressureZone.Infrastructure.Configuration.Streaming;
+using LowPressureZone.Scheduling.Application;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
@@ -71,11 +73,22 @@ public static class WebApplicationBuilderExtensions
         builder.ConfigureAndAddIdentity();
         builder.AddFluentEmail();
         builder.Services.AddHttpContextAccessor();
-        builder.Services.AddFastEndpoints();
+        builder.Services.AddFastEndpoints(options =>
+        {
+            options.Assemblies = new[]
+            {
+                Assembly.Load("LowPressureZone.Api"),
+                Assembly.Load("LowPressureZone.Scheduling.Application"),
+                Assembly.Load("LowPressureZone.Identity.Application")
+            };
+        });
         builder.Services.OpenApiDocument();
         builder.Services.AddHostedService<NightlyTaskService>();
         builder.Services.AddHostedService<BroadcastSyncService>();
         builder.Services.RegisterServicesFromLowPressureZoneApi();
+        builder.Services.RegisterServicesFromLowPressureZoneIdentityApplication();
+        builder.Services.RegisterServicesFromLowPressureZoneSchedulingApplication();
+        builder.Services.RegisterServicesFromLowPressureZoneInfrastructure();
     }
 
     private static void AddDatabases(this WebApplicationBuilder builder)
@@ -107,6 +120,7 @@ public static class WebApplicationBuilderExtensions
                 });
             });
         });
+        builder.Services.AddQuartzDashboard();
     }
 
     private static void ConfigureAndAddIdentity(this WebApplicationBuilder builder)

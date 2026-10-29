@@ -1,6 +1,6 @@
 using LowPressureZone.Core.Domain;
 
-namespace LowPressureZone.Domain.Shared.ReminderValueObject;
+namespace LowPressureZone.Domain.Common.ReminderValueObject;
 
 public readonly record struct Reminder
 {

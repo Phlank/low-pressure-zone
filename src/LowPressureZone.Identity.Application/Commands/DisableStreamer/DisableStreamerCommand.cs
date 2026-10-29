@@ -1,5 +1,5 @@
 using FastEndpoints;
 
-namespace LowPressureZone.Api.Commands.Users.DisableStreamer;
+namespace LowPressureZone.Identity.Application.Commands.DisableStreamer;
 
 public record DisableStreamerCommand(Guid UserId) : ICommand;

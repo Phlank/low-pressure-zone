@@ -21,7 +21,7 @@ public class PostRegister(
     UserManager<AppUser> userManager,
     IdentityContext identityContext,
     IAzuraCastClient radioClient,
-    EmailService emailService) : Endpoint<RegisterRequest>
+    IEmailService emailService) : Endpoint<RegisterRequest>
 {
     private readonly DateTime _requestTime = DateTime.UtcNow;
 

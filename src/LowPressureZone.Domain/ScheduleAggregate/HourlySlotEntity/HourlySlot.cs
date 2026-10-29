@@ -1,15 +1,15 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using FastEndpoints;
 using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
+using LowPressureZone.Domain.Common.ReminderValueObject;
 using LowPressureZone.Domain.PerformerAggregate;
 using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.Events;
 using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlotTimeRangeObject;
 using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.PrerecordedMixObject;
 using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.Rules;
 using LowPressureZone.Domain.ScheduleAggregate.Rules;
-using LowPressureZone.Domain.Shared.ReminderValueObject;
-using LowPressureZone.Domain.Shared.ReminderValueObject.Rules;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity;

@@ -22,6 +22,7 @@
         <PackageReference Include="FFMpegCore" Version="5.5.0" />
         <PackageReference Include="Quartz" Version="4.6.2" />
         <PackageReference Include="Quartz.AspNetCore" Version="4.6.2" />
+        <PackageReference Include="Quartz.Dashboard" Version="4.6.2" />
         <PackageReference Include="Quartz.Extensions.Hosting" Version="4.6.2" />
         <PackageReference Include="jcamp.FluentEmail.Mailgun" Version="4.0.0"/>
         <PackageReference Include="jcamp.FluentEmail.Smtp" Version="4.0.0"/>
@@ -40,9 +41,15 @@
         <ProjectReference Include="..\LowPressureZone.Core\LowPressureZone.Core.csproj"/>
         <ProjectReference Include="..\LowPressureZone.Data\LowPressureZone.Data.csproj" />
         <ProjectReference Include="..\LowPressureZone.Domain\LowPressureZone.Domain.csproj"/>
+        <ProjectReference Include="..\LowPressureZone.Identity.Application\LowPressureZone.Identity.Application.csproj" />
+        <ProjectReference Include="..\LowPressureZone.Scheduling.Application\LowPressureZone.Scheduling.Application.csproj" />
         <ProjectReference Include="..\LowPressureZone.Identity\LowPressureZone.Identity.csproj"/>
         <ProjectReference Include="..\LowPressureZone.Adapter.AzuraCast\LowPressureZone.Adapter.AzuraCast.csproj"/>
         <ProjectReference Include="..\LowPressureZone.Infrastructure\LowPressureZone.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Commands\Users\" />
     </ItemGroup>
 
 </Project>

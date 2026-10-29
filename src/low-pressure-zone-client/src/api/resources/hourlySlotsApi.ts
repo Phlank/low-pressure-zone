@@ -24,7 +24,8 @@ export interface HourlySlotRequest {
   duration: number
   replaceMedia: boolean
   deleteMedia: boolean
-  file: File | null
+  file: File | null,
+  reminderTime: string | null
 }
 
 export interface HourlySlotResponse {
@@ -39,5 +40,6 @@ export interface HourlySlotResponse {
   isPrerecorded: boolean
   isEditable: boolean
   isDeletable: boolean
-  type: 'Hourly'
+  type: 'Hourly',
+  reminderTime: string | null
 }

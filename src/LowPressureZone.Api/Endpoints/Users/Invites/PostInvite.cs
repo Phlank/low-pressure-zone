@@ -16,7 +16,7 @@ public class PostInvite(
     UserManager<AppUser> userManager,
     IdentityContext identityContext,
     DataContext dataContext,
-    EmailService emailService)
+    IEmailService emailService)
     : EndpointWithMapper<InviteRequest, InviteMapper>
 {
     public override void Configure()

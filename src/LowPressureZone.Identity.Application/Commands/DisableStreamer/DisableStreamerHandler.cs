@@ -1,9 +1,8 @@
 using FastEndpoints;
 using LowPressureZone.Adapter.AzuraCast.Clients;
-using LowPressureZone.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace LowPressureZone.Api.Commands.Users.DisableStreamer;
+namespace LowPressureZone.Identity.Application.Commands.DisableStreamer;
 
 public class DisableStreamerHandler(IdentityContext identityContext, IAzuraCastClient client)
     : ICommandHandler<DisableStreamerCommand>

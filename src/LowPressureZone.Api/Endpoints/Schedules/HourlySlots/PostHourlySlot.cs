@@ -4,7 +4,6 @@ using LowPressureZone.Api.Rules;
 using LowPressureZone.Data;
 using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity;
 using LowPressureZone.Identity.Constants;
-using LowPressureZone.Infrastructure.Events;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.HourlySlots;
@@ -14,7 +13,6 @@ public class PostHourlySlot(
     SchedulePermissions schedulePermissions,
     PerformerPermissions performerPermissions,
     HourlySlotPrerecordedMixHandler mixHandler,
-    IEventQueue eventQueue,
     ILogger<PostHourlySlot> logger) : Endpoint<HourlySlotRequest>
 {
     public override void Configure()

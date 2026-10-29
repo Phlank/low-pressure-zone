@@ -12,7 +12,7 @@ namespace LowPressureZone.Api.Endpoints.Users.Invites.Resend;
 public class PostResendInvite(
     IdentityContext identityContext,
     UserManager<AppUser> userManager,
-    EmailService emailService) : EndpointWithoutRequest
+    IEmailService emailService) : EndpointWithoutRequest
 {
     public override void Configure()
     {

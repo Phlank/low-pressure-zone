@@ -1,6 +1,6 @@
 using LowPressureZone.Core.Domain;
 
-namespace LowPressureZone.Domain.Shared.ReminderValueObject.Rules;
+namespace LowPressureZone.Domain.Common.ReminderValueObject.Rules;
 
 public class ReminderMustBeInFuture(DateTimeOffset? reminderTime) : IRule
 {

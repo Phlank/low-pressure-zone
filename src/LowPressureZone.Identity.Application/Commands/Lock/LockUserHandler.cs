@@ -2,7 +2,7 @@ using FastEndpoints;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 
-namespace LowPressureZone.Api.Commands.Users.Lock;
+namespace LowPressureZone.Identity.Application.Commands.Lock;
 
 public class LockUserHandler(UserManager<AppUser> userManager) : ICommandHandler<LockUserCommand>
 {

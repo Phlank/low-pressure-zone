@@ -9,16 +9,16 @@ using Quartz;
 
 namespace LowPressureZone.Scheduling.Application.Consumers.Schedules;
 
-public class HourlySlotReminderSetConsumer(
+[RegisterService<SetUpReminderEmailJobWhenHourlySlotReminderSetConsumer>(LifeTime.Scoped)]
+public class SetUpReminderEmailJobWhenHourlySlotReminderSetConsumer(
     IScheduler scheduler,
     DataContext dataContext,
-    IdentityContext identityContext,
-    ICommandHandler<SendReminderCommand> job) : IEventHandler<HourlySlotReminderSet>
+    IdentityContext identityContext) : IEventHandler<HourlySlotReminderSet>
 {
     public async Task HandleAsync(HourlySlotReminderSet eventModel, CancellationToken ct)
     {
         var jobName = SendSlotReminderJob.JobName(eventModel.HourlySlotId);
-        
+
         if (eventModel.OldJobId is not null)
             await scheduler.DeleteJob(new JobKey(jobName), ct);
 
@@ -38,8 +38,9 @@ public class HourlySlotReminderSetConsumer(
                                          .Select(user => user.Email)
                                          .FirstOrDefaultAsync(ct);
         if (email is null) return;
-        
-        var job = await scheduler.ScheduleJob<IJob<SendReminderCommand>, SendReminderCommand>(new(eventModel.HourlySlotId),
+
+        var job =
+            await scheduler.ScheduleJob<IJob<SendReminderCommand>, SendReminderCommand>(new(eventModel.HourlySlotId),
                                                                                         eventModel.NewReminderTime.Value,
                                                                                         OneOffJobOptions.Replacing(jobName),
                                                                                         cancellationToken: ct);

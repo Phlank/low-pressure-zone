@@ -1,3 +1,4 @@
+using FastEndpoints;
 using FluentValidation.Results;
 using LowPressureZone.Core.Extensions;
 

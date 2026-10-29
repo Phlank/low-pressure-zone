@@ -1,5 +1,5 @@
 using FastEndpoints;
 
-namespace LowPressureZone.Api.Commands.Users.Unlock;
+namespace LowPressureZone.Identity.Application.Commands.Unlock;
 
 public record UnlockUserCommand(Guid UserId) : ICommand;
