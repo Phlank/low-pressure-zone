@@ -123,14 +123,21 @@ public static class WebApplicationBuilderExtensions
     {
         builder.Services.AddQuartz(q =>
         {
-            q.UsePersistentStore(store =>
+            if (builder.Environment.IsEnvironment("Testing"))
             {
-                store.UsePostgres(pg =>
+                q.UseInMemoryStore();
+            }
+            else
+            {
+                q.UsePersistentStore(store =>
                 {
-                    pg.ConnectionStringName = "Data";
+                    store.UsePostgres(pg =>
+                    {
+                        pg.ConnectionStringName = "Data";
+                    });
+                    store.ProvisionSchema();
                 });
-                store.ProvisionSchema();
-            });
+            }
         });
         builder.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
         builder.Services.AddQuartzDashboard();

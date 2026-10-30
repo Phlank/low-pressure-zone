@@ -8,7 +8,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Communities;
 
-public sealed class PutCommunity(DataContext dataContext, NameMustBeUniqueRule nameMustBeUniqueRule) : Endpoint<CommunityRequest>
+public sealed class PutCommunity(
+    DataContext dataContext,
+    NameMustBeUniqueRule nameMustBeUniqueRule,
+    SocialUrlMustBeUniqueRule socialUrlMustBeUniqueRule) : Endpoint<CommunityRequest>
 {
     public override void Configure()
     {
@@ -29,12 +32,10 @@ public sealed class PutCommunity(DataContext dataContext, NameMustBeUniqueRule n
         }
 
         var result = DomainResult.Compose(community.Rename(request.Name),
-                                          community.ChangeSocialUrl(request.SocialUrl))
-                                 .WithAdditionalErrors(await Rule.ApplyAsync(community,
-                                                                             [nameMustBeUniqueRule],
-                                                                             ct));
+                                          community.ChangeSocialUrl(request.SocialUrl));
         this.ThrowIfDomainErrors(result);
-        
+        this.ThrowIfRuleErrors(await Rule.ApplyAsync(community, [nameMustBeUniqueRule, socialUrlMustBeUniqueRule], ct));
+
         await this.PublishEventsAsync(result.Events);
         await dataContext.SaveChangesAsync(ct);
         await Send.NoContentAsync(ct);

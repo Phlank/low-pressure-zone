@@ -60,10 +60,9 @@ public class PostDisconnectBroadcast(IAzuraCastClient client, IdentityContext id
         {
             var timespan = TimeSpan.FromMinutes(minutes);
             var enableTime = DateTimeOffset.UtcNow.Add(timespan);
-            var options = OneOffJobOptions.Replacing(EnableStreamerJob.JobKey(userId));
             await scheduler.ScheduleJob<IJob<EnableStreamerCommand>, EnableStreamerCommand>(new(userId),
                                                                                             enableTime,
-                                                                                            options);
+                                                                                            OneOffJobOptions.Replacing(EnableStreamerJob.JobKey(userId)));
         }
     }
 }

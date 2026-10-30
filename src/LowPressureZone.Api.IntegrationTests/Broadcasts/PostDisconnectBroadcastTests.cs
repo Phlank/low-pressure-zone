@@ -2,6 +2,7 @@ using System.Net;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Api.Endpoints.Broadcasts.Disconnect;
 using LowPressureZone.Api.IntegrationTests.Infrastructure;
+using LowPressureZone.Identity.Application.Commands.EnableStreamer;
 using LowPressureZone.Identity.Application.Jobs;
 using Quartz;
 using static LowPressureZone.Api.IntegrationTests.Infrastructure.TestData;
@@ -112,10 +113,11 @@ public sealed class PostDisconnectBroadcastTests(ApiFixture app) : ApiTestBase(a
          .MustHaveHappenedOnceExactly();
 
         var scheduler = await App.Scheduler;
-        var jobKey = new JobKey(EnableStreamerJob.JobKey(streamer.Id));
+        var jobKey = SchedulerConstants.ScheduledJobKey<IJob<EnableStreamerCommand>>();
         (await ScheduledJobs()).ShouldHaveSingleItem().ShouldBe(jobKey);
         var trigger = (await scheduler.GetTriggersOfJob(jobKey, TestContext.Current.CancellationToken))
             .ShouldHaveSingleItem();
+        trigger.Key.Name.ShouldBe(EnableStreamerJob.JobKey(streamer.Id));
         trigger.StartTimeUtc.ShouldBeInRange(requestedAt.AddMinutes(15), DateTimeOffset.UtcNow.AddMinutes(15));
     }
 

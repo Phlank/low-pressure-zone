@@ -6,18 +6,19 @@ using LowPressureZone.Scheduling.Application.Jobs;
 using LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity.Events;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
-using Wolverine;
+using Wolverine.Attributes;
 
 namespace LowPressureZone.Scheduling.Application.Consumers.Schedules.HourlySlots;
 
-[RegisterService<HourlySlotReminderSetConsumer>(LifeTime.Scoped)]
-public class HourlySlotReminderSetConsumer(
+[WolverineHandler]
+[RegisterService<HourlySlotReminderSetConsumers>(LifeTime.Scoped)]
+public class HourlySlotReminderSetConsumers(
     IScheduler scheduler,
-    IMessageBus messageBus,
     DataContext dataContext,
-    IdentityContext identityContext) : IWolverineHandler
+    IdentityContext identityContext)
 {
-    public async Task ConsumeAsync(HourlySlotReminderSet eventModel, CancellationToken ct)
+    [WolverineHandler]
+    public async Task ConsumeAndSetUpReminderJobAsync(HourlySlotReminderSet eventModel, CancellationToken ct)
     {
         var jobName = SendSlotReminderJob.JobName(eventModel.Id);
 

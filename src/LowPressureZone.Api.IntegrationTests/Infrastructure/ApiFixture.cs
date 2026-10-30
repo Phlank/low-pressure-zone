@@ -86,8 +86,6 @@ public sealed class ApiFixture : AppFixture<Program>
             };
         });
 
-        s.AddQuartz(q => q.UseInMemoryStore());
-
         s.AddAuthentication(options =>
          {
              options.DefaultScheme = TestAuthHandler.SchemeName;

@@ -116,20 +116,18 @@ public sealed class PostCommunityTests(ApiFixture app) : ApiTestBase(app)
         var response = await PostAsAdminAsync(Request("Alpha", "https://new.example.com"));
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-        (await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken)).ShouldContain("Name is already in use");
+        (await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken)).ShouldContain("Already in use");
         (await App.GetCommunitiesAsync()).ShouldHaveSingleItem();
     }
 
     [Fact]
-    public async Task Name_of_a_deleted_community_is_still_reserved()
+    public async Task Name_of_a_deleted_community_is_not_reserved()
     {
         await App.AddCommunityAsync("Alpha", "https://existing.example.com", c => c.Delete());
 
         var response = await PostAsAdminAsync(Request("Alpha", "https://new.example.com"));
 
-        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-        (await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken))
-            .ShouldContain("Name is already in use");
+        response.StatusCode.ShouldBe(HttpStatusCode.Created);
     }
 
     [Fact]
@@ -140,7 +138,7 @@ public sealed class PostCommunityTests(ApiFixture app) : ApiTestBase(app)
         var response = await PostAsAdminAsync(Request("Alpha", "https://alpha.example.com"));
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-        (await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken)).ShouldContain("Social URL is already in use");
+        (await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken)).ShouldContain("Already in use");
         (await App.GetCommunitiesAsync()).ShouldHaveSingleItem();
     }
 }

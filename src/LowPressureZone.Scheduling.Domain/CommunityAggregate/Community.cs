@@ -97,8 +97,8 @@ public class Community : Entity
 
     public static void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Community>().HasIndex(nameof(Name)).IsUnique();
-        modelBuilder.Entity<Community>().HasIndex(nameof(SocialUrl)).IsUnique();
+        modelBuilder.Entity<Community>().HasIndex(nameof(Name));
+        modelBuilder.Entity<Community>().HasIndex(nameof(SocialUrl));
         modelBuilder.Entity<Community>()
                     .HasMany(c => c.Relationships)
                     .WithOne(r => r.Community)

@@ -9,7 +9,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Communities;
 
-public sealed class PostCommunity(DataContext dataContext, NameMustBeUniqueRule nameMustBeUniqueRule)
+public sealed class PostCommunity(
+    DataContext dataContext,
+    NameMustBeUniqueRule nameMustBeUniqueRule,
+    SocialUrlMustBeUniqueRule socialUrlMustBeUniqueRule)
     : Endpoint<CommunityRequest>
 {
     public override void Configure()
@@ -23,15 +26,15 @@ public sealed class PostCommunity(DataContext dataContext, NameMustBeUniqueRule 
     {
         var result = Community.Create(req.Name, req.SocialUrl);
         this.ThrowIfDomainErrors(result);
-        
-        var asyncErrors = await Rule.ApplyAsync(result.Value, [nameMustBeUniqueRule], ct);
-        this.ThrowIfRuleErrors(asyncErrors);
+        this.ThrowIfRuleErrors(await Rule.ApplyAsync(result.Value,
+                                                     [nameMustBeUniqueRule, socialUrlMustBeUniqueRule],
+                                                     ct));
 
         dataContext.Communities.Add(result.Value);
         await dataContext.SaveChangesAsync(ct);
-        
+
         await this.PublishEventsAsync(result.Events);
-        
+
         HttpContext.ExposeLocation();
         await Send.CreatedAtAsync<GetCommunityById>(new
                                                     {
