@@ -8,17 +8,18 @@ using Microsoft.EntityFrameworkCore;
 using Quartz;
 using Wolverine;
 
-namespace LowPressureZone.Scheduling.Application.Consumers.Schedules;
+namespace LowPressureZone.Scheduling.Application.Consumers.Schedules.HourlySlots;
 
-[RegisterService<SetUpReminderEmailJobWhenHourlySlotReminderSetConsumer>(LifeTime.Scoped)]
-public class SetUpReminderEmailJobWhenHourlySlotReminderSetConsumer(
+[RegisterService<HourlySlotReminderSetConsumer>(LifeTime.Scoped)]
+public class HourlySlotReminderSetConsumer(
     IScheduler scheduler,
+    IMessageBus messageBus,
     DataContext dataContext,
     IdentityContext identityContext) : IWolverineHandler
 {
     public async Task ConsumeAsync(HourlySlotReminderSet eventModel, CancellationToken ct)
     {
-        var jobName = SendSlotReminderJob.JobName(eventModel.HourlySlotId);
+        var jobName = SendSlotReminderJob.JobName(eventModel.Id);
 
         if (eventModel.OldJobId is not null)
             await scheduler.DeleteJob(new JobKey(jobName), ct);
@@ -27,7 +28,7 @@ public class SetUpReminderEmailJobWhenHourlySlotReminderSetConsumer(
             return;
 
         var slot = await dataContext.HourlySlots
-                                    .Where(slot => slot.Id == eventModel.HourlySlotId)
+                                    .Where(slot => slot.Id == eventModel.Id)
                                     .Include(slot => slot.Performer)
                                     .FirstOrDefaultAsync(ct);
 
@@ -40,7 +41,7 @@ public class SetUpReminderEmailJobWhenHourlySlotReminderSetConsumer(
                                          .FirstOrDefaultAsync(ct);
         if (email is null) return;
 
-        var job = await scheduler.ScheduleJob<IJob<SendSlotReminderCommand>, SendSlotReminderCommand>(new(eventModel.HourlySlotId),
+        var job = await scheduler.ScheduleJob<IJob<SendSlotReminderCommand>, SendSlotReminderCommand>(new SendSlotReminderCommand(eventModel.Id),
                                                                                                       eventModel.NewReminderTime.Value,
                                                                                                       OneOffJobOptions.Replacing(jobName),
                                                                                                       cancellationToken: ct);

@@ -147,6 +147,7 @@ public class HourlySlot : Entity
     public DomainResult<NoValue> Delete()
     {
         var result = Rule.ApplyIntoResult(NoValue.Instance,
+                                          new HourlySlotDeleted(Id, Reminder.JobId),
                                           new CannotChangeSlotAfterItEndsRule(TimeRange));
         if (result.IsSuccess)
         {

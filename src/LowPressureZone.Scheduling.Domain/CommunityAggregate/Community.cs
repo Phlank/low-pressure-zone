@@ -16,7 +16,7 @@ public class Community : Entity
         get;
         private set => field = value.Trim();
     } = string.Empty;
-    
+
     [MaxLength(512)]
     public string SocialUrl
     {
@@ -41,18 +41,18 @@ public class Community : Entity
 
     public static DomainResult<Community> Create(string name, string socialUrl) =>
         Rule.ApplyIntoResult(new Community(name, socialUrl),
-                                          new NameIsRequiredRule(name),
-                                          new NameLengthCannotExceed128Rule(name),
-                                          new SocialUrlMustBeWellFormedRule(socialUrl),
-                                          new SocialUrlLengthCannotExceed512Rule(socialUrl));
+                             new NameIsRequiredRule(name),
+                             new NameLengthCannotExceed128Rule(name),
+                             new SocialUrlMustBeWellFormedRule(socialUrl),
+                             new SocialUrlLengthCannotExceed512Rule(socialUrl));
 
     public DomainResult<NoValue> Rename(string name)
     {
         var result = Rule.ApplyIntoResult(NoValue.Instance,
-                                                       new NameChanged(Id),
-                                                       new NameIsRequiredRule(name),
-                                                       new NameLengthCannotExceed128Rule(name));
-        
+                                          new NameChanged(Id),
+                                          new NameIsRequiredRule(name),
+                                          new NameLengthCannotExceed128Rule(name));
+
         if (result.IsSuccess)
             Name = name;
 
@@ -62,9 +62,9 @@ public class Community : Entity
     public DomainResult<NoValue> ChangeSocialUrl(string socialUrl)
     {
         var result = Rule.ApplyIntoResult(NoValue.Instance,
-                                                       new SocialUrlChanged(Id),
-                                                       new SocialUrlLengthCannotExceed512Rule(socialUrl),
-                                                       new SocialUrlMustBeWellFormedRule(socialUrl));
+                                          new SocialUrlChanged(Id),
+                                          new SocialUrlLengthCannotExceed512Rule(socialUrl),
+                                          new SocialUrlMustBeWellFormedRule(socialUrl));
         if (result.IsSuccess)
             SocialUrl = socialUrl;
 
