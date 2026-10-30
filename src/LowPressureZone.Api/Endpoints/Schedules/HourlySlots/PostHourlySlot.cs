@@ -73,13 +73,16 @@ public class PostHourlySlot(
                                            request.Duration,
                                            request.Subtitle,
                                            prerecordedMixResult?.Value.UploadedFileName,
-                                           prerecordedMixResult?.Value.AzuraCastMediaId);
-        this.EnqueueOrThrow(slotResult);
-
+                                           prerecordedMixResult?.Value.AzuraCastMediaId,
+                                           request.ReminderTime);
+        this.ThrowIfDomainErrors(slotResult);
+        
         var addResult = schedule.AddHourlySlot(slotResult.Value);
-        this.EnqueueOrThrow(addResult);
+        this.ThrowIfDomainErrors(addResult);
         
         await dataContext.SaveChangesAsync(ct);
+        await this.PublishEventsAsync([.. slotResult.Events, .. addResult.Events]);
+        
         HttpContext.ExposeLocation();
         await Send.CreatedAtAsync<GetHourlySlotById>(new { ScheduleId = id, slotResult.Value.Id }, cancellation: ct);
     }

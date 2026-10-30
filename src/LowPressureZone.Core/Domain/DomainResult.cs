@@ -1,4 +1,3 @@
-using FastEndpoints;
 using FluentValidation.Results;
 using LowPressureZone.Core.Extensions;
 
@@ -25,7 +24,7 @@ public class DomainResult<T> : Result<T, List<RuleError>>
 
 
     public List<ValidationFailure> Failures =>
-        [.. Errors.Select(error => new ValidationFailure(error.Field, error.Message))];
+        [.. Errors.Select(error => error.ToValidationFailure())];
 }
 
 public static class DomainResult
@@ -40,6 +39,11 @@ public static class DomainResult
 
     public static DomainResult<NoValue> Compose(params List<DomainResult<NoValue>> results) =>
         new(NoValue.Instance,
+            [.. results.SelectMany(r => r.Events)],
+            [.. results.SelectMany(r => r.Errors)]);
+    
+    public static DomainResult<T> ComposeInto<T>(T value, params List<DomainResult<NoValue>> results) =>
+        new(value,
             [.. results.SelectMany(r => r.Events)],
             [.. results.SelectMany(r => r.Errors)]);
 

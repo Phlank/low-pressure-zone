@@ -105,7 +105,7 @@ public sealed class EmailService(
                    .Append(" days, ");
         }
 
-        if (timeUntilStart.TotalHours > 0)
+        if (Math.Floor(timeUntilStart.TotalHours) > 0)
         {
             message.Append(timeUntilStart.Hours)
                    .Append(" hours and ");

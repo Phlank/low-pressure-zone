@@ -3,6 +3,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using FastEndpoints;
 using FastEndpoints.OpenApi;
+using JasperFx.CodeGeneration;
+using JasperFx.CodeGeneration.Model;
 using LowPressureZone.Adapter.AzuraCast.Extensions;
 using LowPressureZone.Api.Auth;
 using LowPressureZone.Api.Services.AzuraCast;
@@ -22,6 +24,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
+using Wolverine;
 using NightlyTaskService = LowPressureZone.Api.Services.NightlyTasks.NightlyTaskService;
 
 namespace LowPressureZone.Api.Extensions;
@@ -82,6 +85,14 @@ public static class WebApplicationBuilderExtensions
                 Assembly.Load("LowPressureZone.Identity.Application")
             };
         });
+        builder.Services.AddWolverine(opts =>
+        {
+            opts.CodeGeneration.TypeLoadMode = TypeLoadMode.Dynamic;
+            opts.Discovery.CustomizeHandlerDiscovery(scanner => scanner.Excludes.WithNameSuffix("Handler"));
+            opts.Discovery.IncludeAssembly(Assembly.Load("LowPressureZone.Scheduling.Application"));
+            opts.Discovery.IncludeAssembly(Assembly.Load("LowPressureZone.Identity.Application"));
+            opts.ServiceLocationPolicy = ServiceLocationPolicy.AlwaysAllowed;
+        });
         builder.Services.OpenApiDocument();
         builder.Services.AddHostedService<NightlyTaskService>();
         builder.Services.AddHostedService<BroadcastSyncService>();
@@ -118,8 +129,10 @@ public static class WebApplicationBuilderExtensions
                 {
                     pg.ConnectionStringName = "Data";
                 });
+                store.ProvisionSchema();
             });
         });
+        builder.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
         builder.Services.AddQuartzDashboard();
     }
 

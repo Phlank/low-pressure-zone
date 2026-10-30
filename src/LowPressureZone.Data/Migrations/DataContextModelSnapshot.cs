@@ -17,7 +17,7 @@ partial class DataContextModelSnapshot : ModelSnapshot
     // If you encounter a merge conflict in the line below, it means you need to
     // discard one of the migration branches and recreate its migrations on top of
     // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-    public override string LastMigrationId => "20261020205724_IncludeAdditionalOnModelCreated";
+    public override string LastMigrationId => "20261029211554_AddReminderToHourlySlot";
 
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
@@ -102,7 +102,6 @@ partial class DataContextModelSnapshot : ModelSnapshot
         modelBuilder.Entity("LowPressureZone.Domain.CommunityAggregate.RelationshipEntity.Relationship", b =>
             {
                 b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
                     .HasColumnType("uuid");
 
                 b.Property<Guid>("CommunityId")
@@ -248,6 +247,17 @@ partial class DataContextModelSnapshot : ModelSnapshot
                         b1.Property<string>("UploadedFileName")
                             .HasMaxLength(2048)
                             .HasColumnType("character varying(2048)");
+                    });
+
+                b.ComplexProperty(typeof(Dictionary<string, object>), "Reminder", "LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlot.Reminder#Reminder", b1 =>
+                    {
+                        b1.IsRequired();
+
+                        b1.Property<string>("JobId")
+                            .HasColumnType("text");
+
+                        b1.Property<DateTimeOffset?>("ReminderTime")
+                            .HasColumnType("timestamp with time zone");
                     });
 
                 b.ComplexProperty(typeof(Dictionary<string, object>), "TimeRange", "LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlot.TimeRange#HourlySlotTimeRange", b1 =>

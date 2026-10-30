@@ -47,7 +47,7 @@ public class PostArchiveBroadcast(
         }
 
         var domainResult = broadcast.Archive();
-        this.ThrowIfDomainError(domainResult);
+        this.ThrowIfDomainErrors(domainResult);
 
         var externalBroadcastsResult = await azuraCastClient.GetBroadcastsAsync(broadcast.AzuraCastStreamerId);
         if (externalBroadcastsResult.IsError)

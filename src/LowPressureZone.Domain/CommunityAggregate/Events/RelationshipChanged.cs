@@ -1,4 +1,4 @@
-using FastEndpoints;
+using LowPressureZone.Core.Domain;
 
 namespace LowPressureZone.Domain.CommunityAggregate.Events;
 

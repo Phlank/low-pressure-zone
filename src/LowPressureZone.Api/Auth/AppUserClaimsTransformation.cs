@@ -22,15 +22,17 @@ public class AppUserClaimsTransformation(UserManager<AppUser> userManager, DataC
         if (user is null) return principal;
 
         var relationships = await dataContext.Communities
-                                     .AsNoTracking()
-                                     .Include(community => community.Relationships
-                                                                    .Where(relationship =>
-                                                                               relationship.UserId == user.Id
-                                                                               && (relationship.IsOrganizer
-                                                                                   || relationship.IsPerformer)))
-                                     .SelectMany(community => community.Relationships)
-                                     .ToListAsync();
-        
+                                             .AsNoTracking()
+                                             .AsNoTracking()
+                                             .Include(community => community.Relationships
+                                                                            .Where(relationship =>
+                                                                                       relationship.UserId == user.Id
+                                                                                       && (relationship.IsOrganizer
+                                                                                           || relationship
+                                                                                               .IsPerformer)))
+                                             .SelectMany(community => community.Relationships)
+                                             .ToListAsync();
+
         if (relationships.Count == 0) return principal;
 
         var isPerformer = relationships.Any(relationship => relationship.IsPerformer);
@@ -42,7 +44,7 @@ public class AppUserClaimsTransformation(UserManager<AppUser> userManager, DataC
 
         if (isOrganizer)
             communityRolesIdentity.AddClaim(new(ClaimTypes.Role, RoleNames.Organizer));
-        
+
         principal.AddIdentity(communityRolesIdentity);
         return principal;
     }

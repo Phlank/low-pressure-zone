@@ -11,22 +11,28 @@ using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.PrerecordedMixOb
 using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.Rules;
 using LowPressureZone.Domain.ScheduleAggregate.Rules;
 using Microsoft.EntityFrameworkCore;
+using IEvent = LowPressureZone.Core.Domain.IEvent;
 
 namespace LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity;
 
 [Table("HourlySlots")]
 public class HourlySlot : Entity
 {
+    public Guid ScheduleId { get; private init; }
+    public Schedule Schedule { get; init; } = null!;
+
     [MaxLength(128)]
     public string? Subtitle { get; private set; }
 
-    public Guid PerformerId { get; private set; }
+    public Guid PerformerId { get; private set; } = Guid.Empty;
     public Performer Performer { get; private init; } = null!;
-    public Guid ScheduleId { get; private init; }
-    public Schedule Schedule { get; init; } = null!;
     public PrerecordedMix Prerecord { get; private set; }
     public HourlySlotTimeRange TimeRange { get; private set; }
-    public Reminder Reminder { get; private set; } = Reminder.Create(null).Value;
+    public Reminder Reminder { get; private set; }
+
+    private HourlySlot()
+    {
+    }
 
     public static DomainResult<HourlySlot> Create(
         Guid scheduleId,
@@ -39,38 +45,18 @@ public class HourlySlot : Entity
         DateTimeOffset? reminderTime = null,
         Guid? id = null)
     {
-        var prerecordedMixResult = PrerecordedMix.Create(uploadedFileName is not null,
-                                                         uploadedFileName,
-                                                         azuraCastMediaId);
-        var timeRangeResult = HourlySlotTimeRange.Create(startsAt, duration);
-        var reminderResult = Reminder.Create(reminderTime);
-        List<RuleError> errors =
-        [
-            .. Rule.Apply(new SubtitleLengthCannotExceed128Rule(subtitle)),
-            .. prerecordedMixResult.Errors,
-            .. timeRangeResult.Errors,
-            .. reminderResult.Errors,
-        ];
-
-        if (errors.Count > 0)
-            return DomainResult.Err<HourlySlot>(errors);
-
         var value = new HourlySlot
         {
-            Subtitle = subtitle?.Trim(),
-            PerformerId = performerId,
+            Id = id ?? Guid.NewGuid(),
             ScheduleId = scheduleId,
-            Prerecord = prerecordedMixResult.Value,
-            TimeRange = timeRangeResult.Value,
-            Reminder = reminderResult.Value,
-            Id = id ?? Guid.NewGuid()
         };
 
-        var events = new List<IEvent>();
-        if (reminderTime.HasValue)
-            events.Add(new HourlySlotReminderSet(value.Id, null, reminderTime));
-
-        return DomainResult.Ok(value, events);
+        return DomainResult.ComposeInto(value,
+                                        value.ChangeSubtitle(subtitle),
+                                        value.ChangePerformer(performerId),
+                                        value.ReplacePrerecordedMix(uploadedFileName, azuraCastMediaId),
+                                        value.ChangeTime(startsAt, duration),
+                                        value.SetReminder(reminderTime));
     }
 
     public DomainResult<NoValue> ChangeSubtitle(string? subtitle)
@@ -91,7 +77,18 @@ public class HourlySlot : Entity
 
     public DomainResult<NoValue> ReplacePrerecordedMix(string? uploadedFileName, int? azuraCastMediaId = null)
     {
-        var mixResult = PrerecordedMix.Create(true, uploadedFileName, azuraCastMediaId);
+        if (Prerecord.UploadedFileName == uploadedFileName && Prerecord.AzuraCastMediaId == azuraCastMediaId)
+            return DomainResult.Ok();
+        
+        DomainResult<PrerecordedMix> mixResult;
+        if (uploadedFileName is null && azuraCastMediaId is null)
+        {
+            mixResult = PrerecordedMix.Create(false, null, null);
+        }
+        else
+        {
+            mixResult = PrerecordedMix.Create(true, uploadedFileName, azuraCastMediaId);
+        }
 
         if (mixResult.IsSuccess)
             Prerecord = mixResult.Value;
@@ -128,9 +125,8 @@ public class HourlySlot : Entity
 
     public DomainResult<NoValue> SetReminder(DateTimeOffset? reminderTime)
     {
-        var result = DomainResult.Ok();
         if (Reminder.ReminderTime == reminderTime)
-            return result;
+            return DomainResult.Ok();
 
         var @event = new HourlySlotReminderSet(Id, Reminder.JobId, reminderTime);
 

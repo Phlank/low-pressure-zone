@@ -1,12 +1,16 @@
 ﻿using FastEndpoints;
+using LowPressureZone.Api.Endpoints.Communities.Rules;
 using LowPressureZone.Api.Extensions;
+using LowPressureZone.Core.Domain;
 using LowPressureZone.Data;
 using LowPressureZone.Domain.CommunityAggregate;
 using LowPressureZone.Identity.Constants;
+using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Communities;
 
-public sealed class PostCommunity(DataContext dataContext) : Endpoint<CommunityRequest>
+public sealed class PostCommunity(DataContext dataContext, NameMustBeUniqueRule nameMustBeUniqueRule)
+    : Endpoint<CommunityRequest>
 {
     public override void Configure()
     {
@@ -18,17 +22,22 @@ public sealed class PostCommunity(DataContext dataContext) : Endpoint<CommunityR
     public override async Task HandleAsync(CommunityRequest req, CancellationToken ct)
     {
         var result = Community.Create(req.Name, req.SocialUrl);
-        this.ThrowIfDomainError(result);
-        await this.ThrowIfNotUniqueAsync(dataContext, result.Value, ct);
-        await this.PublishEventsAsync(result);
+        this.ThrowIfDomainErrors(result);
         
+        var asyncErrors = await Rule.ApplyAsync(result.Value, [nameMustBeUniqueRule], ct);
+        this.ThrowIfRuleErrors(asyncErrors);
+
         dataContext.Communities.Add(result.Value);
         await dataContext.SaveChangesAsync(ct);
         
+        await this.PublishEventsAsync(result.Events);
+        
         HttpContext.ExposeLocation();
         await Send.CreatedAtAsync<GetCommunityById>(new
-        {
-            id = result.Value.Id
-        }, Response, cancellation: ct);
+                                                    {
+                                                        id = result.Value.Id
+                                                    },
+                                                    Response,
+                                                    cancellation: ct);
     }
 }

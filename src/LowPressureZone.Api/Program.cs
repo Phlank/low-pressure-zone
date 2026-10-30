@@ -35,9 +35,8 @@ app.UseStaticFiles();
 app.UseResponseCaching();
 if (app.Environment.IsDevelopment())
 {
-    app.MapQuartzDashboard("/quartz-dashboard");
+    app.MapQuartzDashboard("/quartz-dashboard").AllowAnonymous();
 }
-
 app.UseFastEndpoints(config =>
 {
     config.Endpoints.RoutePrefix = "api";

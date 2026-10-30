@@ -6,6 +6,7 @@ using LowPressureZone.Scheduling.Application.Commands.Schedules.SendReminder;
 using LowPressureZone.Scheduling.Application.Jobs;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
+using Wolverine;
 
 namespace LowPressureZone.Scheduling.Application.Consumers.Schedules;
 
@@ -13,9 +14,9 @@ namespace LowPressureZone.Scheduling.Application.Consumers.Schedules;
 public class SetUpReminderEmailJobWhenHourlySlotReminderSetConsumer(
     IScheduler scheduler,
     DataContext dataContext,
-    IdentityContext identityContext) : IEventHandler<HourlySlotReminderSet>
+    IdentityContext identityContext) : IWolverineHandler
 {
-    public async Task HandleAsync(HourlySlotReminderSet eventModel, CancellationToken ct)
+    public async Task ConsumeAsync(HourlySlotReminderSet eventModel, CancellationToken ct)
     {
         var jobName = SendSlotReminderJob.JobName(eventModel.HourlySlotId);
 
