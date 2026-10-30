@@ -20,13 +20,14 @@
         <PackageReference Include="FastEndpoints.OpenApi" Version="9.0.0-beta.2" />
         <PackageReference Include="FastEndpoints.Security" Version="9.0.0-beta.2" />
         <PackageReference Include="FFMpegCore" Version="5.5.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis" Version="5.9.0" />
         <PackageReference Include="Npgsql" Version="10.0.3" />
         <PackageReference Include="Quartz" Version="4.6.2" />
         <PackageReference Include="Quartz.AspNetCore" Version="4.6.2" />
         <PackageReference Include="Quartz.Dashboard" Version="4.6.2" />
         <PackageReference Include="Quartz.Extensions.Hosting" Version="4.6.2" />
-        <PackageReference Include="jcamp.FluentEmail.Mailgun" Version="4.0.0"/>
-        <PackageReference Include="jcamp.FluentEmail.Smtp" Version="4.0.0"/>
+        <PackageReference Include="jcamp.FluentEmail.Mailgun" Version="4.0.0" />
+        <PackageReference Include="jcamp.FluentEmail.Smtp" Version="4.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="11.0.0-rc.2.26504.105" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="11.0.0-rc.2.26504.105">
             <PrivateAssets>all</PrivateAssets>
