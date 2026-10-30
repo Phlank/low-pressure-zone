@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using FastEndpoints;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Domain.BroadcastAggregate;
+using LowPressureZone.Scheduling.Domain.BroadcastAggregate;
 using LowPressureZone.Identity.Constants;
 
 namespace LowPressureZone.Api.Rules;

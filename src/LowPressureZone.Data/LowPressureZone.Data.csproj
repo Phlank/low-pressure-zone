@@ -10,6 +10,7 @@
     <ItemGroup>
         <ProjectReference Include="..\LowPressureZone.Domain\LowPressureZone.Domain.csproj"/>
         <ProjectReference Include="..\LowPressureZone.Infrastructure\LowPressureZone.Infrastructure.csproj"/>
+        <ProjectReference Include="..\LowPressureZone.Scheduling.Domain\LowPressureZone.Scheduling.Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>

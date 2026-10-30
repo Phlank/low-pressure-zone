@@ -1,6 +1,6 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Rules;
-using LowPressureZone.Domain.CommunityAggregate;
+using LowPressureZone.Scheduling.Domain.CommunityAggregate;
 
 namespace LowPressureZone.Api.Endpoints.Communities;
 

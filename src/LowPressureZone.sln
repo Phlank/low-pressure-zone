@@ -55,6 +55,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LowPressureZone.Infrastruct
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LowPressureZone.Identity.Application", "LowPressureZone.Identity.Application\LowPressureZone.Identity.Application.csproj", "{02246457-E477-422D-A0FF-E12C75C6D858}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LowPressureZone.Scheduling.Domain", "LowPressureZone.Scheduling.Domain\LowPressureZone.Scheduling.Domain.csproj", "{AD75E0D2-2DB4-4BEC-A257-33CED9EC989D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -197,6 +199,18 @@ Global
 		{02246457-E477-422D-A0FF-E12C75C6D858}.Release|x64.Build.0 = Release|Any CPU
 		{02246457-E477-422D-A0FF-E12C75C6D858}.Release|x86.ActiveCfg = Release|Any CPU
 		{02246457-E477-422D-A0FF-E12C75C6D858}.Release|x86.Build.0 = Release|Any CPU
+		{AD75E0D2-2DB4-4BEC-A257-33CED9EC989D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD75E0D2-2DB4-4BEC-A257-33CED9EC989D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD75E0D2-2DB4-4BEC-A257-33CED9EC989D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AD75E0D2-2DB4-4BEC-A257-33CED9EC989D}.Debug|x64.Build.0 = Debug|Any CPU
+		{AD75E0D2-2DB4-4BEC-A257-33CED9EC989D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AD75E0D2-2DB4-4BEC-A257-33CED9EC989D}.Debug|x86.Build.0 = Debug|Any CPU
+		{AD75E0D2-2DB4-4BEC-A257-33CED9EC989D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD75E0D2-2DB4-4BEC-A257-33CED9EC989D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD75E0D2-2DB4-4BEC-A257-33CED9EC989D}.Release|x64.ActiveCfg = Release|Any CPU
+		{AD75E0D2-2DB4-4BEC-A257-33CED9EC989D}.Release|x64.Build.0 = Release|Any CPU
+		{AD75E0D2-2DB4-4BEC-A257-33CED9EC989D}.Release|x86.ActiveCfg = Release|Any CPU
+		{AD75E0D2-2DB4-4BEC-A257-33CED9EC989D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -214,6 +228,7 @@ Global
 		{3DCB777D-6087-4E97-B64C-BD27549DB6C3} = {44167E73-CF2C-4D93-9E8A-E25896687C1F}
 		{C7081AF4-DEBA-4083-80CA-E74D607D4D95} = {C8CE0E2B-370A-43AB-888A-65BF960BA18B}
 		{02246457-E477-422D-A0FF-E12C75C6D858} = {44167E73-CF2C-4D93-9E8A-E25896687C1F}
+		{AD75E0D2-2DB4-4BEC-A257-33CED9EC989D} = {44167E73-CF2C-4D93-9E8A-E25896687C1F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E01F24AA-56EC-4C41-A7A6-82A3D36C4C70}

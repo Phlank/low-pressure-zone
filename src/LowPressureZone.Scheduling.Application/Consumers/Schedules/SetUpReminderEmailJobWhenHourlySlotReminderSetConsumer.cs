@@ -1,9 +1,9 @@
 using FastEndpoints;
 using LowPressureZone.Data;
-using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.Events;
 using LowPressureZone.Identity;
 using LowPressureZone.Scheduling.Application.Commands.Schedules.SendReminder;
 using LowPressureZone.Scheduling.Application.Jobs;
+using LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity.Events;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
 using Wolverine;
@@ -40,11 +40,10 @@ public class SetUpReminderEmailJobWhenHourlySlotReminderSetConsumer(
                                          .FirstOrDefaultAsync(ct);
         if (email is null) return;
 
-        var job =
-            await scheduler.ScheduleJob<IJob<SendReminderCommand>, SendReminderCommand>(new(eventModel.HourlySlotId),
-                                                                                        eventModel.NewReminderTime.Value,
-                                                                                        OneOffJobOptions.Replacing(jobName),
-                                                                                        cancellationToken: ct);
+        var job = await scheduler.ScheduleJob<IJob<SendSlotReminderCommand>, SendSlotReminderCommand>(new(eventModel.HourlySlotId),
+                                                                                                      eventModel.NewReminderTime.Value,
+                                                                                                      OneOffJobOptions.Replacing(jobName),
+                                                                                                      cancellationToken: ct);
         slot.LinkReminder(job.TriggerKey.Name);
         await dataContext.SaveChangesAsync(ct);
     }

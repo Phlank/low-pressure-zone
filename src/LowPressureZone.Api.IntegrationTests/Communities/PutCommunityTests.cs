@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using LowPressureZone.Api.Endpoints.Communities;
 using LowPressureZone.Api.IntegrationTests.Infrastructure;
-using LowPressureZone.Domain.CommunityAggregate;
+using LowPressureZone.Scheduling.Domain.CommunityAggregate;
 
 namespace LowPressureZone.Api.IntegrationTests.Communities;
 

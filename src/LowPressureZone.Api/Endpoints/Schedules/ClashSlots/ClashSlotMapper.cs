@@ -1,6 +1,6 @@
 using FastEndpoints;
 using LowPressureZone.Api.Rules;
-using LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity;
+using LowPressureZone.Scheduling.Domain.ScheduleAggregate.ClashSlotEntity;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.ClashSlots;
 

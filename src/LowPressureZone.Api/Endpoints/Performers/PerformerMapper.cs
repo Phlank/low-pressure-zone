@@ -3,7 +3,7 @@ using FastEndpoints;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Core.Domain;
-using LowPressureZone.Domain.PerformerAggregate;
+using LowPressureZone.Scheduling.Domain.PerformerAggregate;
 using LowPressureZone.Identity.Extensions;
 using Shouldly;
 

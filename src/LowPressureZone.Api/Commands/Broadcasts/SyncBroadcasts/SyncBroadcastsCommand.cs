@@ -1,5 +1,5 @@
 using FastEndpoints;
-using LowPressureZone.Domain.BroadcastAggregate;
+using LowPressureZone.Scheduling.Domain.BroadcastAggregate;
 
 namespace LowPressureZone.Api.Commands.Broadcasts.SyncBroadcasts;
 

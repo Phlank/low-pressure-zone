@@ -1,6 +1,6 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Rules;
-using HourlySlot = LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlot;
+using LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.HourlySlots;
 

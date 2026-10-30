@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Scheduling.Application.Commands.Schedules.SendReminder;
 
-[RegisterService<ICommandHandler<SendReminderCommand>>(LifeTime.Scoped)]
+[RegisterService<ICommandHandler<SendSlotReminderCommand>>(LifeTime.Scoped)]
 public class SendSlotReminderHandler(
     IEmailService emailService,
     DataContext dataContext,
-    IdentityContext identityContext) : ICommandHandler<SendReminderCommand>
+    IdentityContext identityContext) : ICommandHandler<SendSlotReminderCommand>
 {
-    public async Task ExecuteAsync(SendReminderCommand command, CancellationToken ct)
+    public async Task ExecuteAsync(SendSlotReminderCommand command, CancellationToken ct)
     {
         var slot = await dataContext.HourlySlots
                                     .Include(slot => slot.Performer)

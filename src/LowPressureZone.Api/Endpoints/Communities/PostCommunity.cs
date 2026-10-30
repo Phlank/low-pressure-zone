@@ -3,7 +3,7 @@ using LowPressureZone.Api.Endpoints.Communities.Rules;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Core.Domain;
 using LowPressureZone.Data;
-using LowPressureZone.Domain.CommunityAggregate;
+using LowPressureZone.Scheduling.Domain.CommunityAggregate;
 using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 

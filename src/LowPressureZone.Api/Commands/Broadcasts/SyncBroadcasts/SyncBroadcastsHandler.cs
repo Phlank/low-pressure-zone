@@ -4,7 +4,7 @@ using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
 using LowPressureZone.Data;
-using LowPressureZone.Domain.BroadcastAggregate;
+using LowPressureZone.Scheduling.Domain.BroadcastAggregate;
 using Microsoft.EntityFrameworkCore;
 using Shouldly;
 

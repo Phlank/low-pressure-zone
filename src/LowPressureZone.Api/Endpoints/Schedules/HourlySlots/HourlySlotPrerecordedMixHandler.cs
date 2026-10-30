@@ -3,9 +3,9 @@ using FastEndpoints;
 using LowPressureZone.Api.Services.Files;
 using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
-using LowPressureZone.Domain.ScheduleAggregate;
-using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity;
-using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.PrerecordedMixObject;
+using LowPressureZone.Scheduling.Domain.ScheduleAggregate;
+using LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity;
+using LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity.PrerecordedMixObject;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.HourlySlots;
 

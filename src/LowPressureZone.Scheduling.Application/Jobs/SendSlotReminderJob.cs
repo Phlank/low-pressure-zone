@@ -8,12 +8,12 @@ using Quartz;
 
 namespace LowPressureZone.Scheduling.Application.Jobs;
 
-[RegisterService<IJob<SendReminderCommand>>(LifeTime.Scoped)]
-public class SendSlotReminderJob(ICommandHandler<SendReminderCommand> commandHandler)
-    : IJob<SendReminderCommand>
+[RegisterService<IJob<SendSlotReminderCommand>>(LifeTime.Scoped)]
+public class SendSlotReminderJob(ICommandHandler<SendSlotReminderCommand> commandHandler)
+    : IJob<SendSlotReminderCommand>
 {
     public async ValueTask Execute(IJobExecutionContext context,
-                                   SendReminderCommand input,
+                                   SendSlotReminderCommand input,
                                    CancellationToken cancellationToken = new()) =>
         await commandHandler.ExecuteAsync(input, cancellationToken);
 

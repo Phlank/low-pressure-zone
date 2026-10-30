@@ -1,7 +1,7 @@
 using System.Net;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Core;
-using LowPressureZone.Domain.BroadcastAggregate;
+using LowPressureZone.Scheduling.Domain.BroadcastAggregate;
 
 namespace LowPressureZone.Api.IntegrationTests.Infrastructure;
 

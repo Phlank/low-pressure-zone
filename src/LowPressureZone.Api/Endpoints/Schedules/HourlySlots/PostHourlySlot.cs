@@ -2,7 +2,7 @@ using FastEndpoints;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Data;
-using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity;
+using LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity;
 using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 
