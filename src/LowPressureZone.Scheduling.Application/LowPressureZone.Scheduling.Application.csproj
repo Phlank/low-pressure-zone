@@ -7,14 +7,14 @@
     </PropertyGroup>
     
     <ItemGroup>
-        <PackageReference Include="FastEndpoints" Version="9.0.0-beta.2" />
-        <PackageReference Include="FastEndpoints.Messaging" Version="9.0.0-beta.2" />
-        <PackageReference Include="FastEndpoints.Generator" Version="9.0.0-beta.2">
+        <PackageReference Include="FastEndpoints" Version="9.0.0-beta.6" />
+        <PackageReference Include="FastEndpoints.Messaging" Version="9.0.0-beta.6" />
+        <PackageReference Include="FastEndpoints.Generator" Version="9.0.0-beta.6">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Quartz" Version="4.6.2" />
-        <PackageReference Include="WolverineFx" Version="6.58.0" />
+        <PackageReference Include="WolverineFx" Version="6.59.1" />
     </ItemGroup>
     
     <ItemGroup>
