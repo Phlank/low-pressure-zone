@@ -3,6 +3,7 @@ global using Microsoft.Extensions.DependencyInjection;
 using LowPressureZone.Api.IntegrationTests.Infrastructure;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;
+using LowPressureZone.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.IntegrationTests.Users;

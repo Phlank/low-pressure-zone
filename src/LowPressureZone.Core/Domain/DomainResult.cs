@@ -7,7 +7,11 @@ public class DomainResult<T> : Result<T, List<RuleError>>
 {
     public List<IEvent> Events { get; private init; } = [];
 
-    internal DomainResult(T? value, List<IEvent>? events, List<RuleError>? error) : base(value, error is not null && !error.IsEmpty ? error : null)
+    internal DomainResult(T? value, List<IEvent>? events, List<RuleError>? error) : base(value,
+                                                                                         error is not null &&
+                                                                                         !error.IsEmpty
+                                                                                             ? error
+                                                                                             : null)
     {
         if (events is not null)
             Events = events;
@@ -20,7 +24,7 @@ public class DomainResult<T> : Result<T, List<RuleError>>
 
 
     public List<ValidationFailure> Failures =>
-        [.. Errors.Select(error => new ValidationFailure(error.Field, error.Message))];
+        [.. Errors.Select(error => error.ToValidationFailure())];
 }
 
 public static class DomainResult
@@ -37,6 +41,11 @@ public static class DomainResult
         new(NoValue.Instance,
             [.. results.SelectMany(r => r.Events)],
             [.. results.SelectMany(r => r.Errors)]);
+    
+    public static DomainResult<T> ComposeInto<T>(T value, params List<DomainResult<NoValue>> results) =>
+        new(value,
+            [.. results.SelectMany(r => r.Events)],
+            [.. results.SelectMany(r => r.Errors)]);
 
     public static DomainResult<T> WithAdditionalErrors<T>(this DomainResult<T> result, params List<RuleError> errors) =>
         new DomainResult<T>(result.IsError || !errors.IsEmpty ? default : result.Value,
@@ -45,4 +54,7 @@ public static class DomainResult
 
     public static DomainResult<T> WithAdditionalRules<T>(this DomainResult<T> result, params List<IRule> rules) =>
         result.WithAdditionalErrors(Rule.Apply(rules));
+
+    public static DomainResult<T> WithAdditionalEvents<T>(this DomainResult<T> result, params List<IEvent> events) =>
+        result.IsError ? Err<T>(result.Errors) : Ok(result.Value, [.. result.Events, .. events]);
 }

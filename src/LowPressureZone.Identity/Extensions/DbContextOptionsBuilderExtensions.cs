@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Entities;
+using LowPressureZone.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

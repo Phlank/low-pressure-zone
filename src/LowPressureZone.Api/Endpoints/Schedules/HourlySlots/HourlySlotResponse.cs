@@ -1,4 +1,3 @@
-using LowPressureZone.Api.Endpoints.Performers;
 using LowPressureZone.Core;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.HourlySlots;
@@ -16,5 +15,6 @@ public class HourlySlotResponse : ITimeRange
     public required bool IsPrerecorded { get; set; }
     public required bool IsEditable { get; set; }
     public required bool IsDeletable { get; set; }
+    public required DateTimeOffset? ReminderTime { get; set; }
     public string Type => "Hourly";
 }

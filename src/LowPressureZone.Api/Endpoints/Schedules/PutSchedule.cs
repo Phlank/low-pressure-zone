@@ -49,7 +49,7 @@ public class PutSchedule(DataContext dataContext, SchedulePermissions permission
                                           schedule.ChangeVisibility(req.IsVisibleToPublic),
                                           schedule.ChangeTime(req.StartsAt, req.EndsAt));
         
-        this.ThrowIfDomainError(result);
+        this.ThrowIfDomainErrors(result);
         await dataContext.SaveChangesAsync(ct);
         await Send.NoContentAsync(ct);
     }

@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using FastEndpoints;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity;
+using LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
 using Shouldly;

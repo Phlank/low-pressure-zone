@@ -1,3 +1,5 @@
+using FastEndpoints;
+
 namespace LowPressureZone.Core.Domain;
 
 public static class Rule
@@ -9,6 +11,22 @@ public static class Rule
         foreach (var rule in brokenRules)
         {
             errors.Add(rule.Error);
+        }
+
+        return errors;
+    }
+
+    public static async Task<List<RuleError>> ApplyAsync<T>(T entity,
+                                                            List<IAsyncRule<T>> rules,
+                                                            CancellationToken ct = default) where T : Entity
+    {
+        List<RuleError> errors = [];
+        foreach (var rule in rules)
+        {
+            if (await rule.IsBrokenAsync(entity, ct))
+            {
+                errors.Add(rule.Error);
+            }
         }
 
         return errors;
@@ -27,7 +45,7 @@ public static class Rule
                                                      IEvent eventIfSuccess,
                                                      params List<IRule> rules) =>
         ApplyIntoResult(valueIfSuccess, [eventIfSuccess], rules);
-    
+
     public static DomainResult<NoValue> ApplyIntoEmptyResult(List<IEvent> events, params List<IRule> rules) =>
         ApplyIntoResult(NoValue.Instance, events, rules);
 

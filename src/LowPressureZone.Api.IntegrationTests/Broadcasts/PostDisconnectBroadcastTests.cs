@@ -2,6 +2,9 @@ using System.Net;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Api.Endpoints.Broadcasts.Disconnect;
 using LowPressureZone.Api.IntegrationTests.Infrastructure;
+using LowPressureZone.Identity.Application.Commands.EnableStreamer;
+using LowPressureZone.Identity.Application.Jobs;
+using Quartz;
 using static LowPressureZone.Api.IntegrationTests.Infrastructure.TestData;
 
 namespace LowPressureZone.Api.IntegrationTests.Broadcasts;
@@ -27,8 +30,8 @@ public sealed class PostDisconnectBroadcastTests(ApiFixture app) : ApiTestBase(a
                         .POSTAsync<PostDisconnectBroadcast, PostDisconnectBroadcastRequest>(request);
     }
 
-    private List<KeyValuePair<string, Hangfire.Storage.Monitoring.ScheduledJobDto>> ScheduledJobs()
-        => [..App.JobStorage.GetMonitoringApi().ScheduledJobs(0, 100)];
+    private async Task<IReadOnlyCollection<JobKey>> ScheduledJobs()
+        => await (await App.Scheduler).GetJobKeys(GroupMatcher<JobKey>.AnyGroup());
 
     [Fact]
     public async Task Anonymous_user_is_unauthorized()
@@ -63,7 +66,7 @@ public sealed class PostDisconnectBroadcastTests(ApiFixture app) : ApiTestBase(a
         A.CallTo(() => AzuraCast.PostBroadcastingAction(BroadcastingActionType.Disconnect))
          .MustHaveHappenedOnceExactly();
         A.CallTo(() => AzuraCast.DisableStreamerAsync(A<int>._)).MustNotHaveHappened();
-        ScheduledJobs().ShouldBeEmpty();
+        (await ScheduledJobs()).ShouldBeEmpty();
     }
 
     [Fact]
@@ -92,14 +95,15 @@ public sealed class PostDisconnectBroadcastTests(ApiFixture app) : ApiTestBase(a
         A.CallTo(() => AzuraCast.DisableStreamerAsync(LiveStreamerId)).MustHaveHappenedOnceExactly()
          .Then(A.CallTo(() => AzuraCast.PostBroadcastingAction(BroadcastingActionType.Disconnect))
                 .MustHaveHappenedOnceExactly());
-        ScheduledJobs().ShouldBeEmpty();
+        (await ScheduledJobs()).ShouldBeEmpty();
     }
 
     [Fact]
     public async Task Disable_minutes_schedules_live_streamer_reenable()
     {
+        var streamer = await App.CreateUserAsync("streamer", streamerId: LiveStreamerId);
         SetUpAzuraCastWithLiveBroadcast();
-        var requestedAt = DateTime.UtcNow;
+        var requestedAt = DateTimeOffset.UtcNow;
 
         var response = await PostAsAdminAsync(new PostDisconnectBroadcastRequest { DisableMinutes = 15 });
 
@@ -108,10 +112,13 @@ public sealed class PostDisconnectBroadcastTests(ApiFixture app) : ApiTestBase(a
         A.CallTo(() => AzuraCast.PostBroadcastingAction(BroadcastingActionType.Disconnect))
          .MustHaveHappenedOnceExactly();
 
-        var job = ScheduledJobs().ShouldHaveSingleItem().Value;
-        job.Job.Method.Name.ShouldBe(nameof(AzuraCast.EnableStreamerAsync));
-        job.Job.Args.ShouldBe([LiveStreamerId]);
-        job.EnqueueAt.ShouldBeInRange(requestedAt.AddMinutes(15), DateTime.UtcNow.AddMinutes(15));
+        var scheduler = await App.Scheduler;
+        var jobKey = SchedulerConstants.ScheduledJobKey<IJob<EnableStreamerCommand>>();
+        (await ScheduledJobs()).ShouldHaveSingleItem().ShouldBe(jobKey);
+        var trigger = (await scheduler.GetTriggersOfJob(jobKey, TestContext.Current.CancellationToken))
+            .ShouldHaveSingleItem();
+        trigger.Key.Name.ShouldBe(EnableStreamerJob.JobKey(streamer.Id));
+        trigger.StartTimeUtc.ShouldBeInRange(requestedAt.AddMinutes(15), DateTimeOffset.UtcNow.AddMinutes(15));
     }
 
     [Fact]
@@ -128,7 +135,7 @@ public sealed class PostDisconnectBroadcastTests(ApiFixture app) : ApiTestBase(a
             .ShouldContain("No broadcast is currently active.");
         A.CallTo(() => AzuraCast.DisableStreamerAsync(A<int>._)).MustNotHaveHappened();
         A.CallTo(() => AzuraCast.PostBroadcastingAction(A<BroadcastingActionType>._)).MustNotHaveHappened();
-        ScheduledJobs().ShouldBeEmpty();
+        (await ScheduledJobs()).ShouldBeEmpty();
     }
 
     [Fact]
@@ -144,7 +151,7 @@ public sealed class PostDisconnectBroadcastTests(ApiFixture app) : ApiTestBase(a
         (await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken))
             .ShouldContain("Error disabling streamer");
         A.CallTo(() => AzuraCast.PostBroadcastingAction(A<BroadcastingActionType>._)).MustNotHaveHappened();
-        ScheduledJobs().ShouldBeEmpty();
+        (await ScheduledJobs()).ShouldBeEmpty();
     }
 
     [Fact]

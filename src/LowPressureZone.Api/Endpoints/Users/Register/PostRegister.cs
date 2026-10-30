@@ -10,6 +10,8 @@ using LowPressureZone.Api.Services;
 using LowPressureZone.Api.Utilities;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;
+using LowPressureZone.Infrastructure.Emails;
+using LowPressureZone.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +21,7 @@ public class PostRegister(
     UserManager<AppUser> userManager,
     IdentityContext identityContext,
     IAzuraCastClient radioClient,
-    EmailService emailService) : Endpoint<RegisterRequest>
+    IEmailService emailService) : Endpoint<RegisterRequest>
 {
     private readonly DateTime _requestTime = DateTime.UtcNow;
 

@@ -1,7 +1,7 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Data;
-using LowPressureZone.Domain.ScheduleAggregate;
+using LowPressureZone.Scheduling.Domain.ScheduleAggregate;
 using LowPressureZone.Identity.Extensions;
 using Microsoft.EntityFrameworkCore;
 

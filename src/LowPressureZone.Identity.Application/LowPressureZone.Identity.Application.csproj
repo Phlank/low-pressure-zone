@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net11.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="FastEndpoints" Version="9.0.0-beta.2" />
+        <PackageReference Include="FastEndpoints.Messaging" Version="9.0.0-beta.2" />
+        <PackageReference Include="FastEndpoints.Generator" Version="9.0.0-beta.2">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Quartz" Version="4.6.2" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="Commands\" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\LowPressureZone.Adapter.AzuraCast\LowPressureZone.Adapter.AzuraCast.csproj" />
+      <ProjectReference Include="..\LowPressureZone.Identity\LowPressureZone.Identity.csproj" />
+    </ItemGroup>
+
+</Project>

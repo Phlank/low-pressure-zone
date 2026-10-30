@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using LowPressureZone.Api.Endpoints.Communities;
 using LowPressureZone.Api.IntegrationTests.Infrastructure;
-using LowPressureZone.Domain.CommunityAggregate;
+using LowPressureZone.Scheduling.Domain.CommunityAggregate;
 
 namespace LowPressureZone.Api.IntegrationTests.Communities;
 
@@ -124,7 +124,7 @@ public sealed class PutCommunityTests(ApiFixture app) : ApiTestBase(app)
         var response = await PutAsAdminAsync(community.Id, Request("Taken"));
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-        (await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken)).ShouldContain("Name is already in use");
+        (await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken)).ShouldContain("Already in use");
         await ShouldBeUnchangedAsync(community.Id);
     }
 }

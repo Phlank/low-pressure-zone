@@ -78,6 +78,25 @@
           :disabled="isSubmitting"
           :invalid="!timeslotForm.val.isValid('subtitle')" />
       </IftaFormField>
+      <IftaFormField
+        input-id="reminderInput"
+        label="Email Reminder"
+        optional
+        size="m">
+        <Select
+          id="reminderInput"
+          v-model:model-value="timeslotForm.state.value.reminderTime"
+          :disabled="isSubmitting"
+          :options="reminderOptions"
+          option-label="label"
+          option-value="value"
+          @update:model-value="updateDefaultReminderTime">
+          <template #value>
+            <span v-if="timeslotForm.state.value.reminderTime === null">No Reminder</span>
+            <span v-else>{{ reminderOptions.find(opt => opt.value === timeslotForm.state.value.reminderTime)?.label }}</span>
+          </template>
+        </Select>
+      </IftaFormField>
     </FormArea>
     <Divider />
     <FormArea v-if="existingSlot === undefined || existingSlot.isPrerecorded">
@@ -178,9 +197,10 @@ import { alwaysValid } from '@/validation/rules/untypedRules.ts'
 import { useScheduleStore } from '@/stores/scheduleStore.ts'
 import FormField from '@/components/form/FormField.vue'
 import { useEntityForm } from '@/composables/useEntityForm.ts'
-import { addHours } from 'date-fns'
+import { addDays, addHours, addMinutes } from 'date-fns'
 import { err, ok, type Result } from '@/types/result.ts'
 import type { DropdownItem } from '@/types/dropdownItem.ts'
+import { useLocalStorage } from '@vueuse/core'
 
 const performers = usePerformerStore()
 const schedules = useScheduleStore()
@@ -208,6 +228,42 @@ type HourlySlotFormState = HourlySlotRequest & {
   duration: number
 }
 
+const getDefaultReminderOptions = (): DropdownItem<string | null>[] => [
+  { label: 'No Reminder', value: null },
+  { label: '30 minutes before', value: addMinutes(props.start, -30).toISOString() },
+  { label: '1 hour before', value: addHours(props.start, -1).toISOString() },
+  { label: '3 hours before', value: addHours(props.start, -3).toISOString() },
+  { label: '12 hours before', value: addHours(props.start, -12).toISOString() },
+  { label: '1 day before', value: addDays(props.start, -1).toISOString() }
+]
+const reminderOptions = computed((): DropdownItem<string | null>[] => {
+  const options = getDefaultReminderOptions()
+  const now = new Date()
+  return options.filter((option) => {
+    if (option.value === null) return true
+
+    const optionDate = parseDate(option.value)
+    return optionDate > now
+  })
+})
+
+const defaultReminderChoice = useLocalStorage('reminderChoice', 'No Reminder', {
+  initOnMounted: true,
+  listenToStorageChanges: false
+})
+const defaultReminderValue = computed(() => {
+  const defaultOption = getDefaultReminderOptions().find(
+    (option) => option.label === defaultReminderChoice.value
+  )
+  return defaultOption?.value ?? null
+})
+const updateDefaultReminderTime = (newValue: string | null) => {
+  const label =
+    reminderOptions.value.find((option) => option.value === newValue)?.label ?? 'No Reminder'
+  timeslotForm.state.value.reminderTime = newValue
+  defaultReminderChoice.value = label
+}
+
 const timeslotForm = useEntityForm<HourlySlotRequest, HourlySlotFormState, HourlySlotResponse>({
   validationRules: (formState) => {
     const rules = hourlySlotRequestRules(formState)
@@ -229,7 +285,10 @@ const timeslotForm = useEntityForm<HourlySlotRequest, HourlySlotFormState, Hourl
       subtitle: entity?.subtitle ?? '',
       file: null,
       replaceMedia: false,
-      deleteMedia: false
+      deleteMedia: false,
+      reminderTime: !!entity?.reminderTime
+        ? parseDate(entity.reminderTime).toISOString()
+        : defaultReminderValue.value
     })
   },
   createPersistentEntityFn: schedules.createHourlySlot(props.scheduleId),
@@ -269,7 +328,7 @@ const performerForm = useEntityForm<PerformerRequest, PerformerRequest, Performe
       socialUrl: ''
     })
   },
-  createPersistentEntityFn: performers.create,
+  createPersistentEntityFn: performers.create
 })
 
 const isSubmitting = ref(false)

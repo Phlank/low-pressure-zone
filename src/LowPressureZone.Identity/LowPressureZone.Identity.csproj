@@ -24,4 +24,8 @@
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="11.0.0-rc.2" />
         <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="11.0.0-rc.2.26504.105" />
     </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\LowPressureZone.Infrastructure\LowPressureZone.Infrastructure.csproj" />
+    </ItemGroup>
 </Project>

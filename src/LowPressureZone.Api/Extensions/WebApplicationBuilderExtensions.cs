@@ -1,17 +1,21 @@
-﻿using System.Text.Json;
+﻿using System.Reflection;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using FastEndpoints;
 using FastEndpoints.OpenApi;
-using Hangfire;
-using Hangfire.PostgreSql;
+using JasperFx.CodeGeneration;
+using JasperFx.CodeGeneration.Model;
 using LowPressureZone.Adapter.AzuraCast.Extensions;
 using LowPressureZone.Api.Auth;
-using LowPressureZone.Api.Models.Configuration;
-using LowPressureZone.Api.Models.Configuration.Streaming;
 using LowPressureZone.Api.Services.AzuraCast;
 using LowPressureZone.Data;
 using LowPressureZone.Identity;
+using LowPressureZone.Identity.Application;
 using LowPressureZone.Identity.Entities;
+using LowPressureZone.Infrastructure;
+using LowPressureZone.Infrastructure.Configuration;
+using LowPressureZone.Infrastructure.Configuration.Streaming;
+using LowPressureZone.Scheduling.Application;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
@@ -19,6 +23,8 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Quartz;
+using Wolverine;
 using NightlyTaskService = LowPressureZone.Api.Services.NightlyTasks.NightlyTaskService;
 
 namespace LowPressureZone.Api.Extensions;
@@ -66,15 +72,34 @@ public static class WebApplicationBuilderExtensions
     {
         builder.AddAzuraCast();
         builder.AddDatabases();
-        builder.AddHangfire();
+        builder.AddQuartz();
         builder.ConfigureAndAddIdentity();
         builder.AddFluentEmail();
         builder.Services.AddHttpContextAccessor();
-        builder.Services.AddFastEndpoints();
+        builder.Services.AddFastEndpoints(options =>
+        {
+            options.Assemblies = new[]
+            {
+                Assembly.Load("LowPressureZone.Api"),
+                Assembly.Load("LowPressureZone.Scheduling.Application"),
+                Assembly.Load("LowPressureZone.Identity.Application")
+            };
+        });
+        builder.Services.AddWolverine(opts =>
+        {
+            opts.CodeGeneration.TypeLoadMode = TypeLoadMode.Dynamic;
+            opts.Discovery.CustomizeHandlerDiscovery(scanner => scanner.Excludes.WithNameSuffix("Handler"));
+            opts.Discovery.IncludeAssembly(Assembly.Load("LowPressureZone.Scheduling.Application"));
+            opts.Discovery.IncludeAssembly(Assembly.Load("LowPressureZone.Identity.Application"));
+            opts.ServiceLocationPolicy = ServiceLocationPolicy.AlwaysAllowed;
+        });
         builder.Services.OpenApiDocument();
         builder.Services.AddHostedService<NightlyTaskService>();
         builder.Services.AddHostedService<BroadcastSyncService>();
         builder.Services.RegisterServicesFromLowPressureZoneApi();
+        builder.Services.RegisterServicesFromLowPressureZoneIdentityApplication();
+        builder.Services.RegisterServicesFromLowPressureZoneSchedulingApplication();
+        builder.Services.RegisterServicesFromLowPressureZoneInfrastructure();
     }
 
     private static void AddDatabases(this WebApplicationBuilder builder)
@@ -94,17 +119,28 @@ public static class WebApplicationBuilderExtensions
         });
     }
 
-    private static void AddHangfire(this WebApplicationBuilder builder)
+    private static void AddQuartz(this WebApplicationBuilder builder)
     {
-        // Use the main database for hangfire, it stores its data in a separate schema
-        var hangfireConnectionString = builder.Configuration.GetConnectionString("Data");
-        builder.Services.AddHangfire(config =>
+        builder.Services.AddQuartz(q =>
         {
-            config.UsePostgreSqlStorage(pgsqlConfig =>
-                                            pgsqlConfig
-                                                .UseNpgsqlConnection(hangfireConnectionString));
+            if (builder.Environment.IsEnvironment("Testing"))
+            {
+                q.UseInMemoryStore();
+            }
+            else
+            {
+                q.UsePersistentStore(store =>
+                {
+                    store.UsePostgres(pg =>
+                    {
+                        pg.ConnectionStringName = "Data";
+                    });
+                    store.ProvisionSchema();
+                });
+            }
         });
-        builder.Services.AddHangfireServer();
+        builder.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+        builder.Services.AddQuartzDashboard();
     }
 
     private static void ConfigureAndAddIdentity(this WebApplicationBuilder builder)

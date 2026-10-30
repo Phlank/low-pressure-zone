@@ -65,7 +65,8 @@ public class PutHourlySlot(
 
         var primaryResult = DomainResult.Compose(slot.ChangePerformer(request.PerformerId),
                                                  slot.ChangeSubtitle(request.Subtitle),
-                                                 slot.ChangeTime(request.StartsAt, request.Duration));
+                                                 slot.ChangeTime(request.StartsAt, request.Duration),
+                                                 slot.SetReminder(request.ReminderTime));
         
         await this.PublishOrThrowAsync(primaryResult);
         

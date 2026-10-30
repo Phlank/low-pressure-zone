@@ -1,11 +1,12 @@
 using FastEndpoints;
 using LowPressureZone.Core;
+using LowPressureZone.Infrastructure.Emails;
 
 namespace LowPressureZone.Api.Services.Files;
 
 [RegisterService<FormFileSaver>(LifeTime.Singleton)]
 public sealed class FormFileSaver(
-    EmailService emailer,
+    IEmailService emailer,
     ILogger<FormFileSaver> logger)
 {
     private static string GetPathForFileName(string fileName) => Path.Combine(Path.GetTempPath(), fileName);

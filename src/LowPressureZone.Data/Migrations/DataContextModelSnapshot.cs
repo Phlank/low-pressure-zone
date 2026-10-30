@@ -17,7 +17,7 @@ partial class DataContextModelSnapshot : ModelSnapshot
     // If you encounter a merge conflict in the line below, it means you need to
     // discard one of the migration branches and recreate its migrations on top of
     // the other branch. See https://aka.ms/efcore-docs-migrations-conflicts for more info.
-    public override string LastMigrationId => "20261020205724_IncludeAdditionalOnModelCreated";
+    public override string LastMigrationId => "20261030204943_RemoveUniqueConstraints";
 
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
@@ -27,102 +27,6 @@ partial class DataContextModelSnapshot : ModelSnapshot
             .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
         NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-        modelBuilder.Entity("LowPressureZone.Domain.BroadcastAggregate.Broadcast", b =>
-            {
-                b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uuid");
-
-                b.Property<int>("AzuraCastBroadcastId")
-                    .HasColumnType("integer");
-
-                b.Property<string>("AzuraCastStreamerDisplayName")
-                    .IsRequired()
-                    .HasColumnType("text");
-
-                b.Property<int>("AzuraCastStreamerId")
-                    .HasColumnType("integer");
-
-                b.Property<bool>("HasFile")
-                    .HasColumnType("boolean");
-
-                b.Property<bool>("IsArchived")
-                    .HasColumnType("boolean");
-
-                b.ComplexProperty(typeof(Dictionary<string, object>), "Time", "LowPressureZone.Domain.BroadcastAggregate.Broadcast.Time#BroadcastTime", b1 =>
-                    {
-                        b1.IsRequired();
-
-                        b1.Property<DateTimeOffset?>("EndsAt")
-                            .HasColumnType("timestamp with time zone");
-
-                        b1.Property<DateTimeOffset>("StartsAt")
-                            .HasColumnType("timestamp with time zone");
-                    });
-
-                b.HasKey("Id");
-
-                b.HasIndex("AzuraCastBroadcastId")
-                    .IsUnique();
-
-                b.ToTable("Broadcasts");
-            });
-
-        modelBuilder.Entity("LowPressureZone.Domain.CommunityAggregate.Community", b =>
-            {
-                b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uuid");
-
-                b.Property<bool>("IsDeleted")
-                    .HasColumnType("boolean");
-
-                b.Property<string>("Name")
-                    .IsRequired()
-                    .HasMaxLength(128)
-                    .HasColumnType("character varying(128)");
-
-                b.Property<string>("SocialUrl")
-                    .IsRequired()
-                    .HasMaxLength(512)
-                    .HasColumnType("character varying(512)");
-
-                b.HasKey("Id");
-
-                b.HasIndex("Name")
-                    .IsUnique();
-
-                b.HasIndex("SocialUrl")
-                    .IsUnique();
-
-                b.ToTable("Communities");
-            });
-
-        modelBuilder.Entity("LowPressureZone.Domain.CommunityAggregate.RelationshipEntity.Relationship", b =>
-            {
-                b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uuid");
-
-                b.Property<Guid>("CommunityId")
-                    .HasColumnType("uuid");
-
-                b.Property<bool>("IsOrganizer")
-                    .HasColumnType("boolean");
-
-                b.Property<bool>("IsPerformer")
-                    .HasColumnType("boolean");
-
-                b.Property<Guid>("UserId")
-                    .HasColumnType("uuid");
-
-                b.HasKey("Id");
-
-                b.HasIndex("CommunityId");
-
-                b.ToTable("Relationships");
-            });
 
         modelBuilder.Entity("LowPressureZone.Domain.NewsAggregate.News", b =>
             {
@@ -148,7 +52,121 @@ partial class DataContextModelSnapshot : ModelSnapshot
                 b.ToTable("News");
             });
 
-        modelBuilder.Entity("LowPressureZone.Domain.PerformerAggregate.Performer", b =>
+        modelBuilder.Entity("LowPressureZone.Domain.Settings.Setting", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
+
+                b.Property<int>("Key")
+                    .HasColumnType("integer");
+
+                b.Property<string>("Value")
+                    .IsRequired()
+                    .HasColumnType("jsonb");
+
+                b.HasKey("Id");
+
+                b.HasIndex("Key")
+                    .IsUnique();
+
+                b.ToTable("Settings");
+            });
+
+        modelBuilder.Entity("LowPressureZone.Scheduling.Domain.BroadcastAggregate.Broadcast", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
+
+                b.Property<int>("AzuraCastBroadcastId")
+                    .HasColumnType("integer");
+
+                b.Property<string>("AzuraCastStreamerDisplayName")
+                    .IsRequired()
+                    .HasColumnType("text");
+
+                b.Property<int>("AzuraCastStreamerId")
+                    .HasColumnType("integer");
+
+                b.Property<bool>("HasFile")
+                    .HasColumnType("boolean");
+
+                b.Property<bool>("IsArchived")
+                    .HasColumnType("boolean");
+
+                b.ComplexProperty(typeof(Dictionary<string, object>), "Time", "LowPressureZone.Scheduling.Domain.BroadcastAggregate.Broadcast.Time#BroadcastTime", b1 =>
+                    {
+                        b1.IsRequired();
+
+                        b1.Property<DateTimeOffset?>("EndsAt")
+                            .HasColumnType("timestamp with time zone");
+
+                        b1.Property<DateTimeOffset>("StartsAt")
+                            .HasColumnType("timestamp with time zone");
+                    });
+
+                b.HasKey("Id");
+
+                b.HasIndex("AzuraCastBroadcastId")
+                    .IsUnique();
+
+                b.ToTable("Broadcasts");
+            });
+
+        modelBuilder.Entity("LowPressureZone.Scheduling.Domain.CommunityAggregate.Community", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
+
+                b.Property<bool>("IsDeleted")
+                    .HasColumnType("boolean");
+
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasMaxLength(128)
+                    .HasColumnType("character varying(128)");
+
+                b.Property<string>("SocialUrl")
+                    .IsRequired()
+                    .HasMaxLength(512)
+                    .HasColumnType("character varying(512)");
+
+                b.HasKey("Id");
+
+                b.HasIndex("Name");
+
+                b.HasIndex("SocialUrl");
+
+                b.ToTable("Communities");
+            });
+
+        modelBuilder.Entity("LowPressureZone.Scheduling.Domain.CommunityAggregate.RelationshipEntity.Relationship", b =>
+            {
+                b.Property<Guid>("Id")
+                    .HasColumnType("uuid");
+
+                b.Property<Guid>("CommunityId")
+                    .HasColumnType("uuid");
+
+                b.Property<bool>("IsOrganizer")
+                    .HasColumnType("boolean");
+
+                b.Property<bool>("IsPerformer")
+                    .HasColumnType("boolean");
+
+                b.Property<Guid>("UserId")
+                    .HasColumnType("uuid");
+
+                b.HasKey("Id");
+
+                b.HasIndex("CommunityId");
+
+                b.ToTable("Relationships");
+            });
+
+        modelBuilder.Entity("LowPressureZone.Scheduling.Domain.PerformerAggregate.Performer", b =>
             {
                 b.Property<Guid>("Id")
                     .ValueGeneratedOnAdd()
@@ -174,7 +192,7 @@ partial class DataContextModelSnapshot : ModelSnapshot
                 b.ToTable("Performers");
             });
 
-        modelBuilder.Entity("LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity.ClashSlot", b =>
+        modelBuilder.Entity("LowPressureZone.Scheduling.Domain.ScheduleAggregate.ClashSlotEntity.ClashSlot", b =>
             {
                 b.Property<Guid>("Id")
                     .HasColumnType("uuid");
@@ -192,7 +210,7 @@ partial class DataContextModelSnapshot : ModelSnapshot
                 b.Property<Guid>("ScheduleId")
                     .HasColumnType("uuid");
 
-                b.ComplexProperty(typeof(Dictionary<string, object>), "TimeRange", "LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity.ClashSlot.TimeRange#ClashTimeRange", b1 =>
+                b.ComplexProperty(typeof(Dictionary<string, object>), "TimeRange", "LowPressureZone.Scheduling.Domain.ScheduleAggregate.ClashSlotEntity.ClashSlot.TimeRange#ClashTimeRange", b1 =>
                     {
                         b1.IsRequired();
 
@@ -220,7 +238,7 @@ partial class DataContextModelSnapshot : ModelSnapshot
                 b.ToTable("ClashSlots");
             });
 
-        modelBuilder.Entity("LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlot", b =>
+        modelBuilder.Entity("LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlot", b =>
             {
                 b.Property<Guid>("Id")
                     .HasColumnType("uuid");
@@ -235,7 +253,7 @@ partial class DataContextModelSnapshot : ModelSnapshot
                     .HasMaxLength(128)
                     .HasColumnType("character varying(128)");
 
-                b.ComplexProperty(typeof(Dictionary<string, object>), "Prerecord", "LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlot.Prerecord#PrerecordedMix", b1 =>
+                b.ComplexProperty(typeof(Dictionary<string, object>), "Prerecord", "LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlot.Prerecord#PrerecordedMix", b1 =>
                     {
                         b1.IsRequired();
 
@@ -250,7 +268,18 @@ partial class DataContextModelSnapshot : ModelSnapshot
                             .HasColumnType("character varying(2048)");
                     });
 
-                b.ComplexProperty(typeof(Dictionary<string, object>), "TimeRange", "LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlot.TimeRange#HourlySlotTimeRange", b1 =>
+                b.ComplexProperty(typeof(Dictionary<string, object>), "Reminder", "LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlot.Reminder#Reminder", b1 =>
+                    {
+                        b1.IsRequired();
+
+                        b1.Property<string>("JobId")
+                            .HasColumnType("text");
+
+                        b1.Property<DateTimeOffset?>("ReminderTime")
+                            .HasColumnType("timestamp with time zone");
+                    });
+
+                b.ComplexProperty(typeof(Dictionary<string, object>), "TimeRange", "LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlot.TimeRange#HourlySlotTimeRange", b1 =>
                     {
                         b1.IsRequired();
 
@@ -276,7 +305,7 @@ partial class DataContextModelSnapshot : ModelSnapshot
                 b.ToTable("HourlySlots");
             });
 
-        modelBuilder.Entity("LowPressureZone.Domain.ScheduleAggregate.Schedule", b =>
+        modelBuilder.Entity("LowPressureZone.Scheduling.Domain.ScheduleAggregate.Schedule", b =>
             {
                 b.Property<Guid>("Id")
                     .ValueGeneratedOnAdd()
@@ -298,7 +327,7 @@ partial class DataContextModelSnapshot : ModelSnapshot
                     .HasMaxLength(256)
                     .HasColumnType("character varying(256)");
 
-                b.ComplexProperty(typeof(Dictionary<string, object>), "AllowedSlotTypes", "LowPressureZone.Domain.ScheduleAggregate.Schedule.AllowedSlotTypes#AllowedScheduleSlotTypes", b1 =>
+                b.ComplexProperty(typeof(Dictionary<string, object>), "AllowedSlotTypes", "LowPressureZone.Scheduling.Domain.ScheduleAggregate.Schedule.AllowedSlotTypes#AllowedScheduleSlotTypes", b1 =>
                     {
                         b1.IsRequired();
 
@@ -309,7 +338,7 @@ partial class DataContextModelSnapshot : ModelSnapshot
                             .HasColumnType("boolean");
                     });
 
-                b.ComplexProperty(typeof(Dictionary<string, object>), "TimeRange", "LowPressureZone.Domain.ScheduleAggregate.Schedule.TimeRange#ScheduleTimeRange", b1 =>
+                b.ComplexProperty(typeof(Dictionary<string, object>), "TimeRange", "LowPressureZone.Scheduling.Domain.ScheduleAggregate.Schedule.TimeRange#ScheduleTimeRange", b1 =>
                     {
                         b1.IsRequired();
 
@@ -330,30 +359,9 @@ partial class DataContextModelSnapshot : ModelSnapshot
                 b.ToTable("Schedules");
             });
 
-        modelBuilder.Entity("LowPressureZone.Domain.Settings.Setting", b =>
+        modelBuilder.Entity("LowPressureZone.Scheduling.Domain.CommunityAggregate.RelationshipEntity.Relationship", b =>
             {
-                b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uuid");
-
-                b.Property<int>("Key")
-                    .HasColumnType("integer");
-
-                b.Property<string>("Value")
-                    .IsRequired()
-                    .HasColumnType("jsonb");
-
-                b.HasKey("Id");
-
-                b.HasIndex("Key")
-                    .IsUnique();
-
-                b.ToTable("Settings");
-            });
-
-        modelBuilder.Entity("LowPressureZone.Domain.CommunityAggregate.RelationshipEntity.Relationship", b =>
-            {
-                b.HasOne("LowPressureZone.Domain.CommunityAggregate.Community", "Community")
+                b.HasOne("LowPressureZone.Scheduling.Domain.CommunityAggregate.Community", "Community")
                     .WithMany("Relationships")
                     .HasForeignKey("CommunityId")
                     .OnDelete(DeleteBehavior.Cascade)
@@ -362,23 +370,23 @@ partial class DataContextModelSnapshot : ModelSnapshot
                 b.Navigation("Community");
             });
 
-        modelBuilder.Entity("LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity.ClashSlot", b =>
+        modelBuilder.Entity("LowPressureZone.Scheduling.Domain.ScheduleAggregate.ClashSlotEntity.ClashSlot", b =>
             {
-                b.HasOne("LowPressureZone.Domain.PerformerAggregate.Performer", "PerformerOne")
+                b.HasOne("LowPressureZone.Scheduling.Domain.PerformerAggregate.Performer", "PerformerOne")
                     .WithMany()
                     .HasForeignKey("PerformerOneId")
                     .OnDelete(DeleteBehavior.Cascade)
                     .IsRequired()
                     .ExcludeForeignKeyFromMigrations(true);
 
-                b.HasOne("LowPressureZone.Domain.PerformerAggregate.Performer", "PerformerTwo")
+                b.HasOne("LowPressureZone.Scheduling.Domain.PerformerAggregate.Performer", "PerformerTwo")
                     .WithMany()
                     .HasForeignKey("PerformerTwoId")
                     .OnDelete(DeleteBehavior.Cascade)
                     .IsRequired()
                     .ExcludeForeignKeyFromMigrations(true);
 
-                b.HasOne("LowPressureZone.Domain.ScheduleAggregate.Schedule", "Schedule")
+                b.HasOne("LowPressureZone.Scheduling.Domain.ScheduleAggregate.Schedule", "Schedule")
                     .WithMany("ClashSlots")
                     .HasForeignKey("ScheduleId")
                     .OnDelete(DeleteBehavior.Cascade)
@@ -392,16 +400,16 @@ partial class DataContextModelSnapshot : ModelSnapshot
                 b.Navigation("Schedule");
             });
 
-        modelBuilder.Entity("LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlot", b =>
+        modelBuilder.Entity("LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlot", b =>
             {
-                b.HasOne("LowPressureZone.Domain.PerformerAggregate.Performer", "Performer")
+                b.HasOne("LowPressureZone.Scheduling.Domain.PerformerAggregate.Performer", "Performer")
                     .WithMany()
                     .HasForeignKey("PerformerId")
                     .OnDelete(DeleteBehavior.Cascade)
                     .IsRequired()
                     .ExcludeForeignKeyFromMigrations(true);
 
-                b.HasOne("LowPressureZone.Domain.ScheduleAggregate.Schedule", "Schedule")
+                b.HasOne("LowPressureZone.Scheduling.Domain.ScheduleAggregate.Schedule", "Schedule")
                     .WithMany("HourlySlots")
                     .HasForeignKey("ScheduleId")
                     .OnDelete(DeleteBehavior.Cascade)
@@ -413,9 +421,9 @@ partial class DataContextModelSnapshot : ModelSnapshot
                 b.Navigation("Schedule");
             });
 
-        modelBuilder.Entity("LowPressureZone.Domain.ScheduleAggregate.Schedule", b =>
+        modelBuilder.Entity("LowPressureZone.Scheduling.Domain.ScheduleAggregate.Schedule", b =>
             {
-                b.HasOne("LowPressureZone.Domain.CommunityAggregate.Community", "Community")
+                b.HasOne("LowPressureZone.Scheduling.Domain.CommunityAggregate.Community", "Community")
                     .WithMany()
                     .HasForeignKey("CommunityId")
                     .OnDelete(DeleteBehavior.Cascade)
@@ -425,12 +433,12 @@ partial class DataContextModelSnapshot : ModelSnapshot
                 b.Navigation("Community");
             });
 
-        modelBuilder.Entity("LowPressureZone.Domain.CommunityAggregate.Community", b =>
+        modelBuilder.Entity("LowPressureZone.Scheduling.Domain.CommunityAggregate.Community", b =>
             {
                 b.Navigation("Relationships");
             });
 
-        modelBuilder.Entity("LowPressureZone.Domain.ScheduleAggregate.Schedule", b =>
+        modelBuilder.Entity("LowPressureZone.Scheduling.Domain.ScheduleAggregate.Schedule", b =>
             {
                 b.Navigation("ClashSlots");
 

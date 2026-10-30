@@ -1,8 +1,8 @@
 using FastEndpoints;
-using LowPressureZone.Api.Commands.Users.DisableStreamer;
-using LowPressureZone.Api.Commands.Users.EnableStreamer;
-using LowPressureZone.Api.Commands.Users.Lock;
-using LowPressureZone.Api.Commands.Users.Unlock;
+using LowPressureZone.Identity.Application.Commands.DisableStreamer;
+using LowPressureZone.Identity.Application.Commands.EnableStreamer;
+using LowPressureZone.Identity.Application.Commands.Lock;
+using LowPressureZone.Identity.Application.Commands.Unlock;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;

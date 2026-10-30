@@ -1,8 +1,8 @@
 using FastEndpoints;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Clients;
-using LowPressureZone.Api.Models.Configuration;
 using LowPressureZone.Core;
+using LowPressureZone.Infrastructure.Configuration;
 using Microsoft.Extensions.Options;
 using Shouldly;
 

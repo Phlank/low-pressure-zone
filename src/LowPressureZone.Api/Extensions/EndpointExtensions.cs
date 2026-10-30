@@ -1,10 +1,11 @@
 ﻿using System.Globalization;
 using System.Text;
 using FastEndpoints;
-using FluentValidation.Results;
 using LowPressureZone.Api.Utilities;
 using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
+using Wolverine;
+using IEvent = LowPressureZone.Core.Domain.IEvent;
 
 namespace LowPressureZone.Api.Extensions;
 
@@ -39,14 +40,6 @@ public static class EndpointExtensions
 
     public static void ThrowIfError<T, TRequest, TResponse>(
         this Endpoint<TRequest, TResponse> endpoint,
-        Result<T, string> result) where TRequest : notnull
-    {
-        if (result.IsError)
-            endpoint.ThrowError(result.Error);
-    }
-
-    public static void ThrowIfError<T, TRequest, TResponse>(
-        this Endpoint<TRequest, TResponse> endpoint,
         Result<T, string> result,
         CompositeFormat format) where TRequest : notnull
     {
@@ -54,58 +47,44 @@ public static class EndpointExtensions
             endpoint.ThrowError(string.Format(CultureInfo.InvariantCulture, format, result.Error));
     }
 
-    public static void ThrowIfError<T, TRequest, TResponse>(
-        this Endpoint<TRequest, TResponse> endpoint,
-        Result<T, HttpResponseMessage> result,
-        CompositeFormat format) where TRequest : notnull
-    {
-        if (result.IsError)
-            endpoint.ThrowError(string.Format(CultureInfo.InvariantCulture, format, result.Error.ReasonPhrase));
-    }
-
-    public static void ThrowIfError<T, TRequest, TResponse>(this Endpoint<TRequest, TResponse> endpoint,
-                                                            Result<T, ValidationFailure> result) where TRequest : notnull
-    {
-        if (result.IsError)
-            endpoint.ThrowError(result.Error.ErrorMessage);
-    }
-    
-    public static void ThrowIfError<T, TRequest, TResponse>(this Endpoint<TRequest, TResponse> endpoint,
-                                                            Result<T, IEnumerable<ValidationFailure>> result) where TRequest : notnull
-    {
-        if (!result.IsError) return;
-        
-        foreach (var failure in result.Error)
-        {
-            endpoint.AddError(failure);
-        }
-        endpoint.ThrowIfAnyErrors();
-    }
-
     public static async Task PublishOrThrowAsync<T, TRequest, TResponse>(
         this Endpoint<TRequest, TResponse> endpoint,
         DomainResult<T> result) where TRequest : notnull
     {
-        endpoint.ThrowIfDomainError(result);
-        await endpoint.PublishEventsAsync(result);
-    }
-
-    public static async Task PublishEventsAsync<T, TRequest, TResponse>(
-        this Endpoint<TRequest, TResponse> endpoint,
-        DomainResult<T> result) where TRequest : notnull
-    {
+        endpoint.ThrowIfDomainErrors(result);
+        var messageBus = endpoint.Resolve<IMessageBus>();
         foreach (var @event in result.Events)
         {
-            await endpoint.PublishAsync(@event);
+            await messageBus.PublishAsync(@event);
         }
     }
     
-    public static void ThrowIfDomainError<T, TRequest, TResponse>(
+    public static async Task PublishEventsAsync<TRequest, TResponse>(
+        this Endpoint<TRequest, TResponse> endpoint,
+        List<IEvent> events) where TRequest : notnull
+    {
+        var messageBus = endpoint.Resolve<IMessageBus>();
+        foreach (var @event in events)
+        {
+            await messageBus.PublishAsync(@event);
+        }
+    }
+
+    public static void ThrowIfDomainErrors<T, TRequest, TResponse>(
         this Endpoint<TRequest, TResponse> endpoint,
         DomainResult<T> result) where TRequest : notnull
     {
         foreach (var failure in result.Failures)
             endpoint.AddError(failure);
+
+        endpoint.ThrowIfAnyErrors();
+    }
+
+    public static void ThrowIfRuleErrors<TRequest, TResponse>(this Endpoint<TRequest, TResponse> endpoint,
+                                                              List<RuleError> errors) where TRequest : notnull
+    {
+        foreach (var error in errors)
+            endpoint.AddError(error.ToValidationFailure());
 
         endpoint.ThrowIfAnyErrors();
     }

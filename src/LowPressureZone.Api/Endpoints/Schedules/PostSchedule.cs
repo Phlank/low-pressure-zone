@@ -2,7 +2,7 @@
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;
 using LowPressureZone.Data;
-using LowPressureZone.Domain.ScheduleAggregate;
+using LowPressureZone.Scheduling.Domain.ScheduleAggregate;
 using LowPressureZone.Identity.Constants;
 using Microsoft.EntityFrameworkCore;
 

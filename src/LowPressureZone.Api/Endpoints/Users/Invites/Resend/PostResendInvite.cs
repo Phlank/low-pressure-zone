@@ -4,6 +4,7 @@ using LowPressureZone.Api.Services;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Entities;
+using LowPressureZone.Infrastructure.Emails;
 using Microsoft.AspNetCore.Identity;
 
 namespace LowPressureZone.Api.Endpoints.Users.Invites.Resend;
@@ -11,7 +12,7 @@ namespace LowPressureZone.Api.Endpoints.Users.Invites.Resend;
 public class PostResendInvite(
     IdentityContext identityContext,
     UserManager<AppUser> userManager,
-    EmailService emailService) : EndpointWithoutRequest
+    IEmailService emailService) : EndpointWithoutRequest
 {
     public override void Configure()
     {

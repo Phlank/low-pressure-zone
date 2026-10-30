@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using FastEndpoints;
-using Hangfire;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Utilities;
 using LowPressureZone.Data.Extensions;
@@ -9,6 +8,7 @@ using LowPressureZone.Identity.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Minerals.StringCases;
+using Quartz;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,9 +35,8 @@ app.UseStaticFiles();
 app.UseResponseCaching();
 if (app.Environment.IsDevelopment())
 {
-    app.UseHangfireDashboard();
+    app.MapQuartzDashboard("/quartz-dashboard").AllowAnonymous();
 }
-
 app.UseFastEndpoints(config =>
 {
     config.Endpoints.RoutePrefix = "api";

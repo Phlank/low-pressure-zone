@@ -1,15 +1,13 @@
-﻿using LowPressureZone.Data.Extensions;
-using LowPressureZone.Domain.BroadcastAggregate;
-using LowPressureZone.Domain.CommunityAggregate;
-using LowPressureZone.Domain.CommunityAggregate.RelationshipEntity;
-using LowPressureZone.Domain.NewsAggregate;
-using LowPressureZone.Domain.PerformerAggregate;
-using LowPressureZone.Domain.ScheduleAggregate;
-using LowPressureZone.Domain.ScheduleAggregate.ClashSlotEntity;
-using LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity;
+﻿using LowPressureZone.Domain.NewsAggregate;
 using LowPressureZone.Domain.Settings;
+using LowPressureZone.Scheduling.Domain.BroadcastAggregate;
+using LowPressureZone.Scheduling.Domain.CommunityAggregate;
+using LowPressureZone.Scheduling.Domain.CommunityAggregate.RelationshipEntity;
+using LowPressureZone.Scheduling.Domain.PerformerAggregate;
+using LowPressureZone.Scheduling.Domain.ScheduleAggregate;
+using LowPressureZone.Scheduling.Domain.ScheduleAggregate.ClashSlotEntity;
+using LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity;
 using Microsoft.EntityFrameworkCore;
-using HourlySlot = LowPressureZone.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlot;
 
 namespace LowPressureZone.Data;
 

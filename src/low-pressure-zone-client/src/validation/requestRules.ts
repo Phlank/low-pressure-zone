@@ -65,6 +65,7 @@ export const hourlySlotRequestRules = (
     startsAt: combineRules(required(), hourOnly()),
     duration: combineRules(required(), oneOf([1, 2, 3], 'Allowed values are 1, 2, or 3')),
     subtitle: maximumLength(64),
+    reminderTime: alwaysValid(),
     file: combineRules<File | null>(
       mimeType(audioMimeTypes, 'Allowed audio types: wav, flac, mp3, m4a, vorbis, and opus.'),
       maxSize(1024 * 1024 * 1024, 'Max file size is 1GB.'),

@@ -3,6 +3,7 @@ using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Services;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;
+using LowPressureZone.Infrastructure.Emails;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Shouldly;
@@ -12,7 +13,7 @@ namespace LowPressureZone.Api.Endpoints.Users.Invites.Resend;
 public class GetResendInvite(
     UserManager<AppUser> userManager,
     IdentityContext identityContext,
-    EmailService emailService) : Endpoint<GetResendInviteRequest>
+    IEmailService emailService) : Endpoint<GetResendInviteRequest>
 {
     private readonly DateTime _start = DateTime.UtcNow;
 

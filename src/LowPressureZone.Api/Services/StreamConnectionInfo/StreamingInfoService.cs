@@ -1,9 +1,9 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Api.Models.Configuration.Streaming;
 using LowPressureZone.Core;
 using LowPressureZone.Identity.Entities;
+using LowPressureZone.Infrastructure.Configuration.Streaming;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 

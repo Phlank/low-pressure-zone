@@ -1,0 +1,121 @@
+﻿using System.Text;
+using System.Text.Json;
+using FastEndpoints;
+using FluentEmail.Core;
+using FluentEmail.Core.Models;
+using LowPressureZone.Core;
+using LowPressureZone.Infrastructure.Configuration;
+using LowPressureZone.Infrastructure.Identity;
+using LowPressureZone.Infrastructure.Resolvers;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
+namespace LowPressureZone.Infrastructure.Emails;
+
+[RegisterService<IEmailService>(LifeTime.Singleton)]
+public sealed class EmailService(
+    IOptions<EmailServiceConfiguration> options,
+    UriResolver uriResolver,
+    IFluentEmailFactory emailFactory,
+    ILogger<EmailService> logger) : IEmailService
+{
+    private static readonly Action<ILogger, string, Exception?> LogEmailFailure =
+        LoggerMessage.Define<string>(LogLevel.Error, new EventId(0, nameof(LogEmailFailure)),
+                                     "Failed to send email: {Response}");
+
+    private async Task<Result<SendResponse, SendResponse>> SendAsync(string toAddress, string subject, string body)
+    {
+        var email = emailFactory.Create()
+                                .SetFrom(options.Value.FromAddress)
+                                .To(toAddress)
+                                .Subject(subject)
+                                .Body(body);
+        var sendResponse = await email.SendAsync();
+
+        if (sendResponse.Successful)
+            return Result.Ok<SendResponse, SendResponse>(sendResponse);
+
+        LogEmailFailure(logger, JsonSerializer.Serialize(sendResponse), null);
+        // Don't send an admin message regarding email failure if the failed email was an admin message
+        var adminEmailBody = "Begin errors";
+        adminEmailBody += "\n" + string.Join("\n", sendResponse.ErrorMessages);
+        if (!subject.Contains("Admin Message", StringComparison.InvariantCulture))
+            _ = await SendAdminMessage(adminEmailBody, "Error sending email");
+        return Result.Err<SendResponse, SendResponse>(sendResponse);
+    }
+
+
+    public async Task SendTwoFactorEmailAsync(string toAddress, string username, string code)
+    {
+        var subject = "2FA | Low Pressure Zone";
+        var message =
+            $"Hey {username}, there was a login request made at Low Pressure Zone using your username and password.\n\nYour two factor authentication code is {code}.\n\nIf you weren't the one making the request, take the time to go to the site and change your password. Hope your day is going alright.";
+        _ = await SendAsync(toAddress, subject, message);
+    }
+
+    public async Task SendInviteEmailAsync(string toAddress, TokenContext context)
+    {
+        var uri = uriResolver.GetInviteUrl(context);
+        var subject = "Welcome | Low Pressure Zone";
+        var message =
+            $"You've been invited to register a new user at Low Pressure Zone. Follow the link below to create your user.\n\n{uri}\n\nThis link will be valid for 24 hours.";
+        _ = await SendAsync(toAddress, subject, message);
+    }
+
+    public async Task SendResetPasswordEmailAsync(string toAddress, string username, TokenContext context)
+    {
+        var uri = uriResolver.GetResetPasswordUrl(context);
+        var subject = "Reset Password | Low Pressure Zone";
+        var message =
+            $"A password reset was requested from Low Pressure Zone for your user, {username}. Click on the link below to reset your password.\n\n{uri}\n\nIf you did not initiate this request, you can ignore this message.";
+        _ = await SendAsync(toAddress, subject, message);
+    }
+
+    public async Task<Result<bool, SendResponse>> SendAdminMessage(string message, string subject)
+    {
+        var adminEmail = options.Value.AdminEmail;
+        subject += " | Admin Message | Low Pressure Zone";
+        if (!subject.EndsWith("Low Pressure Zone", StringComparison.InvariantCulture))
+            subject += " - Low Pressure Zone";
+        var result = await SendAsync(adminEmail, subject, message);
+        if (!result.IsSuccess) return Result.Err<bool, SendResponse>(result.Error);
+        return Result.Ok<bool, SendResponse>(true);
+    }
+
+    public async Task<Result<NoValue, SendResponse>> SendAdminException(Exception ex, string process)
+    {
+        var subject = "Exception thrown in LPZ | Admin Message | Low Pressure Zone";
+        var message = new StringBuilder($"An exception was thrown in Low Pressure Zone during the {process} process.")
+            .AppendLine("Exception details:")
+            .AppendLine(ex.ToString())
+            .ToString();
+        var result = await SendAsync(options.Value.AdminEmail, subject, message);
+        if (!result.IsSuccess) return Result.Err<NoValue, SendResponse>(result.Error);
+        return Result.Ok<NoValue, SendResponse>(NoValue.Instance);
+    }
+
+    public Task SendSlotReminderEmailAsync(string toAddress, DateTimeOffset reminderTime, DateTimeOffset slotStartTime)
+    {
+        var timeUntilStart = slotStartTime - reminderTime;
+        var subject = "Slot Reminder | Low Pressure Zone";
+        var message = new StringBuilder().Append("This is an automated reminder that you have a slot scheduled to start in ");
+        if (timeUntilStart.Days > 0)
+        {
+            message.Append(timeUntilStart.Days)
+                   .Append(" days, ");
+        }
+
+        if (Math.Floor(timeUntilStart.TotalHours) > 0)
+        {
+            message.Append(timeUntilStart.Hours)
+                   .Append(" hours and ");
+        }
+
+        message.Append(timeUntilStart.Minutes)
+               .Append(" minutes.");
+        
+        message.AppendLine().AppendLine("Looking forward to the sounds you bring :)");
+        
+        return SendAsync(toAddress, subject, message.ToString());
+    }
+}

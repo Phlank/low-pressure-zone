@@ -6,6 +6,7 @@ using LowPressureZone.Data;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Entities;
+using LowPressureZone.Infrastructure.Emails;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,7 +16,7 @@ public class PostInvite(
     UserManager<AppUser> userManager,
     IdentityContext identityContext,
     DataContext dataContext,
-    EmailService emailService)
+    IEmailService emailService)
     : EndpointWithMapper<InviteRequest, InviteMapper>
 {
     public override void Configure()
