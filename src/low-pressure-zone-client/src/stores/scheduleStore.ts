@@ -160,6 +160,7 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
           duration: form.duration,
           isPrerecorded: !!form.file,
           uploadedFileName: form.file?.name ?? null,
+          reminderTime: form.reminderTime,
           isEditable: true,
           isDeletable: true,
           type: 'Hourly'

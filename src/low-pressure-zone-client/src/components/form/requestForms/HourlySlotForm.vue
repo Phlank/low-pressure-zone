@@ -89,7 +89,13 @@
           :disabled="isSubmitting"
           :options="reminderOptions"
           option-label="label"
-          option-value="value" />
+          option-value="value"
+          @update:model-value="updateDefaultReminderTime">
+          <template #value>
+            <span v-if="timeslotForm.state.value.reminderTime === null">No Reminder</span>
+            <span v-else>{{ reminderOptions.find(opt => opt.value === timeslotForm.state.value.reminderTime)?.label }}</span>
+          </template>
+        </Select>
       </IftaFormField>
     </FormArea>
     <Divider />
@@ -194,6 +200,7 @@ import { useEntityForm } from '@/composables/useEntityForm.ts'
 import { addDays, addHours, addMinutes } from 'date-fns'
 import { err, ok, type Result } from '@/types/result.ts'
 import type { DropdownItem } from '@/types/dropdownItem.ts'
+import { useLocalStorage } from '@vueuse/core'
 
 const performers = usePerformerStore()
 const schedules = useScheduleStore()
@@ -217,17 +224,44 @@ const selectablePerformers = computed(() => {
   return performers.linkablePerformers
 })
 
-const reminderOptions: DropdownItem<string | null>[] = [
-  { label: 'No Reminder', value: null },
-  { label: '30 minutes', value: addMinutes(props.start, -30).toISOString() },
-  { label: '1 hour', value: addHours(props.start, -1).toISOString() },
-  { label: '3 hours', value: addHours(props.start, -3).toISOString() },
-  { label: '12 hours', value: addHours(props.start, -12).toISOString() },
-  { label: '1 day', value: addDays(props.start, -1).toISOString() }
-]
-
 type HourlySlotFormState = HourlySlotRequest & {
   duration: number
+}
+
+const getDefaultReminderOptions = (): DropdownItem<string | null>[] => [
+  { label: 'No Reminder', value: null },
+  { label: '30 minutes before', value: addMinutes(props.start, -30).toISOString() },
+  { label: '1 hour before', value: addHours(props.start, -1).toISOString() },
+  { label: '3 hours before', value: addHours(props.start, -3).toISOString() },
+  { label: '12 hours before', value: addHours(props.start, -12).toISOString() },
+  { label: '1 day before', value: addDays(props.start, -1).toISOString() }
+]
+const reminderOptions = computed((): DropdownItem<string | null>[] => {
+  const options = getDefaultReminderOptions()
+  const now = new Date()
+  return options.filter((option) => {
+    if (option.value === null) return true
+
+    const optionDate = parseDate(option.value)
+    return optionDate > now
+  })
+})
+
+const defaultReminderChoice = useLocalStorage('reminderChoice', 'No Reminder', {
+  initOnMounted: true,
+  listenToStorageChanges: false
+})
+const defaultReminderValue = computed(() => {
+  const defaultOption = getDefaultReminderOptions().find(
+    (option) => option.label === defaultReminderChoice.value
+  )
+  return defaultOption?.value ?? null
+})
+const updateDefaultReminderTime = (newValue: string | null) => {
+  const label =
+    reminderOptions.value.find((option) => option.value === newValue)?.label ?? 'No Reminder'
+  timeslotForm.state.value.reminderTime = newValue
+  defaultReminderChoice.value = label
 }
 
 const timeslotForm = useEntityForm<HourlySlotRequest, HourlySlotFormState, HourlySlotResponse>({
@@ -252,7 +286,9 @@ const timeslotForm = useEntityForm<HourlySlotRequest, HourlySlotFormState, Hourl
       file: null,
       replaceMedia: false,
       deleteMedia: false,
-      reminderTime: entity?.reminderTime ?? null
+      reminderTime: !!entity?.reminderTime
+        ? parseDate(entity.reminderTime).toISOString()
+        : defaultReminderValue.value
     })
   },
   createPersistentEntityFn: schedules.createHourlySlot(props.scheduleId),
