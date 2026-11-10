@@ -5,7 +5,6 @@ using LowPressureZone.Core.Domain;
 using LowPressureZone.Data;
 using LowPressureZone.Scheduling.Domain.CommunityAggregate;
 using LowPressureZone.Identity.Constants;
-using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Communities;
 

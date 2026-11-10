@@ -1,7 +1,6 @@
 ﻿using System.Security.Claims;
 using FastEndpoints;
 using LowPressureZone.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.Endpoints.Users.Info;

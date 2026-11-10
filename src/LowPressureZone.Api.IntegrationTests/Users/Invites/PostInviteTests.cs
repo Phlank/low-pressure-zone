@@ -1,10 +1,7 @@
 using System.Net;
-using System.Net.Http.Json;
 using LowPressureZone.Api.IntegrationTests.Infrastructure;
 using LowPressureZone.Data;
-using LowPressureZone.Scheduling.Domain.CommunityAggregate.RelationshipEntity;
 using LowPressureZone.Identity;
-using LowPressureZone.Identity.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Api.IntegrationTests.Users.Invites;

@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using FastEndpoints;
 using LowPressureZone.Api.Extensions;
 using LowPressureZone.Api.Rules;

@@ -1,5 +1,4 @@
 ﻿using FastEndpoints;
-using LowPressureZone.Identity;
 using LowPressureZone.Infrastructure.Configuration;
 using LowPressureZone.Infrastructure.Identity;
 using Microsoft.Extensions.Options;

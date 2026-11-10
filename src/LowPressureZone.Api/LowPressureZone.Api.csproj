@@ -12,6 +12,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="AWSSDK.Core" Version="4.0.102.16" />
+        <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.102.7" />
+        <PackageReference Include="AWSSDK.S3" Version="4.0.104.8" />
         <PackageReference Include="FastEndpoints" Version="9.0.0-beta.6" />
         <PackageReference Include="FastEndpoints.Generator" Version="9.0.0-beta.6">
             <PrivateAssets>all</PrivateAssets>

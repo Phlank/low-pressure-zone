@@ -1,5 +1,4 @@
 using System.Net;
-using System.Net.Http.Json;
 using LowPressureZone.Api.Endpoints.Schedules;
 using LowPressureZone.Api.IntegrationTests.Infrastructure;
 

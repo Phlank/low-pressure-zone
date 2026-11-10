@@ -45,11 +45,13 @@ temporaryFiles
 # Mount files
 tools/mounts/azuracast
 tools/mounts/icecast2
+tools/mounts/localstack
 
 # Other items
 LowPressureZone.sln.DotSettings.user
 wwwroot
 .idea/**
+db-forest-config.xml
 package.g.props
 package-lock.json
 /src/.idea/.idea.LowPressureZone/.idea/dataSources**

@@ -1,6 +1,4 @@
 using System.Net;
-using System.Net.Http.Json;
-using LowPressureZone.Api.Endpoints.Users;
 using LowPressureZone.Api.IntegrationTests.Infrastructure;
 using LowPressureZone.Identity.Entities;
 using Microsoft.AspNetCore.Identity;

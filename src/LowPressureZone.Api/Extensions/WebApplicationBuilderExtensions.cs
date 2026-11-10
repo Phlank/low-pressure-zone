@@ -1,6 +1,9 @@
 ﻿using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Amazon;
+using Amazon.Runtime;
+using Amazon.S3;
 using FastEndpoints;
 using FastEndpoints.OpenApi;
 using JasperFx.CodeGeneration;
@@ -131,10 +134,7 @@ public static class WebApplicationBuilderExtensions
             {
                 q.UsePersistentStore(store =>
                 {
-                    store.UsePostgres(pg =>
-                    {
-                        pg.ConnectionStringName = "Data";
-                    });
+                    store.UsePostgres(pg => { pg.ConnectionStringName = "Data"; });
                     store.ProvisionSchema();
                 });
             }
@@ -219,5 +219,16 @@ public static class WebApplicationBuilderExtensions
                    .AddFluentEmail("noreply@lowpressurezone.com", "Low Pressure Zone")
                    .AddMailGunSender(mailgunDomain, mailgunApiKey);
         }
+    }
+
+    private static void AddAws(this WebApplicationBuilder builder)
+    {
+        var awsConfig = builder.Configuration.GetSection("AwsConfiguration").Get<AwsConfiguration>() ??
+                        throw new InvalidOperationException();
+        var credentials = new BasicAWSCredentials(awsConfig.AccessKey, awsConfig.SecretKey);
+        AmazonS3Config config = string.IsNullOrEmpty(awsConfig.Endpoint) ?
+                                    new() { RegionEndpoint = RegionEndpoint.GetBySystemName(awsConfig.Region) } :
+                                    new() { ServiceURL = awsConfig.Endpoint, ForcePathStyle = true };
+        builder.Services.AddSingleton<IAmazonS3>(_ => new AmazonS3Client(credentials, config));
     }
 }
