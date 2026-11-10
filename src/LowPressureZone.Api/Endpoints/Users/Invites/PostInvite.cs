@@ -1,7 +1,6 @@
 ﻿using FastEndpoints;
 using FluentEmail.Core;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Api.Services;
 using LowPressureZone.Data;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Constants;

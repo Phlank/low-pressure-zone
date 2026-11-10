@@ -1,5 +1,4 @@
 using System.Net;
-using LowPressureZone.Api.Endpoints.Schedules.HourlySlots;
 using LowPressureZone.Api.IntegrationTests.Infrastructure;
 
 namespace LowPressureZone.Api.IntegrationTests.Schedules.HourlySlots;

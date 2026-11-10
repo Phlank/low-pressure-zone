@@ -7,11 +7,15 @@
         <UserSecretsId>9d2c548d-3c62-4409-9c65-fe1fa2b047b1</UserSecretsId>
         <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
         <AnalysisLevel>latest-recommended</AnalysisLevel>
+        <LangVersion>preview</LangVersion>
         <Version>1.7.0</Version>
         <Feature>runtime-async=on</Feature>
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="AWSSDK.Core" Version="4.0.102.16" />
+        <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.102.7" />
+        <PackageReference Include="AWSSDK.S3" Version="4.0.104.8" />
         <PackageReference Include="FastEndpoints" Version="9.0.0" />
         <PackageReference Include="FastEndpoints.Generator" Version="9.0.0">
             <PrivateAssets>all</PrivateAssets>

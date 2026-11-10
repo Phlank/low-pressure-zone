@@ -6,7 +6,6 @@ using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Api.Constants;
 using LowPressureZone.Api.Constants.Errors;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Api.Services;
 using LowPressureZone.Api.Utilities;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Entities;

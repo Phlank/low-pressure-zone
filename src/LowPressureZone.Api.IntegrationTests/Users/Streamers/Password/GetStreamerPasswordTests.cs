@@ -1,5 +1,4 @@
 using System.Net;
-using System.Net.Http.Json;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Api.Endpoints.Users.Streamers.Password;
 using LowPressureZone.Api.IntegrationTests.Infrastructure;

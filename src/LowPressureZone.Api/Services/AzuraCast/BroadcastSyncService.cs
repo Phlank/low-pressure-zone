@@ -1,6 +1,4 @@
-using FastEndpoints;
 using LowPressureZone.Api.Commands.Broadcasts.SyncBroadcasts;
-using LowPressureZone.Scheduling.Domain.BroadcastAggregate;
 
 namespace LowPressureZone.Api.Services.AzuraCast;
 
