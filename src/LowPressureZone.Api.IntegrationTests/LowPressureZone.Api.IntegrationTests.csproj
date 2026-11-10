@@ -4,7 +4,6 @@
         <TargetFramework>net11.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <LangVersion>preview</LangVersion>
         <OutputType>Exe</OutputType>
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
