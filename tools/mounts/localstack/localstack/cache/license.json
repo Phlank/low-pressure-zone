@@ -1,0 +1,325 @@
+{
+  "id": "d8ff250c-4855-4aa4-aa02-f55711b4ec24",
+  "license_format": "1",
+  "signature": "a083889c74ddf5c894128a5b69aeff9b0bebed4fc207eaf0a1faeca119de3ae9",
+  "license_type": "freemium",
+  "issue_date": "2026-11-02T01:53:56+00:00",
+  "expiry_date": "2026-11-07T07:43:12+00:00",
+  "products": [
+    {
+      "name": "localstack.platform.plugin/appinspector",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/cloudwatch:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.lambda.runtime_executor/docker",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/config:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "metadata": {
+        "limit": 10
+      },
+      "name": "localstack.appinspector/span_count_limit",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/ec2:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/redshift:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/cloudwatch:v2",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/stepfunctions:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/cloudcontrol:pro",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/dynamodb:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.platform.plugin/extensions",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/iam:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/s3:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/es:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/events:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/kinesis:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/events:v2",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.platform.plugin/lambda-ldm",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/ssm:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/route53:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/lambda:v2",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/firehose:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/kms:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/acm:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/resource-groups:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/cloudwatch:v1",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/sts:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/scheduler:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/sns:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.container.runtime/docker",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/lambda:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/dynamodbstreams:v2",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/events:legacy",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/dynamodb:v2",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/lambda-core:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/resourcegroupstaggingapi:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/secretsmanager:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/dynamodbstreams:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/lambda-web:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/opensearch:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/ses:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/sqs:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/transcribe:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/apigateway:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack-pro",
+      "version": "2026.3.0",
+      "version_operator": ">="
+    },
+    {
+      "name": "localstack.aws.provider/apigateway:next_gen",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/events:v1",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/logs:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/stepfunctions:v2",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/apigateway:legacy",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/logs:v1",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/logs:v2",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.pods.public",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/cloudformation:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/route53resolver:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/support:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/swf:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.platform.plugin/enforce-telemetry",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/s3control:default",
+      "version": "*",
+      "version_operator": "=="
+    },
+    {
+      "name": "localstack.aws.provider/lambda:asf",
+      "version": "*",
+      "version_operator": "=="
+    }
+  ],
+  "license_status": "ACTIVE",
+  "license_secret": "TFMxLjA6gGv19Pjuhmxhiv6E2j26Nun5idsZcAy641CERXGPxCADDBuKxQIzM+PPawtDFxt6",
+  "last_activated": "2026-11-02T01:53:56.370501Z",
+  "reactivate_after": "2026-11-03T01:53:56+00:00",
+  "offline_data": {
+    "localstack_version": "2026.10.4"
+  }
+}

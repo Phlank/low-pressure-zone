@@ -41,6 +41,11 @@ public static class AudioQualityValidator
     private static List<ValidationFailure> ValidateCodec(AudioStream stream, long fileSize, string? propertyName = null)
     {
         List<ValidationFailure> failures = [];
+        if (stream.CodecName is null)
+        {
+            failures.Add(new ValidationFailure(propertyName, "Audio codec not found"));
+            return failures;
+        }
 
         if (!stream.CodecName.StartsWith("pcm_", StringComparison.InvariantCulture)
             && stream.CodecName != "flac"
@@ -54,10 +59,10 @@ public static class AudioQualityValidator
         if (LossyCodecs.Contains(stream.CodecName))
         {
             long bitrate;
-            if (stream.BitRate == 0)
+            if (stream.BitRate is 0 or null)
                 bitrate = fileSize / (long)stream.Duration.TotalSeconds * 8;
             else
-                bitrate = stream.BitRate;
+                bitrate = stream.BitRate.Value;
 
 
             if (bitrate < 256000)

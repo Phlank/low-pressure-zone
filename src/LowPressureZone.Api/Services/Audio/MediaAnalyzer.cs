@@ -12,7 +12,7 @@ public sealed class MediaAnalyzer(ILogger<MediaAnalyzer> logger)
     {
         try
         {
-            var analysis = await FFProbe.AnalyseAsync(filePath, null, ct);
+            var analysis = await FFProbe.AnalyseAsync(filePath, null, null, ct);
             return Result.Ok(analysis);
         }
         catch (FFMpegException ex)

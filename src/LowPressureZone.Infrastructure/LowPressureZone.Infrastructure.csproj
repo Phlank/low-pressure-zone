@@ -15,7 +15,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.23.0" />
-        <PackageReference Include="Quartz" Version="4.6.2" />
+        <PackageReference Include="Quartz" Version="4.7.3" />
     </ItemGroup>
     
     <ItemGroup>
