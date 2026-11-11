@@ -8,6 +8,7 @@
         <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
         <AnalysisLevel>latest-recommended</AnalysisLevel>
         <Version>1.7.0</Version>
+        <Feature>runtime-async=on</Feature>
     </PropertyGroup>
 
     <ItemGroup>

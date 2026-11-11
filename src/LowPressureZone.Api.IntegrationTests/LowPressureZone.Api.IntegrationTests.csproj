@@ -7,6 +7,7 @@
         <OutputType>Exe</OutputType>
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
+        <Feature>runtime-async=on</Feature>
     </PropertyGroup>
 
     <ItemGroup>
