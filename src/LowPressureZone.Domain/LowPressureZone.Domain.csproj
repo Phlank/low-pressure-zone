@@ -6,8 +6,8 @@
         <Nullable>enable</Nullable>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <AnalysisLevel>latest-recommended</AnalysisLevel>
-        <LangVersion>preview</LangVersion>
         <OutputType>Library</OutputType>
+        <Feature>runtime-async=on</Feature>
     </PropertyGroup>
 
     <ItemGroup>
