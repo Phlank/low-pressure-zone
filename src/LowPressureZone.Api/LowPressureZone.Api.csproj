@@ -12,16 +12,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FastEndpoints" Version="9.0.0-beta.6" />
-        <PackageReference Include="FastEndpoints.Generator" Version="9.0.0-beta.6">
+        <PackageReference Include="FastEndpoints" Version="9.0.0" />
+        <PackageReference Include="FastEndpoints.Generator" Version="9.0.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="FastEndpoints.OpenApi" Version="9.0.0-beta.6" />
-        <PackageReference Include="FastEndpoints.Security" Version="9.0.0-beta.6" />
+        <PackageReference Include="FastEndpoints.OpenApi" Version="9.0.0" />
+        <PackageReference Include="FastEndpoints.Security" Version="9.0.0" />
         <PackageReference Include="FFMpegCore" Version="6.0.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis" Version="5.9.0" />
-        <PackageReference Include="Npgsql" Version="10.0.3" />
+        <PackageReference Include="Microsoft.CodeAnalysis" Version="5.12.0" />
+        <PackageReference Include="Npgsql" Version="11.0.0-preview.1-ci.20261111T134306" />
         <PackageReference Include="Quartz" Version="4.7.3" />
         <PackageReference Include="Quartz.AspNetCore" Version="4.7.3" />
         <PackageReference Include="Quartz.Dashboard" Version="4.7.3" />
@@ -33,22 +33,22 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Minerals.StringCases" Version="0.2.2"/>
-        <PackageReference Include="Scalar.AspNetCore" Version="2.20.0" />
-        <PackageReference Include="Shouldly" Version="4.3.0"/>
-        <PackageReference Include="SSH.NET" Version="2026.0.0" />
-        <PackageReference Include="WolverineFx" Version="6.64.0" />
-        <PackageReference Include="WolverineFx.RuntimeCompilation" Version="6.64.0" />
+        <PackageReference Include="Minerals.StringCases" Version="0.2.2" />
+        <PackageReference Include="Scalar.AspNetCore" Version="3.0.0" />
+        <PackageReference Include="Shouldly" Version="4.3.0" />
+        <PackageReference Include="SSH.NET" Version="2026.0.1" />
+        <PackageReference Include="WolverineFx" Version="6.64.2" />
+        <PackageReference Include="WolverineFx.RuntimeCompilation" Version="6.64.2" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\LowPressureZone.Core\LowPressureZone.Core.csproj"/>
+        <ProjectReference Include="..\LowPressureZone.Core\LowPressureZone.Core.csproj" />
         <ProjectReference Include="..\LowPressureZone.Data\LowPressureZone.Data.csproj" />
-        <ProjectReference Include="..\LowPressureZone.Domain\LowPressureZone.Domain.csproj"/>
+        <ProjectReference Include="..\LowPressureZone.Domain\LowPressureZone.Domain.csproj" />
         <ProjectReference Include="..\LowPressureZone.Identity.Application\LowPressureZone.Identity.Application.csproj" />
         <ProjectReference Include="..\LowPressureZone.Scheduling.Application\LowPressureZone.Scheduling.Application.csproj" />
-        <ProjectReference Include="..\LowPressureZone.Identity\LowPressureZone.Identity.csproj"/>
-        <ProjectReference Include="..\LowPressureZone.Adapter.AzuraCast\LowPressureZone.Adapter.AzuraCast.csproj"/>
+        <ProjectReference Include="..\LowPressureZone.Identity\LowPressureZone.Identity.csproj" />
+        <ProjectReference Include="..\LowPressureZone.Adapter.AzuraCast\LowPressureZone.Adapter.AzuraCast.csproj" />
         <ProjectReference Include="..\LowPressureZone.Infrastructure\LowPressureZone.Infrastructure.csproj" />
     </ItemGroup>
 
