@@ -28,7 +28,7 @@ jobs:
         name: Build C# Code
         run: |
           wget https://dot.net/v1/dotnet-install.sh
-          bash ./dotnet-install.sh -Channel 11.0 -Quality preview
+          bash ./dotnet-install.sh -Channel 11.0
           /home/runner/.dotnet/dotnet build ./src/LowPressureZone.sln -c Release
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
@@ -70,7 +70,6 @@ jobs:
         uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 11.0.x
-          dotnet-quality: preview
       - name: Restore dependencies
         run: dotnet restore LowPressureZone.sln
         working-directory: ./src
@@ -89,7 +88,6 @@ jobs:
         uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 11.0.x
-          dotnet-quality: preview
       - name: Run integration tests
         run: dotnet test LowPressureZone.sln
         working-directory: ./src

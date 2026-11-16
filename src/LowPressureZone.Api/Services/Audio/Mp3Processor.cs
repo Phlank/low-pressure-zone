@@ -13,7 +13,7 @@ public sealed class Mp3Processor(ILogger<Mp3Processor> logger)
         var outputFilePath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.mp3");
         try
         {
-            var isConversionSuccessful =
+            var conversionResult =
                 await FFMpegArguments.FromFileInput(inputFilePath,
                                                     false)
                                      .OutputToFile(outputFilePath,
@@ -23,7 +23,7 @@ public sealed class Mp3Processor(ILogger<Mp3Processor> logger)
                                                                      .WithoutMetadata())
                                      .ProcessAsynchronously(true);
 
-            if (isConversionSuccessful)
+            if (conversionResult.Success)
                 return Result.Ok(outputFilePath);
 
             logger.LogError("Unable to convert file to MP3 at {InputFilePath}", inputFilePath);
@@ -44,15 +44,15 @@ public sealed class Mp3Processor(ILogger<Mp3Processor> logger)
         var outputFilePath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.mp3");
         try
         {
-            var isMetadataStripSuccessful =
+            var metadataStripResult =
                 await FFMpegArguments.FromFileInput(inputFilePath,
                                                     false)
                                      .OutputToFile(outputFilePath,
                                                    true,
-                                                   options => options.WithCopyCodec()
+                                                   options => options.CopyStreams()
                                                                      .WithoutMetadata())
                                      .ProcessAsynchronously();
-            if (isMetadataStripSuccessful)
+            if (metadataStripResult.Success)
                 return Result.Ok(outputFilePath);
 
             logger.LogError("Unable to strip metadata from MP3 file at {InputFilePath}", inputFilePath);

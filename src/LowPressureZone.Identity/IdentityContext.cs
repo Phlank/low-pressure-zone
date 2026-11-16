@@ -23,6 +23,6 @@ public class IdentityContext(DbContextOptions<IdentityContext> options)
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        Invitation<Guid, AppUser>.OnModelCreated(builder);
+        Invitation.OnModelCreated(builder);
     }
 }

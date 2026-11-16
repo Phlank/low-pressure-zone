@@ -13,9 +13,11 @@ public sealed class Invitation<TKey, TUser> where TUser : class
     public DateTime? RegistrationDate { get; set; }
     public bool IsCancelled { get; set; }
     public DateTime? CancellationDate { get; set; }
+}
 
-    public static void OnModelCreated(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<Invitation<TKey, TUser>>().Property(e => e.Id).ValueGeneratedNever();
-    }
+public sealed class Invitation
+{
+    public static void OnModelCreated(ModelBuilder modelBuilder) => modelBuilder.Entity<Invitation<Guid, AppUser>>()
+                                                                                .Property(e => e.Id)
+                                                                                .ValueGeneratedNever();
 }
