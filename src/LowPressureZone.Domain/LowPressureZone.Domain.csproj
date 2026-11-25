@@ -15,9 +15,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Ardalis.SmartEnum" Version="8.2.0" />
-        <PackageReference Include="Ardalis.SmartEnum.EFCore" Version="8.2.0" />
-        <PackageReference Include="Ardalis.SmartEnum.SystemTextJson" Version="8.1.0" />
         <PackageReference Include="FastEndpoints.Messaging" Version="9.0.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="11.0.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="11.0.0" />
@@ -25,7 +22,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="11.0.0-rc.3" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="11.0.0" />
     </ItemGroup>
 
     <ItemGroup>

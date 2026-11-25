@@ -1,11 +1,11 @@
 ﻿using System.Security.Claims;
 using FastEndpoints;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Scheduling.Domain.PerformerAggregate;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
+using LowPressureZone.Scheduling.Domain.PerformerAggregate;
 
-namespace LowPressureZone.Api.Rules;
+namespace LowPressureZone.Api.Permissions;
 
 [RegisterService<PerformerPermissions>(LifeTime.Singleton)]
 public sealed class PerformerPermissions(IHttpContextAccessor contextAccessor)

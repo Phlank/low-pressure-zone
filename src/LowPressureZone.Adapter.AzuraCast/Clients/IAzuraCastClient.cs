@@ -1,4 +1,5 @@
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
+using LowPressureZone.Api.Services.AzuraCast;
 using LowPressureZone.Core;
 
 namespace LowPressureZone.Adapter.AzuraCast.Clients;
@@ -32,8 +33,9 @@ public interface IAzuraCastClient
 
     Task<Result<StationMedia, HttpResponseMessage>> GetMediaAsync(int mediaId);
 
-    Task<Result<IEnumerable<StationFileListItem>, HttpResponseMessage>> GetMediaInDirectoryAsync(
-        string directory,
+    Task<Result<IEnumerable<StationFileListItem>, HttpResponseMessage>> ListMediaAsync(
+        AzuraCastMediaDirectory directory,
+        string? searchQuery = "",
         bool useInternalMode = true,
         bool flushCache = true);
 

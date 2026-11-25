@@ -1,11 +1,11 @@
 ﻿using System.Security.Claims;
 using FastEndpoints;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Scheduling.Domain.CommunityAggregate.RelationshipEntity;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
+using LowPressureZone.Scheduling.Domain.CommunityAggregate.RelationshipEntity;
 
-namespace LowPressureZone.Api.Rules;
+namespace LowPressureZone.Api.Permissions;
 
 [RegisterService<RelationshipPermissions>(LifeTime.Singleton)]
 public sealed class RelationshipPermissions(IHttpContextAccessor contextAccessor)

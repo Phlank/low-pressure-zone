@@ -4,7 +4,7 @@ using LowPressureZone.Api.Extensions;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
 
-namespace LowPressureZone.Api.Rules;
+namespace LowPressureZone.Api.Permissions;
 
 [RegisterService<UserPermissions>(LifeTime.Singleton)]
 public class UserPermissions(IHttpContextAccessor contextAccessor)

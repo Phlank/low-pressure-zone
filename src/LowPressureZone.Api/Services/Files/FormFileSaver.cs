@@ -1,6 +1,7 @@
 using FastEndpoints;
 using LowPressureZone.Core;
 using LowPressureZone.Infrastructure.Emails;
+using Results = LowPressureZone.Core.Results;
 
 namespace LowPressureZone.Api.Services.Files;
 
@@ -25,10 +26,10 @@ public sealed class FormFileSaver(
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to save uploaded file: {ErrorMessage}", ex.Message);
-            return Result.Err<string, string>("Failed to save uploaded file.");
+            return Results.Err<string, string>("Failed to save uploaded file.");
         }
 
-        return Result.Ok(path);
+        return Results.Ok(path);
     }
 
     public async Task<Result<string, string>> DeleteFileAsync(string path)
@@ -38,18 +39,18 @@ public sealed class FormFileSaver(
             if (File.Exists(path))
             {
                 File.Delete(path);
-                return Result.Ok(path);
+                return Results.Ok(path);
             }
 
             logger.LogError("Failed to delete saved file at {Path} because it was not found.", path);
-            return Result.Err<string>($"File does not exist at path: {path}");
+            return Results.Err<string>($"File does not exist at path: {path}");
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to delete saved file at {Path}: {ErrorMessage}", path, ex.Message);
-            _ = await emailer.SendAdminMessage($"Failed to delete saved file at {path}: {ex.Message}",
+            _ = await emailer.SendAdminMessageAsync($"Failed to delete saved file at {path}: {ex.Message}",
                                                "Failed to delete saved file");
-            return Result.Err<string, string>($"Failed to delete saved file at {path}: {ex.Message}");
+            return Results.Err<string, string>($"Failed to delete saved file at {path}: {ex.Message}");
         }
     }
 }

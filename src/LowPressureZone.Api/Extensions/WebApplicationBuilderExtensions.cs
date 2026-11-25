@@ -2,12 +2,15 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Amazon;
+using Amazon.Extensions.NETCore.Setup;
 using Amazon.Runtime;
 using Amazon.S3;
 using FastEndpoints;
 using FastEndpoints.OpenApi;
 using JasperFx.CodeGeneration;
 using JasperFx.CodeGeneration.Model;
+using LowPressureZone.Adapter.AzuraCast;
+using LowPressureZone.Adapter.AzuraCast.Exceptions;
 using LowPressureZone.Adapter.AzuraCast.Extensions;
 using LowPressureZone.Api.Auth;
 using LowPressureZone.Api.Services.AzuraCast;
@@ -18,7 +21,10 @@ using LowPressureZone.Identity.Entities;
 using LowPressureZone.Infrastructure;
 using LowPressureZone.Infrastructure.Configuration;
 using LowPressureZone.Infrastructure.Configuration.Streaming;
+using LowPressureZone.Infrastructure.Emails;
+using LowPressureZone.Infrastructure.Extensions;
 using LowPressureZone.Scheduling.Application;
+using LowPressureZone.Scheduling.Domain.BroadcastAggregate.Events;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
@@ -26,8 +32,12 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Quartz;
 using Wolverine;
+using Wolverine.EntityFrameworkCore;
+using Wolverine.ErrorHandling;
+using Wolverine.Postgresql;
 using NightlyTaskService = LowPressureZone.Api.Services.NightlyTasks.NightlyTaskService;
 
 namespace LowPressureZone.Api.Extensions;
@@ -57,6 +67,14 @@ public static class WebApplicationBuilderExtensions
         services.Configure<AzuraCastInstallationConfiguration>(builder.Configuration
                                                                       .GetSection(AzuraCastInstallationConfiguration
                                                                                       .Name));
+        
+        services.Configure<AWSOptions>(options =>
+        {
+            options.Credentials = new BasicAWSCredentials(builder.Configuration["AwsConfiguration:AccessKey"]!,
+                                                          builder.Configuration["AwsConfiguration:SecretKey"]!);
+            options.Region = RegionEndpoint.GetBySystemName(builder.Configuration["AwsConfiguration:Region"]!);
+        });
+        
         services.AddCors(options =>
         {
             options.AddPolicy("Frontend",
@@ -73,6 +91,8 @@ public static class WebApplicationBuilderExtensions
 
     public static void AddApiServices(this WebApplicationBuilder builder)
     {
+        var dataConnectionString =
+            builder.Configuration.GetConnectionString("Data") ?? throw new InvalidOperationException();
         builder.AddAzuraCast();
         builder.AddDatabases();
         builder.AddQuartz();
@@ -95,7 +115,23 @@ public static class WebApplicationBuilderExtensions
             opts.Discovery.IncludeAssembly(Assembly.Load("LowPressureZone.Scheduling.Application"));
             opts.Discovery.IncludeAssembly(Assembly.Load("LowPressureZone.Identity.Application"));
             opts.ServiceLocationPolicy = ServiceLocationPolicy.AlwaysAllowed;
+
+            opts.PersistMessagesWithPostgresql(dataConnectionString);
+            opts.UseEntityFrameworkCoreTransactions();
+
+            opts.Policies.OnException<IntegrationException>()
+                .RetryWithCooldown([.. Enumerable.Repeat(TimeSpan.FromSeconds(10), 25)]).Then
+                .SendAdminEmail().Then
+                .MoveToErrorQueue();
+            opts.Policies.OnException<AzuraCastStateException>()
+                .RetryWithCooldown([.. Enumerable.Repeat(TimeSpan.FromSeconds(10), 25)]).Then
+                .SendAdminEmail().Then
+                .MoveToErrorQueue();
+
+            opts.Policies.ForMessagesOfType<BroadcastArchived>().DelayedFor(TimeSpan.FromMinutes(2));
         });
+        builder.Services.AddDefaultAWSOptions((provider) => provider.GetRequiredService<IOptions<AWSOptions>>().Value);
+        builder.Services.AddAWSService<IAmazonS3>();
         builder.Services.OpenApiDocument();
         builder.Services.AddHostedService<NightlyTaskService>();
         builder.Services.AddHostedService<BroadcastSyncService>();
@@ -103,6 +139,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.RegisterServicesFromLowPressureZoneIdentityApplication();
         builder.Services.RegisterServicesFromLowPressureZoneSchedulingApplication();
         builder.Services.RegisterServicesFromLowPressureZoneInfrastructure();
+        builder.Services.RegisterServicesFromLowPressureZoneAdapterAzuraCast();
     }
 
     private static void AddDatabases(this WebApplicationBuilder builder)
@@ -116,10 +153,12 @@ public static class WebApplicationBuilderExtensions
             if (builder.Environment.IsDevelopment()) options.EnableSensitiveDataLogging();
         }).AddDataProtection().PersistKeysToDbContext<IdentityContext>();
         builder.Services.AddDbContext<DataContext>(options =>
-        {
-            options.UseNpgsql(dataConnectionString);
-            if (builder.Environment.IsDevelopment()) options.EnableSensitiveDataLogging();
-        });
+                                                   {
+                                                       options.UseNpgsql(dataConnectionString);
+                                                       if (builder.Environment.IsDevelopment())
+                                                           options.EnableSensitiveDataLogging();
+                                                   },
+                                                   optionsLifetime: ServiceLifetime.Singleton);
     }
 
     private static void AddQuartz(this WebApplicationBuilder builder)
@@ -226,9 +265,9 @@ public static class WebApplicationBuilderExtensions
         var awsConfig = builder.Configuration.GetSection("AwsConfiguration").Get<AwsConfiguration>() ??
                         throw new InvalidOperationException();
         var credentials = new BasicAWSCredentials(awsConfig.AccessKey, awsConfig.SecretKey);
-        AmazonS3Config config = string.IsNullOrEmpty(awsConfig.Endpoint) ?
-                                    new() { RegionEndpoint = RegionEndpoint.GetBySystemName(awsConfig.Region) } :
-                                    new() { ServiceURL = awsConfig.Endpoint, ForcePathStyle = true };
+        AmazonS3Config config = string.IsNullOrEmpty(awsConfig.Endpoint)
+                                    ? new() { RegionEndpoint = RegionEndpoint.GetBySystemName(awsConfig.Region) }
+                                    : new() { ServiceURL = awsConfig.Endpoint, ForcePathStyle = true };
         builder.Services.AddSingleton<IAmazonS3>(_ => new AmazonS3Client(credentials, config));
     }
 }

@@ -2,6 +2,7 @@ using System.Net;
 using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Api.Endpoints.Broadcasts.Archive;
 using LowPressureZone.Api.IntegrationTests.Infrastructure;
+using LowPressureZone.Api.Services.AzuraCast;
 using LowPressureZone.Core;
 using static LowPressureZone.Api.IntegrationTests.Infrastructure.TestData;
 
@@ -16,7 +17,7 @@ public sealed class PostArchiveBroadcastTests(ApiFixture app) : ApiTestBase(app)
 
     // Values from the AzuraCastInstallation section of the API's appsettings.json.
     private const string ArchivePlaylistName = "Rotation";
-    private const string ArchiveDirectory = "Archive";
+    private const AzuraCastMediaDirectory ArchiveDirectory = AzuraCastMediaDirectory.Archives;
 
     private static readonly DateTime Start = new(2026, 2, 28, 22, 0, 0, DateTimeKind.Utc);
 
@@ -31,7 +32,7 @@ public sealed class PostArchiveBroadcastTests(ApiFixture app) : ApiTestBase(app)
         A.CallTo(() => AzuraCast.GetBroadcastsAsync(A<int?>._))
          .Returns(BroadcastsResult(RemoteBroadcast(BroadcastId, StreamerId, "DJ Archive", Start, Start.AddHours(1))));
         A.CallTo(() => AzuraCast.GetPlaylistByNameAsync(ArchivePlaylistName))
-         .Returns(Result.Ok(new StationPlaylist
+         .Returns(Results.Ok(new StationPlaylist
          {
              Id = ArchivePlaylistId,
              Name = ArchivePlaylistName,
@@ -46,9 +47,9 @@ public sealed class PostArchiveBroadcastTests(ApiFixture app) : ApiTestBase(app)
          .ReturnsLazily((System.IO.Stream _, string path) =>
          {
              _uploadedPath = path;
-             return Result.Ok(path);
+             return Results.Ok(path);
          });
-        A.CallTo(() => AzuraCast.GetMediaInDirectoryAsync(ArchiveDirectory, A<bool>._, A<bool>._))
+        A.CallTo(() => AzuraCast.ListMediaAsync(ArchiveDirectory, searchQuery:A<string?>._, useInternalMode: A<bool>._, flushCache: A<bool>._))
          .ReturnsLazily(() => Ok<IEnumerable<StationFileListItem>>(
          [
              new StationFileListItem
@@ -204,7 +205,7 @@ public sealed class PostArchiveBroadcastTests(ApiFixture app) : ApiTestBase(app)
         await AddLocalBroadcastAsync();
         SetUpAzuraCastForArchive();
         A.CallTo(() => AzuraCast.GetPlaylistByNameAsync(ArchivePlaylistName))
-         .Returns(Result.Err<StationPlaylist>("Playlist not found"));
+         .Returns(Results.Err<StationPlaylist>("Playlist not found"));
 
         var response = await PostAsAdminAsync();
 

@@ -1,6 +1,6 @@
 using FastEndpoints;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Api.Rules;
+using LowPressureZone.Api.Permissions;
 using LowPressureZone.Data;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;

@@ -1,5 +1,5 @@
 ﻿using FastEndpoints;
-using LowPressureZone.Api.Rules;
+using LowPressureZone.Api.Permissions;
 using LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.HourlySlots;
@@ -18,8 +18,8 @@ public sealed class HourlySlotMapper(
         Duration = slot.TimeRange.Duration,
         Subtitle = slot.Subtitle,
         PerformerId = slot.PerformerId,
-        UploadedFileName = slot.Prerecord.UploadedFileName,
-        IsPrerecorded = slot.Prerecord.IsPrerecorded,
+        UploadedFileName = slot.PrerecordedMix?.UploadedMedia?.UploadedFileName,
+        IsPrerecorded = slot.PrerecordedMix is not null,
         ReminderTime = slot.Reminder.ReminderTime,
         IsEditable = permissions.IsEditAuthorized(slot),
         IsDeletable = permissions.IsDeleteAuthorized(slot)

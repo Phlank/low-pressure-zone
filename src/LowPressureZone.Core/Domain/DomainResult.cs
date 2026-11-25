@@ -22,6 +22,16 @@ public class DomainResult<T> : Result<T, List<RuleError>>
     public DomainResult<NoValue> ToNoValue() =>
         IsError ? DomainResult.Err<NoValue>(Errors) : DomainResult.Ok();
 
+    public DomainResult<TOut> Switch<TOut>() where TOut : class
+    {
+        if (!IsError) throw new InvalidOperationException("Cannot switch a successful result to another type.");
+        return DomainResult.Err<TOut>(Errors);
+    }
+
+    public DomainResult<T> ComposeWith<TOther>(DomainResult<TOther> other) =>
+        new(IsError || other.IsError ? default : Value,
+            [.. Events, .. other.Events],
+            [.. Errors, .. other.Errors]);
 
     public List<ValidationFailure> Failures =>
         [.. Errors.Select(error => error.ToValidationFailure())];
@@ -41,7 +51,7 @@ public static class DomainResult
         new(NoValue.Instance,
             [.. results.SelectMany(r => r.Events)],
             [.. results.SelectMany(r => r.Errors)]);
-    
+
     public static DomainResult<T> ComposeInto<T>(T value, params List<DomainResult<NoValue>> results) =>
         new(value,
             [.. results.SelectMany(r => r.Events)],

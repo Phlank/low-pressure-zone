@@ -22,9 +22,10 @@ public static class DistributedApplicationBuilderExtensions
             var awsConfig = builder.AddAWSSDKConfig()
                                    .WithProfile("default")
                                    .WithRegion(RegionEndpoint.USEast1);
-
+            
             var localStackPort = builder.Configuration.GetValue<int>("AppHost:Ports:LocalStack");
-            var localStack = builder.AddLocalStack(awsConfig: awsConfig,
+            var localStack = builder.AddLocalStack(name: "localstack",
+                                                   awsConfig: awsConfig,
                                                    localStackOptions: LocalStackOptions(edgePort: localStackPort),
                                                    configureContainer: cfg =>
                                                    {
@@ -35,9 +36,10 @@ public static class DistributedApplicationBuilderExtensions
                                                        cfg.Port = localStackPort;
                                                    })!
                                     .WithEnvironment("LOCALSTACK_AUTH_TOKEN",
-                                                     builder.Configuration["LocalStack:Token"]!);
+                                                     builder.Configuration["AppHost:LocalStack:Token"]!);
 
             var awsServices = builder.AddAWSCloudFormationTemplate("aws-resources", "localstackCloudFormation.json")
+                                     .WithReference(localStack)
                                      .WaitForStart(localStack);
 
             var s3Seed = builder.AddExecutable("localstack-s3-seed",
@@ -55,12 +57,14 @@ public static class DistributedApplicationBuilderExtensions
                                 .WithEnvironment("AWS_ACCESS_KEY_ID", "000000000000")
                                 .WithEnvironment("AWS_SECRET_ACCESS_KEY", "000000000000")
                                 .WithEnvironment("AWS_EC2_METADATA_DISABLED", "true")
-                                .WaitForCompletion(awsServices);
+                                .WaitFor(awsServices);
 
             return new()
             {
                 AwsResources = awsServices,
-                LocalStack = localStack
+                LocalStack = localStack,
+                Endpoint = $"http://localhost:{localStackPort}",
+                S3Seed = s3Seed
             };
         }
     }

@@ -1,5 +1,5 @@
 using FastEndpoints;
-using LowPressureZone.Scheduling.Application.Commands.Schedules.SendReminder;
+using LowPressureZone.Scheduling.Application.Commands.Schedules.HourlySlots.SendReminder;
 using Quartz;
 
 namespace LowPressureZone.Scheduling.Application.Jobs;

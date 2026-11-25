@@ -3,6 +3,7 @@ using LowPressureZone.Adapter.AzuraCast.ApiSchema;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Adapter.AzuraCast.Mappers;
 using LowPressureZone.Core;
+using Results = LowPressureZone.Core.Results;
 
 namespace LowPressureZone.Api.Services.AzuraCast;
 
@@ -23,7 +24,7 @@ public class AzuraCastMediaUpdater(ILogger<AzuraCastMediaUpdater> logger, IAzura
         if (updateResult.IsError)
         {
             logger.LogError("Failed to update media: {Reason}", updateResult.Error.ReasonPhrase);
-            return Result.Err("Failed to update media");
+            return Results.Err("Failed to update media");
         }
         return new Result<string>();
     }

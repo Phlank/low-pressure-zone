@@ -1,12 +1,12 @@
 ﻿using System.Security.Claims;
 using FastEndpoints;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
+using LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity;
 using Shouldly;
 
-namespace LowPressureZone.Api.Rules;
+namespace LowPressureZone.Api.Permissions;
 
 [RegisterService<HourlySlotPermissions>(LifeTime.Singleton)]
 public sealed class HourlySlotPermissions(IHttpContextAccessor contextAccessor)
@@ -17,6 +17,7 @@ public sealed class HourlySlotPermissions(IHttpContextAccessor contextAccessor)
     {
         slot.Performer.ShouldNotBeNull();
         if (User == null) return false;
+        if (slot.PrerecordedMix is not null) return false;
         if (slot.TimeRange.StartsAt < DateTime.UtcNow) return false;
         if (User.IsInRole(RoleNames.Admin)) return true;
         return slot.Performer.CreatorUserId == User.GetIdOrDefault() || IsCommunityOrganizer(slot);

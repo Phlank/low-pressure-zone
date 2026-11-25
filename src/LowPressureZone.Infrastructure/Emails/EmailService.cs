@@ -33,15 +33,15 @@ public sealed class EmailService(
         var sendResponse = await email.SendAsync();
 
         if (sendResponse.Successful)
-            return Result.Ok<SendResponse, SendResponse>(sendResponse);
+            return Results.Ok<SendResponse, SendResponse>(sendResponse);
 
         LogEmailFailure(logger, JsonSerializer.Serialize(sendResponse), null);
         // Don't send an admin message regarding email failure if the failed email was an admin message
         var adminEmailBody = "Begin errors";
         adminEmailBody += "\n" + string.Join("\n", sendResponse.ErrorMessages);
         if (!subject.Contains("Admin Message", StringComparison.InvariantCulture))
-            _ = await SendAdminMessage(adminEmailBody, "Error sending email");
-        return Result.Err<SendResponse, SendResponse>(sendResponse);
+            _ = await SendAdminMessageAsync(adminEmailBody, "Error sending email");
+        return Results.Err<SendResponse, SendResponse>(sendResponse);
     }
 
 
@@ -71,27 +71,38 @@ public sealed class EmailService(
         _ = await SendAsync(toAddress, subject, message);
     }
 
-    public async Task<Result<bool, SendResponse>> SendAdminMessage(string message, string subject)
+    public async Task<Result<bool, SendResponse>> SendAdminMessageAsync(string message, string subject)
     {
         var adminEmail = options.Value.AdminEmail;
         subject += " | Admin Message | Low Pressure Zone";
         if (!subject.EndsWith("Low Pressure Zone", StringComparison.InvariantCulture))
             subject += " - Low Pressure Zone";
         var result = await SendAsync(adminEmail, subject, message);
-        if (!result.IsSuccess) return Result.Err<bool, SendResponse>(result.Error);
-        return Result.Ok<bool, SendResponse>(true);
+        if (!result.IsSuccess) return Results.Err<bool, SendResponse>(result.Error);
+        return Results.Ok<bool, SendResponse>(true);
     }
 
-    public async Task<Result<NoValue, SendResponse>> SendAdminException(Exception ex, string process)
+    public async Task<Result<NoValue, SendResponse>> SendAdminException(
+        Exception ex,
+        string process,
+        string? additionalMessage = null)
     {
         var subject = "Exception thrown in LPZ | Admin Message | Low Pressure Zone";
-        var message = new StringBuilder($"An exception was thrown in Low Pressure Zone during the {process} process.")
-            .AppendLine("Exception details:")
-            .AppendLine(ex.ToString())
-            .ToString();
-        var result = await SendAsync(options.Value.AdminEmail, subject, message);
-        if (!result.IsSuccess) return Result.Err<NoValue, SendResponse>(result.Error);
-        return Result.Ok<NoValue, SendResponse>(NoValue.Instance);
+        var message = new StringBuilder($"An exception was thrown in Low Pressure Zone during the {process} process.");
+        if (!string.IsNullOrWhiteSpace(additionalMessage))
+        {
+            message.AppendLine()
+                   .AppendLine("Additional context:")
+                   .AppendLine(additionalMessage);
+        }
+
+        message.AppendLine()
+               .AppendLine("Exception details:")
+               .AppendLine(ex.ToString());
+        
+        var result = await SendAsync(options.Value.AdminEmail, subject, message.ToString());
+        if (!result.IsSuccess) return Results.Err<NoValue, SendResponse>(result.Error);
+        return Results.Ok<NoValue, SendResponse>(NoValue.Instance);
     }
 
     public Task SendSlotReminderEmailAsync(string toAddress, DateTimeOffset reminderTime, DateTimeOffset slotStartTime)

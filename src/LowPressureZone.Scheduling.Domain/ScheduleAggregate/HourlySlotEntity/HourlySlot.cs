@@ -6,7 +6,7 @@ using LowPressureZone.Scheduling.Domain.Common.ReminderValueObject;
 using LowPressureZone.Scheduling.Domain.PerformerAggregate;
 using LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity.Events;
 using LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity.HourlySlotTimeRangeObject;
-using LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity.PrerecordedMixObject;
+using LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity.PrerecordedMixEntity;
 using LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity.Rules;
 using LowPressureZone.Scheduling.Domain.ScheduleAggregate.Rules;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +24,8 @@ public class HourlySlot : Entity
 
     public Guid PerformerId { get; private set; } = Guid.Empty;
     public Performer Performer { get; private init; } = null!;
-    public PrerecordedMix Prerecord { get; private set; }
+    public Guid? PrerecordedMixId { get; private set; }
+    public PrerecordedMix? PrerecordedMix { get; private set; }
     public HourlySlotTimeRange TimeRange { get; private set; }
     public Reminder Reminder { get; private set; }
 
@@ -39,7 +40,7 @@ public class HourlySlot : Entity
         int duration,
         string? subtitle = null,
         string? uploadedFileName = null,
-        int? azuraCastMediaId = null,
+        Guid? uploadedMediaId = null,
         DateTimeOffset? reminderTime = null,
         Guid? id = null)
     {
@@ -49,13 +50,17 @@ public class HourlySlot : Entity
             ScheduleId = scheduleId,
         };
 
-        return DomainResult.ComposeInto(value,
-                                        value.ChangeSubtitle(subtitle),
-                                        value.ChangePerformer(performerId),
-                                        value.ReplacePrerecordedMix(uploadedFileName, azuraCastMediaId),
-                                        value.ChangeTime(startsAt, duration),
-                                        value.SetReminder(reminderTime));
-    }
+        var composed = DomainResult.ComposeInto(value,
+                                                value.ChangeSubtitle(subtitle),
+                                                value.ChangePerformer(performerId),
+                                                value.ChangeTime(startsAt, duration),
+                                                value.SetReminder(reminderTime));
+        
+        if (uploadedFileName is not null && uploadedMediaId.HasValue)
+            composed = composed.ComposeWith(value.SetUpPrerecordedMix(uploadedMediaId.Value, uploadedFileName));
+         
+        return composed;
+   }
 
     public DomainResult<NoValue> ChangeSubtitle(string? subtitle)
     {
@@ -73,40 +78,6 @@ public class HourlySlot : Entity
         return DomainResult.Ok();
     }
 
-    public DomainResult<NoValue> ReplacePrerecordedMix(string? uploadedFileName, int? azuraCastMediaId = null)
-    {
-        if (Prerecord.UploadedFileName == uploadedFileName && Prerecord.AzuraCastMediaId == azuraCastMediaId)
-            return DomainResult.Ok();
-        
-        DomainResult<PrerecordedMix> mixResult;
-        if (uploadedFileName is null && azuraCastMediaId is null)
-        {
-            mixResult = PrerecordedMix.Create(false, null, null);
-        }
-        else
-        {
-            mixResult = PrerecordedMix.Create(true, uploadedFileName, azuraCastMediaId);
-        }
-
-        if (mixResult.IsSuccess)
-            Prerecord = mixResult.Value;
-
-        return mixResult.ToNoValue();
-    }
-
-    public DomainResult<NoValue> DeletePrerecordedMix()
-    {
-        if (!Prerecord.IsPrerecorded)
-            return DomainResult.Err<NoValue>(new RuleError("No mix to delete"));
-
-        var result = PrerecordedMix.Create(false, null, null);
-
-        if (result.IsSuccess)
-            Prerecord = result.Value;
-
-        return result.ToNoValue();
-    }
-
     public DomainResult<NoValue> ChangeTime(DateTimeOffset startsAt, int duration)
     {
         if (startsAt == TimeRange.StartsAt && duration == TimeRange.Duration)
@@ -119,6 +90,15 @@ public class HourlySlot : Entity
             TimeRange = timeRangeResult.Value;
 
         return timeRangeResult.ToNoValue();
+    }
+
+    private DomainResult<NoValue> SetUpPrerecordedMix(Guid uploadedMediaId, string uploadedFileName)
+    {
+        var result = PrerecordedMix.Create(uploadedMediaId, uploadedFileName);
+        if (result.IsSuccess)
+            PrerecordedMix = result.Value;
+
+        return result.ToNoValue();
     }
 
     public DomainResult<NoValue> SetReminder(DateTimeOffset? reminderTime)
@@ -164,14 +144,15 @@ public class HourlySlot : Entity
                     .ValueGeneratedNever();
 
         modelBuilder.Entity<HourlySlot>()
-                    .ComplexProperty(slot => slot.Prerecord);
-
-        modelBuilder.Entity<HourlySlot>()
                     .ComplexProperty(slot => slot.TimeRange);
 
         modelBuilder.Entity<HourlySlot>()
                     .HasIndex(slot => slot.TimeRange.StartsAt)
                     .IsUnique();
+
+        modelBuilder.Entity<HourlySlot>().HasOne(slot => slot.PrerecordedMix).WithOne(mix => mix.Slot)
+                    .HasForeignKey<HourlySlot>(slot => slot.PrerecordedMixId);
+        modelBuilder.Entity<HourlySlot>().Navigation(slot => slot.PrerecordedMix).AutoInclude();
 
         modelBuilder.Entity<HourlySlot>().HasOne(slot => slot.Performer).WithMany()
                     .HasForeignKey(slot => slot.PerformerId).ExcludeForeignKeyFromMigrations();

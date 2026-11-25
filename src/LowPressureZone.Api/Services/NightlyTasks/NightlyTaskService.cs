@@ -6,7 +6,6 @@ namespace LowPressureZone.Api.Services.NightlyTasks;
 public sealed partial class NightlyTaskService(
     IEmailService emailService,
     NightlyBroadcastDeletionModule nightlyBroadcastDeletionModule,
-    NightlyPrerecordedMixCleanupModule nightlyPrerecordedMixCleanupModule,
     ILogger<NightlyTaskService> logger)
     : BackgroundService
 {
@@ -31,7 +30,6 @@ public sealed partial class NightlyTaskService(
                 }
 
                 await nightlyBroadcastDeletionModule.DeleteOutOfDateBroadcastsAsync();
-                await nightlyPrerecordedMixCleanupModule.CleanupPrerecordedMixesAsync();
             }
             catch (Exception ex)
             {

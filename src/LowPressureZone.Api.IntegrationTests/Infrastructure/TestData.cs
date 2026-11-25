@@ -58,7 +58,7 @@ public static class TestData
     {
         var broadcast = Broadcast.Create(id, streamerId, displayName, hasFile, start, end).Value;
         if (isArchived)
-            broadcast.Archive().IsSuccess.ShouldBeTrue();
+            broadcast.Archive(Guid.NewGuid()).IsSuccess.ShouldBeTrue();
 
         return broadcast;
     }

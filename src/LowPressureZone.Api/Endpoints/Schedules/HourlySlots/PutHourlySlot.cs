@@ -1,6 +1,6 @@
 using FastEndpoints;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Api.Rules;
+using LowPressureZone.Api.Permissions;
 using LowPressureZone.Core.Domain;
 using LowPressureZone.Data;
 using LowPressureZone.Identity.Constants;
@@ -12,8 +12,7 @@ namespace LowPressureZone.Api.Endpoints.Schedules.HourlySlots;
 public class PutHourlySlot(
     DataContext dataContext,
     HourlySlotPermissions permissions,
-    PerformerPermissions performerPermissions,
-    HourlySlotPrerecordedMixHandler mixHandler) : Endpoint<HourlySlotRequest>
+    PerformerPermissions performerPermissions) : Endpoint<HourlySlotRequest>
 {
     public override void Configure()
     {
@@ -46,6 +45,11 @@ public class PutHourlySlot(
             return;
         }
 
+        if (slot.PrerecordedMix is not null)
+        {
+            ThrowError("Cannot edit a prerecorded slot. Delete the slot and create a new one instead.");
+        }
+
         if (!permissions.IsEditAuthorized(slot))
         {
             await Send.UnauthorizedAsync(ct);
@@ -59,37 +63,12 @@ public class PutHourlySlot(
             return;
         }
 
-        var addMix = !slot.Prerecord.IsPrerecorded && request.File is not null;
-        var replaceMix = slot.Prerecord.IsPrerecorded && request.ReplaceMedia;
-        var deleteMix = slot.Prerecord.IsPrerecorded && request.DeleteMedia;
-
         var primaryResult = DomainResult.Compose(slot.ChangePerformer(request.PerformerId),
                                                  slot.ChangeSubtitle(request.Subtitle),
                                                  slot.ChangeTime(request.StartsAt, request.Duration),
                                                  slot.SetReminder(request.ReminderTime));
         
         await this.PublishOrThrowAsync(primaryResult);
-        
-        if (addMix)
-        {
-            var mixResult = await mixHandler.AddNewMixFile(this, schedule, request, ct);
-            await this.PublishOrThrowAsync(mixResult);
-            await this.PublishOrThrowAsync(slot.ReplacePrerecordedMix(mixResult.Value.UploadedFileName, 
-                                                               mixResult.Value.AzuraCastMediaId));
-        } 
-        else if (replaceMix)
-        {
-            var mixResult = await mixHandler.ReplaceMixFile(this, slot, request, ct);
-            await this.PublishOrThrowAsync(mixResult);
-            await this.PublishOrThrowAsync(slot.ReplacePrerecordedMix(mixResult.Value.UploadedFileName, 
-                                                               mixResult.Value.AzuraCastMediaId));
-        }
-        else if (deleteMix)
-        {
-            var mixResult = await mixHandler.DeleteMixFile(this, slot);
-            await this.PublishOrThrowAsync(mixResult);
-            await this.PublishOrThrowAsync(slot.DeletePrerecordedMix());
-        }
         
         await dataContext.SaveChangesAsync(ct);
         await Send.NoContentAsync(ct);

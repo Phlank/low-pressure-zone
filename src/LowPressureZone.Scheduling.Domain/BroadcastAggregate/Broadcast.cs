@@ -1,7 +1,9 @@
 using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
 using LowPressureZone.Scheduling.Domain.BroadcastAggregate.BroadcastTimeValueObject;
+using LowPressureZone.Scheduling.Domain.BroadcastAggregate.Events;
 using LowPressureZone.Scheduling.Domain.BroadcastAggregate.Rules;
+using LowPressureZone.Scheduling.Domain.UploadedMediaAggregate;
 using Microsoft.EntityFrameworkCore;
 
 namespace LowPressureZone.Scheduling.Domain.BroadcastAggregate;
@@ -14,6 +16,8 @@ public class Broadcast : Entity
     public bool HasFile { get; private set; }
     public bool IsArchived { get; private set; }
     public BroadcastTime Time { get; private set; }
+    public Guid? UploadedMediaId { get; private set; }
+    public UploadedMedia? UploadedMedia { get; private set; }
 
     // EF Core constructor
     private Broadcast()
@@ -48,14 +52,16 @@ public class Broadcast : Entity
         });
     }
 
-    public DomainResult<NoValue> Archive()
+    public DomainResult<NoValue> Archive(Guid uploadedMediaId)
     {
-        var result = Rule.ApplyIntoResult(NoValue.Instance,
-                                          new CannotArchiveIfNoFileRule(this),
-                                          new CannotArchiveIfAlreadyArchivedRule(this));
+        var result = Rule.ApplyIntoEmptyResult(new BroadcastArchived(Id),
+                                               new CannotArchiveIfNoFileRule(this),
+                                               new CannotArchiveIfAlreadyArchivedRule(this))
+                         .WithAdditionalEvents(new BroadcastArchived(Id));
         if (result.IsSuccess)
         {
             IsArchived = true;
+            UploadedMediaId = uploadedMediaId;
         }
 
         return result;
@@ -89,8 +95,14 @@ public class Broadcast : Entity
         modelBuilder.Entity<Broadcast>()
                     .HasIndex(broadcast => broadcast.AzuraCastBroadcastId)
                     .IsUnique();
-        
+
         modelBuilder.Entity<Broadcast>()
                     .ComplexProperty(broadcast => broadcast.Time);
+
+        modelBuilder.Entity<Broadcast>().HasOne(broadcast => broadcast.UploadedMedia)
+                    .WithOne()
+                    .HasForeignKey<Broadcast>(broadcast => broadcast.UploadedMediaId)
+                    .ExcludeForeignKeyFromMigrations();
+        modelBuilder.Entity<Broadcast>().Navigation(broadcast => broadcast.UploadedMedia).AutoInclude();
     }
 }

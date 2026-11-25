@@ -1,12 +1,12 @@
 using System.Security.Claims;
 using FastEndpoints;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Scheduling.Domain.ScheduleAggregate.ClashSlotEntity;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
+using LowPressureZone.Scheduling.Domain.ScheduleAggregate.ClashSlotEntity;
 using Shouldly;
 
-namespace LowPressureZone.Api.Rules;
+namespace LowPressureZone.Api.Permissions;
 
 [RegisterService<ClashSlotPermissions>(LifeTime.Singleton)]
 public sealed class ClashSlotPermissions(IHttpContextAccessor contextAccessor)

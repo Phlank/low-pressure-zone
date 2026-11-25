@@ -2,6 +2,7 @@ using FastEndpoints;
 using FFMpegCore;
 using FFMpegCore.Exceptions;
 using LowPressureZone.Core;
+using Results = LowPressureZone.Core.Results;
 
 namespace LowPressureZone.Api.Services.Audio;
 
@@ -13,7 +14,7 @@ public sealed class MediaAnalyzer(ILogger<MediaAnalyzer> logger)
         try
         {
             var analysis = await FFProbe.AnalyseAsync(filePath, null, null, ct);
-            return Result.Ok(analysis);
+            return Results.Ok(analysis);
         }
         catch (FFMpegException ex)
         {
@@ -30,6 +31,6 @@ public sealed class MediaAnalyzer(ILogger<MediaAnalyzer> logger)
                             ex.Message);
         }
 
-        return Result.Err<IMediaAnalysis>("Failed to analyze media file.");
+        return Results.Err<IMediaAnalysis>("Failed to analyze media file.");
     }
 }

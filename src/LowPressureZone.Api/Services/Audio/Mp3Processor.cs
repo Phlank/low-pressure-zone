@@ -2,6 +2,7 @@ using FastEndpoints;
 using FFMpegCore;
 using FFMpegCore.Enums;
 using LowPressureZone.Core;
+using Results = LowPressureZone.Core.Results;
 
 namespace LowPressureZone.Api.Services.Audio;
 
@@ -24,10 +25,10 @@ public sealed class Mp3Processor(ILogger<Mp3Processor> logger)
                                      .ProcessAsynchronously(true);
 
             if (conversionResult.Success)
-                return Result.Ok(outputFilePath);
+                return Results.Ok(outputFilePath);
 
             logger.LogError("Unable to convert file to MP3 at {InputFilePath}", inputFilePath);
-            return Result.Err<string>("Failed to process audio file.");
+            return Results.Err<string>("Failed to process audio file.");
         }
         catch (Exception ex)
         {
@@ -35,7 +36,7 @@ public sealed class Mp3Processor(ILogger<Mp3Processor> logger)
                             "Unable to convert file to MP3 at {InputFilePath}: {ErrorMessage}",
                             inputFilePath,
                             ex.Message);
-            return Result.Err<string>("Failed to process audio file.");
+            return Results.Err<string>("Failed to process audio file.");
         }
     }
 
@@ -53,10 +54,10 @@ public sealed class Mp3Processor(ILogger<Mp3Processor> logger)
                                                                      .WithoutMetadata())
                                      .ProcessAsynchronously();
             if (metadataStripResult.Success)
-                return Result.Ok(outputFilePath);
+                return Results.Ok(outputFilePath);
 
             logger.LogError("Unable to strip metadata from MP3 file at {InputFilePath}", inputFilePath);
-            return Result.Err<string>("Failed to process MP3 file.");
+            return Results.Err<string>("Failed to process MP3 file.");
         }
         catch (Exception ex)
         {
@@ -64,7 +65,7 @@ public sealed class Mp3Processor(ILogger<Mp3Processor> logger)
                             "Unable to strip metadata from MP3 file at {InputFilePath}: {ErrorMessage}",
                             inputFilePath,
                             ex.Message);
-            return Result.Err<string>("Failed to process MP3 file.");
+            return Results.Err<string>("Failed to process MP3 file.");
         }
     }
 }

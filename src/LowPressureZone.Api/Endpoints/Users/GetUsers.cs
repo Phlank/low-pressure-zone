@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using FastEndpoints;
-using LowPressureZone.Api.Rules;
+using LowPressureZone.Api.Permissions;
 using LowPressureZone.Data;
 using LowPressureZone.Identity;
 using LowPressureZone.Identity.Constants;

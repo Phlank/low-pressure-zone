@@ -77,18 +77,18 @@ var localStackOptions = new LocalStackOptions(useLocalStack: true,
 var localStackPort = builder.Configuration.GetValue<int>("AppHost:Ports:LocalStack")!;
 var localStack = builder.AddLpzLocalStack();
 
-var api = builder.AddProject<LowPressureZone_Api>("lpz-api")
+var api = builder.AddDotnetProject("lpz-api", "../LowPressureZone.Api/LowPressureZone.Api.csproj")
                  .AddConfigurationToEnvironment(builder.Configuration.GetSection("LowPressureZone"))
                  .WaitFor(azuracast)
                  .WaitFor(mailpit)
                  .WaitForStart(domainDatabase)
                  .WaitForStart(identityDatabase)
-                 .WaitForStart(localStack.)
-                 .WaitForCompletion(s3Seed)
+                 .WaitForStart(localStack.LocalStack)
+                 .WaitForCompletion(localStack.S3Seed)
                  .WithReference(mailpit)
                  .WithReference(domainDatabase, "Data")
                  .WithReference(identityDatabase, "Identity")
-                 .WithEnvironment("AWSCONFIG__ENDPOINT", localStackEndpoint);
+                 .WithEnvironment("AWSCONFIGURATION__ENDPOINT", localStack.Endpoint);
 
 var clientPort = builder.Configuration.GetValue<int>("AppHost:Ports:Client")!;
 var client = builder.AddViteApp("lpz-client", "../low-pressure-zone-client")
@@ -97,5 +97,4 @@ var client = builder.AddViteApp("lpz-client", "../low-pressure-zone-client")
                                       targetPort: clientPort,
                                       env: "PORT",
                                       isProxied: false);
-
 await builder.Build().RunAsync();

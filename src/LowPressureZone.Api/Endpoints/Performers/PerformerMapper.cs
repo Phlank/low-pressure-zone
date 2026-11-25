@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using FastEndpoints;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Api.Rules;
+using LowPressureZone.Api.Permissions;
 using LowPressureZone.Core.Domain;
 using LowPressureZone.Scheduling.Domain.PerformerAggregate;
 using LowPressureZone.Identity.Extensions;

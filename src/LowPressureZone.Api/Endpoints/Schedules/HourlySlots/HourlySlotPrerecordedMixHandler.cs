@@ -1,76 +1,66 @@
 using System.Diagnostics;
 using FastEndpoints;
+using LowPressureZone.Adapter.AzuraCast.Resolvers;
+using LowPressureZone.Api.Services.AzuraCast;
 using LowPressureZone.Api.Services.Files;
-using LowPressureZone.Core;
 using LowPressureZone.Core.Domain;
+using LowPressureZone.Infrastructure.Adapters;
+using LowPressureZone.Infrastructure.Events;
+using LowPressureZone.Infrastructure.Http;
+using LowPressureZone.Infrastructure.Resolvers;
 using LowPressureZone.Scheduling.Domain.ScheduleAggregate;
-using LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity;
-using LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity.PrerecordedMixObject;
+using LowPressureZone.Scheduling.Domain.UploadedMediaAggregate;
 
 namespace LowPressureZone.Api.Endpoints.Schedules.HourlySlots;
 
 [RegisterService<HourlySlotPrerecordedMixHandler>(LifeTime.Scoped)]
 public class HourlySlotPrerecordedMixHandler(
     PrerecordedMixFileProcessor fileProcessor,
-    PrerecordedMixCleanupService cleanupService)
+    IAzuraCastMediaPathResolver pathResolver,
+    IS3Adapter s3,
+    IEventBus eventBus)
 {
-    public async Task<DomainResult<PrerecordedMix>> AddNewMixFile<TRequest, TResponse>(
-        Endpoint<TRequest, TResponse> endpoint,
-        Schedule schedule,
+    public async Task<DomainResult<UploadedMedia>> ValidateAndUploadMixFile(
         HourlySlotRequest request,
-        CancellationToken ct) where TRequest : notnull
+        string performerName,
+        Schedule schedule,
+        CancellationToken ct)
     {
         Debug.Assert(request.File is not null);
 
-        var processResult = await fileProcessor.ProcessRequestFileToMp3Async(request, ct);
+        var processResult = await fileProcessor.ProcessPrerecordedMixFileToMp3Async(request, ct);
         if (processResult.IsError)
         {
-            endpoint.ValidationFailures.AddRange(processResult.Error);
-            endpoint.ThrowIfAnyErrors();
+            return processResult.Switch<UploadedMedia>();
         }
 
-        var enqueueResult = await fileProcessor.EnqueuePrerecordedMixAsync(request,
-                                                                           schedule.TimeRange.StartsAt,
-                                                                           processResult.Value,
-                                                                           ct);
-        if (enqueueResult.IsError)
+        var localFilePath = processResult.Value;
+
+        try
         {
-            endpoint.ThrowError(enqueueResult.Error);
+            await using var fileStream = File.OpenRead(localFilePath);
+            var uploadFileName = MediaFileNameResolver.Resolve(request.StartsAt, performerName, request.Subtitle);
+            var uploadFilePath = pathResolver.ResolveFilePath(AzuraCastMediaDirectory.Prerecords, uploadFileName);
+            var uploadResult = await s3.PutObjectAsync(fileStream, uploadFilePath, ct);
+            fileStream.Close();
+            File.Delete(localFilePath);
+            if (uploadResult.HttpStatusCode.IsError())
+            {
+                await eventBus.PublishAsync(new NotifiableCircumstanceOccurred(nameof(ValidateAndUploadMixFile),
+                                                                               $"Upload failed with status code {uploadResult.HttpStatusCode}"),
+                                            cancellation: ct);
+                return DomainResult.Err<UploadedMedia>(new RuleError("Upload to external provider failed",
+                                                                     nameof(request.File)));
+            }
+
+            var uploadedMediaResult = UploadedMedia.Create(uploadFileName, uploadFilePath);
+            return uploadedMediaResult;
         }
-
-        return PrerecordedMix.Create(true, request.File.FileName, enqueueResult.Value);
-    }
-
-    public async Task<DomainResult<PrerecordedMix>> ReplaceMixFile<TRequest, TResponse>(
-        Endpoint<TRequest, TResponse> endpoint,
-        HourlySlot slot,
-        HourlySlotRequest request,
-        CancellationToken ct) where TRequest : notnull
-    {
-        Debug.Assert(request.File is not null);
-
-        var result = await fileProcessor.UpdateEnqueuedPrerecordedMixAsync(slot.Id, request, ct);
-        if (result.IsError)
+        catch (Exception ex)
         {
-            endpoint.ValidationFailures.AddRange(result.Error);
-            endpoint.ThrowIfAnyErrors();
+            await eventBus.PublishAsync(new NotifiableCircumstanceOccurred(nameof(ValidateAndUploadMixFile), null, ex),
+                                        cancellation: ct);
+            throw;
         }
-
-        return PrerecordedMix.Create(true, Path.GetFileName(request.File.FileName), result.Value);
-    }
-
-    public async Task<DomainResult<NoValue>> DeleteMixFile<TRequest, TResponse>(
-        Endpoint<TRequest, TResponse> endpoint,
-        HourlySlot slot) where TRequest : notnull
-    {
-        Debug.Assert(slot.Prerecord.AzuraCastMediaId.HasValue);
-
-        var deleteResult = await cleanupService.DeleteEnqueuedPrerecordedMixAsync(slot.Prerecord.AzuraCastMediaId!.Value);
-        if (deleteResult.IsError)
-        {
-            endpoint.ThrowError(deleteResult.Error);
-        }
-
-        return DomainResult.Ok();
     }
 }

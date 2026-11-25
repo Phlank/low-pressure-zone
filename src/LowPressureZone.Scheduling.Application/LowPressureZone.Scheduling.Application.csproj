@@ -15,10 +15,12 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Quartz" Version="4.7.3" />
-        <PackageReference Include="WolverineFx" Version="6.64.2" />
+        <PackageReference Include="WolverineFx" Version="7.0.0-beta.1" />
+        <PackageReference Include="WolverineFx.EntityFrameworkCore" Version="7.0.0-beta.1" />
     </ItemGroup>
     
     <ItemGroup>
+      <ProjectReference Include="..\LowPressureZone.Adapter.AzuraCast\LowPressureZone.Adapter.AzuraCast.csproj" />
       <ProjectReference Include="..\LowPressureZone.Data\LowPressureZone.Data.csproj" />
       <ProjectReference Include="..\LowPressureZone.Domain\LowPressureZone.Domain.csproj" />
       <ProjectReference Include="..\LowPressureZone.Identity\LowPressureZone.Identity.csproj" />

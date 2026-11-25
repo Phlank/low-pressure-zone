@@ -1,6 +1,6 @@
 ﻿using FastEndpoints;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Api.Rules;
+using LowPressureZone.Api.Permissions;
 using LowPressureZone.Scheduling.Domain.CommunityAggregate.RelationshipEntity;
 
 namespace LowPressureZone.Api.Endpoints.Communities.Relationships;

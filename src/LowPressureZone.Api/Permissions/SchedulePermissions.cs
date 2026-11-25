@@ -1,11 +1,11 @@
 ﻿using System.Security.Claims;
 using FastEndpoints;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Scheduling.Domain.ScheduleAggregate;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
+using LowPressureZone.Scheduling.Domain.ScheduleAggregate;
 
-namespace LowPressureZone.Api.Rules;
+namespace LowPressureZone.Api.Permissions;
 
 [RegisterService<SchedulePermissions>(LifeTime.Singleton)]
 public sealed class SchedulePermissions(IHttpContextAccessor contextAccessor)

@@ -1,6 +1,6 @@
 using FastEndpoints;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Api.Rules;
+using LowPressureZone.Api.Permissions;
 using LowPressureZone.Data;
 using LowPressureZone.Scheduling.Domain.ScheduleAggregate.HourlySlotEntity;
 using LowPressureZone.Identity.Constants;
@@ -52,19 +52,22 @@ public class PostHourlySlot(
             await Send.UnauthorizedAsync(ct);
             return;
         }
-        
+
         logger.LogInformation("Processing file for hourly slot...");
 
-        var prerecordedMixResult = request.File is not null
-                                       ? await mixHandler.AddNewMixFile(this, schedule, request, ct)
-                                       : null;
+        var uploadedMixResult = request.File is not null
+                                    ? await mixHandler.ValidateAndUploadMixFile(request,
+                                                                                performer.Name,
+                                                                                schedule,
+                                                                                ct)
+                                    : null;
 
-        if (prerecordedMixResult is not null)
+        if (uploadedMixResult is not null)
         {
-            logger.LogInformation("File processing failed...");
-            await this.PublishOrThrowAsync(prerecordedMixResult);
+            this.ThrowIfDomainErrors(uploadedMixResult);
+            dataContext.UploadedMedia.Add(uploadedMixResult.Value);
         }
-        
+
         logger.LogInformation("File processed; persisting slot with prerecorded mix details...");
 
         var slotResult = HourlySlot.Create(schedule.Id,
@@ -72,17 +75,17 @@ public class PostHourlySlot(
                                            request.StartsAt,
                                            request.Duration,
                                            request.Subtitle,
-                                           prerecordedMixResult?.Value.UploadedFileName,
-                                           prerecordedMixResult?.Value.AzuraCastMediaId,
+                                           request.File?.FileName,
+                                           uploadedMixResult?.Value.Id,
                                            request.ReminderTime);
         this.ThrowIfDomainErrors(slotResult);
-        
+
         var addResult = schedule.AddHourlySlot(slotResult.Value);
         this.ThrowIfDomainErrors(addResult);
-        
+
         await dataContext.SaveChangesAsync(ct);
         await this.PublishEventsAsync([.. slotResult.Events, .. addResult.Events]);
-        
+
         HttpContext.ExposeLocation();
         await Send.CreatedAtAsync<GetHourlySlotById>(new { ScheduleId = id, slotResult.Value.Id }, cancellation: ct);
     }

@@ -2,7 +2,7 @@
 using LowPressureZone.Api.Endpoints.Communities;
 using LowPressureZone.Api.Endpoints.Schedules.ClashSlots;
 using LowPressureZone.Api.Endpoints.Schedules.HourlySlots;
-using LowPressureZone.Api.Rules;
+using LowPressureZone.Api.Permissions;
 using LowPressureZone.Scheduling.Domain.ScheduleAggregate;
 using Shouldly;
 

@@ -1,6 +1,7 @@
 using FastEndpoints;
 using LowPressureZone.Adapter.AzuraCast.Clients;
 using LowPressureZone.Core;
+using Results = LowPressureZone.Core.Results;
 
 namespace LowPressureZone.Api.Services.Files;
 
@@ -13,7 +14,7 @@ public sealed class PrerecordedMixCleanupService(
     {
         var getMediaResult = await azuraCastClient.GetMediaAsync(azuraCastMediaId);
         if (getMediaResult.IsError)
-            return Result.Err<bool>("Unable to retrieve media in AzuraCast");
+            return Results.Err<bool>("Unable to retrieve media in AzuraCast");
 
         var mediaId = getMediaResult.Value.Id;
         var isPlaylistDeleteError = false;
@@ -27,11 +28,11 @@ public sealed class PrerecordedMixCleanupService(
 
         var deleteMediaResult = await azuraCastClient.DeleteMediaAsync(mediaId);
         if (deleteMediaResult.IsError)
-            return Result.Err<bool>("Failed to delete media in AzuraCast");
+            return Results.Err<bool>("Failed to delete media in AzuraCast");
 
         if (isPlaylistDeleteError)
             logger.LogWarning("Failed to delete AzuraCast playlist for timeslot, but successfully deleted the media.");
 
-        return Result.Ok(true);
+        return Results.Ok(true);
     }
 }

@@ -1,12 +1,12 @@
 ﻿using System.Security.Claims;
 using FastEndpoints;
 using LowPressureZone.Api.Extensions;
-using LowPressureZone.Scheduling.Domain.CommunityAggregate;
 using LowPressureZone.Identity.Constants;
 using LowPressureZone.Identity.Extensions;
+using LowPressureZone.Scheduling.Domain.CommunityAggregate;
 using Shouldly;
 
-namespace LowPressureZone.Api.Rules;
+namespace LowPressureZone.Api.Permissions;
 
 [RegisterService<CommunityPermissions>(LifeTime.Singleton)]
 public sealed class CommunityPermissions(IHttpContextAccessor contextAccessor)
